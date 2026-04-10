@@ -1,0 +1,173 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  CloserFlow — premium SaaS: strakke typografie, diepte, rust.
+*/
+@layer base {
+  :root {
+    --background: 210 32% 98%;
+    --foreground: 224 64% 5%;
+    --card: 0 0% 100%;
+    --card-foreground: 224 64% 5%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 64% 5%;
+    --primary: 222 48% 32%;
+    --primary-foreground: 210 40% 99%;
+    --secondary: 220 16% 95%;
+    --secondary-foreground: 224 50% 8%;
+    --muted: 220 14% 94%;
+    --muted-foreground: 220 10% 36%;
+    --accent: 262 48% 48%;
+    --accent-foreground: 210 40% 99%;
+    --destructive: 0 72% 42%;
+    --destructive-foreground: 210 40% 99%;
+    --border: 220 14% 78%;
+    --input: 220 14% 82%;
+    --ring: 222 52% 36%;
+    --radius: 0.8125rem;
+    --chart-1: 222 52% 36%;
+    --chart-2: 262 48% 48%;
+    --chart-3: 142 56% 40%;
+    --chart-4: 32 90% 48%;
+    --chart-5: 340 65% 50%;
+    --shadow-sm: 0 1px 2px 0 rgb(15 23 42 / 0.04);
+    --shadow-md: 0 4px 20px -6px rgb(15 23 42 / 0.1),
+      0 1px 0 0 rgb(15 23 42 / 0.05);
+    --shadow-lg: 0 20px 44px -18px rgb(15 23 42 / 0.12),
+      0 1px 0 0 rgb(15 23 42 / 0.04);
+    --cf-mesh-a: hsl(222 42% 42% / 0.07);
+    --cf-mesh-b: hsl(262 40% 55% / 0.05);
+    --cf-mesh-c: hsl(220 30% 50% / 0.04);
+  }
+
+  .dark {
+    --background: 228 32% 4%;
+    --foreground: 210 36% 98%;
+    --card: 222 26% 7%;
+    --card-foreground: 210 36% 98%;
+    --popover: 222 26% 7.5%;
+    --popover-foreground: 210 36% 98%;
+    --primary: 220 42% 58%;
+    --primary-foreground: 210 40% 99%;
+    --secondary: 220 14% 12%;
+    --secondary-foreground: 210 36% 96%;
+    --muted: 220 14% 13%;
+    --muted-foreground: 215 14% 62%;
+    --accent: 262 58% 56%;
+    --accent-foreground: 210 40% 99%;
+    --destructive: 0 58% 46%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 220 14% 22%;
+    --input: 220 14% 22%;
+    --ring: 220 42% 58%;
+    --chart-1: 220 42% 56%;
+    --chart-2: 262 58% 56%;
+    --chart-3: 142 56% 46%;
+    --chart-4: 32 90% 52%;
+    --chart-5: 340 72% 56%;
+    --shadow-sm: 0 1px 0 0 hsl(220 16% 12% / 0.85);
+    --shadow-md: 0 4px 24px -8px rgb(0 0 0 / 0.5),
+      0 1px 0 0 hsl(220 16% 18% / 0.35);
+    --shadow-lg: 0 20px 48px -20px rgb(0 0 0 / 0.55),
+      0 1px 0 0 hsl(220 16% 20% / 0.3);
+    --cf-mesh-a: hsl(var(--primary) / 0.08);
+    --cf-mesh-b: hsl(var(--accent) / 0.05);
+    --cf-mesh-c: hsl(220 40% 40% / 0.04);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    @apply scroll-smooth;
+    scrollbar-gutter: stable;
+  }
+  body {
+    @apply min-h-screen bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  ::selection {
+    @apply bg-primary/25 text-foreground;
+  }
+}
+
+@layer utilities {
+  .cf-app-mesh {
+    background-image: radial-gradient(
+        ellipse 130% 90% at 50% -35%,
+        var(--cf-mesh-a),
+        transparent 58%
+      ),
+      radial-gradient(
+        ellipse 70% 45% at 100% 0%,
+        var(--cf-mesh-b),
+        transparent 50%
+      ),
+      radial-gradient(
+        ellipse 80% 50% at 0% 100%,
+        var(--cf-mesh-c),
+        transparent 45%
+      );
+  }
+  .glass {
+    @apply border border-border/60 bg-card/60 shadow-[var(--shadow-md)] backdrop-blur-2xl dark:border-white/[0.07] dark:bg-card/45 dark:shadow-[var(--shadow-md)];
+  }
+  .glass-bubble {
+    @apply rounded-2xl border border-border/50 bg-background/55 shadow-inner-soft backdrop-blur-xl dark:border-white/[0.1] dark:bg-white/[0.04];
+  }
+  .cf-surface {
+    @apply rounded-2xl border border-border/65 bg-card/85 shadow-[var(--shadow-md)] backdrop-blur-xl dark:border-white/[0.07] dark:bg-card/90;
+  }
+  .cf-transition {
+    @apply transition-all duration-200 ease-out;
+  }
+  .cf-hover-lift {
+    @apply cf-transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-lg)];
+  }
+  .cf-hot-glow {
+    @apply rounded-md ring-1 ring-primary/15 bg-primary/[0.06];
+  }
+  .cf-shimmer {
+    background: linear-gradient(
+      110deg,
+      hsl(var(--muted) / 0.22) 0%,
+      hsl(var(--muted) / 0.42) 45%,
+      hsl(var(--muted) / 0.22) 90%
+    );
+    background-size: 200% 100%;
+    @apply animate-cf-shimmer-bg;
+  }
+  .cf-stale-banner {
+    animation: cf-slide 0.5s ease-out both;
+  }
+  .cf-eyebrow {
+    @apply text-[0.6875rem] font-semibold uppercase tracking-[0.2em] text-primary;
+  }
+  .cf-heading-xl {
+    @apply text-balance font-extrabold tracking-tight text-foreground;
+  }
+  /** Dashboard — premium panelen (donker + licht) */
+  .cf-dashboard-panel {
+    @apply relative overflow-hidden rounded-2xl border border-border/70 bg-gradient-to-b from-card via-card/95 to-card/80 shadow-[0_1px_0_0_hsl(220_13%_70%/0.55),0_16px_40px_-20px_rgb(15_23_42/0.1)] dark:border-white/[0.1] dark:from-card dark:via-card/95 dark:to-[hsl(222_26%_5%)] dark:shadow-[0_1px_0_0_hsl(220_16%_22%/0.55),0_20px_50px_-24px_rgb(0_0_0/0.5)];
+  }
+  .cf-dashboard-panel::before {
+    content: "";
+    @apply pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/35 to-transparent;
+  }
+  .cf-workflow-shell {
+    @apply relative overflow-hidden rounded-2xl border border-border/45 bg-gradient-to-br from-primary/[0.04] via-muted/30 to-muted/10 shadow-[0_2px_12px_-4px_rgb(0_0_0/0.08)] dark:border-white/[0.06] dark:from-primary/[0.08] dark:via-card/40 dark:to-card/20 dark:shadow-[0_4px_24px_-12px_rgb(0_0_0/0.4)];
+  }
+  .shadow-inner-soft {
+    box-shadow: inset 0 1px 0 0 hsl(0 0% 0% / 0.06);
+  }
+  .dark .shadow-inner-soft {
+    box-shadow: inset 0 1px 0 0 hsl(210 40% 100% / 0.06);
+  }
+}

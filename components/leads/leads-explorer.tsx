@@ -1,0 +1,232 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import Link from "next/link";
+import type { Lead, LeadStatus } from "@/lib/types";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { LeadStatusMenu } from "@/components/leads/lead-status-menu";
+import { formatCurrency, formatDateTime } from "@/lib/utils";
+import { useDebouncedValue } from "@/hooks/use-debounce";
+import { Inbox, Search } from "lucide-react";
+import { computeDisplayScore, leadTemperature } from "@/lib/sales/scoring";
+import { TemperatureBadge } from "@/components/sales/temperature-badge";
+import { NewLeadDialog } from "@/components/leads/new-lead-dialog";
+
+const SOURCES = [
+  "all",
+  "Website",
+  "Google Maps",
+  "WhatsApp",
+  "Referral",
+  "Facebook",
+  "Instagram",
+  "Cold call",
+];
+
+export function LeadsExplorer({
+  leads,
+  staleReplyLeadIds = [],
+  demoMode = false,
+}: {
+  leads: Lead[];
+  staleReplyLeadIds?: string[];
+  demoMode?: boolean;
+}) {
+  const [q, setQ] = useState("");
+  const [status, setStatus] = useState<LeadStatus | "all">("all");
+  const [source, setSource] = useState<string>("all");
+  const [sort, setSort] = useState<"activity" | "value" | "score">("activity");
+  const dq = useDebouncedValue(q, 250);
+
+  const stale = useMemo(
+    () => new Set(staleReplyLeadIds),
+    [staleReplyLeadIds],
+  );
+
+  const filtered = useMemo(() => {
+    let list = [...leads];
+    if (dq.trim()) {
+      const n = dq.toLowerCase();
+      list = list.filter(
+        (l) =>
+          l.full_name.toLowerCase().includes(n) ||
+          (l.email || "").toLowerCase().includes(n) ||
+          (l.intent || "").toLowerCase().includes(n),
+      );
+    }
+    if (status !== "all") list = list.filter((l) => l.status === status);
+    if (source !== "all") list = list.filter((l) => (l.source || "") === source);
+    if (sort === "activity") {
+      list.sort(
+        (a, b) =>
+          (b.last_message_at ? new Date(b.last_message_at).getTime() : 0) -
+          (a.last_message_at ? new Date(a.last_message_at).getTime() : 0),
+      );
+    } else if (sort === "value") {
+      list.sort(
+        (a, b) => (b.estimated_value || 0) - (a.estimated_value || 0),
+      );
+    } else {
+      list.sort(
+        (a, b) =>
+          computeDisplayScore(b, { staleReply: stale.has(b.id) }) -
+          computeDisplayScore(a, { staleReply: stale.has(a.id) }),
+      );
+    }
+    return list;
+  }, [leads, dq, status, source, sort, stale]);
+
+  return (
+    <div className="space-y-8">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div className="flex w-full flex-1 flex-col gap-3 sm:flex-row sm:items-stretch">
+          <div className="relative min-w-0 flex-1">
+            <Search className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Zoek op naam, e-mail, intentie…"
+              className="h-12 pl-11"
+            />
+          </div>
+          <NewLeadDialog disabled={demoMode} />
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <select
+            className="h-12 min-h-[44px] rounded-xl border border-white/[0.08] bg-background/50 px-4 text-sm shadow-inner-soft"
+            value={status}
+            onChange={(e) => setStatus(e.target.value as LeadStatus | "all")}
+          >
+            <option value="all">Alle statussen</option>
+            <option value="new">Nieuw</option>
+            <option value="active">Actief</option>
+            <option value="quote_sent">Offerte verstuurd</option>
+            <option value="appointment_booked">Afspraak ingepland</option>
+            <option value="won">Gewonnen</option>
+            <option value="lost">Verloren</option>
+          </select>
+          <select
+            className="h-12 min-h-[44px] rounded-xl border border-white/[0.08] bg-background/50 px-4 text-sm shadow-inner-soft"
+            value={source}
+            onChange={(e) => setSource(e.target.value)}
+          >
+            {SOURCES.map((s) => (
+              <option key={s} value={s}>
+                {s === "all"
+                  ? "Alle bronnen"
+                  : s === "Referral"
+                    ? "Doorverwijzing"
+                    : s === "Cold call"
+                      ? "Koude acquisitie"
+                      : s}
+              </option>
+            ))}
+          </select>
+          <select
+            className="h-12 min-h-[44px] rounded-xl border border-white/[0.08] bg-background/50 px-4 text-sm shadow-inner-soft"
+            value={sort}
+            onChange={(e) =>
+              setSort(e.target.value as "activity" | "value" | "score")
+            }
+          >
+            <option value="activity">Sorteer: laatste activiteit</option>
+            <option value="value">Sorteer: waarde</option>
+            <option value="score">Sorteer: score</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="overflow-hidden rounded-2xl border border-white/[0.06] bg-card/40 shadow-premium">
+        {filtered.length === 0 ? (
+          <div className="flex flex-col items-center px-8 py-16 text-center">
+            <div className="mb-5 flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <Inbox className="size-7" />
+            </div>
+            <p className="text-lg font-semibold tracking-tight text-foreground">
+              Geen leads gevonden
+            </p>
+            <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
+              Wis filters — of breng meer inbound binnen zodat CloserFlow elk bericht
+              automatisch vastlegt.
+            </p>
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Naam</TableHead>
+                <TableHead>Bron</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Prioriteit</TableHead>
+                <TableHead>Score</TableHead>
+                <TableHead>Waarde</TableHead>
+                <TableHead>Laatste activiteit</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filtered.map((l) => {
+                const display = computeDisplayScore(l, {
+                  staleReply: stale.has(l.id),
+                });
+                const temp = leadTemperature(l, display);
+                return (
+                  <TableRow key={l.id}>
+                    <TableCell className="font-medium">
+                      <Link
+                        href={`/dashboard/leads/${l.id}`}
+                        className="text-foreground transition-colors hover:text-primary"
+                      >
+                        {l.full_name}
+                      </Link>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {l.source || "—"}
+                    </TableCell>
+                    <TableCell>
+                      <LeadStatusMenu
+                        leadId={l.id}
+                        status={l.status}
+                        demoMode={demoMode}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <TemperatureBadge temp={temp} />
+                        {stale.has(l.id) ? (
+                          <span className="rounded-full border border-destructive/25 bg-destructive/10 px-2.5 py-0.5 text-2xs font-semibold uppercase tracking-wide text-destructive">
+                            Te laat
+                          </span>
+                        ) : null}
+                      </div>
+                    </TableCell>
+                    <TableCell className="tabular-nums text-muted-foreground">
+                      {display}
+                    </TableCell>
+                    <TableCell className="text-base font-semibold tabular-nums text-foreground">
+                      {l.estimated_value != null
+                        ? formatCurrency(l.estimated_value)
+                        : "—"}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {l.last_message_at
+                        ? formatDateTime(l.last_message_at)
+                        : "—"}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        )}
+      </div>
+    </div>
+  );
+}

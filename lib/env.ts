@@ -1,14 +1,32 @@
+import { cookies } from "next/headers";
+
+/** Demo dataset + UI — env, sidebar toggle, anonymous preview, or logged-in demo. */
 export function isDemoMode(): boolean {
-  return process.env.NEXT_PUBLIC_CLOSERFLOW_DEMO === "true";
+  if (process.env.NEXT_PUBLIC_CLOSERFLOW_DEMO === "true") return true;
+  try {
+    const c = cookies();
+    return (
+      c.get("closerflow_demo")?.value === "1" ||
+      c.get("cf_anon_demo")?.value === "1"
+    );
+  } catch {
+    return false;
+  }
 }
 
-export function hasSupabaseEnv(): boolean {
-  return Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL &&
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  );
+export function isAnonymousPreviewSession(): boolean {
+  try {
+    return cookies().get("cf_anon_demo")?.value === "1";
+  } catch {
+    return false;
+  }
 }
 
-export function hasOpenAIKey(): boolean {
-  return Boolean(process.env.OPENAI_API_KEY);
+/** Founder "sales mode" — stronger value/urgency cues in product UI. */
+export function isSalesMode(): boolean {
+  try {
+    return cookies().get("cf_sales_mode")?.value === "1";
+  } catch {
+    return false;
+  }
 }

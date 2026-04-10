@@ -5,8 +5,10 @@ export async function createClient() {
   const cookieStore = await cookies();
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key) {
-    throw new Error("Missing Supabase server environment variables");
+  if (!url?.trim() || !key?.trim()) {
+    throw new Error(
+      "Missing Supabase env: set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in closerflow/.env.local (copy from .env.example, values from Supabase → Project Settings → API).",
+    );
   }
 
   return createServerClient(url, key, {

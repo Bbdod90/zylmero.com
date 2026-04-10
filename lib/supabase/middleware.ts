@@ -1,19 +1,13 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const DEMO = process.env.NEXT_PUBLIC_CLOSERFLOW_DEMO === "true";
-
 export async function updateSession(request: NextRequest) {
-  if (DEMO) {
-    return NextResponse.next({ request });
-  }
-
-  let supabaseResponse = NextResponse.next({ request });
+  let response = NextResponse.next({ request });
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!url || !key) {
-    return supabaseResponse;
+    return response;
   }
 
   const supabase = createServerClient(url, key, {
@@ -25,14 +19,24 @@ export async function updateSession(request: NextRequest) {
         cookiesToSet.forEach(({ name, value }) =>
           request.cookies.set(name, value),
         );
-        supabaseResponse = NextResponse.next({ request });
+        response = NextResponse.next({ request });
         cookiesToSet.forEach(({ name, value, options }) =>
-          supabaseResponse.cookies.set(name, value, options),
+          response.cookies.set(name, value, options),
         );
       },
     },
   });
 
   await supabase.auth.getUser();
-  return supabaseResponse;
+
+  const ref = request.nextUrl.searchParams.get("ref");
+  if (ref && /^[A-Z0-9]{6,12}$/i.test(ref)) {
+    response.cookies.set("cf_referral_code", ref.toUpperCase().slice(0, 12), {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 90,
+      sameSite: "lax",
+    });
+  }
+
+  return response;
 }

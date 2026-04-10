@@ -1,0 +1,43 @@
+<!-- Plak in Supabase → Authentication → Email Templates → Confirm signup (HTML body).
+     Onderwerp: Bevestig je account – CloserFlow -->
+
+<h2 style="font-family:sans-serif;">Bevestig je account</h2>
+
+<p style="font-family:sans-serif;">Je bent er bijna.</p>
+
+<p style="font-family:sans-serif;">
+Klik op de knop hieronder om je account te activeren en direct te starten:
+</p>
+
+<p>
+  <a href="{{ .ConfirmationURL }}" 
+     style="
+       background:#4F6EF7;
+       color:white;
+       padding:14px 22px;
+       border-radius:10px;
+       text-decoration:none;
+       font-weight:600;
+       display:inline-block;
+     ">
+     Account bevestigen
+  </a>
+</p>
+
+<p style="font-family:sans-serif;margin-top:20px;">
+Werkt de knop niet? Kopieer en plak deze link in je browser:
+</p>
+
+<p style="font-family:sans-serif;word-break:break-all;">
+{{ .ConfirmationURL }}
+</p>
+
+<br>
+
+<p style="font-family:sans-serif;color:#888;">
+Na bevestiging word je automatisch ingelogd en kom je direct in je dashboard.
+</p>
+
+<p style="font-family:sans-serif;">
+— CloserFlow
+</p>

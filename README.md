@@ -1,36 +1,28 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CloserFlow
 
-## Getting Started
+Production SaaS: AI-assisted sales for garages and SMB. Stack: Next.js 14 App Router, TypeScript, Tailwind, Supabase (Auth + Postgres + RLS), OpenAI, Recharts, date-fns, Sonner.
 
-First, run the development server:
+## Setup
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. Create a Supabase project. Run `supabase/schema.sql` in the SQL editor (baseline schema).
+2. Run each file in `supabase/migrations/` in chronological order in the SQL editor (or use Supabase CLI). This adds `automations`, `leads_marketing`, referrals, widget columns, and policies. Skipping this step causes missing-table errors for automations and the homepage lead form.
+3. Copy `.env.example` to `.env.local` and set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (marketing leads + e-mail queue), `NEXT_PUBLIC_SITE_URL`, `OPENAI_API_KEY`.
+4. In Supabase Auth → URL Configuration: Site URL = je `NEXT_PUBLIC_SITE_URL` (bijv. `https://jouw-app.vercel.app`). Redirect URLs: `https://jouw-app.vercel.app/**` plus `/auth/callback` en `/reset-password`.
+5. `npm install && npm run dev`
+6. Sign up at `/signup`, complete `/dashboard/onboarding`.
+7. Optional: run `supabase/seed.sql` after the first user exists (associates demo data to `auth.users`).
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Routes
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `/login`, `/signup`
+- `/dashboard`, `/dashboard/insights`, `/dashboard/playbooks`, `/dashboard/integrations`, `/dashboard/leads`, `/dashboard/leads/[id]`, `/dashboard/inbox`, `/dashboard/quotes`, `/dashboard/appointments`, `/dashboard/settings`, `/dashboard/ai`, `/dashboard/automations`, `/dashboard/onboarding`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Server actions
 
-## Learn More
+- `actions/ai.ts` — `summarizeLeadConversation`, `generateLeadReply`, `generateQuoteDraft`, `moveLeadToSuggestedStage`, `advanceLeadStageLinearAction`
+- `actions/inbox.ts`, `actions/leads.ts`, `actions/settings.ts`, `actions/automations.ts`, `actions/auth.ts`, `actions/onboarding.ts`
 
-To learn more about Next.js, take a look at the following resources:
+## SQL
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `supabase/schema.sql` — tables, indexes, `updated_at` triggers, RLS (`owner_user_id`)
+- `supabase/seed.sql` — garage demo (8 leads, conversations, messages, quotes, appointments, automations)

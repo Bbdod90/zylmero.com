@@ -6,6 +6,7 @@ const config: Config = {
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./styles/**/*.css",
   ],
   theme: {
     extend: {
@@ -55,6 +56,19 @@ const config: Config = {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        xl: "1rem",
+        "2xl": "1.25rem",
+        "3xl": "1.5rem",
+      },
+      spacing: {
+        4.5: "1.125rem",
+        13: "3.25rem",
+        15: "3.75rem",
+        18: "4.5rem",
+        22: "5.5rem",
+      },
+      fontSize: {
+        "2xs": ["0.6875rem", { lineHeight: "1rem" }],
       },
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
@@ -62,20 +76,48 @@ const config: Config = {
       },
       keyframes: {
         "fade-in": {
-          from: { opacity: "0", transform: "translateY(4px)" },
-          to: { opacity: "1", transform: "translateY(0)" },
+          from: { opacity: "0" },
+          to: { opacity: "1" },
         },
         shimmer: {
           "100%": { transform: "translateX(100%)" },
+        },
+        "cf-scan": {
+          "0%, 100%": { opacity: "0.4" },
+          "50%": { opacity: "1" },
+        },
+        "cf-slide": {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
+        },
+        "cf-hot-pulse": {
+          "0%, 100%": {
+            boxShadow: "0 0 0 0 hsl(32 95% 55% / 0.35)",
+          },
+          "50%": {
+            boxShadow: "0 0 20px 2px hsl(32 95% 50% / 0.2)",
+          },
+        },
+        "cf-shimmer-bg": {
+          "100%": { backgroundPosition: "200% 0" },
         },
       },
       animation: {
         "fade-in": "fade-in 0.35s ease-out forwards",
         shimmer: "shimmer 1.5s infinite",
+        "cf-scan": "cf-scan 2s ease-in-out infinite",
+        "cf-slide": "cf-slide 0.45s ease-out forwards",
+        "cf-hot-pulse": "cf-hot-pulse 2.4s ease-in-out infinite",
+        "cf-shimmer-bg": "cf-shimmer-bg 1.8s ease-in-out infinite",
       },
       boxShadow: {
-        glow: "0 0 0 1px hsl(var(--ring) / 0.25), 0 18px 50px -24px hsl(var(--primary) / 0.35)",
-        card: "0 1px 0 0 hsl(var(--border) / 0.8), 0 12px 40px -28px rgb(0 0 0 / 0.55)",
+        glow: "0 0 0 1px hsl(var(--ring) / 0.18), 0 18px 44px -24px hsl(var(--primary) / 0.28)",
+        card: "0 4px 24px -10px rgb(0 0 0 / 0.45), 0 1px 0 0 hsl(220 16% 18% / 0.4)",
+        premium:
+          "0 1px 0 0 hsl(220 13% 88% / 0.9), 0 12px 40px -16px rgb(15 23 42 / 0.08), 0 0 0 1px hsl(220 13% 88% / 0.5)",
+      },
+      transitionDuration: {
+        250: "250ms",
       },
     },
   },

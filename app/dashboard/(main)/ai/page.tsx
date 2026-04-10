@@ -1,0 +1,40 @@
+import { getAuth } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
+import { PageFrame } from "@/components/layout/page-frame";
+import { AiPanel } from "@/components/settings/ai-panel";
+
+export default async function AiSettingsPage() {
+  const auth = await getAuth();
+  if (!auth.company) return null;
+  const supabase = await createClient();
+  const { data: s } = await supabase
+    .from("company_settings")
+    .select("*")
+    .eq("company_id", auth.company.id)
+    .maybeSingle();
+
+  const rawPrefs = s?.automation_preferences;
+  let automationNote = "";
+  if (rawPrefs && typeof rawPrefs === "object" && rawPrefs !== null) {
+    if ("note" in rawPrefs) {
+      automationNote = String((rawPrefs as { note?: string }).note || "");
+    } else {
+      const j = JSON.stringify(rawPrefs);
+      automationNote = j === "{}" ? "" : j;
+    }
+  }
+
+  return (
+    <PageFrame
+      title="AI-instellingen"
+      subtitle="Toon, antwoordstijl en voorkeuren voor je AI-closer."
+    >
+      <AiPanel
+        tone={s?.tone ?? null}
+        reply_style={s?.reply_style ?? null}
+        language={s?.language || "nl"}
+        automationNote={automationNote}
+      />
+    </PageFrame>
+  );
+}
