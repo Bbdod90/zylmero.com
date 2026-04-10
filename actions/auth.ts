@@ -100,7 +100,7 @@ export async function requestPasswordResetAction(
   const base = resolveSiteUrl();
   const supabase = await createClient();
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${base}/reset-password`,
+    redirectTo: `${base}/auth/callback?next=/reset-password`,
   });
   if (error) {
     return { error: mapAuthError(error.message) };
