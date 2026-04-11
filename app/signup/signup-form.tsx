@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useRef, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { signUpMarketingHookAction } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,10 +21,60 @@ function setReferralCookieClient(code: string) {
   document.cookie = `${COOKIE_REFERRAL}=${encodeURIComponent(v)}; Path=/; Max-Age=${maxAge}; SameSite=Lax${secure ? "; Secure" : ""}`;
 }
 
+function SignupPasswordField({
+  id,
+  label,
+  value,
+  onChange,
+  autoComplete,
+  disabled,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  autoComplete: string;
+  disabled?: boolean;
+}) {
+  const [visible, setVisible] = useState(false);
+
+  return (
+    <div className="space-y-2">
+      <Label htmlFor={id}>{label}</Label>
+      <div className="relative">
+        <Input
+          id={id}
+          type={visible ? "text" : "password"}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          autoComplete={autoComplete}
+          disabled={disabled}
+          className="rounded-xl pr-11"
+          minLength={8}
+          required
+        />
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="absolute right-1 top-1/2 size-9 -translate-y-1/2 rounded-lg text-muted-foreground"
+          onClick={() => setVisible((v) => !v)}
+          aria-label={visible ? "Verberg wachtwoord" : "Toon wachtwoord"}
+          tabIndex={-1}
+        >
+          {visible ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export function SignupForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const referral = searchParams.get("ref")?.trim().toUpperCase().slice(0, 12) ?? "";
+  const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [pending, setPending] = useState(false);
@@ -39,11 +90,15 @@ export function SignupForm() {
     const form = e.currentTarget;
     const fd = new FormData(form);
     const email = String(fd.get("email") || "").trim();
-    const password = String(fd.get("password") || "");
 
     try {
       if (!email || !password || password.length < 8) {
         setError("E-mail en wachtwoord (min. 8 tekens) zijn verplicht.");
+        submitLock.current = false;
+        return;
+      }
+      if (password !== passwordConfirm) {
+        setError("De wachtwoorden komen niet overeen.");
         submitLock.current = false;
         return;
       }
@@ -124,35 +179,38 @@ export function SignupForm() {
           className="rounded-xl"
         />
       </div>
-      <div className="space-y-2">
-        <Label htmlFor="password">Wachtwoord (min. 8 tekens)</Label>
-        <Input
-          id="password"
-          name="password"
-          type="password"
-          autoComplete="new-password"
-          required
-          minLength={8}
-          disabled={pending}
-          className="rounded-xl"
-        />
-        {error ? (
-          <div className="space-y-2 pt-1">
-            <p className="text-sm leading-relaxed text-red-600 dark:text-red-400/90">{error}</p>
-            {/account met dit e-mailadres|inloggen/i.test(error) ? (
-              <Link href="/login" className="text-sm font-medium text-primary hover:underline">
-                Ga naar inloggen
-              </Link>
-            ) : null}
-            {/registratiepogingen|wacht|te veel pogingen|rate limit/i.test(error) ? (
-              <p className="text-xs text-muted-foreground">
-                Tip: druk niet herhaald op de knop. Blijft dit terugkomen: verhoog limieten onder
-                Supabase → Authentication → Rate limits.
-              </p>
-            ) : null}
-          </div>
-        ) : null}
-      </div>
+      <SignupPasswordField
+        id="password"
+        label="Wachtwoord (min. 8 tekens)"
+        value={password}
+        onChange={setPassword}
+        autoComplete="new-password"
+        disabled={pending}
+      />
+      <SignupPasswordField
+        id="password-confirm"
+        label="Herhaal wachtwoord"
+        value={passwordConfirm}
+        onChange={setPasswordConfirm}
+        autoComplete="new-password"
+        disabled={pending}
+      />
+      {error ? (
+        <div className="space-y-2 pt-1">
+          <p className="text-sm leading-relaxed text-red-600 dark:text-red-400/90">{error}</p>
+          {/account met dit e-mailadres|inloggen/i.test(error) ? (
+            <Link href="/login" className="text-sm font-medium text-primary hover:underline">
+              Ga naar inloggen
+            </Link>
+          ) : null}
+          {/registratiepogingen|wacht|te veel pogingen|rate limit/i.test(error) ? (
+            <p className="text-xs text-muted-foreground">
+              Tip: druk niet herhaald op de knop. Blijft dit terugkomen: verhoog limieten onder
+              Supabase → Authentication → Rate limits.
+            </p>
+          ) : null}
+        </div>
+      ) : null}
       <Button type="submit" className="w-full rounded-xl" disabled={pending}>
         {pending ? "Account aanmaken…" : "Start gratis proefperiode"}
       </Button>
