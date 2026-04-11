@@ -61,6 +61,7 @@ export async function updateBusinessProfileAction(
       name,
       contact_email: contact_email || null,
       contact_phone: contact_phone || null,
+      profile_intake_completed: true,
     })
     .eq("id", auth.company.id);
 
@@ -100,6 +101,7 @@ export async function updateBusinessProfileAction(
 
   if (e2) return { error: e2.message };
   revalidatePath("/dashboard/settings");
+  revalidatePath("/dashboard", "layout");
   return { ok: true };
 }
 

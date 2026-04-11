@@ -29,6 +29,8 @@ export interface Company {
   name: string;
   owner_user_id: string;
   onboarding_completed: boolean;
+  /** false na overslaan wizard; true na volledige flow of opslaan Bedrijf in Instellingen */
+  profile_intake_completed: boolean;
   /** Canonical niche id (lib/niches.ts), bijv. garage, hair_salon */
   niche: string | null;
   contact_email: string | null;

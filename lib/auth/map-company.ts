@@ -32,6 +32,8 @@ export function mapCompanyRow(row: Record<string, unknown>): Company {
     name: row.name as string,
     owner_user_id: row.owner_user_id as string,
     onboarding_completed: Boolean(row.onboarding_completed),
+    profile_intake_completed:
+      row.profile_intake_completed === false ? false : true,
     niche: (row.niche as string) ?? null,
     contact_email: (row.contact_email as string) ?? null,
     contact_phone: (row.contact_phone as string) ?? null,

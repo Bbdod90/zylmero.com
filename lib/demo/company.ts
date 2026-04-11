@@ -15,6 +15,7 @@ export const DEMO_COMPANY: Company = {
   owner_user_id: DEMO_USER_ID,
   niche: "garage",
   onboarding_completed: true,
+  profile_intake_completed: true,
   contact_email: BRAND_DEMO_LOCAL_EMAIL,
   contact_phone: "+31 40 000 0000",
   trial_starts_at: null,

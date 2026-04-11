@@ -1,7 +1,10 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
-import { completeOnboardingAction } from "@/actions/onboarding";
+import {
+  completeOnboardingAction,
+  skipOnboardingWizardAction,
+} from "@/actions/onboarding";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -89,7 +92,9 @@ export function OnboardingWizard() {
   const [painNote, setPainNote] = useState("");
   const [response, setResponse] = useState("hours");
   const [pending, start] = useTransition();
+  const [skipPending, startSkip] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [skipError, setSkipError] = useState<string | null>(null);
 
   const leak = useMemo(
     () => monthlyLeak(Number(avgOrder) || 0, response),
@@ -137,6 +142,14 @@ export function OnboardingWizard() {
     });
   }
 
+  function skipWizard() {
+    setSkipError(null);
+    startSkip(async () => {
+      const res = await skipOnboardingWizardAction();
+      if (res?.error) setSkipError(res.error);
+    });
+  }
+
   const canStep0 = companyName.trim() && (niche !== "other" || nicheCustom.trim());
   const canStep2 = Number(avgOrder) > 0;
   const canStep1 = channels.size > 0;
@@ -155,9 +168,30 @@ export function OnboardingWizard() {
               In vijf korte stappen zie je waar je omzet blijft liggen — daarna richten we {BRAND_NAME} voor je
               in.
             </p>
+            <div className="mt-4 flex flex-col gap-2 border-t border-primary/15 pt-4 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-xs text-muted-foreground">
+                Liever direct verder? Je vult bedrijfsgegevens later in bij Instellingen.
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="shrink-0 rounded-lg border-border/80"
+                disabled={pending || skipPending}
+                onClick={skipWizard}
+              >
+                {skipPending ? "Bezig…" : "Overslaan — naar dashboard"}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
+
+      {skipError ? (
+        <div className="rounded-xl border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          {skipError}
+        </div>
+      ) : null}
 
       <Card className="overflow-hidden border-border/60 bg-card/90 shadow-2xl shadow-black/20">
         <CardHeader className="space-y-4 border-b border-border/50 bg-muted/20 px-6 pb-5 pt-6">
@@ -478,6 +512,18 @@ export function OnboardingWizard() {
               </Button>
             )}
           </div>
+          {step >= 1 && step <= 3 ? (
+            <div className="text-center">
+              <button
+                type="button"
+                className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
+                disabled={pending || !canStep0}
+                onClick={() => setStep(4)}
+              >
+                Stappen 2–4 overslaan — gebruik standaardwaarden
+              </button>
+            </div>
+          ) : null}
         </CardContent>
       </Card>
     </div>

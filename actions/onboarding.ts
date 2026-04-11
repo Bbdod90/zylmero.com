@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { getAuth } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -15,6 +16,177 @@ import {
 } from "@/lib/niches";
 
 export type OnboardingState = { error?: string };
+
+const QUICK_START_COMPANY_NAME = "Mijn bedrijf";
+const QUICK_START_NICHE: NicheId = "garage";
+
+/** Verplaatst automation_preferences naar niche_intake en verwijdert de kolom uit de payload. */
+function rowWithoutAutomationPreferences(
+  row: Record<string, unknown>,
+): Record<string, unknown> {
+  const prefs = (row.automation_preferences as Record<string, unknown>) || {};
+  const baseIntake =
+    row.niche_intake &&
+    typeof row.niche_intake === "object" &&
+    !Array.isArray(row.niche_intake)
+      ? { ...(row.niche_intake as Record<string, string>) }
+      : {};
+  const prefIntake =
+    prefs.niche_intake &&
+    typeof prefs.niche_intake === "object" &&
+    !Array.isArray(prefs.niche_intake)
+      ? (prefs.niche_intake as Record<string, string>)
+      : {};
+  const nicheKey =
+    typeof prefs.niche_key === "string" ? prefs.niche_key : undefined;
+  const onboardingFlow =
+    prefs.onboarding_flow != null ? String(prefs.onboarding_flow) : undefined;
+  const { automation_preferences: _a, ...rest } = row;
+  return {
+    ...rest,
+    niche_intake: {
+      ...baseIntake,
+      ...prefIntake,
+      ...(nicheKey ? { niche_key: nicheKey } : {}),
+      ...(onboardingFlow ? { onboarding_flow: onboardingFlow } : {}),
+    },
+  };
+}
+
+function omitBookingLink(row: Record<string, unknown>): Record<string, unknown> {
+  const { booking_link: _b, ...rest } = row;
+  return rest;
+}
+
+async function insertCompanySettingsResilient(
+  supabase: SupabaseClient,
+  fullRow: Record<string, unknown>,
+): Promise<{ error: { message: string } | null }> {
+  const attempts: Record<string, unknown>[] = [
+    fullRow,
+    omitBookingLink(fullRow),
+    rowWithoutAutomationPreferences(fullRow),
+    omitBookingLink(rowWithoutAutomationPreferences(fullRow)),
+  ];
+
+  let last: { message: string } | null = null;
+  for (const attempt of attempts) {
+    const { error } = await supabase.from("company_settings").insert(attempt);
+    if (!error) return { error: null };
+    last = error;
+  }
+  return { error: last };
+}
+
+async function applyReferralIfPresent(companyId: string) {
+  try {
+    const ref =
+      cookies().get("zm_referral_code")?.value?.trim().toUpperCase() ||
+      cookies().get("cf_referral_code")?.value?.trim().toUpperCase();
+    if (ref && ref.length >= 6) {
+      const admin = createAdminClient();
+      const { data: refRow } = await admin
+        .from("companies")
+        .select("id")
+        .eq("referral_code", ref)
+        .maybeSingle();
+      if (refRow?.id && refRow.id !== companyId) {
+        await admin.from("referral_conversions").insert({
+          referrer_company_id: refRow.id,
+          referee_company_id: companyId,
+          referral_code: ref,
+          credit_eur: 10,
+        });
+      }
+    }
+  } catch {
+    /* referral niet verplicht */
+  }
+}
+
+export async function skipOnboardingWizardAction(): Promise<OnboardingState> {
+  const auth = await getAuth();
+  if (!auth.user) {
+    redirect("/login");
+  }
+  if (auth.company) {
+    redirect("/dashboard");
+  }
+
+  const niche_key = QUICK_START_NICHE;
+  const config = getNicheConfig(niche_key);
+  const nicheLabel = displayNicheLabel(niche_key, "");
+
+  const faqPairs = config.defaultFaqTemplate
+    .split("\n\n")
+    .map((block) => {
+      const [q, a] = block.split("||");
+      return { q: q?.trim() || "", a: a?.trim() || "" };
+    })
+    .filter((row) => row.q && row.a);
+
+  const supabase = await createClient();
+  const now = new Date();
+  const trialEnd = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+
+  const { data: company, error: cErr } = await supabase
+    .from("companies")
+    .insert({
+      name: QUICK_START_COMPANY_NAME,
+      owner_user_id: auth.user.id,
+      onboarding_completed: true,
+      profile_intake_completed: false,
+      contact_email: null,
+      contact_phone: null,
+      trial_starts_at: now.toISOString(),
+      trial_ends_at: trialEnd.toISOString(),
+      plan: "trial",
+      is_active: true,
+      niche: niche_key,
+    })
+    .select("id")
+    .single();
+
+  if (cErr || !company) {
+    return { error: cErr?.message || "Bedrijf kon niet worden aangemaakt." };
+  }
+
+  const automation_preferences = {
+    niche_key,
+    niche_intake: {} as Record<string, string>,
+    onboarding_skipped: true,
+  };
+
+  const settingsRow: Record<string, unknown> = {
+    company_id: company.id,
+    niche: nicheLabel,
+    services: [...config.defaultServices],
+    faq: faqPairs.length ? faqPairs : [],
+    pricing_hints: config.defaultPricingHints || null,
+    business_hours: {},
+    booking_link: null,
+    tone: config.defaultTone,
+    reply_style: config.defaultReplyStyle,
+    language: "nl",
+    knowledge_snippets: [],
+    niche_intake: {},
+    automation_preferences,
+  };
+
+  const { error: sErr } = await insertCompanySettingsResilient(
+    supabase,
+    settingsRow,
+  );
+  if (sErr) {
+    return { error: sErr.message };
+  }
+
+  await ensureCompanyReferralCode(supabase, company.id);
+  await applyReferralIfPresent(company.id);
+
+  revalidatePath("/", "layout");
+  redirect("/dashboard/ai-setup");
+}
 
 export async function completeOnboardingAction(
   _prev: OnboardingState,
@@ -130,6 +302,7 @@ export async function completeOnboardingAction(
       name,
       owner_user_id: auth.user.id,
       onboarding_completed: true,
+      profile_intake_completed: true,
       contact_email: contact_email || null,
       contact_phone: contact_phone || null,
       trial_starts_at: now.toISOString(),
@@ -145,7 +318,13 @@ export async function completeOnboardingAction(
     return { error: cErr?.message || "Bedrijf kon niet worden aangemaakt." };
   }
 
-  const { error: sErr } = await supabase.from("company_settings").insert({
+  const automation_preferences = {
+    niche_key,
+    niche_intake: intake,
+    ...(flowV5 ? { onboarding_flow: "conversion_v5" } : {}),
+  };
+
+  const settingsRow: Record<string, unknown> = {
     company_id: company.id,
     niche: nicheLabel,
     services: services.length ? services : [],
@@ -158,44 +337,22 @@ export async function completeOnboardingAction(
     tone: tone || null,
     reply_style: reply_style || null,
     language: "nl",
-    niche_intake: intake,
     knowledge_snippets: [],
-    automation_preferences: {
-      niche_key,
-      niche_intake: intake,
-      ...(flowV5 ? { onboarding_flow: "conversion_v5" } : {}),
-    },
-  });
+    niche_intake: intake,
+    automation_preferences,
+  };
+
+  const { error: sErr } = await insertCompanySettingsResilient(
+    supabase,
+    settingsRow,
+  );
 
   if (sErr) {
     return { error: sErr.message };
   }
 
   await ensureCompanyReferralCode(supabase, company.id);
-
-  try {
-    const ref =
-      cookies().get("zm_referral_code")?.value?.trim().toUpperCase() ||
-      cookies().get("cf_referral_code")?.value?.trim().toUpperCase();
-    if (ref && ref.length >= 6) {
-      const admin = createAdminClient();
-      const { data: refRow } = await admin
-        .from("companies")
-        .select("id")
-        .eq("referral_code", ref)
-        .maybeSingle();
-      if (refRow?.id && refRow.id !== company.id) {
-        await admin.from("referral_conversions").insert({
-          referrer_company_id: refRow.id,
-          referee_company_id: company.id,
-          referral_code: ref,
-          credit_eur: 10,
-        });
-      }
-    }
-  } catch {
-    /* referral niet verplicht */
-  }
+  await applyReferralIfPresent(company.id);
 
   revalidatePath("/", "layout");
   redirect("/dashboard/ai-setup");

@@ -17,6 +17,7 @@ import { createClient } from "@/lib/supabase/server";
 import { syncNotificationsForCompany } from "@/lib/notifications/sync";
 import { fetchNotificationsForCompany } from "@/lib/queries/notifications";
 import { PastDueBanner } from "@/components/billing/past-due-banner";
+import { ProfileIntakeBanner } from "@/components/dashboard/profile-intake-banner";
 import { ConversionUrgencyBar } from "@/components/dashboard/conversion-urgency-bar";
 import { isFounderUser } from "@/lib/founder/access";
 import type { AppNotification } from "@/lib/types";
@@ -86,6 +87,11 @@ export default async function MainDashboardLayout({
           <DemoBanner forced={demoForced} demoNicheId={getDemoNicheId()} />
         ) : null}
         <PastDueBanner company={auth.company} />
+        {!demoOn &&
+        !isDemoCompanyId(auth.company.id) &&
+        !auth.company.profile_intake_completed ? (
+          <ProfileIntakeBanner />
+        ) : null}
         <ConversionUrgencyBar demoMode={demoOn} />
         <MonetizationClient
           companyId={auth.company.id}
