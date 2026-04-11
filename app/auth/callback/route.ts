@@ -2,6 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { type EmailOtpType } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
+import { BRAND_DEFAULT_SITE_URL } from "@/lib/brand";
 import { getPublicRedirectOrigin } from "@/lib/proxy-public-request";
 
 function safeNextPath(raw: string | null): string {
@@ -27,7 +28,14 @@ export async function GET(request: NextRequest) {
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  const origin = getPublicRedirectOrigin(request);
+  /*
+   * Productie: ALTIJD vast https://zylmero.com — géén afleiding uit request (Railway = localhost:8080).
+   * Lokaal `next dev`: gewone origin uit request/env.
+   */
+  const origin =
+    process.env.NODE_ENV === "development"
+      ? getPublicRedirectOrigin(request)
+      : BRAND_DEFAULT_SITE_URL.replace(/\/$/, "");
   if (!url?.trim() || !key?.trim()) {
     return NextResponse.redirect(new URL("/login?reason=config", origin));
   }
