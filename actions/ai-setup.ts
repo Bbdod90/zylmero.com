@@ -18,6 +18,15 @@ function parseFaq(source: string) {
     .filter((row) => row.q && row.a);
 }
 
+function withoutKeys(
+  row: Record<string, unknown>,
+  keys: string[],
+): Record<string, unknown> {
+  const next = { ...row };
+  for (const k of keys) delete next[k];
+  return next;
+}
+
 function buildUpsertPayload(
   companyId: string,
   existing: Record<string, unknown> | null,
@@ -207,16 +216,28 @@ Taal: Nederlands. Toon: professioneel, verkopend, helder.`,
     ai_setup_completed_at: now,
   });
 
-  const { error: uErr } = await supabase
-    .from("company_settings")
-    .upsert(payload, { onConflict: "company_id" });
-
-  if (uErr) {
-    return { error: uErr.message };
+  const attempts = [
+    payload,
+    withoutKeys(payload, ["ai_usage_count"]),
+    withoutKeys(payload, [
+      "ai_usage_count",
+      "white_label_logo_url",
+      "white_label_primary",
+    ]),
+  ];
+  let lastMsg: string | null = null;
+  for (const body of attempts) {
+    const { error: uErr } = await supabase
+      .from("company_settings")
+      .upsert(body, { onConflict: "company_id" });
+    if (!uErr) {
+      revalidatePath("/", "layout");
+      return { ok: true };
+    }
+    lastMsg = uErr.message;
   }
 
-  revalidatePath("/", "layout");
-  return { ok: true };
+  return { error: lastMsg ?? "Opslaan mislukt." };
 }
 
 export async function runAiSetupAction(

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
   BarChart3,
   BookOpen,
@@ -23,6 +24,7 @@ import {
   UsersRound,
   ClipboardList,
   Brain,
+  X,
 } from "lucide-react";
 import type { AppNotification } from "@/lib/types";
 import { BRAND_NAME } from "@/lib/brand";
@@ -32,6 +34,8 @@ import { DemoModeToggle } from "@/components/sales/demo-mode-toggle";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 
 type NavItem = { href: string; label: string; icon: typeof Gauge };
+
+const STORAGE_HIDE_GROEI = "zylmero_sidebar_hide_groei_v1";
 
 const GROUPS: { title: string; items: NavItem[] }[] = [
   {
@@ -116,6 +120,59 @@ function NavLink({
   );
 }
 
+function GrowthNavLink({
+  item,
+  pathname,
+  onNavigate,
+  onDismissFromMenu,
+}: {
+  item: NavItem;
+  pathname: string;
+  onNavigate?: () => void;
+  onDismissFromMenu: () => void;
+}) {
+  const Icon = item.icon;
+  const active =
+    pathname === item.href ||
+    (item.href !== "/dashboard" && pathname.startsWith(item.href));
+  return (
+    <div className="flex min-h-11 items-stretch gap-0.5">
+      <Link
+        href={item.href}
+        onClick={() => onNavigate?.()}
+        className={cn(
+          "group relative flex min-w-0 flex-1 touch-manipulation items-center gap-3 rounded-lg px-3 py-2 text-[0.8125rem] font-medium transition-colors duration-200 active:bg-muted/50",
+          active
+            ? "bg-primary/[0.09] text-foreground before:absolute before:left-0 before:top-1/2 before:h-7 before:w-[3px] before:-translate-y-1/2 before:rounded-full before:bg-primary dark:bg-white/[0.06]"
+            : "text-muted-foreground hover:bg-muted/60 hover:text-foreground dark:hover:bg-white/[0.04]",
+        )}
+      >
+        <Icon
+          className={cn(
+            "size-[1.125rem] shrink-0 transition-colors",
+            active
+              ? "text-primary"
+              : "text-muted-foreground group-hover:text-foreground",
+          )}
+        />
+        <span className="truncate">{item.label}</span>
+      </Link>
+      <button
+        type="button"
+        className="flex size-11 shrink-0 touch-manipulation items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground dark:hover:bg-white/[0.04]"
+        aria-label="Groei uit het menu verbergen"
+        title="Groei uit het menu verbergen"
+        onClick={(e) => {
+          e.preventDefault();
+          onDismissFromMenu();
+        }}
+      >
+        <X className="size-4" strokeWidth={2} />
+      </button>
+    </div>
+  );
+}
+
 export type AppSidebarProps = {
   companyName: string;
   demoActive: boolean;
@@ -145,6 +202,26 @@ export function AppSidebar({
   hideNotificationBell = false,
 }: AppSidebarProps) {
   const pathname = usePathname();
+  const [groeiMenuHidden, setGroeiMenuHidden] = useState(false);
+
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(STORAGE_HIDE_GROEI) === "1") {
+        setGroeiMenuHidden(true);
+      }
+    } catch {
+      /* private mode */
+    }
+  }, []);
+
+  function dismissGroeiFromSidebar() {
+    try {
+      localStorage.setItem(STORAGE_HIDE_GROEI, "1");
+    } catch {
+      /* ignore */
+    }
+    setGroeiMenuHidden(true);
+  }
 
   const groups = GROUPS.map((g) => {
     if (g.title !== "Pipeline") return g;
@@ -210,14 +287,27 @@ export function AppSidebar({
               {group.title}
             </p>
             <div className="flex flex-col gap-0.5">
-              {group.items.map((item) => (
-                <NavLink
-                  key={item.href}
-                  item={item}
-                  pathname={pathname}
-                  onNavigate={onNavLinkClick}
-                />
-              ))}
+              {(groeiMenuHidden
+                ? group.items.filter((i) => i.href !== "/dashboard/growth")
+                : group.items
+              ).map((item) =>
+                item.href === "/dashboard/growth" ? (
+                  <GrowthNavLink
+                    key={item.href}
+                    item={item}
+                    pathname={pathname}
+                    onNavigate={onNavLinkClick}
+                    onDismissFromMenu={dismissGroeiFromSidebar}
+                  />
+                ) : (
+                  <NavLink
+                    key={item.href}
+                    item={item}
+                    pathname={pathname}
+                    onNavigate={onNavLinkClick}
+                  />
+                ),
+              )}
             </div>
           </div>
         ))}
