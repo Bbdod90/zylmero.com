@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { getAuth } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getNicheConfig, isNicheId, type NicheId } from "@/lib/niches";
@@ -27,84 +28,123 @@ function withoutKeys(
   return next;
 }
 
-function buildUpsertPayload(
+/**
+ * Alleen kolommen die AI-setup echt schrijft + bestaande waarden om overschrijven te voorkomen.
+ * Geen whatsapp/auto_reply/ai_usage/white_label — die ontbreken vaak op oudere productie-DB's en
+ * hoeven hier niet geüpdatet te worden (PostgREST upsert wijzigt alleen meegestuurde keys).
+ */
+function buildAiSetupSlimUpsertPayload(
   companyId: string,
   existing: Record<string, unknown> | null,
-  patch: Record<string, unknown>,
+  patch: {
+    niche: string;
+    services: string[];
+    faq: { q: string; a: string }[];
+    tone: string;
+    reply_style: string;
+    pricing_hints: string;
+    ai_setup_completed_at: string;
+  },
 ): Record<string, unknown> {
   const e = existing || {};
-  const whatsapp =
-    e.whatsapp_channel && typeof e.whatsapp_channel === "object"
-      ? e.whatsapp_channel
-      : { provider: "mock", connected: false };
   return {
     company_id: companyId,
-    niche: (patch.niche as string) ?? (e.niche as string) ?? null,
-    services: (patch.services as string[]) ?? (e.services as string[]) ?? [],
-    faq: (patch.faq as object) ?? (e.faq as object) ?? [],
-    pricing_hints:
-      (patch.pricing_hints as string | null) ??
-      (e.pricing_hints as string | null) ??
-      null,
+    niche: patch.niche,
+    services: patch.services,
+    faq: patch.faq,
+    pricing_hints: patch.pricing_hints,
     business_hours:
-      (patch.business_hours as object) ??
-      (e.business_hours as object) ??
-      ({} as Record<string, unknown>),
-    booking_link:
-      (patch.booking_link as string | null) ??
-      (e.booking_link as string | null) ??
-      null,
-    tone: (patch.tone as string | null) ?? (e.tone as string | null) ?? null,
-    reply_style:
-      (patch.reply_style as string | null) ??
-      (e.reply_style as string | null) ??
-      null,
-    language: (patch.language as string) ?? (e.language as string) ?? "nl",
+      (e.business_hours as object) ?? ({} as Record<string, unknown>),
+    booking_link: (e.booking_link as string | null) ?? null,
+    tone: patch.tone,
+    reply_style: patch.reply_style,
+    language: (e.language as string) || "nl",
     automation_preferences:
-      (patch.automation_preferences as object) ??
-      (e.automation_preferences as object) ??
-      ({} as Record<string, unknown>),
-    whatsapp_channel: (patch.whatsapp_channel as object) ?? whatsapp,
-    auto_reply_enabled:
-      (patch.auto_reply_enabled as boolean) ??
-      Boolean(e.auto_reply_enabled),
-    auto_reply_delay_seconds:
-      typeof patch.auto_reply_delay_seconds === "number"
-        ? patch.auto_reply_delay_seconds
-        : typeof e.auto_reply_delay_seconds === "number"
-          ? e.auto_reply_delay_seconds
-          : 30,
-    ai_usage_count:
-      typeof patch.ai_usage_count === "number"
-        ? patch.ai_usage_count
-        : typeof e.ai_usage_count === "number"
-          ? e.ai_usage_count
-          : 0,
-    ai_setup_completed_at:
-      (patch.ai_setup_completed_at as string) ??
-      (e.ai_setup_completed_at as string) ??
-      null,
-    niche_intake:
-      (patch.niche_intake as object) ??
-      (e.niche_intake as object) ??
-      ({} as Record<string, unknown>),
-    knowledge_snippets:
-      (patch.knowledge_snippets as object) ??
-      (e.knowledge_snippets as object) ??
-      [],
-    white_label_logo_url:
-      (patch.white_label_logo_url as string | null) ??
-      (e.white_label_logo_url as string | null) ??
-      null,
-    white_label_primary:
-      (patch.white_label_primary as string | null) ??
-      (e.white_label_primary as string | null) ??
-      null,
+      (e.automation_preferences as object) ?? ({} as Record<string, unknown>),
+    niche_intake: (e.niche_intake as object) ?? ({} as Record<string, unknown>),
+    knowledge_snippets: (e.knowledge_snippets as object) ?? [],
+    ai_setup_completed_at: patch.ai_setup_completed_at,
   };
+}
+
+function aiSetupUpsertAttempts(slim: Record<string, unknown>): Record<string, unknown>[] {
+  return [
+    slim,
+    withoutKeys(slim, ["knowledge_snippets"]),
+    withoutKeys(slim, ["knowledge_snippets", "niche_intake"]),
+    withoutKeys(slim, [
+      "knowledge_snippets",
+      "niche_intake",
+      "automation_preferences",
+    ]),
+    withoutKeys(slim, [
+      "knowledge_snippets",
+      "niche_intake",
+      "automation_preferences",
+      "business_hours",
+      "booking_link",
+    ]),
+    withoutKeys(slim, [
+      "knowledge_snippets",
+      "niche_intake",
+      "automation_preferences",
+      "business_hours",
+      "booking_link",
+      "language",
+    ]),
+    {
+      company_id: slim.company_id,
+      niche: slim.niche,
+      services: slim.services,
+      faq: slim.faq,
+      pricing_hints: slim.pricing_hints,
+      tone: slim.tone,
+      reply_style: slim.reply_style,
+      ai_setup_completed_at: slim.ai_setup_completed_at,
+    },
+    {
+      company_id: slim.company_id,
+      services: slim.services,
+      faq: slim.faq,
+      pricing_hints: slim.pricing_hints,
+      tone: slim.tone,
+      reply_style: slim.reply_style,
+      ai_setup_completed_at: slim.ai_setup_completed_at,
+    },
+  ];
 }
 
 /** Geen redirect() hier: met useFormState/navigatie faalt dat vaak stil → eeuwige “pending”. Client navigeert bij ok. */
 export type AiSetupState = { error?: string; ok?: true };
+
+/**
+ * Geen upsert: sommige productie-DB's missen PRIMARY KEY/UNIQUE op company_id, dan faalt ON CONFLICT.
+ */
+async function writeCompanySettingsRow(
+  supabase: SupabaseClient,
+  companyId: string,
+  body: Record<string, unknown>,
+  rowExists: boolean,
+): Promise<{ error: { message: string } | null }> {
+  if (rowExists) {
+    const { error } = await supabase
+      .from("company_settings")
+      .update(body)
+      .eq("company_id", companyId);
+    return { error: error ? { message: error.message } : null };
+  }
+  const { error: insErr } = await supabase.from("company_settings").insert(body);
+  if (!insErr) return { error: null };
+  const msg = insErr.message || "";
+  if (/duplicate|already exists|unique/i.test(msg)) {
+    const { error: upErr } = await supabase
+      .from("company_settings")
+      .update(body)
+      .eq("company_id", companyId);
+    return { error: upErr ? { message: upErr.message } : null };
+  }
+  return { error: { message: msg } };
+}
 
 async function persistAiSetup(
   services: string[],
@@ -206,7 +246,7 @@ Taal: Nederlands. Toon: professioneel, verkopend, helder.`,
     mapped?.niche ||
     cfg.label;
 
-  const payload = buildUpsertPayload(auth.company.id, existing, {
+  const slim = buildAiSetupSlimUpsertPayload(auth.company.id, existing, {
     niche: nicheLabel,
     services: servicesOut,
     faq: faqPairsOut,
@@ -216,20 +256,16 @@ Taal: Nederlands. Toon: professioneel, verkopend, helder.`,
     ai_setup_completed_at: now,
   });
 
-  const attempts = [
-    payload,
-    withoutKeys(payload, ["ai_usage_count"]),
-    withoutKeys(payload, [
-      "ai_usage_count",
-      "white_label_logo_url",
-      "white_label_primary",
-    ]),
-  ];
+  const attempts = aiSetupUpsertAttempts(slim);
+  const rowExists = existing != null;
   let lastMsg: string | null = null;
   for (const body of attempts) {
-    const { error: uErr } = await supabase
-      .from("company_settings")
-      .upsert(body, { onConflict: "company_id" });
+    const { error: uErr } = await writeCompanySettingsRow(
+      supabase,
+      auth.company.id,
+      body,
+      rowExists,
+    );
     if (!uErr) {
       revalidatePath("/", "layout");
       return { ok: true };
