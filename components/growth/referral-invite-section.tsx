@@ -40,16 +40,17 @@ export function ReferralInviteSection({
   const link = code ? `${base}/signup?ref=${encodeURIComponent(code)}` : "";
 
   return (
-    <Card className="rounded-[1.35rem] border-primary/20 bg-gradient-to-br from-primary/[0.07] to-transparent">
-      <CardHeader className="flex flex-row items-start gap-3 space-y-0">
-        <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/12 text-primary">
+    <Card className="cf-dashboard-panel rounded-[1.35rem] border-primary/25 bg-gradient-to-br from-primary/[0.08] via-card to-card/90 dark:from-primary/[0.1] dark:via-card dark:to-[hsl(222_26%_6%)]">
+      <CardHeader className="flex flex-row items-start gap-3 space-y-0 sm:p-8 sm:pb-4">
+        <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-primary/8 text-primary shadow-inner-soft ring-1 ring-primary/15">
           <Gift className="size-5" />
         </div>
-        <div>
-          <CardTitle className="text-lg font-bold tracking-tight">
+        <div className="min-w-0">
+          <p className="cf-eyebrow text-[0.625rem]">Referrals</p>
+          <CardTitle className="mt-1 text-xl font-bold tracking-tight sm:text-2xl">
             Nodig andere garages uit
           </CardTitle>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
             Deel je unieke link. Per nieuwe klant die via jou start, tellen we{" "}
             <span className="font-semibold text-foreground">
               €{creditPerReferralEur} tegoed
@@ -58,9 +59,9 @@ export function ReferralInviteSection({
           </p>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-5 sm:px-8 sm:pb-8">
         <div className="flex flex-wrap items-center gap-3 text-sm">
-          <span className="rounded-full border border-white/[0.08] bg-card/40 px-3 py-1 font-semibold tabular-nums">
+          <span className="rounded-full border border-border/60 bg-muted/30 px-3.5 py-1.5 text-xs font-semibold tabular-nums text-foreground shadow-sm dark:border-white/[0.08] dark:bg-white/[0.04]">
             {referralCount} doorverwijzing(en)
           </span>
         </div>
@@ -68,17 +69,17 @@ export function ReferralInviteSection({
           <Button
             type="button"
             variant="secondary"
-            className="rounded-xl font-bold"
+            className="h-11 rounded-xl px-6 text-sm font-bold shadow-sm"
             onClick={() => void ensure()}
           >
             Maak mijn link
           </Button>
         ) : (
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
             <Input
               readOnly
               value={link}
-              className="font-mono text-xs sm:text-sm"
+              className="h-11 rounded-xl border-border/70 bg-background/50 font-mono text-xs shadow-inner-soft sm:flex-1 sm:text-sm"
             />
             <CopyButton text={link} label="Kopieer link" />
           </div>

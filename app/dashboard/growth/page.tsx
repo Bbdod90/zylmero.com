@@ -34,6 +34,8 @@ export default async function GrowthPage() {
     <PageFrame
       title="Klanten werven"
       subtitle="Volg dit systeem — benadering, demo&apos;s en afsluitingen. Geen blog: een pijplijn."
+      dismissHref="/dashboard"
+      dismissLabel="Terug naar dashboard"
     >
       <div className="mb-10">
         <ReferralInviteSection

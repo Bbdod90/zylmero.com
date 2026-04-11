@@ -118,21 +118,29 @@ export function GrowthDashboard({
 
   if (!ready || !data) {
     return (
-      <div className="flex min-h-[320px] items-center justify-center text-sm text-muted-foreground">
-        Je groei-workspace laden…
+      <div className="cf-dashboard-panel flex min-h-[280px] flex-col items-center justify-center gap-3 p-10 text-center">
+        <div className="size-10 animate-pulse rounded-full bg-primary/15 ring-2 ring-primary/20" />
+        <p className="text-sm font-medium text-muted-foreground">
+          Je groei-workspace laden…
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-10">
-      <Card className="glass rounded-2xl border-primary/25 bg-primary/[0.04] dark:border-primary/20">
-        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-4 space-y-0">
-          <div className="flex items-center gap-3">
-            <Rocket className="size-8 text-primary" />
+    <div className="space-y-12">
+      <Card className="cf-dashboard-panel rounded-2xl border-primary/25 bg-gradient-to-br from-primary/[0.06] via-card to-card dark:from-primary/[0.09] dark:via-card dark:to-[hsl(222_26%_6%)]">
+        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-4 space-y-0 sm:p-8 sm:pb-6">
+          <div className="flex items-center gap-4">
+            <div className="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/22 to-primary/8 text-primary shadow-inner-soft ring-1 ring-primary/18">
+              <Rocket className="size-6" />
+            </div>
             <div>
-              <CardTitle className="text-lg">Verkoopmodus</CardTitle>
-              <p className="text-sm text-muted-foreground">
+              <p className="cf-eyebrow text-[0.625rem]">Modus</p>
+              <CardTitle className="mt-0.5 text-xl font-bold tracking-tight">
+                Verkoopmodus
+              </CardTitle>
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                 Benadrukt waarde, ROI en urgentie bij leads en berichten.
               </p>
             </div>
@@ -152,11 +160,18 @@ export function GrowthDashboard({
       </Card>
 
       <section>
-        <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold tracking-tight">
-          <Target className="size-5 text-primary" />
-          Acties voor vandaag
-        </h2>
-        <div className="grid gap-2 sm:grid-cols-2">
+        <div className="mb-5 flex items-end gap-3">
+          <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
+            <Target className="size-5" />
+          </div>
+          <div>
+            <p className="cf-eyebrow text-[0.625rem]">Focus</p>
+            <h2 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
+              Acties voor vandaag
+            </h2>
+          </div>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
           {DAILY.map((t) => (
             <button
               key={t.id}
@@ -171,10 +186,10 @@ export function GrowthDashboard({
                 }))
               }
               className={cn(
-                "flex items-center gap-3 rounded-xl border px-4 py-3 text-left text-sm transition-colors",
+                "cf-transition flex items-center gap-3 rounded-xl border px-4 py-3.5 text-left text-sm font-medium shadow-sm",
                 data.dailyTasks[t.id]
-                  ? "border-primary/40 bg-primary/10"
-                  : "border-border/70 bg-card/50 hover:bg-muted/40",
+                  ? "border-primary/45 bg-primary/[0.12] shadow-md ring-1 ring-primary/15 dark:bg-primary/[0.14]"
+                  : "border-border/65 bg-card/60 hover:border-primary/20 hover:bg-muted/50 dark:bg-card/40 dark:hover:bg-white/[0.04]",
               )}
             >
               {data.dailyTasks[t.id] ? (
@@ -189,12 +204,15 @@ export function GrowthDashboard({
       </section>
 
       <section>
-        <h2 className="mb-4 text-lg font-semibold tracking-tight">Pijplijn</h2>
+        <div className="mb-5">
+          <p className="cf-eyebrow text-[0.625rem]">Pipeline</p>
+          <h2 className="mt-1 text-xl font-bold tracking-tight sm:text-2xl">Pijplijn</h2>
+        </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {PIPELINE_KEYS.map(({ key, label }) => (
-            <Card key={key} className="rounded-2xl border-border/70">
-              <CardHeader className="pb-2">
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            <Card key={key} className="cf-dashboard-panel rounded-2xl">
+              <CardHeader className="pb-2 pt-6">
+                <p className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                   {label}
                 </p>
               </CardHeader>
@@ -243,14 +261,17 @@ export function GrowthDashboard({
       </section>
 
       <section>
-        <h2 className="mb-4 text-lg font-semibold tracking-tight">Scripts</h2>
-        <p className="mb-4 text-sm text-muted-foreground">
+        <div className="mb-2">
+          <p className="cf-eyebrow text-[0.625rem]">Outreach</p>
+          <h2 className="mt-1 text-xl font-bold tracking-tight sm:text-2xl">Scripts</h2>
+        </div>
+        <p className="mb-6 max-w-2xl text-sm leading-relaxed text-muted-foreground">
           Kopiëren, [haken] invullen, versturen. Blijf menselijk — één gesprek
           tegelijk.
         </p>
-        <div className="space-y-4">
+        <div className="space-y-5">
           {OUTREACH_SCRIPTS.map((s) => (
-            <Card key={s.id} className="rounded-2xl border-border/70">
+            <Card key={s.id} className="cf-dashboard-panel rounded-2xl">
               <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2 space-y-0 pb-2">
                 <CardTitle className="text-base font-medium">{s.label}</CardTitle>
                 <CopyButton text={s.body} />
@@ -266,10 +287,13 @@ export function GrowthDashboard({
       </section>
 
       <section>
-        <h2 className="mb-4 text-lg font-semibold tracking-tight">
-          Hoe je klanten vindt
-        </h2>
-        <Card className="rounded-2xl border-border/70">
+        <div className="mb-5">
+          <p className="cf-eyebrow text-[0.625rem]">Acquisitie</p>
+          <h2 className="mt-1 text-xl font-bold tracking-tight sm:text-2xl">
+            Hoe je klanten vindt
+          </h2>
+        </div>
+        <Card className="cf-dashboard-panel rounded-2xl">
           <CardContent className="space-y-4 pt-6">
             <div>
               <p className="text-sm font-medium">Zoekwoorden</p>
@@ -277,7 +301,7 @@ export function GrowthDashboard({
                 {LEAD_FINDER_KEYWORDS.map((k) => (
                   <span
                     key={k}
-                    className="rounded-full border border-border/60 bg-muted/30 px-2.5 py-0.5 text-xs"
+                    className="rounded-full border border-border/55 bg-muted/35 px-3 py-1 text-xs font-medium text-foreground shadow-sm ring-1 ring-black/[0.03] dark:border-white/[0.08] dark:bg-white/[0.05] dark:ring-white/[0.04]"
                   >
                     {k}
                   </span>
@@ -304,10 +328,13 @@ export function GrowthDashboard({
       </section>
 
       <section>
-        <h2 className="mb-4 text-lg font-semibold tracking-tight">
-          Demo-link generator
-        </h2>
-        <Card className="rounded-2xl border-border/70">
+        <div className="mb-5">
+          <p className="cf-eyebrow text-[0.625rem]">Delen</p>
+          <h2 className="mt-1 text-xl font-bold tracking-tight sm:text-2xl">
+            Demo-link generator
+          </h2>
+        </div>
+        <Card className="cf-dashboard-panel rounded-2xl">
           <CardContent className="space-y-4 pt-6">
             <p className="text-sm text-muted-foreground">
               Deel deze link — opent het product in demo-modus (zonder login).
@@ -339,10 +366,13 @@ export function GrowthDashboard({
       </section>
 
       <section>
-        <h2 className="mb-4 text-lg font-semibold tracking-tight">
-          Snelle setup voor klanten
-        </h2>
-        <Card className="rounded-2xl border-border/70">
+        <div className="mb-5">
+          <p className="cf-eyebrow text-[0.625rem]">Onboarding</p>
+          <h2 className="mt-1 text-xl font-bold tracking-tight sm:text-2xl">
+            Snelle setup voor klanten
+          </h2>
+        </div>
+        <Card className="cf-dashboard-panel rounded-2xl">
           <CardContent className="pt-6">
             <form onSubmit={submitInvite} className="space-y-4 max-w-md">
               <div className="space-y-2">
@@ -385,10 +415,13 @@ export function GrowthDashboard({
       </section>
 
       <section>
-        <h2 className="mb-4 text-lg font-semibold tracking-tight">
-          Omzet-snapshot
-        </h2>
-        <Card className="rounded-2xl border-primary/20 bg-primary/[0.04]">
+        <div className="mb-5">
+          <p className="cf-eyebrow text-[0.625rem]">Impact</p>
+          <h2 className="mt-1 text-xl font-bold tracking-tight sm:text-2xl">
+            Omzet-snapshot
+          </h2>
+        </div>
+        <Card className="cf-dashboard-panel rounded-2xl border-primary/25 bg-gradient-to-br from-primary/[0.07] via-card to-card dark:from-primary/[0.1]">
           <CardContent className="grid gap-6 pt-6 md:grid-cols-2">
             <div className="space-y-2">
               <Label>Leads per maand (inbound)</Label>
@@ -427,15 +460,18 @@ export function GrowthDashboard({
       </section>
 
       <section>
-        <h2 className="mb-4 text-lg font-semibold tracking-tight">
-          Testimonial-builder
-        </h2>
-        <p className="mb-4 text-sm text-muted-foreground">
+        <div className="mb-2">
+          <p className="cf-eyebrow text-[0.625rem]">Social proof</p>
+          <h2 className="mt-1 text-xl font-bold tracking-tight sm:text-2xl">
+            Testimonial-builder
+          </h2>
+        </div>
+        <p className="mb-6 max-w-2xl text-sm leading-relaxed text-muted-foreground">
           Demo-citaten voor pitches — vrij bewerken; opgeslagen in deze browser.
         </p>
-        <div className="space-y-4">
+        <div className="space-y-5">
           {data.testimonials.map((row, idx) => (
-            <Card key={row.id} className="rounded-2xl border-border/70">
+            <Card key={row.id} className="cf-dashboard-panel rounded-2xl">
               <CardContent className="space-y-3 pt-6">
                 <Textarea
                   value={row.quote}
@@ -516,19 +552,22 @@ export function GrowthDashboard({
       </section>
 
       <section>
-        <h2 className="mb-4 text-lg font-semibold tracking-tight">
-          Checklist eerste klant
-        </h2>
-        <div className="mb-3 h-2 overflow-hidden rounded-full bg-muted">
+        <div className="mb-5">
+          <p className="cf-eyebrow text-[0.625rem]">Mijlpaal</p>
+          <h2 className="mt-1 text-xl font-bold tracking-tight sm:text-2xl">
+            Checklist eerste klant
+          </h2>
+        </div>
+        <div className="mb-4 h-2.5 overflow-hidden rounded-full bg-muted/80 ring-1 ring-border/50 dark:ring-white/[0.06]">
           <div
-            className="h-full rounded-full bg-primary transition-all"
+            className="h-full rounded-full bg-gradient-to-r from-primary to-primary/80 transition-all duration-500"
             style={{ width: `${firstDealProgress}%` }}
           />
         </div>
-        <p className="mb-4 text-sm text-muted-foreground">
+        <p className="mb-5 text-sm font-medium text-muted-foreground">
           {firstDealProgress}% klaar — ga zo door.
         </p>
-        <div className="grid gap-2">
+        <div className="grid gap-3">
           {FIRST_DEAL.map((t) => (
             <button
               key={t.id}
@@ -543,10 +582,10 @@ export function GrowthDashboard({
                 }))
               }
               className={cn(
-                "flex items-center gap-3 rounded-xl border px-4 py-3 text-left text-sm transition-colors",
+                "cf-transition flex items-center gap-3 rounded-xl border px-4 py-3.5 text-left text-sm font-medium shadow-sm",
                 data.checklist[t.id]
-                  ? "border-primary/40 bg-primary/10"
-                  : "border-border/70 bg-card/50 hover:bg-muted/40",
+                  ? "border-primary/45 bg-primary/[0.12] ring-1 ring-primary/15 dark:bg-primary/[0.14]"
+                  : "border-border/65 bg-card/60 hover:border-primary/20 hover:bg-muted/50 dark:bg-card/40",
               )}
             >
               {data.checklist[t.id] ? (

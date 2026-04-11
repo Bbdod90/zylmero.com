@@ -20,7 +20,7 @@ export function WidgetSettings({
   const snippet = `<script src="${scriptSrc}" async></script>`;
 
   return (
-    <Card className="rounded-2xl border-border/70 bg-card/50">
+    <Card className="cf-dashboard-panel rounded-2xl">
       <CardHeader>
         <CardTitle className="text-base font-semibold">Website-widget</CardTitle>
         <p className="text-sm text-muted-foreground">

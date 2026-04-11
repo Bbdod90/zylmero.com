@@ -25,7 +25,7 @@ export function BillingSettings({
     : "—";
 
   return (
-    <div className="space-y-6 rounded-2xl border border-border/70 bg-card/50 p-6">
+    <div className="cf-dashboard-panel space-y-6 p-6 sm:p-8">
       <div>
         <p className="text-sm font-medium">Huidig abonnement</p>
         <p className="mt-1 text-2xl font-semibold capitalize">

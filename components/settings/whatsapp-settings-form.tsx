@@ -33,7 +33,7 @@ export function WhatsAppSettingsForm({
   const [state, action] = useFormState(updateWhatsAppSettingsAction, initial);
 
   return (
-    <form action={action} className="space-y-6 rounded-2xl border border-border/70 bg-card/50 p-6">
+    <form action={action} className="cf-dashboard-panel space-y-6 p-6 sm:p-8">
       <div className="space-y-2">
         <Label htmlFor="provider">Provider</Label>
         <select

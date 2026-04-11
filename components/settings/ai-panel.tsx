@@ -34,15 +34,24 @@ export function AiPanel({
   return (
     <form
       action={action}
-      className="glass max-w-2xl space-y-5 rounded-3xl p-6 sm:p-8"
+      className="cf-dashboard-panel max-w-2xl space-y-6 p-6 sm:p-8"
     >
+      <header className="space-y-1 border-b border-border/40 pb-5 dark:border-white/[0.06]">
+        <p className="cf-eyebrow text-[0.625rem]">AI-closer</p>
+        <h2 className="text-lg font-bold tracking-tight sm:text-xl">
+          Hoe je AI praat met klanten
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          Deze teksten sturen toon en stijl van suggesties en automatische antwoorden.
+        </p>
+      </header>
       <div className="space-y-2">
         <Label htmlFor="tone">Toon</Label>
         <Textarea
           id="tone"
           name="tone"
           defaultValue={tone || ""}
-          className="min-h-[90px] rounded-xl"
+          className="min-h-[90px] resize-none rounded-xl"
         />
       </div>
       <div className="space-y-2">
@@ -69,7 +78,7 @@ export function AiPanel({
           id="automation_preferences"
           name="automation_preferences"
           defaultValue={automationNote}
-          className="min-h-[140px] rounded-xl"
+          className="min-h-[140px] resize-none rounded-xl"
           placeholder="Beschrijf hoe assertief opvolging moet zijn…"
         />
       </div>

@@ -87,28 +87,46 @@ export function SettingsTabs({
 
   return (
     <Tabs defaultValue={tab} className="w-full">
-      <TabsList className="flex h-auto flex-wrap gap-1 rounded-xl bg-muted/40 p-1">
-        <TabsTrigger value="business" className="rounded-lg">
+      <TabsList className="flex h-auto w-full flex-wrap gap-1 rounded-2xl border border-border/50 bg-muted/35 p-1.5 shadow-inner-soft dark:border-white/[0.08] dark:bg-white/[0.04]">
+        <TabsTrigger
+          value="business"
+          className="rounded-xl px-4 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-primary/20 dark:data-[state=active]:bg-card dark:data-[state=active]:ring-primary/25"
+        >
           Bedrijf
         </TabsTrigger>
-        <TabsTrigger value="knowledge" className="rounded-lg">
+        <TabsTrigger
+          value="knowledge"
+          className="rounded-xl px-4 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-primary/20 dark:data-[state=active]:bg-card dark:data-[state=active]:ring-primary/25"
+        >
           Kennis
         </TabsTrigger>
-        <TabsTrigger value="branding" className="rounded-lg">
+        <TabsTrigger
+          value="branding"
+          className="rounded-xl px-4 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-primary/20 dark:data-[state=active]:bg-card dark:data-[state=active]:ring-primary/25"
+        >
           Huisstijl
         </TabsTrigger>
-        <TabsTrigger value="whatsapp" className="rounded-lg">
+        <TabsTrigger
+          value="whatsapp"
+          className="rounded-xl px-4 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-primary/20 dark:data-[state=active]:bg-card dark:data-[state=active]:ring-primary/25"
+        >
           WhatsApp
         </TabsTrigger>
-        <TabsTrigger value="billing" className="rounded-lg">
+        <TabsTrigger
+          value="billing"
+          className="rounded-xl px-4 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-primary/20 dark:data-[state=active]:bg-card dark:data-[state=active]:ring-primary/25"
+        >
           Facturatie
         </TabsTrigger>
-        <TabsTrigger value="widget" className="rounded-lg">
+        <TabsTrigger
+          value="widget"
+          className="rounded-xl px-4 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-primary/20 dark:data-[state=active]:bg-card dark:data-[state=active]:ring-primary/25"
+        >
           Widget
         </TabsTrigger>
       </TabsList>
       <TabsContent value="business" className="mt-6 space-y-6">
-        <form action={a1} className="space-y-4 rounded-2xl border border-border/70 bg-card/50 p-6">
+        <form action={a1} className="cf-dashboard-panel space-y-5 p-6 sm:p-8">
           <div className="space-y-2">
             <Label htmlFor="company_name">Bedrijfsnaam</Label>
             <Input
@@ -167,7 +185,7 @@ export function SettingsTabs({
         </form>
       </TabsContent>
       <TabsContent value="knowledge" className="mt-6">
-        <form action={a2} className="space-y-4 rounded-2xl border border-border/70 bg-card/50 p-6">
+        <form action={a2} className="cf-dashboard-panel space-y-5 p-6 sm:p-8">
           <div className="space-y-2">
             <Label htmlFor="pricing_hints">Prijshints</Label>
             <Textarea
@@ -215,7 +233,7 @@ export function SettingsTabs({
         </form>
       </TabsContent>
       <TabsContent value="branding" className="mt-6">
-        <form action={a4} className="space-y-4 rounded-2xl border border-border/70 bg-card/50 p-6">
+        <form action={a4} className="cf-dashboard-panel space-y-5 p-6 sm:p-8">
           <div className="space-y-2">
             <Label htmlFor="white_label_logo_url">Logo-URL (https)</Label>
             <Input
@@ -248,8 +266,8 @@ export function SettingsTabs({
           auto_reply_enabled={settings.auto_reply_enabled}
           auto_reply_delay_seconds={settings.auto_reply_delay_seconds}
         />
-        <div className="rounded-xl border border-dashed border-border/80 bg-muted/10 p-4 text-xs text-muted-foreground">
-          <p className="font-medium text-foreground">Webhook-endpoint</p>
+        <div className="glass-bubble rounded-2xl border border-dashed border-border/70 p-5 text-xs text-muted-foreground dark:border-white/[0.1]">
+          <p className="font-semibold text-foreground">Webhook-endpoint</p>
           <p className="mt-1 break-all">
             POST {siteOrigin}/api/webhooks/whatsapp
           </p>
@@ -274,9 +292,11 @@ export function SettingsTabs({
         {widgetEmbedToken ? (
           <WidgetSettings siteOrigin={siteOrigin} embedToken={widgetEmbedToken} />
         ) : (
-          <p className="text-sm text-muted-foreground">
-            Widget-token ontbreekt. Voer de database-migratie uit en herlaad deze pagina.
-          </p>
+          <div className="cf-dashboard-panel rounded-2xl p-8 text-center">
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              Widget-token ontbreekt. Voer de database-migratie uit en herlaad deze pagina.
+            </p>
+          </div>
         )}
       </TabsContent>
     </Tabs>
