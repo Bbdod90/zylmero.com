@@ -73,6 +73,11 @@ function omitLanguage(row: Record<string, unknown>): Record<string, unknown> {
   return rest;
 }
 
+function omitNicheColumn(row: Record<string, unknown>): Record<string, unknown> {
+  const { niche: _n, ...rest } = row;
+  return rest;
+}
+
 async function insertCompanySettingsResilient(
   supabase: SupabaseClient,
   fullRow: Record<string, unknown>,
@@ -103,10 +108,26 @@ async function insertCompanySettingsResilient(
       faq: fullRow.faq ?? [],
       pricing_hints: fullRow.pricing_hints ?? null,
     },
+    {
+      company_id: fullRow.company_id,
+      services: fullRow.services ?? [],
+      faq: fullRow.faq ?? [],
+      pricing_hints: fullRow.pricing_hints ?? null,
+      language: (fullRow.language as string) || "nl",
+    },
+    {
+      company_id: fullRow.company_id,
+      services: fullRow.services ?? [],
+      faq: fullRow.faq ?? [],
+      pricing_hints: fullRow.pricing_hints ?? null,
+    },
+    { company_id: fullRow.company_id },
   ];
   const attempts: Record<string, unknown>[] = [
     ...baseAttempts,
     ...baseAttempts.map(omitLanguage),
+    ...baseAttempts.map(omitNicheColumn),
+    ...baseAttempts.map((r) => omitNicheColumn(omitLanguage(r))),
   ];
 
   let last: { message: string } | null = null;
