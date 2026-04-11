@@ -68,12 +68,17 @@ function omitNicheIntakeAndKnowledge(row: Record<string, unknown>): Record<strin
   return rest;
 }
 
+function omitLanguage(row: Record<string, unknown>): Record<string, unknown> {
+  const { language: _l, ...rest } = row;
+  return rest;
+}
+
 async function insertCompanySettingsResilient(
   supabase: SupabaseClient,
   fullRow: Record<string, unknown>,
 ): Promise<{ error: { message: string } | null }> {
   const noAuto = rowWithoutAutomationPreferences(fullRow);
-  const attempts: Record<string, unknown>[] = [
+  const baseAttempts: Record<string, unknown>[] = [
     fullRow,
     omitBookingLink(fullRow),
     omitBusinessHours(fullRow),
@@ -91,6 +96,17 @@ async function insertCompanySettingsResilient(
       pricing_hints: fullRow.pricing_hints ?? null,
       language: (fullRow.language as string) || "nl",
     },
+    {
+      company_id: fullRow.company_id,
+      niche: fullRow.niche,
+      services: fullRow.services ?? [],
+      faq: fullRow.faq ?? [],
+      pricing_hints: fullRow.pricing_hints ?? null,
+    },
+  ];
+  const attempts: Record<string, unknown>[] = [
+    ...baseAttempts,
+    ...baseAttempts.map(omitLanguage),
   ];
 
   let last: { message: string } | null = null;
