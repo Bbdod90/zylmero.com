@@ -7,6 +7,8 @@ import { isDemoMode } from "@/lib/env";
 import type { Company, CompanyRole } from "@/lib/types";
 import { mapCompanyRow } from "@/lib/auth/map-company";
 import { ANONYMOUS_DEMO_USER_ID } from "@/lib/auth/constants";
+import { COOKIE_ANON_DEMO } from "@/lib/app-cookies";
+import { BRAND_DEMO_PREVIEW_EMAIL } from "@/lib/brand";
 
 export type AuthState =
   | { user: null; company: null; companyRole: null }
@@ -25,11 +27,14 @@ export const getAuth = cache(async (): Promise<AuthState> => {
 
   if (!user) {
     try {
-      if (cookies().get("cf_anon_demo")?.value === "1") {
+      if (
+        cookies().get(COOKIE_ANON_DEMO)?.value === "1" ||
+        cookies().get("cf_anon_demo")?.value === "1"
+      ) {
         return {
           user: {
             id: ANONYMOUS_DEMO_USER_ID,
-            email: "demo@preview.closerflow.app",
+            email: BRAND_DEMO_PREVIEW_EMAIL,
           },
           company: getDemoCompany(),
           companyRole: "owner",

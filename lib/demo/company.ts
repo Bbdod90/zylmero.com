@@ -1,4 +1,5 @@
 import type { Company } from "@/lib/types";
+import { BRAND_DEMO_LOCAL_EMAIL, BRAND_NAME } from "@/lib/brand";
 import { getNicheConfig } from "@/lib/niches";
 import { getDemoNicheId } from "@/lib/demo/niche-context";
 import { DEMO_GARAGE_BRAND } from "@/lib/demo/demo-brand";
@@ -10,11 +11,11 @@ export const DEMO_COMPANY_ID = "dddddddd-dddd-4ddd-8ddd-dddddddddddd";
 
 export const DEMO_COMPANY: Company = {
   id: DEMO_COMPANY_ID,
-  name: "CloserFlow Demo",
+  name: `${BRAND_NAME} Demo`,
   owner_user_id: DEMO_USER_ID,
   niche: "garage",
   onboarding_completed: true,
-  contact_email: "demo@closerflow.local",
+  contact_email: BRAND_DEMO_LOCAL_EMAIL,
   contact_phone: "+31 40 000 0000",
   trial_starts_at: null,
   trial_ends_at: null,

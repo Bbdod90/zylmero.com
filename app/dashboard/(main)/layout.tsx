@@ -8,7 +8,7 @@ import {
 } from "@/lib/billing/trial";
 import { getUpgradeNudgeSignals } from "@/lib/queries/monetization";
 import { MonetizationClient } from "@/components/monetization/monetization-client";
-import { isDemoMode } from "@/lib/env";
+import { isDemoMode, isForcedDemoEnv } from "@/lib/env";
 import { getDemoNicheId } from "@/lib/demo/niche-context";
 import { AppSidebar } from "@/components/layout/sidebar";
 import { DemoBanner } from "@/components/sales/demo-banner";
@@ -46,7 +46,7 @@ export default async function MainDashboardLayout({
   }
 
   const demoOn = isDemoMode();
-  const demoForced = process.env.NEXT_PUBLIC_CLOSERFLOW_DEMO === "true";
+  const demoForced = isForcedDemoEnv();
   const trialDays =
     !isDemoCompanyId(auth.company.id) && auth.company.plan === "trial"
       ? trialDaysRemaining(auth.company)

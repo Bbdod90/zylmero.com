@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Loader2, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { BRAND_LOGO_MONOGRAM, BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 import { enterAnonymousDemo } from "@/actions/demo";
 
@@ -18,12 +19,44 @@ type ChatMsg =
       valueLine: string;
     };
 
+/** Alleen begroeting → geen model-call; voorkomt “banden om 10:00” zonder context. */
+function isGreetingOnly(raw: string): boolean {
+  const t = raw.toLowerCase().trim().replace(/[!?.…]+$/g, "").trim();
+  if (t.length > 55) return false;
+  if (
+    /\b(apk|band|rem|lek|afspraak|offerte|montage|winter|zomer|kenteken|auto|lekkage|reparatie|klus|storing|install|verwarm|boiler|dak|stuc|schilder|loodgieter)\b/i.test(
+      t,
+    )
+  ) {
+    return false;
+  }
+  return /^(hoi|hi|hey|hallo|yo|dag|hee|hé|goedemorgen|goedemiddag|goedenavond|goededag)(\s+(hoi|hi|hey|hallo|dag|daar|team|allemaal|ff))*$/i.test(
+    t,
+  );
+}
+
+function greetingReply(): {
+  reply: string;
+  resultTitle: string;
+  valueLine: string;
+} {
+  return {
+    reply:
+      "Hoi! Leuk dat je even kijkt. Waarmee kan ik je helpen — bijvoorbeeld een afspraak plannen of een vraag over een klus?",
+    resultTitle: "Intake",
+    valueLine: "—",
+  };
+}
+
 function simulateResponse(userText: string): {
   reply: string;
   resultTitle: string;
   valueLine: string;
 } {
   const t = userText.toLowerCase();
+  if (isGreetingOnly(userText)) {
+    return greetingReply();
+  }
   if (/apk|keuring|mot|periodiek/i.test(t)) {
     return {
       reply: "Morgen 09:00 of 15:00 — wat past?",
@@ -53,9 +86,10 @@ function simulateResponse(userText: string): {
     };
   }
   return {
-    reply: "Dank je. Morgen 10:00 of 14:30 — wat wil je?",
-    resultTitle: "Afspraak",
-    valueLine: "€120 – €350",
+    reply:
+      "Dank je! Kun je in één zin zeggen waar het om gaat (bijv. lekkage, onderhoud, spoed) en wat je voorkeur is qua moment?",
+    resultTitle: "Vervolgvraag",
+    valueLine: "Op aanvraag",
   };
 }
 
@@ -96,35 +130,47 @@ export function LandingInteractiveChat() {
     let resultTitle: string;
     let valueLine: string;
 
-    try {
-      const res = await fetch("/api/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: text,
-          context: { branche: "lokaal servicebedrijf", prijsrange: "€120–€600" },
-        }),
-      });
-      const data = (await res.json()) as {
-        reply?: string;
-        resultTitle?: string;
-        valueLine?: string;
-      };
-      if (data.reply) {
-        reply = data.reply;
-        resultTitle = data.resultTitle || "Afspraak";
-        valueLine = data.valueLine || "€120 – €600";
-      } else {
+    if (isGreetingOnly(text)) {
+      const s = greetingReply();
+      reply = s.reply;
+      resultTitle = s.resultTitle;
+      valueLine = s.valueLine;
+    } else {
+      try {
+        const res = await fetch("/api/ai", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: text,
+            landing_demo: true,
+            context: {
+              branche:
+                "lokaal service- of ambachtsbedrijf (niet specifiek garage)",
+              prijsrange: "€120–€600",
+            },
+          }),
+        });
+        const data = (await res.json()) as {
+          reply?: string;
+          resultTitle?: string;
+          valueLine?: string;
+        };
+        if (res.ok && data.reply) {
+          reply = data.reply;
+          resultTitle = data.resultTitle || "Afspraak";
+          valueLine = data.valueLine || "€120 – €600";
+        } else {
+          const s = simulateResponse(text);
+          reply = s.reply;
+          resultTitle = s.resultTitle;
+          valueLine = s.valueLine;
+        }
+      } catch {
         const s = simulateResponse(text);
         reply = s.reply;
         resultTitle = s.resultTitle;
         valueLine = s.valueLine;
       }
-    } catch {
-      const s = simulateResponse(text);
-      reply = s.reply;
-      resultTitle = s.resultTitle;
-      valueLine = s.valueLine;
     }
 
     window.setTimeout(() => {
@@ -157,11 +203,11 @@ export function LandingInteractiveChat() {
           <div className="overflow-hidden rounded-[1.35rem] border border-white/[0.08] bg-[#0c0f14] shadow-[0_24px_56px_-28px_rgba(0,0,0,0.55)] ring-1 ring-white/[0.06] dark:bg-[#080a0d]">
             <div className="flex items-center gap-3 border-b border-white/[0.08] bg-white/[0.04] px-4 py-3">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground shadow-inner">
-                CF
+                {BRAND_LOGO_MONOGRAM}
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-bold text-white">
-                  CloserFlow · demo
+                  {BRAND_NAME} · demo
                 </p>
                 <p className="text-xs text-muted-foreground">Antwoord binnen seconden</p>
               </div>

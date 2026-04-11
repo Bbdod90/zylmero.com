@@ -9,7 +9,8 @@ import {
 /** Actieve demo-branche (cookie, server-only). */
 export function getDemoNicheId(): NicheId {
   try {
-    const v = cookies().get(NICHE_COOKIE)?.value;
+    const v =
+      cookies().get(NICHE_COOKIE)?.value || cookies().get("cf_demo_niche")?.value;
     if (v && isNicheId(v)) return v;
   } catch {
     /* build / static */

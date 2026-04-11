@@ -7,7 +7,7 @@ export async function createClient() {
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url?.trim() || !key?.trim()) {
     throw new Error(
-      "Missing Supabase env: set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in closerflow/.env.local (copy from .env.example, values from Supabase → Project Settings → API).",
+      "Missing Supabase env: set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in .env.local (copy from .env.example, values from Supabase → Project Settings → API).",
     );
   }
 
@@ -21,8 +21,11 @@ export async function createClient() {
           cookiesToSet.forEach(({ name, value, options }) =>
             cookieStore.set(name, value, options),
           );
-        } catch {
-          /* Server Component — ignore */
+        } catch (e) {
+          /* Kan falen in sommige Server Component-contexten; bij login zie je dan direct weer /login. */
+          if (process.env.NODE_ENV === "development") {
+            console.error("[Supabase] cookies().set mislukt (sessie wordt niet bewaard):", e);
+          }
         }
       },
     },

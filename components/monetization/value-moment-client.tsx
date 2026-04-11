@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { completeValueMomentAction } from "@/actions/value-moment";
+import { BRAND_NAME } from "@/lib/brand";
 import { Sparkles } from "lucide-react";
 
 function Submit() {
@@ -46,9 +47,9 @@ export function ValueMomentClient() {
   return (
     <div className="mx-auto max-w-lg space-y-8 px-4 py-10">
       <div className="text-center">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">CloserFlow</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">{BRAND_NAME}</p>
         <h1 className="mt-4 text-3xl font-bold tracking-tight">Dit is je eerste omzetmoment</h1>
-        <p className="mt-3 text-muted-foreground">Zo reageert CloserFlow — snel, kort, richting afspraak.</p>
+        <p className="mt-3 text-muted-foreground">Zo reageert {BRAND_NAME} — snel, kort, richting afspraak.</p>
       </div>
 
       <Card className="overflow-hidden rounded-2xl border-primary/20 bg-card/80 shadow-lg">

@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const token = searchParams.get("token");
   if (!token || !/^[0-9a-f-]{36}$/i.test(token)) {
-    return new NextResponse("// CloserFlow: ongeldige token", {
+    return new NextResponse("// Zylmero: ongeldige token", {
       headers: { "Content-Type": "application/javascript; charset=utf-8" },
     });
   }

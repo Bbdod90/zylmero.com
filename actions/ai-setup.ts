@@ -1,6 +1,5 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { getAuth } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -19,7 +18,8 @@ function parseFaq(source: string) {
     .filter((row) => row.q && row.a);
 }
 
-export type AiSetupState = { error?: string };
+/** Geen redirect() hier: met useFormState/navigatie faalt dat vaak stil → eeuwige “pending”. Client navigeert bij ok. */
+export type AiSetupState = { error?: string; ok?: true };
 
 export async function runAiSetupAction(
   _prev: AiSetupState,
@@ -27,7 +27,7 @@ export async function runAiSetupAction(
 ): Promise<AiSetupState> {
   const auth = await getAuth();
   if (!auth.user || !auth.company) {
-    redirect("/login");
+    return { error: "Je sessie is verlopen. Log opnieuw in." };
   }
 
   const supabase = await createClient();
@@ -39,7 +39,8 @@ export async function runAiSetupAction(
 
   const mapped = mapCompanySettingsRow(raw as Record<string, unknown>);
   if (mapped?.ai_setup_completed_at) {
-    redirect("/dashboard/value-moment");
+    revalidatePath("/", "layout");
+    return { ok: true };
   }
 
   const nicheKey: NicheId =
@@ -54,26 +55,36 @@ export async function runAiSetupAction(
   let reply_style = cfg.defaultReplyStyle;
   let pricing_hints = cfg.defaultPricingHints;
 
+  const auto = await createDefaultAutomations();
+  if (auto.error) {
+    return { error: auto.error };
+  }
+
   if (process.env.OPENAI_API_KEY) {
     try {
       const openai = getOpenAI();
-      const res = await openai.chat.completions.create({
-        model: OPENAI_MODEL,
-        response_format: { type: "json_object" },
-        messages: [
-          {
-            role: "system",
-            content:
-              "Je bent een NL copywriter voor servicebedrijven. Antwoord alleen met geldige JSON.",
-          },
-          {
-            role: "user",
-            content: `Bedrijf: ${auth.company.name}. Branche: ${cfg.label}.
+      const signal = AbortSignal.timeout(22_000);
+      const res = await openai.chat.completions.create(
+        {
+          model: OPENAI_MODEL,
+          response_format: { type: "json_object" },
+          max_tokens: 2500,
+          messages: [
+            {
+              role: "system",
+              content:
+                "Je bent een NL copywriter voor servicebedrijven. Antwoord alleen met geldige JSON.",
+            },
+            {
+              role: "user",
+              content: `Bedrijf: ${auth.company.name}. Branche: ${cfg.label}.
 Genereer JSON met keys: services (array van 6-10 korte dienstregels), faq (array van {q,a}, 4-6 items), tone (string), reply_style (string), pricing_hints (string met richtprijzen).
 Taal: Nederlands. Toon: professioneel, verkopend, helder.`,
-          },
-        ],
-      });
+            },
+          ],
+        },
+        { signal },
+      );
       const txt = res.choices[0]?.message?.content?.trim();
       if (txt) {
         const parsed = JSON.parse(txt) as {
@@ -94,17 +105,12 @@ Taal: Nederlands. Toon: professioneel, verkopend, helder.`,
         if (parsed.pricing_hints) pricing_hints = parsed.pricing_hints;
       }
     } catch {
-      /* fallback cfg */
+      /* timeout, netwerk of parse — branche-defaults blijven staan */
     }
   }
 
-  const auto = await createDefaultAutomations();
-  if (auto.error) {
-    return { error: auto.error };
-  }
-
   const now = new Date().toISOString();
-  const { error: uErr } = await supabase
+  const { data: updatedRows, error: uErr } = await supabase
     .from("company_settings")
     .update({
       services,
@@ -114,12 +120,19 @@ Taal: Nederlands. Toon: professioneel, verkopend, helder.`,
       pricing_hints,
       ai_setup_completed_at: now,
     })
-    .eq("company_id", auth.company.id);
+    .eq("company_id", auth.company.id)
+    .select("company_id");
 
   if (uErr) {
     return { error: uErr.message };
   }
+  if (!updatedRows?.length) {
+    return {
+      error:
+        "Je bedrijfsinstellingen ontbreken. Log opnieuw in of neem contact op met support.",
+    };
+  }
 
   revalidatePath("/", "layout");
-  redirect("/dashboard/value-moment");
+  return { ok: true };
 }

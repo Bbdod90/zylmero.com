@@ -1,3 +1,5 @@
+import { BRAND_NAME } from "@/lib/brand";
+
 export type OutreachChannel =
   | "instagram_dm"
   | "whatsapp"
@@ -35,7 +37,7 @@ Hoi,
 
 Ik zie dat jullie klanten via telefoon/WhatsApp benaderen. Veel garages verliezen werk simpelweg omdat er niet binnen een uur wordt geantwoord.
 
-Ik bouwde CloserFlow — het antwoordt in jullie toon en stuurt mensen richting een boeking. Heb je 10 minuten om te kijken?
+Ik bouwde ${BRAND_NAME} — het antwoordt in jullie toon en stuurt mensen richting een boeking. Heb je 10 minuten om te kijken?
 
 Groet,
 [Jouw naam]`,

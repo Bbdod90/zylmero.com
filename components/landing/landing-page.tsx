@@ -1,5 +1,5 @@
-import { CfLanding } from "@/components/landing/cf-landing";
+import { ZylmeroLanding } from "@/components/landing/zylmero-landing";
 
 export function LandingPage() {
-  return <CfLanding />;
+  return <ZylmeroLanding />;
 }

@@ -18,20 +18,59 @@ function Submit() {
 
 const initial: AuthFormState = {};
 
-export function LoginForm({ reason }: { reason?: string }) {
+export function LoginForm({
+  reason,
+  notice,
+  detail,
+}: {
+  reason?: string;
+  notice?: string;
+  detail?: string;
+}) {
   const [state, formAction] = useFormState(signInAction, initial);
 
   const reasonHint =
     reason === "auth"
-      ? "Link verlopen of ongeldig. Probeer opnieuw in te loggen of vraag een nieuwe bevestigingsmail aan."
+      ? `Link verlopen of ongeldig. Probeer opnieuw in te loggen of vraag een nieuwe bevestigingsmail aan.${detail ? ` (${detail})` : ""}`
       : reason === "config"
         ? "De app is nog niet goed geconfigureerd. Neem contact op met support."
         : null;
 
+  const noticeOk =
+    notice === "wachtwoord-gewijzigd"
+      ? "Je wachtwoord is gewijzigd. Log nu in met je nieuwe wachtwoord."
+      : null;
+
+  const verifyHint =
+    reason === "verify" ? (
+      <p className="rounded-xl border border-amber-500/35 bg-amber-500/10 px-3 py-2 text-sm leading-relaxed text-foreground">
+        Geen geldige sessie na de link uit je mail? Controleer of je de nieuwste bevestigingsmail
+        gebruikt, of log hier in met e-mail en wachtwoord als je account al actief is.
+      </p>
+    ) : null;
+
+  const pkceHint =
+    reason === "pkce" ? (
+      <p className="rounded-xl border border-amber-500/35 bg-amber-500/10 px-3 py-2 text-sm leading-relaxed text-foreground">
+        Deze link hoort bij een <strong>oudere</strong> bevestigingsmail (PKCE). Vraag een nieuwe
+        registratie aan of gebruik &quot;Wachtwoord vergeten&quot;, of log in als je account al
+        bevestigd is. Nieuwe mails gebruiken een link die op elk apparaat werkt.
+      </p>
+    ) : null;
+
   return (
     <form action={formAction} className="space-y-5">
+      {noticeOk ? (
+        <p className="rounded-xl border border-primary/25 bg-primary/10 px-3 py-2 text-sm text-foreground">
+          {noticeOk}
+        </p>
+      ) : null}
+      {verifyHint}
+      {pkceHint}
       {reasonHint ? (
-        <p className="text-sm leading-relaxed text-muted-foreground">{reasonHint}</p>
+        <p className="rounded-xl border border-destructive/25 bg-destructive/10 px-3 py-2 text-sm leading-relaxed text-destructive">
+          {reasonHint}
+        </p>
       ) : null}
       <div className="space-y-2">
         <Label htmlFor="email">E-mail</Label>

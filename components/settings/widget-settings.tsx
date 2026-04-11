@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CopyButton } from "@/components/growth/copy-button";
+import { BRAND_NAME } from "@/lib/brand";
 
 export function WidgetSettings({
   siteOrigin,
@@ -24,7 +25,7 @@ export function WidgetSettings({
         <CardTitle className="text-base font-semibold">Website-widget</CardTitle>
         <p className="text-sm text-muted-foreground">
           Plak dit vóór <code className="rounded bg-muted px-1">&lt;/body&gt;</code>. Bezoekers
-          kunnen een bericht sturen — leads komen binnen in CloserFlow.
+          kunnen een bericht sturen — leads komen binnen in {BRAND_NAME}.
         </p>
       </CardHeader>
       <CardContent className="space-y-4">

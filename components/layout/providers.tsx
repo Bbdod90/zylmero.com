@@ -4,13 +4,13 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 import type { ReactNode } from "react";
 
-export function Providers({ children }: { children: ReactNode }) {
+function Providers({ children }: { children: ReactNode }) {
   return (
     <ThemeProvider
       attribute="class"
       defaultTheme="dark"
       enableSystem={false}
-      storageKey="closerflow-theme"
+      storageKey="zylmero-theme"
       disableTransitionOnChange
     >
       {children}
@@ -18,7 +18,7 @@ export function Providers({ children }: { children: ReactNode }) {
         richColors
         position="top-right"
         closeButton
-        theme="system"
+        theme="dark"
         toastOptions={{
           classNames: {
             toast:
@@ -31,3 +31,6 @@ export function Providers({ children }: { children: ReactNode }) {
     </ThemeProvider>
   );
 }
+
+export default Providers;
+export { Providers };

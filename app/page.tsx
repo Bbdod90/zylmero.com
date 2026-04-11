@@ -6,6 +6,10 @@ import { LandingPage } from "@/components/landing/landing-page";
 export default async function Home() {
   const auth = await getAuth();
 
+  if (auth.user && !auth.company) {
+    redirect("/dashboard/onboarding");
+  }
+
   if (auth.user && auth.company) {
     if (!auth.company.onboarding_completed) {
       redirect("/dashboard/onboarding");

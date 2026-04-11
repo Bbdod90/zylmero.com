@@ -1,5 +1,6 @@
 import { HeartHandshake, LineChart, MessageCircle, Rocket } from "lucide-react";
 import { ScrollReveal } from "@/components/landing/scroll-reveal";
+import { BRAND_NAME } from "@/lib/brand";
 
 const STEPS = [
   {
@@ -14,7 +15,7 @@ const STEPS = [
   },
   {
     icon: Rocket,
-    title: "Wat CloserFlow doet",
+    title: `Wat ${BRAND_NAME} doet`,
     body: "Eén rustige inbox, AI die jouw toon volgt, offertes en afspraken in één pijplijn. Van eerste bericht tot geboekt moment — zonder chaos.",
   },
   {

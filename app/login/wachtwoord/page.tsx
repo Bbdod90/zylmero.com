@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ForgotPasswordForm } from "@/app/login/forgot-password-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { BRAND_LOGO_MONOGRAM } from "@/lib/brand";
 
 export default function ForgotPasswordPage() {
   return (
@@ -12,7 +13,7 @@ export default function ForgotPasswordPage() {
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
           <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/30 to-accent/20 text-lg font-bold text-primary">
-            CF
+            {BRAND_LOGO_MONOGRAM}
           </div>
           <h1 className="mt-4 text-2xl font-semibold tracking-tight">Wachtwoord vergeten</h1>
           <p className="mt-2 text-sm text-muted-foreground">

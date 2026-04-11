@@ -31,7 +31,7 @@ export async function updateSession(request: NextRequest) {
 
   const ref = request.nextUrl.searchParams.get("ref");
   if (ref && /^[A-Z0-9]{6,12}$/i.test(ref)) {
-    response.cookies.set("cf_referral_code", ref.toUpperCase().slice(0, 12), {
+    response.cookies.set("zm_referral_code", ref.toUpperCase().slice(0, 12), {
       path: "/",
       maxAge: 60 * 60 * 24 * 90,
       sameSite: "lax",

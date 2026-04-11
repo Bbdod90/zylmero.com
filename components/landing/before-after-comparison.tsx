@@ -12,6 +12,7 @@ import {
   Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 import { enterAnonymousDemo } from "@/actions/demo";
 
@@ -102,7 +103,7 @@ export function BeforeAfterComparison() {
             )}
           >
             <p className="text-center text-xs font-bold uppercase tracking-[0.18em] text-primary">
-              Met CloserFlow
+              Met {BRAND_NAME}
             </p>
             <ul className="mt-8 space-y-4">
               {AFTER.map(({ icon: Icon, text }) => (

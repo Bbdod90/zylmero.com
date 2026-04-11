@@ -10,12 +10,12 @@ import { LandingNav } from "@/components/landing/landing-nav";
 import { StickyConversionBar } from "@/components/landing/sticky-conversion-bar";
 import { Button } from "@/components/ui/button";
 import { BILLING_PLANS } from "@/lib/billing/plans";
+import { BRAND_CONTACT_EMAIL, BRAND_LOGO_MONOGRAM, BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
 const HERO_H1 = "Je reageert te laat — en dat kost je klanten";
 
-const HERO_SUB =
-  "Aanvragen komen binnen, maar zonder snelle reactie kiest je klant iemand anders. CloserFlow reageert direct en zet aanvragen om in afspraken.";
+const HERO_SUB = `Aanvragen komen binnen, maar zonder snelle reactie kiest je klant iemand anders. ${BRAND_NAME} reageert direct en zet aanvragen om in afspraken.`;
 
 const HERO_TRUST = "Vaak al terugverdiend met één extra klant";
 
@@ -26,7 +26,7 @@ const fadeUp = {
   transition: { duration: 0.28, ease: [0.22, 1, 0.36, 1] },
 };
 
-export function CfLanding() {
+export function ZylmeroLanding() {
   return (
     <div className="min-h-screen bg-background pb-32 text-foreground md:pb-24">
       <LandingNav />
@@ -125,10 +125,10 @@ export function CfLanding() {
       >
         <div className="mx-auto max-w-[720px] px-4 md:px-8">
           <h2 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-            Wat CloserFlow doet
+            Wat {BRAND_NAME} doet
           </h2>
           <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-            Iemand stuurt een aanvraag. CloserFlow antwoordt meteen, stelt korte vragen en helpt door naar een
+            Iemand stuurt een aanvraag. {BRAND_NAME} antwoordt meteen, stelt korte vragen en helpt door naar een
             afspraak. Jij hoeft niet constant je telefoon te checken.
           </p>
         </div>
@@ -149,7 +149,11 @@ export function CfLanding() {
           <div className="mt-14 grid gap-8 md:grid-cols-3 md:gap-10">
             {[
               { step: "1", title: "Aanvraag komt binnen", body: "Via je site, mail of WhatsApp — alles op één plek." },
-              { step: "2", title: "CloserFlow reageert direct", body: "Korte, duidelijke antwoorden. Geen uren stilte." },
+              {
+                step: "2",
+                title: `${BRAND_NAME} reageert direct`,
+                body: "Korte, duidelijke antwoorden. Geen uren stilte.",
+              },
               { step: "3", title: "Afspraak wordt ingepland", body: "De klant kiest een moment. Jij ziet het in je agenda." },
             ].map((item) => (
               <div
@@ -385,9 +389,9 @@ export function CfLanding() {
           <div className="flex flex-col items-center gap-3 md:items-start">
             <div className="flex items-center gap-2.5">
               <div className="flex size-9 items-center justify-center rounded-lg bg-primary/15 text-sm font-semibold text-primary">
-                CF
+                {BRAND_LOGO_MONOGRAM}
               </div>
-              <span className="font-semibold text-foreground">CloserFlow</span>
+              <span className="font-semibold text-foreground">{BRAND_NAME}</span>
             </div>
             <p className="text-sm text-muted-foreground">Minder te laat, meer geboekt</p>
           </div>
@@ -395,7 +399,7 @@ export function CfLanding() {
             <Link href="/login" className="hover:text-foreground">
               Inloggen
             </Link>
-            <a href="mailto:hello@closerflow.app" className="hover:text-foreground">
+            <a href={`mailto:${BRAND_CONTACT_EMAIL}`} className="hover:text-foreground">
               Contact
             </a>
             <a href="#prijzen" className="hover:text-foreground">

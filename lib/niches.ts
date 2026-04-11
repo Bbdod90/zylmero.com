@@ -5,7 +5,7 @@
 
 export const DEMO_NICHE_DEFAULT = "garage" as const;
 
-export const NICHE_COOKIE = "cf_demo_niche";
+export const NICHE_COOKIE = "zm_demo_niche";
 
 export const NICHE_OPTION_IDS = [
   "general_services",

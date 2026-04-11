@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { enterAnonymousDemo } from "@/actions/demo";
+import { BRAND_NAME } from "@/lib/brand";
 
 function Submit() {
   const { pending } = useFormStatus();
@@ -117,7 +118,7 @@ export function MarketingLeadCapture() {
         ) : null}
         <Submit />
         <p className="text-center text-xs text-muted-foreground">
-          Door te versturen ga je akkoord met contact over CloserFlow. Geen nieuwsbrief zonder
+          Door te versturen ga je akkoord met contact over {BRAND_NAME}. Geen nieuwsbrief zonder
           toestemming.
         </p>
       </form>

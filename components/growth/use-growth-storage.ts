@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-const KEY = "closerflow_growth_v1";
+const KEY = "zylmero_growth_v1";
 
 export interface PipelineCounts {
   contacted: number;

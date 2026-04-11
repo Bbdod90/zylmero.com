@@ -1,4 +1,4 @@
--- CloserFlow — production schema (Supabase Postgres)
+-- Zylmero — production schema (Supabase Postgres)
 
 create extension if not exists "pgcrypto";
 

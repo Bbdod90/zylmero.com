@@ -1,3 +1,4 @@
+import { BRAND_NAME } from "@/lib/brand";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatDateTime } from "@/lib/utils";
 
@@ -16,7 +17,7 @@ async function sendResendHtml(input: {
   const key = process.env.RESEND_API_KEY;
   const from =
     process.env.RESEND_FROM_EMAIL?.trim() ||
-    "CloserFlow <onboarding@resend.dev>";
+    `${BRAND_NAME} <onboarding@resend.dev>`;
   if (!key) {
     console.info(
       `[appointment-reminder] (geen RESEND_API_KEY) skip naar ${input.to}`,
@@ -138,7 +139,7 @@ export async function processAppointmentReminders(): Promise<{
             : ""
         }
         ${row.notes ? `<p style="margin:0 0 8px"><strong>Notitie:</strong> ${escapeHtml(row.notes)}</p>` : ""}
-        <p style="margin:16px 0 0;font-size:13px;color:#666">— CloserFlow</p>
+        <p style="margin:16px 0 0;font-size:13px;color:#666">— ${BRAND_NAME}</p>
       </div>
     `;
 

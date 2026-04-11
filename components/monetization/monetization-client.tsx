@@ -67,7 +67,7 @@ export function MonetizationClient({
 
   useEffect(() => {
     if (!showUpgradeNudge || plan !== "trial") return;
-    const k = `cf_nudge_${companyId}`;
+    const k = `zm_nudge_${companyId}`;
     try {
       if (sessionStorage.getItem(k)) return;
     } catch {
@@ -78,7 +78,7 @@ export function MonetizationClient({
 
   function dismiss() {
     try {
-      sessionStorage.setItem(`cf_nudge_${companyId}`, "1");
+      sessionStorage.setItem(`zm_nudge_${companyId}`, "1");
     } catch {
       /* ignore */
     }

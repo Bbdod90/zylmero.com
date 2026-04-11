@@ -91,8 +91,20 @@ export async function completeOnboardingAction(
     if (formData.get(`channel_${id}`) === "on") chList.push(id);
   }
 
+  const weeklyBand = intake.weekly_leads_band || "";
+  const teamSz = intake.team_size || "";
+  const pain = intake.pain_note || "";
   const pricing_hints = flowV5
-    ? `Gemiddelde order rond €${avgOrderNum || "—"}. Kanalen: ${chList.join(", ") || "n.t.b."}. Reactietijd: ${responseTime || "—"}.`
+    ? [
+        `Gemiddelde order rond €${avgOrderNum || "—"}.`,
+        `Kanalen: ${chList.join(", ") || "n.t.b."}.`,
+        `Reactietijd nu: ${responseTime || "—"}.`,
+        weeklyBand ? `Geschatte aanvragen per week: ${weeklyBand}.` : "",
+        teamSz ? `Team: ${teamSz}.` : "",
+        pain ? `Belangrijkste knelpunt: ${pain}.` : "",
+      ]
+        .filter(Boolean)
+        .join(" ")
     : String(formData.get("pricing_hints") || "").trim() ||
       config.defaultPricingHints;
   const hoursRaw = String(formData.get("business_hours") || "").trim();
@@ -162,7 +174,9 @@ export async function completeOnboardingAction(
   await ensureCompanyReferralCode(supabase, company.id);
 
   try {
-    const ref = cookies().get("cf_referral_code")?.value?.trim().toUpperCase();
+    const ref =
+      cookies().get("zm_referral_code")?.value?.trim().toUpperCase() ||
+      cookies().get("cf_referral_code")?.value?.trim().toUpperCase();
     if (ref && ref.length >= 6) {
       const admin = createAdminClient();
       const { data: refRow } = await admin

@@ -8,6 +8,7 @@ import type { BillingPlanId } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { BillingUpgradeClient } from "@/components/billing/billing-upgrade-client";
 import { PAYWALL_AI_LEADS } from "@/lib/billing/paywall";
+import { BRAND_CONTACT_EMAIL, BRAND_NAME } from "@/lib/brand";
 
 export default async function UpgradePage() {
   const auth = await getAuth();
@@ -31,7 +32,7 @@ export default async function UpgradePage() {
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 px-4 py-12 md:py-16">
       <div className="mx-auto max-w-3xl text-center">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-          CloserFlow
+          {BRAND_NAME}
         </p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">
           {expired
@@ -131,7 +132,7 @@ export default async function UpgradePage() {
             </Button>
           )}
           <Button variant="ghost" asChild className="rounded-xl">
-            <a href="mailto:hello@closerflow.app">Contact verkoop</a>
+            <a href={`mailto:${BRAND_CONTACT_EMAIL}`}>Contact verkoop</a>
           </Button>
         </div>
       </div>

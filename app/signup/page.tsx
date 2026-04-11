@@ -1,8 +1,10 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { SignupForm } from "@/app/signup/signup-form";
+import { LocalhostMobileHint } from "@/components/auth/localhost-mobile-hint";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { BRAND_LOGO_MONOGRAM } from "@/lib/brand";
 
 export default function SignupPage() {
   return (
@@ -13,7 +15,7 @@ export default function SignupPage() {
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
           <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/26 to-accent/16 text-lg font-bold text-primary shadow-sm ring-1 ring-primary/15">
-            CF
+            {BRAND_LOGO_MONOGRAM}
           </div>
           <h1 className="mt-4 text-2xl font-semibold tracking-tight text-foreground">
             Start gratis proefperiode
@@ -22,6 +24,7 @@ export default function SignupPage() {
             Binnen 5 minuten live · Geen creditcard · Annuleer wanneer je wilt
           </p>
         </div>
+        <LocalhostMobileHint />
         <Card className="rounded-2xl border-border/70 bg-card/70">
           <CardHeader>
             <CardTitle className="text-base">Account</CardTitle>

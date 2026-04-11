@@ -1,3 +1,4 @@
+import { BRAND_NAME } from "@/lib/brand";
 import { getTemplate } from "@/lib/marketing/email-templates";
 
 export async function sendQueuedMarketingEmail(input: {
@@ -15,7 +16,7 @@ export async function sendQueuedMarketingEmail(input: {
   const key = process.env.RESEND_API_KEY;
   const from =
     process.env.RESEND_FROM_EMAIL?.trim() ||
-    "CloserFlow <onboarding@resend.dev>";
+    `${BRAND_NAME} <onboarding@resend.dev>`;
 
   if (!key) {
     console.info(

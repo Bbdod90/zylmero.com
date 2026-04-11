@@ -6,7 +6,11 @@ const openai = process.env.OPENAI_API_KEY
   : null;
 
 export async function POST(req: Request) {
-  let body: { message?: string; context?: { branche?: string; prijsrange?: string } };
+  let body: {
+    message?: string;
+    landing_demo?: boolean;
+    context?: { branche?: string; prijsrange?: string };
+  };
   try {
     body = await req.json();
   } catch {
@@ -18,6 +22,7 @@ export async function POST(req: Request) {
   }
   const branche = body.context?.branche || "service";
   const prijsrange = body.context?.prijsrange || "€100–€500";
+  const landingDemo = Boolean(body.landing_demo);
 
   if (!openai) {
     return NextResponse.json(
@@ -28,18 +33,26 @@ export async function POST(req: Request) {
 
   const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
 
+  const landingRules = landingDemo
+    ? `
+Homepage-demo: bezoekers typen vaak kort. Geen garage-standaardantwoorden tenzij ze expliciet over auto’s, banden, APK of montage praten.
+`
+    : "";
+
   const completion = await openai.chat.completions.create({
     model,
-    temperature: 0.45,
+    temperature: 0.35,
     max_tokens: 280,
     response_format: { type: "json_object" },
     messages: [
       {
         role: "system",
-        content: `Je antwoordt namens een Nederlands ${branche}-bedrijf. Schrijf zoals een ondernemer: kort, duidelijk, geen moeilijke woorden, geen marketingtaal.
-Stel hooguit twee vragen. Werk toe naar een concrete afspraak of volgende stap.
-Zeg nooit dat je een AI of assistent bent. Prijsindicatie voor context: ${prijsrange}.
-Antwoord alleen met een JSON-object met keys: reply, resultTitle, valueLine.`,
+        content: `Je antwoordt namens een Nederlands ${branche}-bedrijf. Schrijf zoals een ondernemer: kort, duidelijk, geen moeilijke woorden, geen marketingtaal.${landingRules}
+Als het bericht alleen een begroeting is (bijv. "hoi", "hallo", "hey") zonder concrete vraag: groet vriendelijk en vraag één zin wat ze nodig hebben. Geen afspraaktijden, geen "morgen om …", geen prijs in reply. Zet resultTitle op "Intake" en valueLine op "—".
+Als wél een concrete vraag of dienst genoemd wordt: stel hooguit twee vragen en werk toe naar een afspraak of volgende stap.
+Noem geen banden, APK, remmen of andere diensten die de klant niet genoemd heeft.
+Zeg nooit dat je een AI of assistent bent. Typische prijsrange voor valueLine (alleen als het past bij de vraag): ${prijsrange}.
+Antwoord alleen met JSON met keys: reply (string), resultTitle (string), valueLine (string).`,
       },
       { role: "user", content: message },
     ],

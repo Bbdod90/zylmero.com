@@ -19,6 +19,7 @@ import { Inbox, Search } from "lucide-react";
 import { computeDisplayScore, leadTemperature } from "@/lib/sales/scoring";
 import { TemperatureBadge } from "@/components/sales/temperature-badge";
 import { NewLeadDialog } from "@/components/leads/new-lead-dialog";
+import { BRAND_NAME } from "@/lib/brand";
 
 const SOURCES = [
   "all",
@@ -154,7 +155,7 @@ export function LeadsExplorer({
               Geen leads gevonden
             </p>
             <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
-              Wis filters — of breng meer inbound binnen zodat CloserFlow elk bericht
+              Wis filters — of breng meer inbound binnen zodat {BRAND_NAME} elk bericht
               automatisch vastlegt.
             </p>
           </div>

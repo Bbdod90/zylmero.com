@@ -16,7 +16,7 @@ export async function setSalesModeCookie(enabled: boolean): Promise<GrowthAction
   if (!auth.user || !auth.company || isDemoCompanyId(auth.company.id)) {
     return { ok: false, error: "Inloggen vereist." };
   }
-  cookies().set("cf_sales_mode", enabled ? "1" : "0", {
+  cookies().set("zm_sales_mode", enabled ? "1" : "0", {
     path: "/",
     maxAge: 60 * 60 * 24 * 365,
     sameSite: "lax",
@@ -77,7 +77,7 @@ export async function inviteClientAccount(input: {
       invited_by_company: auth.company.id,
       suggested_business_name: businessName,
     },
-    redirectTo: `${siteUrl}/auth/callback`,
+    redirectTo: `${siteUrl}/auth/callback?next=/dashboard`,
   });
 
   if (error) {

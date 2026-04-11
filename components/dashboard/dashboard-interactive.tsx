@@ -8,6 +8,7 @@ import {
 } from "@/components/motion/animated-number";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StaleReplyPulse } from "@/components/dashboard/stale-reply-pulse";
+import { BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
 function KpiCard({
@@ -181,7 +182,7 @@ export function DashboardInteractive(props: DashboardInteractiveProps) {
         <Card className="rounded-2xl border-border/50 bg-gradient-to-b from-card to-card/90 transition-colors hover:border-primary/25 dark:to-[hsl(222_26%_5.5%)]">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-semibold tracking-tight">
-              Waarde die CloserFlow hielp sluiten
+              Waarde die {BRAND_NAME} hielp sluiten
             </CardTitle>
             <p className="text-sm leading-relaxed text-muted-foreground">
               Geaccepteerde offertes (EUR) — ruimte die je ontgrendelt met snelheid.

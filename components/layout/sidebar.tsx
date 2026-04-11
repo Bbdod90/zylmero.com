@@ -25,6 +25,7 @@ import {
   Brain,
 } from "lucide-react";
 import type { AppNotification } from "@/lib/types";
+import { BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 import { signOutAction } from "@/actions/auth";
 import { DemoModeToggle } from "@/components/sales/demo-mode-toggle";
@@ -154,7 +155,7 @@ export function AppSidebar({
           <p className="truncate text-sm font-semibold leading-tight tracking-tight text-foreground">
             {companyName}
           </p>
-          <p className="text-2xs text-muted-foreground/90">CloserFlow</p>
+          <p className="text-2xs text-muted-foreground/90">{BRAND_NAME}</p>
           {trialDaysLeft != null && trialDaysLeft > 0 ? (
             <p className="mt-1.5 text-2xs font-medium text-amber-400/95">
               Proefperiode · nog {trialDaysLeft}{" "}

@@ -3,6 +3,7 @@ import { getAuth } from "@/lib/auth";
 import { getTeamInvitePreview } from "@/actions/team";
 import { AcceptInviteClient } from "./accept-invite-client";
 import { Button } from "@/components/ui/button";
+import { BRAND_NAME } from "@/lib/brand";
 
 export default async function AcceptInvitePage({
   searchParams,
@@ -27,7 +28,7 @@ export default async function AcceptInvitePage({
   return (
     <div className="mx-auto max-w-md p-8">
       <h1 className="text-xl font-semibold tracking-tight">
-        Teamuitnodiging CloserFlow
+        Teamuitnodiging {BRAND_NAME}
       </h1>
       {preview ? (
         <p className="mt-2 text-sm text-muted-foreground">

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Company } from "@/lib/types";
 import { Button } from "@/components/ui/button";
+import { BRAND_NAME } from "@/lib/brand";
 
 const planLabel: Record<string, string> = {
   trial: "Proefperiode",
@@ -57,7 +58,7 @@ export function BillingSettings({
         <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-4 text-sm text-muted-foreground">
           <p className="font-medium text-foreground">Voordat je opzegt</p>
           <p className="mt-1">
-            Als je stopt, verlies je automatisering en leads die CloserFlow voor je
+            Als je stopt, verlies je automatisering en leads die {BRAND_NAME} voor je
             opving terwijl jij met je werk bezig was.
           </p>
         </div>

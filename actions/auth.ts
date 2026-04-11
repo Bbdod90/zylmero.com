@@ -6,7 +6,8 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { mapAuthError } from "@/lib/i18n/auth-errors";
 import { scheduleMarketingDrip } from "@/lib/marketing/drip";
-import { resolveSiteUrl } from "@/lib/site-url";
+import { COOKIE_ANON_DEMO, COOKIE_DEMO, COOKIE_DEMO_ENTRY, COOKIE_SALES_MODE, LEGACY_COOKIES_TO_CLEAR } from "@/lib/app-cookies";
+import { tryResolveSiteUrl } from "@/lib/site-url";
 
 export type AuthFormState = {
   error?: string;
@@ -30,62 +31,24 @@ export async function signInAction(
     password,
   });
   if (error) {
-    return {
-      error: "Ongeldige gegevens. Controleer je e-mail en wachtwoord.",
-    };
+    return { error: mapAuthError(error.message) };
   }
   revalidatePath("/", "layout");
   redirect("/dashboard");
 }
 
-export async function signUpAction(
-  _prev: AuthFormState,
-  formData: FormData,
-): Promise<AuthFormState> {
-  const email = String(formData.get("email") || "").trim();
-  const password = String(formData.get("password") || "");
-  if (!email || !password || password.length < 8) {
-    return { error: "E-mail en wachtwoord (min. 8 tekens) zijn verplicht." };
-  }
-
-  const base = resolveSiteUrl();
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      emailRedirectTo: `${base}/auth/callback`,
-    },
-  });
-  if (error) {
-    return { error: mapAuthError(error.message) };
-  }
-
-  const refCookie = String(formData.get("referral_code") || "").trim();
-  if (refCookie) {
-    try {
-      cookies().set("cf_referral_code", refCookie.toUpperCase().slice(0, 12), {
-        path: "/",
-        maxAge: 60 * 60 * 24 * 90,
-        sameSite: "lax",
-      });
-    } catch {
-      /* ignore */
-    }
-  }
-
-  if (!data.session) {
-    return { success: true };
-  }
-
+/**
+ * Signup gebeurt in de browser (`createBrowserClient`) zodat Supabase rate limits per
+ * eindgebruiker-IP telt — server-side signup deelt één IP (Railway/Vercel) en raakt snel “te veel pogingen”.
+ * Deze action alleen als er direct een sessie is (e-mailbevestiging uit in Supabase).
+ */
+export async function signUpMarketingHookAction(email: string): Promise<void> {
   try {
     await scheduleMarketingDrip({ email, source: "signup" });
   } catch {
     /* niet blokkerend */
   }
-
   revalidatePath("/", "layout");
-  redirect("/dashboard/onboarding");
 }
 
 export async function requestPasswordResetAction(
@@ -97,10 +60,18 @@ export async function requestPasswordResetAction(
     return { error: "Vul je e-mailadres in." };
   }
 
-  const base = resolveSiteUrl();
+  /* Direct naar /reset-password: anders kan Supabase bij afwijkende callback naar Site URL (/) gaan. */
+  const base = tryResolveSiteUrl();
+  if (!base) {
+    return {
+      error:
+        "Site-URL ontbreekt: zet SITE_URL of NEXT_PUBLIC_SITE_URL in .env (zelfde basis-URL als je live app). Anders kan Supabase geen geldige resetlink maken.",
+    };
+  }
   const supabase = await createClient();
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${base}/auth/callback?next=/reset-password`,
+    /* `?r=1` zodat e-mailtemplate altijd `&token_hash=…` mag gebruiken (cross-device, geen PKCE). */
+    redirectTo: `${base}/reset-password?r=1`,
   });
   if (error) {
     return { error: mapAuthError(error.message) };
@@ -138,9 +109,16 @@ export async function signOutAction() {
   const supabase = await createClient();
   await supabase.auth.signOut();
   try {
-    cookies().set("cf_anon_demo", "", { path: "/", maxAge: 0 });
-    cookies().set("closerflow_demo", "", { path: "/", maxAge: 0 });
-    cookies().set("cf_sales_mode", "", { path: "/", maxAge: 0 });
+    const store = cookies();
+    for (const name of [
+      COOKIE_ANON_DEMO,
+      COOKIE_DEMO,
+      COOKIE_SALES_MODE,
+      COOKIE_DEMO_ENTRY,
+      ...LEGACY_COOKIES_TO_CLEAR,
+    ]) {
+      store.set(name, "", { path: "/", maxAge: 0 });
+    }
   } catch {
     /* ignore */
   }

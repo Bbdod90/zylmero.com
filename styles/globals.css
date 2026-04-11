@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /*
-  CloserFlow — premium SaaS: strakke typografie, diepte, rust.
+  Zylmero — premium SaaS: strakke typografie, diepte, rust.
 */
 @layer base {
   :root {
@@ -99,7 +99,7 @@
 }
 
 @layer utilities {
-  .cf-app-mesh {
+  .zm-app-mesh {
     background-image: radial-gradient(
         ellipse 130% 90% at 50% -35%,
         var(--cf-mesh-a),
