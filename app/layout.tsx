@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import dynamic from "next/dynamic";
 import { JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import { BRAND_NAME } from "@/lib/brand";
@@ -26,6 +26,17 @@ export const metadata: Metadata = {
   description: `Verlies geen klanten door trage reacties. ${BRAND_NAME} zet WhatsApp- en inboxberichten om in afspraken, offertes en omzet.`,
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "hsl(210 32% 98%)" },
+    { media: "(prefers-color-scheme: dark)", color: "hsl(228 32% 4%)" },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -34,7 +45,7 @@ export default function RootLayout({
   return (
     <html lang="nl" className="scroll-smooth" suppressHydrationWarning>
       <body
-        className={`${sans.variable} ${mono.variable} zm-app-mesh min-h-screen bg-background font-sans text-[15px] antialiased transition-colors duration-300 sm:text-[15.5px]`}
+        className={`${sans.variable} ${mono.variable} zm-app-mesh min-h-dvh bg-background font-sans text-[15px] antialiased transition-colors duration-300 sm:text-[15.5px]`}
       >
         <Providers>{children}</Providers>
       </body>

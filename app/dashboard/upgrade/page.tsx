@@ -29,7 +29,7 @@ export default async function UpgradePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 px-4 py-12 md:py-16">
+    <div className="min-h-dvh bg-gradient-to-b from-background to-secondary/20 px-safe py-12 md:py-16">
       <div className="mx-auto max-w-3xl text-center">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
           {BRAND_NAME}

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Sparkles } from "lucide-react";
-import { runAiSetupAction } from "@/actions/ai-setup";
+import { runAiSetupAction, skipAiSetupAction } from "@/actions/ai-setup";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BRAND_NAME } from "@/lib/brand";
@@ -13,6 +13,7 @@ export function AiSetupClient({ companyName }: { companyName: string }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [skipPending, setSkipPending] = useState(false);
   const [showSlow, setShowSlow] = useState(false);
 
   useEffect(() => {
@@ -35,7 +36,7 @@ export function AiSetupClient({ companyName }: { companyName: string }) {
         return;
       }
       if (result?.ok) {
-        router.push("/dashboard/value-moment");
+        router.push("/dashboard");
         router.refresh();
         return;
       }
@@ -49,8 +50,30 @@ export function AiSetupClient({ companyName }: { companyName: string }) {
     }
   }
 
+  async function onSkip() {
+    setError(null);
+    setSkipPending(true);
+    try {
+      const result = await skipAiSetupAction();
+      if (result?.error) {
+        setError(result.error);
+        return;
+      }
+      if (result?.ok) {
+        router.push("/dashboard");
+        router.refresh();
+        return;
+      }
+      setError("Kon niet overslaan. Probeer opnieuw.");
+    } catch {
+      setError("Verbinding verbroken. Vernieuw de pagina en probeer opnieuw.");
+    } finally {
+      setSkipPending(false);
+    }
+  }
+
   return (
-    <div className="mx-auto max-w-lg px-4 py-12">
+    <div className="mx-auto w-full max-w-lg px-safe py-10 sm:px-6 sm:py-12">
       <Card className="rounded-[1.35rem] border-primary/15 bg-card/80 shadow-xl">
         <CardHeader className="space-y-3 text-center">
           <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-primary/12 text-primary">
@@ -91,10 +114,19 @@ export function AiSetupClient({ companyName }: { companyName: string }) {
             ) : null}
             <Button
               type="submit"
-              className="h-14 w-full rounded-2xl text-base font-bold shadow-lg shadow-primary/25"
-              disabled={pending}
+              className="h-14 min-h-[3.25rem] w-full touch-manipulation rounded-2xl text-base font-bold shadow-lg shadow-primary/25"
+              disabled={pending || skipPending}
             >
               {pending ? "Even geduld…" : "Genereer mijn AI-profiel"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="h-12 min-h-12 w-full touch-manipulation rounded-xl border-border/80"
+              disabled={pending || skipPending}
+              onClick={onSkip}
+            >
+              {skipPending ? "Bezig…" : "Overslaan — later in Instellingen"}
             </Button>
             {showSlow ? (
               <p className="text-center text-xs text-muted-foreground">

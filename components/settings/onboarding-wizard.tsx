@@ -155,8 +155,8 @@ export function OnboardingWizard() {
   const canStep1 = channels.size > 0;
 
   return (
-    <div className="w-full max-w-xl space-y-8">
-      <div className="relative overflow-hidden rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/[0.12] via-primary/[0.05] to-transparent p-5 shadow-sm">
+    <div className="w-full max-w-xl space-y-6 sm:space-y-8">
+      <div className="relative overflow-hidden rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/[0.12] via-primary/[0.05] to-transparent p-4 shadow-sm sm:p-5">
         <div className="absolute -right-8 -top-8 size-32 rounded-full bg-primary/10 blur-2xl" />
         <div className="relative flex items-start gap-3">
           <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">
@@ -176,7 +176,7 @@ export function OnboardingWizard() {
                 type="button"
                 variant="outline"
                 size="sm"
-                className="shrink-0 rounded-lg border-border/80"
+                className="h-11 min-h-11 shrink-0 touch-manipulation rounded-lg border-border/80 sm:h-9 sm:min-h-0"
                 disabled={pending || skipPending}
                 onClick={skipWizard}
               >
@@ -194,7 +194,7 @@ export function OnboardingWizard() {
       ) : null}
 
       <Card className="overflow-hidden border-border/60 bg-card/90 shadow-2xl shadow-black/20">
-        <CardHeader className="space-y-4 border-b border-border/50 bg-muted/20 px-6 pb-5 pt-6">
+        <CardHeader className="space-y-4 border-b border-border/50 bg-muted/20 px-4 pb-4 pt-5 sm:px-6 sm:pb-5 sm:pt-6">
           <div className="flex items-center justify-between gap-3">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               Stap {step + 1} / {steps}
@@ -208,7 +208,7 @@ export function OnboardingWizard() {
             />
           </div>
         </CardHeader>
-        <CardContent className="space-y-6 px-6 py-7">
+        <CardContent className="space-y-5 px-4 py-6 sm:space-y-6 sm:px-6 sm:py-7">
           {step === 0 ? (
             <div className="space-y-5">
               <div className="space-y-2">
@@ -219,8 +219,9 @@ export function OnboardingWizard() {
                   id="co"
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}
-                  className="h-12 rounded-xl border-border/80 text-base"
+                  className="h-12 min-h-12 rounded-xl border-border/80 text-base"
                   placeholder="Bijv. De Schildershoek"
+                  autoComplete="organization"
                   required
                 />
               </div>
@@ -234,7 +235,7 @@ export function OnboardingWizard() {
                       type="button"
                       onClick={() => setNiche(opt.id)}
                       className={cn(
-                        "rounded-xl border px-3 py-2.5 text-left text-sm font-medium transition-all",
+                        "min-h-11 touch-manipulation rounded-xl border px-3 py-2.5 text-left text-sm font-medium transition-all",
                         niche === opt.id
                           ? "border-primary bg-primary/12 text-primary shadow-sm ring-1 ring-primary/20"
                           : "border-border/70 text-muted-foreground hover:border-border hover:bg-muted/50",
@@ -273,7 +274,7 @@ export function OnboardingWizard() {
                     type="button"
                     onClick={() => toggleChannel(c.id)}
                     className={cn(
-                      "flex flex-col gap-1 rounded-2xl border px-4 py-4 text-left transition-all",
+                      "flex min-h-[4.5rem] touch-manipulation flex-col gap-1 rounded-2xl border px-4 py-4 text-left transition-all sm:min-h-0",
                       channels.has(c.id)
                         ? "border-primary bg-primary/10 shadow-sm ring-1 ring-primary/25"
                         : "border-border/70 hover:bg-muted/40",
@@ -409,7 +410,7 @@ export function OnboardingWizard() {
                       type="button"
                       onClick={() => setResponse(r.id)}
                       className={cn(
-                        "flex w-full items-start gap-4 rounded-2xl border px-4 py-4 text-left transition-all sm:px-5 sm:py-5",
+                        "flex w-full touch-manipulation items-start gap-4 rounded-2xl border px-4 py-4 text-left transition-all sm:px-5 sm:py-5",
                         response === r.id
                           ? "border-primary bg-primary/[0.09] shadow-md ring-2 ring-primary/25"
                           : "border-border/70 hover:border-border hover:bg-muted/30",
@@ -439,10 +440,10 @@ export function OnboardingWizard() {
 
           {step === 4 ? (
             <div className="space-y-5">
-              <div className="relative overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-b from-primary/[0.14] to-transparent px-6 py-8 text-center">
+              <div className="relative overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-b from-primary/[0.14] to-transparent px-4 py-6 text-center sm:px-6 sm:py-8">
                 <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,hsl(var(--primary)/0.2),transparent_55%)]" />
                 <p className="relative text-sm font-medium text-muted-foreground">Geschat omzet dat nu blijft liggen</p>
-                <p className="relative mt-2 text-5xl font-black tabular-nums tracking-tight text-primary">
+                <p className="relative mt-2 break-words text-3xl font-black tabular-nums tracking-tight text-primary sm:text-4xl md:text-5xl">
                   €{leak.toLocaleString("nl-NL")}
                 </p>
                 <p className="relative mt-1 text-sm font-medium text-foreground">per maand</p>
@@ -478,7 +479,7 @@ export function OnboardingWizard() {
               <Button
                 type="button"
                 variant="outline"
-                className="flex-1 rounded-xl border-border/80"
+                className="min-h-12 flex-1 touch-manipulation rounded-xl border-border/80 sm:min-h-10"
                 onClick={() => setStep((s) => s - 1)}
                 disabled={pending}
               >
@@ -490,7 +491,7 @@ export function OnboardingWizard() {
             {step < 4 ? (
               <Button
                 type="button"
-                className="flex-1 rounded-xl font-semibold shadow-lg shadow-primary/20"
+                className="min-h-12 flex-1 touch-manipulation rounded-xl font-semibold shadow-lg shadow-primary/20 sm:min-h-10"
                 disabled={
                   pending ||
                   (step === 0 && !canStep0) ||
@@ -504,7 +505,7 @@ export function OnboardingWizard() {
             ) : (
               <Button
                 type="button"
-                className="flex-1 rounded-xl font-bold shadow-lg shadow-primary/25"
+                className="min-h-12 flex-1 touch-manipulation rounded-xl font-bold shadow-lg shadow-primary/25 sm:min-h-10"
                 disabled={pending || !canStep0}
                 onClick={submit}
               >
@@ -516,7 +517,7 @@ export function OnboardingWizard() {
             <div className="text-center">
               <button
                 type="button"
-                className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
+                className="min-h-11 touch-manipulation px-2 py-2 text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
                 disabled={pending || !canStep0}
                 onClick={() => setStep(4)}
               >

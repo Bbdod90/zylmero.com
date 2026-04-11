@@ -20,14 +20,11 @@ export default async function AiSetupPage() {
 
   const done = Boolean(st?.ai_setup_completed_at);
   if (done) {
-    if (!auth.company.value_moment_completed_at) {
-      redirect("/dashboard/value-moment");
-    }
     redirect("/dashboard");
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-secondary/10 to-background">
+    <div className="min-h-dvh bg-gradient-to-b from-background via-secondary/10 to-background">
       <div className="border-b border-border/60 bg-card/30 px-6 py-4">
         <p className="text-sm font-semibold">{BRAND_NAME}</p>
         <p className="text-xs text-muted-foreground">AI-setup</p>

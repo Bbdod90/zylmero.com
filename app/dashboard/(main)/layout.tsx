@@ -10,7 +10,7 @@ import { getUpgradeNudgeSignals } from "@/lib/queries/monetization";
 import { MonetizationClient } from "@/components/monetization/monetization-client";
 import { isDemoMode, isForcedDemoEnv } from "@/lib/env";
 import { getDemoNicheId } from "@/lib/demo/niche-context";
-import { AppSidebar } from "@/components/layout/sidebar";
+import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { DemoBanner } from "@/components/sales/demo-banner";
 import { ANONYMOUS_DEMO_USER_ID } from "@/lib/auth/constants";
 import { createClient } from "@/lib/supabase/server";
@@ -18,6 +18,7 @@ import { syncNotificationsForCompany } from "@/lib/notifications/sync";
 import { fetchNotificationsForCompany } from "@/lib/queries/notifications";
 import { PastDueBanner } from "@/components/billing/past-due-banner";
 import { ProfileIntakeBanner } from "@/components/dashboard/profile-intake-banner";
+import { DeferredSetupBanner } from "@/components/dashboard/deferred-setup-banner";
 import { ConversionUrgencyBar } from "@/components/dashboard/conversion-urgency-bar";
 import { isFounderUser } from "@/lib/founder/access";
 import type { AppNotification } from "@/lib/types";
@@ -39,13 +40,6 @@ export default async function MainDashboardLayout({
     redirect("/dashboard/upgrade");
   }
 
-  if (
-    !isDemoCompanyId(auth.company.id) &&
-    !auth.company.value_moment_completed_at
-  ) {
-    redirect("/dashboard/value-moment");
-  }
-
   const demoOn = isDemoMode();
   const demoForced = isForcedDemoEnv();
   const trialDays =
@@ -56,6 +50,18 @@ export default async function MainDashboardLayout({
 
   const supabase = await createClient();
   const founderSales = await isFounderUser(supabase, auth.user.id);
+
+  let needsAiSetupNudge = false;
+  let needsValueMomentNudge = false;
+  if (!demoOn && !isDemoCompanyId(auth.company.id)) {
+    needsValueMomentNudge = !auth.company.value_moment_completed_at;
+    const { data: stRow } = await supabase
+      .from("company_settings")
+      .select("ai_setup_completed_at")
+      .eq("company_id", auth.company.id)
+      .maybeSingle();
+    needsAiSetupNudge = !stRow?.ai_setup_completed_at;
+  }
 
   let notifications: AppNotification[] = [];
   let showUpgradeNudge = false;
@@ -71,36 +77,41 @@ export default async function MainDashboardLayout({
     upgradeNudgeReason = showUpgradeNudge ? signals.nudgeReason : null;
   }
 
+  const sidebarProps = {
+    companyName: auth.company.name,
+    demoActive: demoOn,
+    demoForced: demoForced,
+    trialDaysLeft: trialDays,
+    isAnonymousPreview: isAnonymousPreview,
+    notifications,
+    founderSales,
+  };
+
   return (
-    <div className="flex min-h-screen bg-background">
-      <AppSidebar
-        companyName={auth.company.name}
-        demoActive={demoOn}
-        demoForced={demoForced}
-        trialDaysLeft={trialDays}
-        isAnonymousPreview={isAnonymousPreview}
-        notifications={notifications}
-        founderSales={founderSales}
-      />
-      <div className="flex min-w-0 flex-1 flex-col">
-        {demoOn ? (
-          <DemoBanner forced={demoForced} demoNicheId={getDemoNicheId()} />
-        ) : null}
-        <PastDueBanner company={auth.company} />
-        {!demoOn &&
-        !isDemoCompanyId(auth.company.id) &&
-        !auth.company.profile_intake_completed ? (
-          <ProfileIntakeBanner />
-        ) : null}
-        <ConversionUrgencyBar demoMode={demoOn} />
-        <MonetizationClient
-          companyId={auth.company.id}
-          plan={auth.company.plan}
-          showUpgradeNudge={showUpgradeNudge}
-          nudgeReason={upgradeNudgeReason}
+    <DashboardShell sidebarProps={sidebarProps}>
+      {demoOn ? (
+        <DemoBanner forced={demoForced} demoNicheId={getDemoNicheId()} />
+      ) : null}
+      <PastDueBanner company={auth.company} />
+      {!demoOn &&
+      !isDemoCompanyId(auth.company.id) &&
+      !auth.company.profile_intake_completed ? (
+        <ProfileIntakeBanner />
+      ) : null}
+      {!demoOn && !isDemoCompanyId(auth.company.id) ? (
+        <DeferredSetupBanner
+          needsAiSetup={needsAiSetupNudge}
+          needsValueMoment={needsValueMomentNudge}
         />
-        {children}
-      </div>
-    </div>
+      ) : null}
+      <ConversionUrgencyBar demoMode={demoOn} />
+      <MonetizationClient
+        companyId={auth.company.id}
+        plan={auth.company.plan}
+        showUpgradeNudge={showUpgradeNudge}
+        nudgeReason={upgradeNudgeReason}
+      />
+      {children}
+    </DashboardShell>
   );
 }

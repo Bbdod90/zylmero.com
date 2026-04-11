@@ -8,16 +8,16 @@ import { BRAND_LOGO_MONOGRAM } from "@/lib/brand";
 
 export default function SignupPage() {
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-background p-6">
-      <div className="absolute right-4 top-4 z-10">
+    <div className="relative flex min-h-dvh items-center justify-center bg-background px-safe py-8 sm:p-6">
+      <div className="absolute right-[max(1rem,env(safe-area-inset-right))] top-[max(1rem,env(safe-area-inset-top))] z-10">
         <ThemeToggle />
       </div>
-      <div className="w-full max-w-md space-y-6">
+      <div className="w-full max-w-md space-y-5 sm:space-y-6">
         <div className="text-center">
           <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/26 to-accent/16 text-lg font-bold text-primary shadow-sm ring-1 ring-primary/15">
             {BRAND_LOGO_MONOGRAM}
           </div>
-          <h1 className="mt-4 text-2xl font-semibold tracking-tight text-foreground">
+          <h1 className="mt-4 text-balance text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
             Start gratis proefperiode
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">

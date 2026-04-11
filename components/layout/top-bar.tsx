@@ -11,7 +11,7 @@ export function TopBar({
   return (
     <header className="sticky top-0 z-30 border-b border-border/50 bg-background/85 backdrop-blur-md supports-[backdrop-filter]:bg-background/70 dark:border-white/[0.06] dark:bg-background/[0.82]">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
-      <div className="mx-auto flex min-h-[3.75rem] max-w-[1580px] items-center justify-between gap-4 px-4 py-2.5 sm:min-h-[4rem] sm:px-7 lg:px-12">
+      <div className="mx-auto flex min-h-[3.75rem] max-w-[1580px] items-center justify-between gap-3 px-safe py-2.5 sm:min-h-[4rem] sm:gap-4 sm:px-7 lg:px-12">
         <div className="min-w-0 space-y-2">
           <h1 className="truncate text-lg font-semibold tracking-tight text-foreground sm:text-xl">
             {title}

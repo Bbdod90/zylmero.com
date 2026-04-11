@@ -82,9 +82,11 @@ const GROUPS: { title: string; items: NavItem[] }[] = [
 function NavLink({
   item,
   pathname,
+  onNavigate,
 }: {
   item: NavItem;
   pathname: string;
+  onNavigate?: () => void;
 }) {
   const Icon = item.icon;
   const active =
@@ -93,8 +95,9 @@ function NavLink({
   return (
     <Link
       href={item.href}
+      onClick={() => onNavigate?.()}
       className={cn(
-        "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-[0.8125rem] font-medium transition-colors duration-200",
+        "group relative flex min-h-11 touch-manipulation items-center gap-3 rounded-lg px-3 py-2 text-[0.8125rem] font-medium transition-colors duration-200 active:bg-muted/50",
         active
           ? "bg-primary/[0.09] text-foreground before:absolute before:left-0 before:top-1/2 before:h-7 before:w-[3px] before:-translate-y-1/2 before:rounded-full before:bg-primary dark:bg-white/[0.06]"
           : "text-muted-foreground hover:bg-muted/60 hover:text-foreground dark:hover:bg-white/[0.04]",
@@ -113,6 +116,22 @@ function NavLink({
   );
 }
 
+export type AppSidebarProps = {
+  companyName: string;
+  demoActive: boolean;
+  demoForced: boolean;
+  trialDaysLeft?: number | null;
+  isAnonymousPreview?: boolean;
+  notifications?: AppNotification[];
+  founderSales?: boolean;
+  /** Root <aside> (bijv. `hidden lg:flex` voor desktop-only) */
+  className?: string;
+  /** Sluit mobiel menu na navigatie */
+  onNavLinkClick?: () => void;
+  /** Verberg bel in zijbalk (bijv. mobiele header toont al meldingen) */
+  hideNotificationBell?: boolean;
+};
+
 export function AppSidebar({
   companyName,
   demoActive,
@@ -121,15 +140,10 @@ export function AppSidebar({
   isAnonymousPreview,
   notifications = [],
   founderSales = false,
-}: {
-  companyName: string;
-  demoActive: boolean;
-  demoForced: boolean;
-  trialDaysLeft?: number | null;
-  isAnonymousPreview?: boolean;
-  notifications?: AppNotification[];
-  founderSales?: boolean;
-}) {
+  className,
+  onNavLinkClick,
+  hideNotificationBell = false,
+}: AppSidebarProps) {
   const pathname = usePathname();
 
   const groups = GROUPS.map((g) => {
@@ -146,8 +160,13 @@ export function AppSidebar({
   });
 
   return (
-    <aside className="sticky top-0 flex h-screen w-[16.25rem] shrink-0 flex-col border-r border-border/55 bg-background/55 backdrop-blur-md dark:border-white/[0.06] dark:bg-card/40">
-      <div className="flex min-h-[4rem] items-center gap-2.5 border-b border-border/55 px-4 py-3.5 dark:border-white/[0.06]">
+    <aside
+      className={cn(
+        "sticky top-0 flex h-dvh max-h-dvh w-full min-w-0 shrink-0 flex-col border-r border-border/55 bg-background/80 backdrop-blur-md dark:border-white/[0.06] dark:bg-card/40 lg:w-[16.25rem]",
+        className,
+      )}
+    >
+      <div className="flex min-h-[3.75rem] items-center gap-2.5 border-b border-border/55 px-3 py-3 sm:min-h-[4rem] sm:px-4 sm:py-3.5 dark:border-white/[0.06]">
         <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/22 to-accent/12 shadow-inner-soft ring-1 ring-border/50 dark:from-primary/28 dark:ring-white/[0.07]">
           <LayoutGrid className="size-[1.0625rem] text-primary" />
         </div>
@@ -163,7 +182,7 @@ export function AppSidebar({
             </p>
           ) : null}
         </div>
-        {!isAnonymousPreview ? (
+        {!isAnonymousPreview && !hideNotificationBell ? (
           <NotificationBell initial={notifications} />
         ) : null}
       </div>
@@ -171,7 +190,8 @@ export function AppSidebar({
         <div className="border-b border-border/50 px-4 pb-4 pt-2 dark:border-white/[0.05]">
           <Link
             href="/dashboard/upgrade"
-            className="flex items-center gap-2 rounded-xl border border-primary/20 bg-primary/[0.06] px-3.5 py-2.5 text-2xs font-semibold text-primary transition-colors hover:bg-primary/10"
+            onClick={() => onNavLinkClick?.()}
+            className="flex min-h-11 touch-manipulation items-center gap-2 rounded-xl border border-primary/20 bg-primary/[0.06] px-3.5 py-2.5 text-2xs font-semibold text-primary transition-colors hover:bg-primary/10"
           >
             <CreditCard className="size-3.5 shrink-0" />
             Bekijk abonnementen
@@ -191,7 +211,12 @@ export function AppSidebar({
             </p>
             <div className="flex flex-col gap-0.5">
               {group.items.map((item) => (
-                <NavLink key={item.href} item={item} pathname={pathname} />
+                <NavLink
+                  key={item.href}
+                  item={item}
+                  pathname={pathname}
+                  onNavigate={onNavLinkClick}
+                />
               ))}
             </div>
           </div>
@@ -202,8 +227,9 @@ export function AppSidebar({
           </p>
           <Link
             href="/dashboard/upgrade"
+            onClick={() => onNavLinkClick?.()}
             className={cn(
-              "group flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all duration-200",
+              "group flex min-h-11 touch-manipulation items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all duration-200",
               pathname === "/dashboard/upgrade"
                 ? "bg-primary/12 text-foreground dark:bg-white/[0.08]"
                 : "text-muted-foreground hover:bg-muted/70 hover:text-foreground dark:hover:bg-white/[0.04]",
@@ -227,7 +253,7 @@ export function AppSidebar({
       <form action={signOutAction} className="border-t border-border/60 p-4 dark:border-white/[0.06]">
         <button
           type="submit"
-          className="flex w-full items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground dark:hover:bg-white/[0.04]"
+          className="flex min-h-12 w-full touch-manipulation items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground dark:hover:bg-white/[0.04]"
         >
           <LogOut className="size-4" />
           {isAnonymousPreview ? "Demo verlaten" : "Uitloggen"}

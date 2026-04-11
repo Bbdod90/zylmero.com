@@ -13,7 +13,7 @@ export function DemoBanner({
   const anon = isAnonymousPreviewSession();
 
   return (
-    <div className="relative overflow-hidden border-b border-border/50 bg-gradient-to-r from-primary/[0.06] via-card/50 to-accent/[0.04] px-4 py-3 text-center text-xs leading-relaxed sm:flex sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left">
+    <div className="relative overflow-hidden border-b border-border/50 bg-gradient-to-r from-primary/[0.06] via-card/50 to-accent/[0.04] px-safe py-3 text-center text-xs leading-relaxed sm:flex sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_100%_120%_at_30%_-40%,hsl(var(--primary)/0.12),transparent_55%)]" />
       <div className="relative flex flex-1 flex-col items-center gap-2 sm:flex-row sm:items-center sm:gap-3">
         <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary ring-1 ring-primary/20">

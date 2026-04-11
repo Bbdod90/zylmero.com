@@ -28,7 +28,7 @@ const fadeUp = {
 
 export function ZylmeroLanding() {
   return (
-    <div className="min-h-screen bg-background pb-32 text-foreground md:pb-24">
+    <div className="min-h-dvh bg-background pb-32 text-foreground md:pb-24">
       <LandingNav />
 
       <section className="relative overflow-hidden border-b border-border/40 dark:border-white/[0.06]">

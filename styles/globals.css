@@ -85,13 +85,24 @@
   html {
     @apply scroll-smooth;
     scrollbar-gutter: stable;
+    overflow-x: clip;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
   body {
-    @apply min-h-screen bg-background text-foreground antialiased;
+    @apply overflow-x-hidden bg-background text-foreground antialiased;
+    min-height: 100vh;
+    min-height: 100dvh;
     font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: hsl(var(--primary) / 0.12);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
   }
   ::selection {
     @apply bg-primary/25 text-foreground;
@@ -99,6 +110,33 @@
 }
 
 @layer utilities {
+  /**
+   * Viewport-hoogte: één property-set, geen dubbele Tailwind-classes (cssConflict).
+   * 100vh eerst als fallback; 100dvh wint op browsers die dynamic viewport ondersteunen.
+   */
+  .min-h-dvh {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+  .h-dvh {
+    height: 100vh;
+    height: 100dvh;
+  }
+  .max-h-dvh {
+    max-height: 100vh;
+    max-height: 100dvh;
+  }
+  /** Horizontale safe-area (iPhone notch, tablets) */
+  .px-safe {
+    padding-left: max(1rem, env(safe-area-inset-left, 0px));
+    padding-right: max(1rem, env(safe-area-inset-right, 0px));
+  }
+  .pb-safe {
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+  }
+  .pt-safe {
+    padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
+  }
   .zm-app-mesh {
     background-image: radial-gradient(
         ellipse 130% 90% at 50% -35%,

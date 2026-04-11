@@ -31,7 +31,7 @@ export default async function AuthBevestigdPage({
       : `${BRAND_DEFAULT_SITE_URL.replace(/\/$/, "")}${nextPath}`;
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center bg-background px-6 py-16 [background-image:radial-gradient(ellipse_80%_50%_at_50%_-20%,hsl(var(--primary)/0.12),transparent)]">
+    <div className="relative flex min-h-dvh flex-col items-center justify-center bg-background px-safe py-16 [background-image:radial-gradient(ellipse_80%_50%_at_50%_-20%,hsl(var(--primary)/0.12),transparent)]">
       <div className="absolute right-4 top-4">
         <ThemeToggle />
       </div>

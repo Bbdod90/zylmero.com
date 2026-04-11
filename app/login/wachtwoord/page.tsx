@@ -6,7 +6,7 @@ import { BRAND_LOGO_MONOGRAM } from "@/lib/brand";
 
 export default function ForgotPasswordPage() {
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-background p-6">
+    <div className="relative flex min-h-dvh items-center justify-center bg-background px-safe py-8 sm:p-6">
       <div className="absolute right-4 top-4 z-10">
         <ThemeToggle />
       </div>

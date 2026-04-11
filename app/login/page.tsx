@@ -15,16 +15,18 @@ export default function LoginPage({
   const detail = typeof searchParams?.detail === "string" ? searchParams.detail : undefined;
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-background p-6">
-      <div className="absolute right-4 top-4 z-10">
+    <div className="relative flex min-h-dvh items-center justify-center bg-background px-safe py-8 sm:p-6">
+      <div className="absolute right-[max(1rem,env(safe-area-inset-right))] top-[max(1rem,env(safe-area-inset-top))] z-10">
         <ThemeToggle />
       </div>
-      <div className="w-full max-w-md space-y-8">
+      <div className="w-full max-w-md space-y-6 sm:space-y-8">
         <div className="text-center">
           <div className="mx-auto flex size-12 items-center justify-center rounded-xl bg-primary/12 text-sm font-semibold text-primary ring-1 ring-primary/15">
             {BRAND_LOGO_MONOGRAM}
           </div>
-          <h1 className="mt-5 text-2xl font-semibold tracking-tight text-foreground">Inloggen</h1>
+          <h1 className="mt-5 text-balance text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
+            Inloggen
+          </h1>
           <p className="mt-2 text-sm text-muted-foreground">Log in om je aanvragen te beheren</p>
         </div>
         <LocalhostMobileHint />

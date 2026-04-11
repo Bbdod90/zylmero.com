@@ -58,15 +58,39 @@ function omitBookingLink(row: Record<string, unknown>): Record<string, unknown> 
   return rest;
 }
 
+function omitBusinessHours(row: Record<string, unknown>): Record<string, unknown> {
+  const { business_hours: _h, ...rest } = row;
+  return rest;
+}
+
+function omitNicheIntakeAndKnowledge(row: Record<string, unknown>): Record<string, unknown> {
+  const { niche_intake: _n, knowledge_snippets: _k, ...rest } = row;
+  return rest;
+}
+
 async function insertCompanySettingsResilient(
   supabase: SupabaseClient,
   fullRow: Record<string, unknown>,
 ): Promise<{ error: { message: string } | null }> {
+  const noAuto = rowWithoutAutomationPreferences(fullRow);
   const attempts: Record<string, unknown>[] = [
     fullRow,
     omitBookingLink(fullRow),
-    rowWithoutAutomationPreferences(fullRow),
-    omitBookingLink(rowWithoutAutomationPreferences(fullRow)),
+    omitBusinessHours(fullRow),
+    omitBookingLink(omitBusinessHours(fullRow)),
+    noAuto,
+    omitBookingLink(noAuto),
+    omitBusinessHours(noAuto),
+    omitBookingLink(omitBusinessHours(noAuto)),
+    omitNicheIntakeAndKnowledge(omitBookingLink(omitBusinessHours(noAuto))),
+    {
+      company_id: fullRow.company_id,
+      niche: fullRow.niche,
+      services: fullRow.services ?? [],
+      faq: fullRow.faq ?? [],
+      pricing_hints: fullRow.pricing_hints ?? null,
+      language: (fullRow.language as string) || "nl",
+    },
   ];
 
   let last: { message: string } | null = null;
@@ -185,7 +209,7 @@ export async function skipOnboardingWizardAction(): Promise<OnboardingState> {
   await applyReferralIfPresent(company.id);
 
   revalidatePath("/", "layout");
-  redirect("/dashboard/ai-setup");
+  redirect("/dashboard");
 }
 
 export async function completeOnboardingAction(
@@ -355,5 +379,5 @@ export async function completeOnboardingAction(
   await applyReferralIfPresent(company.id);
 
   revalidatePath("/", "layout");
-  redirect("/dashboard/ai-setup");
+  redirect("/dashboard");
 }

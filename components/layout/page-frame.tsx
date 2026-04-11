@@ -13,7 +13,7 @@ export function PageFrame({
   return (
     <>
       <TopBar title={title} subtitle={subtitle} />
-      <div className="mx-auto w-full max-w-[1580px] flex-1 space-y-8 px-4 py-7 sm:space-y-11 sm:px-7 sm:py-9 lg:px-12 lg:py-11">
+      <div className="mx-auto w-full max-w-[1580px] flex-1 space-y-8 px-safe py-7 sm:space-y-11 sm:px-7 sm:py-9 lg:px-12 lg:py-11">
         {children}
       </div>
     </>
