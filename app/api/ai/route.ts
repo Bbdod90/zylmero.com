@@ -62,6 +62,20 @@ function dentalIntent(msg: string): boolean {
   );
 }
 
+/** Laadpaal / EV-laadinfrastructuur (elektricien-demo), niet verwarren met automotive banden/APK. */
+function electricianEvIntent(msg: string): boolean {
+  return /\b(laadpaal|laadpalen|wallbox|opladen|oplaad|thuislader|ev\b|elektrisch\s+auto|elektrische\s+auto|laadstation)\b/i.test(
+    msg.toLowerCase(),
+  );
+}
+
+function confirmationFollowUpIntent(msg: string): boolean {
+  const t = msg.toLowerCase();
+  return /\b(doen\s+jullie|doen\s+jullie\s+dat|kunnen\s+jullie(\s+dat)?|kan\s+dat|is\s+dat\s+mogelijk|doen\s+jullie\s+ook|maken\s+jullie\s+dat|regelen\s+jullie\s+dat|is\s+dat\s+iets\s+voor\s+jullie)\b/i.test(
+    t,
+  );
+}
+
 export async function POST(req: Request) {
   let body: {
     message?: string;
@@ -121,6 +135,11 @@ ANTWOORDREGELS OP BASIS VAN KENNIS:
 - Vragen over diensten, prijsindicaties, FAQ, werkwijze of "wat doen jullie": antwoord concreet met bovenstaande info. Mag uitgebreider dan één zin als de vraag dat vraagt.
 - Staat iets niet in de bedrijfskennis (bijv. exacte openingstijden, adres, volledige prijslijst): zeg eerlijk dat je dat in dit bericht niet hebt staan en bied bellen, terugbelafspraak of een voorkeursdag/tijdvak — verzin geen fictieve tijden, adressen of tarieven.
 - Gebruik prijzen alleen zoals in de kennis (richting/indicatie); waar "…" of placeholder staat: noem dat het definitieve tarief na inspectie of op afspraak is.
+
+VERVOLG & BEVESTIGING (zeer belangrijk):
+- Herhaal je vorige antwoord nooit letterlijk of quasi-identiek. Als de klant een korte vervolgvraag stelt ("doen jullie dat?", "kan dat?", "maken jullie dat ook?"): antwoord eerst inhoudelijk ja/nee op basis van de dienstenlijst hierboven, in nieuwe zinnen — niet opnieuw dezelfde alinea met alle intake-vragen.
+- Vraagt de klant of jullie iets doen dat expliciet in de dienstenlijst staat (bijv. "Laadpaal"): zeg enthousiast dat jullie dat doen en koppel kort aan die dienst; daarna pas 1–2 relevante vervolgvragen (planning, week, situatie) — geen irrelevante vragen (bijv. geen vonken/stroomuitval tenzij de klant een storing meldt of het om een storing gaat).
+- De klant noemde al een onderwerp (bijv. laadpaal): sluit daar inhoudelijk op aan; stel niet opnieuw de volledige generieke intake als je dat net al deed.
 `;
     identityIntro = `Je bent de receptionist / planner van een ${cfg.label.toLowerCase()}.`;
   }
@@ -188,15 +207,40 @@ ${vehiclePromptBlock(vehicle)}
       "Tandarts / mond: empathisch bij pijn of spoed; vraag kort naar beschikbaarheid; geen diagnose geven — wel afspraak of terugbelafspraak.",
     );
   }
+  if (
+    landingDemo &&
+    demoNiche === "electrician" &&
+    (electricianEvIntent(fullTextForIntent) || confirmationFollowUpIntent(message))
+  ) {
+    sectorLines.push(
+      "Elektricien — laadpaal / wallbox / EV-thuislader: als 'Laadpaal' (of vergelijkbaar) in de bedrijfskennis staat, bevestig eerst dat jullie dat doen en benoem het kort; daarna praktische vervolgstap (inspectie/planning, gewenste week). Herhaal niet je vorige standaardintake als de klant alleen bevestigt. Geen autobanden/APK-vragen.",
+    );
+  }
   const sectorBlock =
     landingDemo && sectorLines.length > 0
       ? `\nSector (alleen wat past bij het gesprek):\n${sectorLines.map((s) => `- ${s}`).join("\n")}\n`
       : "";
 
+  const lastAssistant =
+    landingDemo && historySanitized.length > 0
+      ? [...historySanitized].reverse().find((h) => h.role === "assistant")
+      : undefined;
+
+  const antiRepeatBlock =
+    landingDemo && demoNiche && lastAssistant?.content
+      ? `
+Laatste bericht van jou aan deze klant (NIET herhalen; de klant heeft dit al gezien — antwoord met nieuwe woorden en focus op wat de nieuwe vraag vraagt):
+"""
+${lastAssistant.content.trim().slice(0, 1200)}
+"""
+`
+      : "";
+
   const historyNote =
     landingDemo && historySanitized.length > 0
       ? `
-Er is eerdere chatgeschiedenis in dit gesprek — lees die mee. Herhaal NIET dezelfde algemene vraag als de klant al specifieker is geworden (bijv. eerst "lekkage", daarna "douche" → reageer op de combinatie en plan een concrete vervolgstap).
+Er is eerdere chatgeschiedenis — lees die mee. Herhaal geen identieke of bijna-identieke tekst als je vorige antwoord.
+Als de klant specifieker wordt of een bevestiging vraagt: reageer op dat nieuwe detail (bijv. eerst laadpaal, daarna "doen jullie dat?" → eerst ja + kort waarom, dan planning).
 `
       : "";
 
@@ -206,7 +250,7 @@ Er is eerdere chatgeschiedenis in dit gesprek — lees die mee. Herhaal NIET dez
 Homepage-demo: natuurlijke zinnen in het Nederlands — kort bij een simpele intake, iets uitgebreider als de klant een inhoudelijke vraag stelt (prijs, diensten, werkwijze).
 Blijf in de gekozen demo-rol; antwoord alsof je daar werkt. Geen rollen door elkaar.
 Waarde: snelle duidelijkheid — concrete afspraak, tijdvak of duidelijke volgende stap; op informerende vragen gewoon inhoudelijk antwoord binnen de bedrijfskennis.
-${historyNote}
+${antiRepeatBlock}${historyNote}
 ${rdwBlock}${sectorBlock}
 `
       : `
@@ -237,7 +281,7 @@ Als geen sector-hint past: blijf een warme, efficiënte lokale dienstverlener; �
 
   const completion = await openai.chat.completions.create({
     model,
-    temperature: landingDemo && demoNiche ? 0.38 : 0.35,
+    temperature: landingDemo && demoNiche ? 0.52 : 0.35,
     max_tokens: landingDemo && demoNiche ? 520 : 380,
     response_format: { type: "json_object" },
     messages: [
@@ -245,7 +289,7 @@ Als geen sector-hint past: blijf een warme, efficiënte lokale dienstverlener; �
         role: "system",
         content: `${identityIntro} Schrijf zoals een ondernemer: kort, duidelijk, geen moeilijke woorden, geen marketingtaal.${personaBlock}${landingRules}
 Als het laatste bericht alleen een begroeting is (bijv. "hoi", "hallo", "hey") zonder concrete vraag én er is geen eerdere context: groet vriendelijk en vraag één zin wat ze nodig hebben. Geen afspraaktijden, geen "morgen om …", geen prijs in reply. Zet resultTitle op "Intake" en valueLine op "—".
-Als wél een concrete vraag of klacht genoemd wordt (ook in eerdere berichten in dit gesprek): stel hooguit één vervolgvraag als iets echt ontbreekt; anders werk direct toe naar een afspraak of tijdvoorstel. Herhaal geen identieke tekst als je vorige antwoord.
+Als wél een concrete vraag of klacht genoemd wordt: bij een inhoudelijke vervolgvraag eerst antwoord geven (ja/nee/uitleg), niet opnieuw hetzelfde intake-blok. Anders: hooguit één gerichte vervolgvraag als iets echt ontbreekt; zo niet, werk naar afspraak of tijdvoorstel. Herhaal nooit je vorige antwoord letterlijk.
 ${extraServicesRule}
 Zeg nooit dat je een AI of assistent bent. Typische prijsrange voor valueLine (alleen als het past bij de vraag): ${prijsrangeResolved}.
 Antwoord alleen met JSON met keys: reply (string), resultTitle (string), valueLine (string).`,

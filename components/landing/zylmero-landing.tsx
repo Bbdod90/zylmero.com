@@ -30,11 +30,15 @@ export function ZylmeroLanding() {
   const heroSub = heroSubtitleForRole(demoRole, BRAND_NAME);
 
   return (
-    <div className="min-h-dvh bg-background pb-32 text-foreground md:pb-24">
+    <div className="relative min-h-dvh overflow-x-hidden bg-background pb-32 text-foreground md:pb-24">
+      <div
+        className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,hsl(var(--primary)/0.14),transparent_55%),radial-gradient(ellipse_60%_40%_at_100%_0%,hsl(var(--primary)/0.08),transparent_50%),radial-gradient(ellipse_50%_35%_at_0%_20%,hsl(220_40%_50%/0.06),transparent_50%)]"
+        aria-hidden
+      />
       <LandingNav />
 
       <section className="relative overflow-hidden border-b border-border/40 dark:border-white/[0.06]">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_100%_55%_at_50%_-25%,hsl(var(--primary)/0.12),transparent_58%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_100%_55%_at_50%_-25%,hsl(var(--primary)/0.14),transparent_58%)]" />
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,transparent,hsl(var(--background)))]" />
 
         <div className="relative mx-auto max-w-[1200px] px-4 pb-20 pt-12 md:px-8 md:pb-28 md:pt-16 lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16">
@@ -111,7 +115,7 @@ export function ZylmeroLanding() {
             ].map((line) => (
               <li
                 key={line}
-                className="rounded-xl border border-border/50 bg-card/80 px-5 py-4 text-base text-foreground"
+                className="rounded-xl border border-border/50 bg-card/80 px-5 py-4 text-base text-foreground transition-colors duration-200 hover:border-primary/25 hover:bg-card"
               >
                 {line}
               </li>
@@ -160,9 +164,9 @@ export function ZylmeroLanding() {
             ].map((item) => (
               <div
                 key={item.step}
-                className="relative rounded-2xl border border-border/50 bg-card/60 p-8 dark:border-white/[0.08]"
+                className="group relative rounded-2xl border border-border/50 bg-card/60 p-8 shadow-sm shadow-black/5 transition duration-300 dark:border-white/[0.08] dark:shadow-black/30 dark:hover:border-primary/25 dark:hover:bg-card/80"
               >
-                <div className="mb-6 flex size-11 items-center justify-center rounded-full bg-primary/15 text-sm font-semibold text-primary">
+                <div className="mb-6 flex size-11 items-center justify-center rounded-full bg-primary/15 text-sm font-semibold text-primary ring-1 ring-primary/20 transition group-hover:bg-primary/20">
                   {item.step}
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">{item.title}</h3>
@@ -235,7 +239,7 @@ export function ZylmeroLanding() {
             ].map((t) => (
               <blockquote
                 key={t.name}
-                className="rounded-2xl border border-border/50 bg-card/50 p-8 dark:border-white/[0.08]"
+                className="rounded-2xl border border-border/50 bg-card/50 p-8 shadow-sm shadow-black/5 transition duration-300 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-md dark:border-white/[0.08] dark:shadow-black/25"
               >
                 <p className="text-base leading-relaxed text-foreground">&ldquo;{t.quote}&rdquo;</p>
                 <footer className="mt-6 border-t border-border/40 pt-6">
@@ -254,7 +258,7 @@ export function ZylmeroLanding() {
         {...fadeUp}
       >
         <div className="mx-auto max-w-[1200px] px-4 md:px-8">
-          <div className="mx-auto max-w-2xl rounded-2xl border border-border/50 bg-muted/25 p-8 text-center dark:border-white/[0.08] md:p-10">
+          <div className="mx-auto max-w-2xl rounded-2xl border border-border/50 bg-muted/25 p-8 text-center shadow-[0_20px_60px_-30px_hsl(var(--primary)/0.35)] dark:border-white/[0.08] md:p-10">
             <h2 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl">
               Wat trage reactie je kost
             </h2>
@@ -281,10 +285,10 @@ export function ZylmeroLanding() {
               <div
                 key={plan.id}
                 className={cn(
-                  "relative flex flex-col rounded-2xl border p-8",
+                  "relative flex flex-col rounded-2xl border p-8 transition duration-300 hover:-translate-y-0.5",
                   plan.popular
-                    ? "border-primary/40 bg-primary/[0.06] shadow-[0_0_0_1px_hsl(var(--primary)/0.2)] lg:scale-[1.02]"
-                    : "border-border/60 bg-card/40 dark:border-white/[0.08]",
+                    ? "border-primary/40 bg-primary/[0.06] shadow-[0_0_0_1px_hsl(var(--primary)/0.2),0_24px_48px_-28px_hsl(var(--primary)/0.25)] lg:scale-[1.02]"
+                    : "border-border/60 bg-card/40 shadow-sm shadow-black/5 hover:border-primary/20 dark:border-white/[0.08] dark:shadow-black/20",
                 )}
               >
                 {plan.popular ? (
@@ -347,7 +351,7 @@ export function ZylmeroLanding() {
             ].map((item) => (
               <details
                 key={item.q}
-                className="group rounded-xl border border-border/50 bg-card/40 px-5 open:bg-muted/20 dark:border-white/[0.08]"
+                className="group rounded-xl border border-border/50 bg-card/40 px-5 backdrop-blur-[2px] transition open:bg-muted/25 hover:border-primary/20 dark:border-white/[0.08]"
               >
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 py-4 font-semibold text-foreground">
                   {item.q}

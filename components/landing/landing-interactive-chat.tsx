@@ -55,15 +55,61 @@ function greetingReply(nicheId: NicheId): {
   };
 }
 
-function simulateResponse(userText: string, nicheId: NicheId): {
+function evChargingIntent(t: string): boolean {
+  return /\b(laadpaal|laadpalen|wallbox|opladen|oplaad|thuislader|ev\b|elektrisch\s+auto|elektrische\s+auto|lader\b)\b/i.test(
+    t,
+  );
+}
+
+function confirmationFollowUp(t: string): boolean {
+  return /\b(doen\s+jullie|doen\s+jullie\s+dat|kunnen\s+jullie(\s+dat)?|kan\s+dat|is\s+dat\s+mogelijk|maken\s+jullie\s+dat|jullie\s+dat)\b/i.test(
+    t,
+  );
+}
+
+function hasServiceKeyword(full: string, service: string): boolean {
+  const s = service.toLowerCase();
+  if (s.length < 3) return false;
+  return full.toLowerCase().includes(s);
+}
+
+function simulateResponse(
+  fullConversationText: string,
+  nicheId: NicheId,
+  opts?: { lastUserMessage?: string },
+): {
   reply: string;
   resultTitle: string;
   valueLine: string;
 } {
-  const t = userText.toLowerCase();
+  const last = (opts?.lastUserMessage || fullConversationText).trim();
+  const t = last.toLowerCase();
+  const full = fullConversationText.toLowerCase();
   const cfg = getNicheConfig(nicheId);
-  if (isGreetingOnly(userText)) {
+  if (isGreetingOnly(last)) {
     return greetingReply(nicheId);
+  }
+
+  /** Korte bevestiging na eerdere berichten — inhoudelijk antwoorden i.p.v. herhaling. */
+  if (nicheId === "electrician" && confirmationFollowUp(t) && (evChargingIntent(full) || /\blaadpaal\b/i.test(full))) {
+    const hasLaadpaalService = cfg.defaultServices.some((s) => /laadpaal/i.test(s));
+    if (hasLaadpaalService) {
+      return {
+        reply:
+          "Ja — laadpalen en wallboxen installeren doen we gewoon. We kunnen kort een inspectie/planning inplannen: welke week komt het beste uit, en gaat het om nieuwbouw of een bestaande meterkast?",
+        resultTitle: "Laadpaal / installatie",
+        valueLine: cfg.defaultPricingHints?.slice(0, 56) || "Op aanvraag",
+      };
+    }
+  }
+
+  if (nicheId === "electrician" && evChargingIntent(last)) {
+    const diensten = cfg.defaultServices.slice(0, 4).join(", ");
+    return {
+      reply: `Top — een laadpaal thuis plannen doen we graag. Bij ons hoort o.a. ${diensten}. Ik plan het liefst een korte inspectie om de meterkast en het gewenste vermogen (bijv. 11 of 22 kW) mee te nemen — welke week past ongeveer?`,
+      resultTitle: "Laadpaal",
+      valueLine: cfg.defaultPricingHints?.slice(0, 56) || "Op aanvraag",
+    };
   }
   if (/\b(tand|tandarts|gebit|kies|vulling|controle|bleken|mond)\b/i.test(t)) {
     return {
@@ -129,12 +175,30 @@ function simulateResponse(userText: string, nicheId: NicheId): {
       valueLine: "€95 – €210",
     };
   }
+
+  if (confirmationFollowUp(t) && cfg.defaultServices.some((s) => hasServiceKeyword(full, s))) {
+    const hit = cfg.defaultServices.find((s) => hasServiceKeyword(full, s));
+    return {
+      reply: `Ja — ${hit ? `${hit.toLowerCase()} doen we` : "dat doen we"} graag. Zullen we een kort moment plannen of bel ik je zo terug met een voorstel?`,
+      resultTitle: cfg.label,
+      valueLine: cfg.defaultPricingHints?.slice(0, 56) || "Op aanvraag",
+    };
+  }
+
   const diensten =
     cfg.defaultServices.length > 0
       ? ` We doen o.a. ${cfg.defaultServices.slice(0, 4).join(", ")}.`
       : "";
+  const q = cfg.ai.qualifyingQuestions;
+  const variant = (fullConversationText.length + last.length) % 2;
+  const followQ =
+    variant === 0
+      ? q.slice(0, 2).join(" ")
+      : q.length > 1
+        ? `${q[0]} ${q[q.length - 1]}`
+        : q[0] || "Wat is handig qua planning?";
   return {
-    reply: `Dank je!${diensten} ${cfg.ai.qualifyingQuestions.slice(0, 2).join(" ")} Zo plannen we snel iets dat past.`,
+    reply: `Dank je!${diensten} ${followQ} Zo kunnen we snel iets passends inplannen.`,
     resultTitle: cfg.label,
     valueLine: cfg.defaultPricingHints?.slice(0, 56) || "Op aanvraag",
   };
@@ -275,7 +339,7 @@ export function LandingInteractiveChat() {
           resultTitle = data.resultTitle || "Afspraak";
           valueLine = data.valueLine || "€120 – €600";
         } else {
-          const s = simulateResponse(combinedForFallback, demoRole);
+          const s = simulateResponse(combinedForFallback, demoRole, { lastUserMessage: text });
           reply = s.reply;
           resultTitle = s.resultTitle;
           valueLine = s.valueLine;
@@ -285,7 +349,7 @@ export function LandingInteractiveChat() {
         ...messages.filter((m) => m.role === "user").map((m) => m.text),
         text,
       ].join(" ");
-      const s = simulateResponse(combinedForFallback, demoRole);
+      const s = simulateResponse(combinedForFallback, demoRole, { lastUserMessage: text });
       reply = s.reply;
       resultTitle = s.resultTitle;
       valueLine = s.valueLine;

@@ -299,11 +299,11 @@ export const NICHE_CATALOG: Record<NicheId, NicheDefinition> = {
     ],
     ai: {
       contextExtra:
-        "Branche: elektrotechniek. Geen onveilige DIY-adviezen; bij twijfel doorverwijzen naar inspectie.",
+        "Branche: elektrotechniek. Laadpalen/wallbox (thuislaadpaal) horen bij jullie standaardaanbod als 'Laadpaal' in de dienstenlijst staat — bevestig dat enthousiast en plan intake; geen onveilige DIY-adviezen. Bij storingen/vonken wél veiligheid eerst.",
       qualifyingQuestions: [
-        "Wat doet of laat de installatie niet?",
-        "Is er sprake van vonken/stroomuitval?",
-        "Nieuwbouw of bestaande installatie?",
+        "Is het nieuwbouw of een bestaande meterkast — en ongeveer welk vermogen (11/22 kW) denk je?",
+        "Wat doet of laat de installatie niet (alleen relevant bij storing/renovatie)?",
+        "Is er sprake van vonken of stroomuitval? (alleen als de klant een storing meldt)",
       ],
       quoteInstructions: "Arbeid, materialen (kabels, componenten), keuring indien relevant.",
     },
