@@ -17,14 +17,14 @@ export const OUTREACH_SCRIPTS: OutreachScript[] = [
   {
     id: "instagram_dm",
     label: "Instagram (DM)",
-    body: `Hey! Korte vraag — mis je soms berichten van klanten als je druk bent in de werkplaats?
+    body: `Hey! Korte vraag — mis je soms berichten van klanten als je druk bent op de zaak?
 
-Ik heb een kleine tool gebouwd die direct antwoordt en meer werk uit DM’s haalt. Ik kan je in 2 min laten zien hoe het werkt, als je wilt.`,
+Ik heb een kleine tool gebouwd die direct antwoordt en meer afspraken uit DM’s haalt. Ik kan je in 2 min laten zien hoe het werkt, als je wilt.`,
   },
   {
     id: "whatsapp",
     label: "WhatsApp",
-    body: `Hi — ik ben [Jouw naam]. Ik help lokale garages WhatsApp om te zetten in geboekte afspraken (zonder iemand extra aan de balie).
+    body: `Hi — ik ben [Jouw naam]. Ik help lokale bedrijven WhatsApp om te zetten in geboekte afspraken (zonder iemand extra aan de balie).
 
 Zin in een kort gesprek deze week?`,
   },
@@ -35,7 +35,7 @@ Zin in een kort gesprek deze week?`,
 
 Hoi,
 
-Ik zie dat jullie klanten via telefoon/WhatsApp benaderen. Veel garages verliezen werk simpelweg omdat er niet binnen een uur wordt geantwoord.
+Ik zie dat jullie klanten via telefoon/WhatsApp benaderen. Veel lokale zaken verliezen werk simpelweg omdat er niet binnen een uur wordt geantwoord.
 
 Ik bouwde ${BRAND_NAME} — het antwoordt in jullie toon en stuurt mensen richting een boeking. Heb je 10 minuten om te kijken?
 
@@ -47,7 +47,7 @@ Groet,
     label: "Opvolging",
     body: `Hey — even een duwtje. Snap helemaal dat je het druk hebt.
 
-Als je ooit wilt zien hoe werkplaatsen in seconden antwoorden (en de agenda vullen), kan ik een demo-link sturen. Geen druk.`,
+Als je ooit wilt zien hoe andere ondernemers in seconden antwoorden (en de agenda vullen), kan ik een demo-link sturen. Geen druk.`,
   },
   {
     id: "closing",

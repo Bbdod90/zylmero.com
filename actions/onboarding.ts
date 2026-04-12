@@ -18,7 +18,7 @@ import {
 export type OnboardingState = { error?: string };
 
 const QUICK_START_COMPANY_NAME = "Mijn bedrijf";
-const QUICK_START_NICHE: NicheId = "garage";
+const QUICK_START_NICHE: NicheId = "general_services";
 
 /** Verplaatst automation_preferences naar niche_intake en verwijdert de kolom uit de payload. */
 function rowWithoutAutomationPreferences(

@@ -79,6 +79,27 @@ const GROUPS: { title: string; items: NavItem[] }[] = [
   },
 ];
 
+/** Kortere zijbalk voor anonieme demo-rondleiding (minder keuzestress). */
+const ANONYMOUS_PREVIEW_GROUPS: { title: string; items: NavItem[] }[] = [
+  {
+    title: "Demo",
+    items: [
+      { href: "/dashboard", label: "Overzicht", icon: Gauge },
+      { href: "/dashboard/inbox", label: "Berichten", icon: Inbox },
+      { href: "/dashboard/pipeline", label: "Pipeline", icon: Kanban },
+      { href: "/dashboard/leads", label: "Leads", icon: Users },
+      { href: "/dashboard/appointments", label: "Afspraken", icon: CalendarDays },
+    ],
+  },
+  {
+    title: "AI voor klanten",
+    items: [
+      { href: "/dashboard/ai-knowledge", label: "AI trainen · website", icon: Brain },
+      { href: "/dashboard/ai", label: "AI-instellingen", icon: Sparkles },
+    ],
+  },
+];
+
 function NavLink({
   item,
   pathname,
@@ -146,8 +167,10 @@ export function AppSidebar({
 }: AppSidebarProps) {
   const pathname = usePathname();
 
-  const groups = GROUPS.map((g) => {
-    if (g.title !== "Pipeline") return g;
+  const baseGroups = isAnonymousPreview ? ANONYMOUS_PREVIEW_GROUPS : GROUPS;
+
+  const groups = baseGroups.map((g) => {
+    if (g.title !== "Pipeline" || isAnonymousPreview) return g;
     const items = [...g.items];
     if (founderSales) {
       items.splice(1, 0, {

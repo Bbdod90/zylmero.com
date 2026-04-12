@@ -3,7 +3,8 @@
  * Nieuwe branche: voeg id toe aan NicheId, vul NICHE_CATALOG, en kies optie in onboarding.
  */
 
-export const DEMO_NICHE_DEFAULT = "garage" as const;
+/** Standaard: universeel (niet alleen garage) — demo en anonieme rondleiding. */
+export const DEMO_NICHE_DEFAULT = "general_services" as const;
 
 export const NICHE_COOKIE = "zm_demo_niche";
 
@@ -392,13 +393,13 @@ export const NICHE_CATALOG: Record<NicheId, NicheDefinition> = {
   general_services: def(
     "general_services",
     "Dienstverlener",
-    "Professionele diensten voor MKB en particulier.",
+    "Voor elke lokale zaak met afspraken: van kapper tot praktijk tot monteur — snelle reactie en geen gemiste klanten.",
     {
       defaultServices: [
-        "Consultatie",
-        "Projectbegeleiding",
-        "Onderhoudscontract",
-        "Inspectie",
+        "Intake en planning",
+        "Afspraken en herinneringen",
+        "Offerte of richtprijs",
+        "Spoed of wachtlijst",
       ],
       onboardingFields: [
         {
@@ -416,11 +417,11 @@ export const NICHE_CATALOG: Record<NicheId, NicheDefinition> = {
       ],
       ai: {
         contextExtra:
-          "Branche: algemene dienstverlening. Kwalificeer scope, timing en budget voordat je prijs noemt.",
+          "Branche: lokale dienstverlening met afspraken (kan kapper, zorg, garage, ambacht zijn). Kwalificeer kort wat de klant wil, wanneer het uitkomt, en of het spoed is. Geen prijs die niet past bij de vraag.",
         qualifyingQuestions: [
-          "Wat moet er precies gebeuren?",
-          "Wanneer wil je starten?",
-          "Wat is je indicatiebudget?",
+          "Waar kan ik je mee helpen — en hoe spoed is het?",
+          "Welke dag of tijd past ongeveer?",
+          "Is dit je eerste keer bij ons of kom je vaker?",
         ],
       },
     },

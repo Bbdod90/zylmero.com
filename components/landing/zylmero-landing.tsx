@@ -15,9 +15,9 @@ import { cn } from "@/lib/utils";
 
 const HERO_H1 = "Je reageert te laat — en dat kost je klanten";
 
-const HERO_SUB = `Aanvragen komen binnen, maar zonder snelle reactie kiest je klant iemand anders. ${BRAND_NAME} reageert direct en zet aanvragen om in afspraken.`;
+const HERO_SUB = `Kapper, praktijk, garage of monteur: aanvragen komen binnen terwijl jij aan het werk bent. Zonder snelle reactie kiest je klant iemand anders. ${BRAND_NAME} vangt berichten op, kwalificeert kort en helpt om afspraken te boeken — ook als je agenda vol zit.`;
 
-const HERO_TRUST = "Vaak al terugverdiend met één extra klant";
+const HERO_TRUST = "Vaak al terugverdiend met één extra afspraak";
 
 const fadeUp = {
   initial: { opacity: 0, y: 14 },

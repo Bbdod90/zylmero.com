@@ -33,7 +33,7 @@ import {
 } from "lucide-react";
 
 const DAILY = [
-  { id: "contact_10", label: "Neem contact op met 10 garages" },
+  { id: "contact_10", label: "Neem contact op met 10 lokale bedrijven" },
   { id: "demo_5", label: "Stuur 5 demo-uitnodigingen" },
   { id: "follow_3", label: "Opvolging bij 3 leads" },
   { id: "call_1", label: "Plan 1 belafspraak" },
@@ -311,12 +311,12 @@ export function GrowthDashboard({
             <Separator />
             <ul className="list-inside list-disc space-y-1 text-sm text-muted-foreground">
               <li>
-                <strong className="text-foreground">Google Maps:</strong> zoek
-                &quot;garage&quot; + stad, open profielen, noteer telefoon / WhatsApp.
+                <strong className="text-foreground">Google Maps:</strong> zoek een sector + stad
+                (bijv. kapsalon, praktijk, garage), open profielen, noteer telefoon / WhatsApp.
               </li>
               <li>
-                <strong className="text-foreground">Instagram:</strong> hashtags
-                #garage #[stad] #apk — DM werkplaatsen die posten maar traag antwoorden.
+                <strong className="text-foreground">Instagram:</strong> hashtags #[stad] + sector
+                (#kapper, #tandarts, #garage …) — DM zaken die posten maar traag antwoorden.
               </li>
             </ul>
             <CopyButton
@@ -381,7 +381,7 @@ export function GrowthDashboard({
                   id="biz"
                   value={inviteName}
                   onChange={(e) => setInviteName(e.target.value)}
-                  placeholder="Naam van hun garage"
+                  placeholder="Naam van hun bedrijf"
                   className="rounded-xl"
                   required
                 />
@@ -393,7 +393,7 @@ export function GrowthDashboard({
                   type="email"
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
-                  placeholder="owner@garage.nl"
+                  placeholder="eigenaar@bedrijf.nl"
                   className="rounded-xl"
                   required
                 />

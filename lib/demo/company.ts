@@ -2,7 +2,7 @@ import type { Company } from "@/lib/types";
 import { BRAND_DEMO_LOCAL_EMAIL, BRAND_NAME } from "@/lib/brand";
 import { getNicheConfig } from "@/lib/niches";
 import { getDemoNicheId } from "@/lib/demo/niche-context";
-import { DEMO_GARAGE_BRAND } from "@/lib/demo/demo-brand";
+import { DEMO_GARAGE_BRAND, DEMO_UNIVERSAL_BRAND } from "@/lib/demo/demo-brand";
 
 /** Stable id for demo UI; no DB row required when demo mode uses static data only. */
 export const DEMO_USER_ID = "00000000-0000-0000-0000-000000000001";
@@ -13,7 +13,7 @@ export const DEMO_COMPANY: Company = {
   id: DEMO_COMPANY_ID,
   name: `${BRAND_NAME} Demo`,
   owner_user_id: DEMO_USER_ID,
-  niche: "garage",
+  niche: "general_services",
   onboarding_completed: true,
   profile_intake_completed: true,
   contact_email: BRAND_DEMO_LOCAL_EMAIL,
@@ -43,6 +43,15 @@ export function getDemoCompany(): Company {
       name: DEMO_GARAGE_BRAND.legalName,
       contact_email: DEMO_GARAGE_BRAND.email,
       contact_phone: DEMO_GARAGE_BRAND.phoneDisplay,
+    };
+  }
+  if (id === "general_services") {
+    return {
+      ...DEMO_COMPANY,
+      niche: id,
+      name: DEMO_UNIVERSAL_BRAND.legalName,
+      contact_email: DEMO_UNIVERSAL_BRAND.email,
+      contact_phone: DEMO_UNIVERSAL_BRAND.phoneDisplay,
     };
   }
   const niche = getNicheConfig(id);

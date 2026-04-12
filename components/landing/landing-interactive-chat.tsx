@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { BRAND_LOGO_MONOGRAM, BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 import { enterAnonymousDemo } from "@/actions/demo";
+import type { RdwVehicleSnapshot } from "@/lib/rdw/kenteken";
 
 type ChatMsg =
   | { id: string; role: "user"; text: string }
@@ -24,7 +25,7 @@ function isGreetingOnly(raw: string): boolean {
   const t = raw.toLowerCase().trim().replace(/[!?.…]+$/g, "").trim();
   if (t.length > 55) return false;
   if (
-    /\b(apk|band|rem|lek|afspraak|offerte|montage|winter|zomer|kenteken|auto|lekkage|reparatie|klus|storing|install|verwarm|boiler|dak|stuc|schilder|loodgieter)\b/i.test(
+    /\b(apk|band|banden|voorband|achterband|rem|lek|lekkage|lekkende|afspraak|offerte|montage|winter|zomer|kenteken|auto|reparatie|klus|storing|install|verwarm|boiler|dak|stuc|schilder|loodgieter|knip|knippen|kapper|salon|kleur|balayage|tand|tandarts|gebit|kies|controle|bleken|mond|vulling)\b/i.test(
       t,
     )
   ) {
@@ -42,7 +43,7 @@ function greetingReply(): {
 } {
   return {
     reply:
-      "Hoi! Leuk dat je even kijkt. Waarmee kan ik je helpen — bijvoorbeeld een afspraak plannen of een vraag over een klus?",
+      "Hoi! Leuk dat je even kijkt. Waarmee kan ik je helpen — bijvoorbeeld een afspraak, een spoedvraag of iets dat je wilt laten plannen?",
     resultTitle: "Intake",
     valueLine: "—",
   };
@@ -57,6 +58,22 @@ function simulateResponse(userText: string): {
   if (isGreetingOnly(userText)) {
     return greetingReply();
   }
+  if (/\b(tand|tandarts|gebit|kies|vulling|controle|bleken|mond)\b/i.test(t)) {
+    return {
+      reply:
+        "Dat kan ik je helpen plannen. Is het spoed (pijn) of een reguliere controle? Welke dag of week komt het beste uit?",
+      resultTitle: "Praktijk",
+      valueLine: "€85 – €220",
+    };
+  }
+  if (/\b(knip|knippen|kapper|salon|kleur|balayage|baard|highlights)\b/i.test(t)) {
+    return {
+      reply:
+        "Top — welke behandeling wil je precies, en welke dag of tijdstip komt het beste uit? Dan zoek ik een passend slot.",
+      resultTitle: "Salon",
+      valueLine: "€35 – €195",
+    };
+  }
   if (/apk|keuring|mot|periodiek/i.test(t)) {
     return {
       reply: "Morgen 09:00 of 15:00 — wat past?",
@@ -64,9 +81,18 @@ function simulateResponse(userText: string): {
       valueLine: "€120 – €200",
     };
   }
+  if (/lek|lekkage|lekkende/i.test(t) && /band|voorband|achterband|wiel/i.test(t)) {
+    return {
+      reply:
+        "Dat is vervelend — een lek aan de band lossen we het liefst vandaag nog. Mag ik je kenteken? Dan koppelen we het goede wiel en plannen we korte inspectie of reparatie.",
+      resultTitle: "Band / lek",
+      valueLine: "€35 – €180",
+    };
+  }
   if (/band|winter|zomer|profiel|montage/i.test(t)) {
     return {
-      reply: "Kunnen we donderdag inplannen? Stuur even je kenteken.",
+      reply:
+        "Prima — voor montage of bandwissel hebben we je kenteken nodig (dan weten we maat en type). Welke dag komt het beste uit?",
       resultTitle: "Afspraak",
       valueLine: "€280 – €420",
     };
@@ -87,7 +113,7 @@ function simulateResponse(userText: string): {
   }
   return {
     reply:
-      "Dank je! Kun je in één zin zeggen waar het om gaat (bijv. lekkage, onderhoud, spoed) en wat je voorkeur is qua moment?",
+      "Dank je! Kun je in één zin zeggen waar het om gaat (bijv. afspraak, spoed, offerte) en wat je voorkeur is qua moment?",
     resultTitle: "Vervolgvraag",
     valueLine: "Op aanvraag",
   };
@@ -137,6 +163,44 @@ export function LandingInteractiveChat() {
       valueLine = s.valueLine;
     } else {
       try {
+        let vehicle: RdwVehicleSnapshot | undefined;
+        try {
+          const rv = await fetch("/api/rdw/resolve", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: text }),
+          });
+          const rvData = (await rv.json()) as { vehicle?: RdwVehicleSnapshot };
+          if (rv.ok && rvData.vehicle) vehicle = rvData.vehicle;
+        } catch {
+          /* RDW optioneel */
+        }
+
+        const autoHint =
+          /\b(band|banden|apk|kenteken|auto|voorband|achterband|lek|lekkage|lekkende|montage|winterband|zomerband|rechter|linker|voertuig|garage|wiel)\b/i.test(
+            text,
+          ) || Boolean(vehicle);
+        const dentalHint = /\b(tand|tandarts|gebit|kies|vulling|controle|bleken|mond)\b/i.test(
+          text,
+        );
+        const beautyHint =
+          /\b(knip|knippen|kapper|salon|kleur|balayage|baard|highlights)\b/i.test(text);
+
+        let branche =
+          "lokaal bedrijf met afspraken (kapper, praktijk, garage, ambacht — pas aan op de vraag)";
+        let prijsrange = "€45–€650 (richting afhankelijk van dienst)";
+
+        if (autoHint) {
+          branche = "garage / banden / autotechniek (kenteken kan via RDW)";
+          prijsrange = "€75–€550 (band/montage; exact na inspectie)";
+        } else if (dentalHint) {
+          branche = "tandartspraktijk / mondhygiëne";
+          prijsrange = "€85–€450 (afhankelijk van behandeling)";
+        } else if (beautyHint) {
+          branche = "kapsalon / barbershop";
+          prijsrange = "€35–€220 (afhankelijk van behandeling)";
+        }
+
         const res = await fetch("/api/ai", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -144,9 +208,9 @@ export function LandingInteractiveChat() {
             message: text,
             landing_demo: true,
             context: {
-              branche:
-                "lokaal service- of ambachtsbedrijf (niet specifiek garage)",
-              prijsrange: "€120–€600",
+              branche,
+              prijsrange,
+              vehicle,
             },
           }),
         });
@@ -195,7 +259,8 @@ export function LandingInteractiveChat() {
             Van bericht naar afspraak
           </h2>
           <p className="mt-4 text-base text-muted-foreground">
-            Stuur een korte aanvraag — zo zou je klant het sturen.
+            Of je nu zaak, praktijk of werkplaats hebt: stuur een korte aanvraag — zo zou je klant het
+            sturen.
           </p>
         </div>
 
@@ -221,7 +286,8 @@ export function LandingInteractiveChat() {
             >
               {messages.length === 0 ? (
                 <p className="px-2 py-8 text-center text-sm text-zinc-500">
-                  Bijv.: &ldquo;Kunnen jullie morgen nog komen voor een lekkage?&rdquo;
+                  Bijv.: &ldquo;Ik wil volgende week knippen — hebben jullie donderdag nog een plek?&rdquo;
+                  of &ldquo;Pijn aan een kies, kunnen jullie vandaag nog?&rdquo;
                 </p>
               ) : null}
 
@@ -268,7 +334,7 @@ export function LandingInteractiveChat() {
                 <Input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Typ een korte aanvraag…"
+                  placeholder="Bijv. afspraak, spoed of offerte…"
                   maxLength={400}
                   disabled={busy}
                   className={cn(

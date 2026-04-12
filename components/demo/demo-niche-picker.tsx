@@ -4,8 +4,10 @@ import { setDemoNicheAction } from "@/actions/demo";
 import { cn } from "@/lib/utils";
 
 const OPTIONS = [
+  { id: "general_services", label: "Voorbeeld (mix)" },
   { id: "garage", label: "Garage" },
   { id: "hair_salon", label: "Kapper" },
+  { id: "dentist", label: "Tandarts" },
   { id: "plumber", label: "Loodgieter" },
 ] as const;
 

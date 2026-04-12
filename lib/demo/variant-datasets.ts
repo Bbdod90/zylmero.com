@@ -439,8 +439,263 @@ function plumber(): DemoDataset {
   return { leads, messages, quotes, appointments };
 }
 
+/** Mix van sectoren — standaard demo (general_services). */
+function universalServices(): DemoDataset {
+  const leads: Lead[] = [
+    {
+      id: "demo-u-l1",
+      company_id: DEMO_COMPANY_ID,
+      full_name: "Sophie Mulder",
+      email: "sophie@email.nl",
+      phone: "+31610101010",
+      source: "Instagram",
+      status: "active",
+      score: 88,
+      summary: "Balayage + knippen — wil donderdag of zaterdag.",
+      intent: "Salon · kleur",
+      estimated_value: 185,
+      suggested_next_action: "Slot voorstellen + foto haar.",
+      status_recommendation: "active",
+      last_message_at: iso(35),
+      notes: null,
+      created_at: iso(60 * 20),
+      updated_at: iso(35),
+    },
+    {
+      id: "demo-u-l2",
+      company_id: DEMO_COMPANY_ID,
+      full_name: "Daan Visser",
+      email: "daan@werk.nl",
+      phone: "+31620202020",
+      source: "Website",
+      status: "active",
+      score: 91,
+      summary: "Pijn links onder — spoedconsult dit weekend?",
+      intent: "Tandarts · spoed",
+      estimated_value: 95,
+      suggested_next_action: "Bel 15 min of vandaag nog plek.",
+      status_recommendation: "active",
+      last_message_at: iso(18),
+      notes: null,
+      created_at: iso(60 * 5),
+      updated_at: iso(18),
+    },
+    {
+      id: "demo-u-l3",
+      company_id: DEMO_COMPANY_ID,
+      full_name: "Yasmine El Amrani",
+      email: null,
+      phone: "+31630303030",
+      source: "WhatsApp",
+      status: "quote_sent",
+      score: 76,
+      summary: "Winterbanden + uitlijnen — kenteken bekend.",
+      intent: "Garage · banden",
+      estimated_value: 420,
+      suggested_next_action: "Offerte akkoord + leverweek banden.",
+      status_recommendation: "quote_sent",
+      last_message_at: iso(120),
+      notes: null,
+      created_at: iso(60 * 40),
+      updated_at: iso(120),
+    },
+    {
+      id: "demo-u-l4",
+      company_id: DEMO_COMPANY_ID,
+      full_name: "Rick de Vries",
+      email: "rick@home.nl",
+      phone: "+31640404040",
+      source: "Google",
+      status: "new",
+      score: 72,
+      summary: "Lek onder badkamer — vandaag nog iemand?",
+      intent: "Loodgieter · spoed",
+      estimated_value: 265,
+      suggested_next_action: "Spoedslot of telefonische triage.",
+      status_recommendation: "new",
+      last_message_at: iso(50),
+      notes: null,
+      created_at: iso(60 * 2),
+      updated_at: iso(50),
+    },
+  ];
+
+  const messages: Message[] = [
+    {
+      id: "demo-u-m1",
+      conversation_id: "demo-u-c0",
+      role: "user",
+      content:
+        "Hoi! Balayage + knippen — hebben jullie donderdag pm of zaterdag ochtend?",
+      created_at: iso(40),
+    },
+    {
+      id: "demo-u-m2",
+      conversation_id: "demo-u-c0",
+      role: "staff",
+      content:
+        "Hi Sophie — beide opties vaak mogelijk. Mag ik een foto van je haar nu? Dan geef ik een richtprijs en stuur ik twee slots.",
+      created_at: iso(38),
+    },
+    {
+      id: "demo-u-m3",
+      conversation_id: "demo-u-c1",
+      role: "user",
+      content:
+        "Ik heb sinds gisteren steek links onder. Kunnen jullie me vandaag nog kijken?",
+      created_at: iso(20),
+    },
+    {
+      id: "demo-u-m4",
+      conversation_id: "demo-u-c2",
+      role: "user",
+      content:
+        "Kunnen jullie winterbanden monteren en uitlijnen? Kenteken is J-882-FX.",
+      created_at: iso(130),
+    },
+    {
+      id: "demo-u-m5",
+      conversation_id: "demo-u-c3",
+      role: "user",
+      content: "Er lekt water uit het badkamermeubel — hoe snel kunnen jullie?",
+      created_at: iso(55),
+    },
+  ];
+
+  const quotes: Quote[] = [
+    {
+      id: "demo-u-q1",
+      company_id: DEMO_COMPANY_ID,
+      lead_id: "demo-u-l3",
+      title: "Winterbanden + uitlijnen",
+      description: "4× banden, montage, balanceren, uitlijnen.",
+      status: "sent",
+      currency: "EUR",
+      subtotal: 347.11,
+      vat_rate: 0.21,
+      vat_amount: 72.89,
+      total: 420,
+      line_items: [
+        {
+          id: "li-u1",
+          description: "Banden (×4) seizoensset",
+          quantity: 4,
+          unit_price: 72,
+          line_total: 288,
+        },
+        {
+          id: "li-u2",
+          description: "Montage, balanceren, uitlijnen",
+          quantity: 1,
+          unit_price: 59.11,
+          line_total: 59.11,
+        },
+      ],
+      internal_notes: null,
+      created_at: iso(60 * 12),
+      updated_at: iso(60 * 12),
+    },
+  ];
+
+  const appointments: Appointment[] = [
+    {
+      id: "demo-u-a1",
+      company_id: DEMO_COMPANY_ID,
+      lead_id: "demo-u-l2",
+      starts_at: isoFuture(6),
+      ends_at: isoFuture(6.5),
+      status: "confirmed",
+      notes: "Spoedconsult pijn linksonder",
+      created_at: iso(15),
+      updated_at: iso(15),
+    },
+  ];
+
+  return { leads, messages, quotes, appointments };
+}
+
+function dentist(): DemoDataset {
+  const leads: Lead[] = [
+    {
+      id: "demo-d-l1",
+      company_id: DEMO_COMPANY_ID,
+      full_name: "Eva Janssen",
+      email: "eva@email.nl",
+      phone: "+31650505050",
+      source: "Website",
+      status: "active",
+      score: 89,
+      summary: "Jaarcontrole + kleine vulling — volgende week.",
+      intent: "Controle",
+      estimated_value: 125,
+      suggested_next_action: "Bevestig datum en vraag naar klachten.",
+      status_recommendation: "active",
+      last_message_at: iso(90),
+      notes: null,
+      created_at: iso(60 * 48),
+      updated_at: iso(90),
+    },
+    {
+      id: "demo-d-l2",
+      company_id: DEMO_COMPANY_ID,
+      full_name: "Finn Bakker",
+      email: null,
+      phone: "+31660606060",
+      source: "WhatsApp",
+      status: "new",
+      score: 94,
+      summary: "Afgebroken stukje kies — pijn bij koud.",
+      intent: "Spoed",
+      estimated_value: 180,
+      suggested_next_action: "Zelfde dag slot of verwijzing.",
+      status_recommendation: "new",
+      last_message_at: iso(12),
+      notes: null,
+      created_at: iso(25),
+      updated_at: iso(12),
+    },
+  ];
+
+  const messages: Message[] = [
+    {
+      id: "demo-d-m1",
+      conversation_id: "demo-d-c0",
+      role: "user",
+      content: "Ik wil graag een controle en eventueel een kleine vulling plannen.",
+      created_at: iso(100),
+    },
+    {
+      id: "demo-d-m2",
+      conversation_id: "demo-d-c1",
+      role: "user",
+      content:
+        "Er is een stukje van mijn kies af — doet zeer bij koud drinken. Kunnen jullie vandaag?",
+      created_at: iso(15),
+    },
+  ];
+
+  const quotes: Quote[] = [];
+  const appointments: Appointment[] = [
+    {
+      id: "demo-d-a1",
+      company_id: DEMO_COMPANY_ID,
+      lead_id: "demo-d-l1",
+      starts_at: isoFuture(48),
+      ends_at: isoFuture(48.5),
+      status: "confirmed",
+      notes: "Controle + mogelijke vulling",
+      created_at: iso(60 * 10),
+      updated_at: iso(60 * 10),
+    },
+  ];
+
+  return { leads, messages, quotes, appointments };
+}
+
 export function getDatasetForNiche(nicheId: NicheId): DemoDataset {
+  if (nicheId === "general_services") return universalServices();
   if (nicheId === "hair_salon") return hairSalon();
   if (nicheId === "plumber") return plumber();
+  if (nicheId === "dentist") return dentist();
   return garage();
 }

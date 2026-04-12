@@ -23,8 +23,8 @@ export function BillingUpgradeClient({
         Gekozen: {planLabel} · €{plan?.priceEur ?? "—"}/mnd
       </p>
       <p className="text-center text-[11px] text-muted-foreground">
-        Eén extra klus deze maand betaalt dit meestal — veel werkplaatsen zien
-        +2–5 klussen per week door snellere antwoorden.
+        Eén extra afspraak of klus deze maand betaalt dit meestal — veel lokale zaken zien
+        merkbaar meer boekingen door snellere antwoorden.
       </p>
       <Button
         type="button"

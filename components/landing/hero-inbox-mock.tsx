@@ -1,23 +1,23 @@
 import { cn } from "@/lib/utils";
-import { DEMO_GARAGE_BRAND, demoGarageMonogram } from "@/lib/demo/demo-brand";
+import { DEMO_UNIVERSAL_BRAND, demoUniversalMonogram } from "@/lib/demo/demo-brand";
 
 const THREADS = [
   {
-    name: "Kevin · remmen voor",
-    preview: "Tikkend geluid bij remmen — Golf 8",
-    value: "€340",
+    name: "Sophie · salon",
+    preview: "Balayage + knippen — donderdag of zaterdag?",
+    value: "€185",
     hot: true,
   },
   {
-    name: "Samira · banden",
-    preview: "4 zomerbanden 225/45 R17 deze week",
-    value: "€580",
+    name: "Daan · praktijk",
+    preview: "Pijn linksonder — dit weekend iemand vrij?",
+    value: "€95",
     hot: true,
   },
   {
-    name: "Noa · vloot",
-    preview: "2 bedrijfsbussen — jaarprijs",
-    value: "€4.200",
+    name: "Yasmine · banden",
+    preview: "Winterbanden + uitlijnen — kenteken bekend",
+    value: "€420",
     hot: false,
   },
 ];
@@ -32,23 +32,23 @@ export function HeroInboxMock() {
         <div className="flex items-center justify-between border-b border-white/[0.06] bg-white/[0.02] px-4 py-3.5">
           <div className="flex min-w-0 items-center gap-3">
             <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/30 to-primary/10 text-xs font-bold tracking-tight text-primary-foreground">
-              {demoGarageMonogram()}
+              {demoUniversalMonogram()}
             </div>
             <div className="min-w-0">
               <p className="truncate text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                {DEMO_GARAGE_BRAND.shortName}
+                {DEMO_UNIVERSAL_BRAND.shortName}
               </p>
               <p className="truncate text-sm font-semibold tracking-tight text-foreground">
-                {DEMO_GARAGE_BRAND.legalName}
+                {DEMO_UNIVERSAL_BRAND.legalName}
               </p>
             </div>
           </div>
           <div className="flex shrink-0 flex-col items-end gap-1">
             <span className="rounded-full border border-primary/25 bg-primary/12 px-2.5 py-1 text-[11px] font-extrabold tabular-nums text-primary shadow-[0_0_20px_-6px_hsl(var(--primary)/0.55)]">
-              €2.180 mogelijk vandaag
+              €1.940 mogelijk vandaag
             </span>
             <span className="text-[10px] font-bold tabular-nums text-muted-foreground">
-              Openstaand rond €12,4k
+              Openstaand rond €11,2k
             </span>
           </div>
         </div>
@@ -68,17 +68,11 @@ export function HeroInboxMock() {
               )}
             >
               <div className="min-w-0 flex-1">
-                <p className="truncate text-xs font-medium text-foreground">
-                  {t.name}
-                </p>
-                <p className="truncate text-[11px] text-muted-foreground">
-                  {t.preview}
-                </p>
+                <p className="truncate text-xs font-medium text-foreground">{t.name}</p>
+                <p className="truncate text-[11px] text-muted-foreground">{t.preview}</p>
               </div>
               <div className="ml-2 flex shrink-0 flex-col items-end gap-0.5">
-                <span className="text-xs font-bold tabular-nums text-primary">
-                  {t.value}
-                </span>
+                <span className="text-xs font-bold tabular-nums text-primary">{t.value}</span>
                 {t.hot ? (
                   <span className="text-[9px] font-semibold uppercase text-amber-400/95">
                     spoed
@@ -93,37 +87,20 @@ export function HeroInboxMock() {
           <div className="rounded-2xl rounded-tl-md border border-white/[0.08] bg-white/[0.03] px-3 py-2.5">
             <p className="text-[10px] font-medium text-muted-foreground">Klant</p>
             <p className="text-sm leading-relaxed text-foreground">
-              Hi — remmen piepen als het koud is. Kunnen jullie morgenochtend kijken?
-              Kenteken K-451-GH.
+              Hi — ik heb pijn aan een kies en het lukt niet om online te boeken. Kunnen jullie
+              vandaag nog tussen 14:00–16:00?
             </p>
           </div>
 
-          <div className="flex items-center gap-2 px-1 text-[11px] text-muted-foreground">
-            <span className="inline-flex gap-1" aria-hidden>
-              <span className="size-1.5 rounded-full bg-primary/80" />
-              <span className="size-1.5 rounded-full bg-primary/80" />
-              <span className="size-1.5 rounded-full bg-primary/80" />
-            </span>
-            Antwoord wordt klaargezet…
-          </div>
-
-          <div className="ml-3 rounded-2xl rounded-tr-md border border-primary/20 bg-primary/[0.1] px-3 py-2.5 backdrop-blur-sm">
-            <p className="text-[10px] font-medium text-primary">Binnen enkele seconden</p>
+          <div className="rounded-2xl rounded-tr-md border border-primary/20 bg-primary/[0.08] px-3 py-2.5">
+            <p className="text-[10px] font-medium text-primary">Jij (automatisch)</p>
             <p className="text-sm leading-relaxed text-foreground">
-              Goedemorgen — we kunnen morgen om 08:00 of 10:30. Voor remwerk aan de voorzijde
-              zit je meestal rond €240–€380 na inspectie. Zal ik 08:00 voor je reserveren?
-            </p>
-          </div>
-
-          <div className="rounded-xl border border-primary/20 bg-primary/[0.08] px-3 py-2">
-            <p className="text-[11px] font-semibold text-primary">
-              Geboekt · inspectie remmen · morgen 08:00
+              Hi — dank je voor je bericht. Mag ik je geboortedatum en of je bij ons patiënt bent?
+              Dan zoek ik direct een plek tussen 14:00–16:00 of bel ik je zo terug.
             </p>
           </div>
         </div>
       </div>
-      <div className="pointer-events-none absolute -right-8 -top-8 size-44 rounded-full bg-primary/18 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-10 -left-10 size-48 rounded-full bg-accent/14 blur-3xl" />
     </div>
   );
 }

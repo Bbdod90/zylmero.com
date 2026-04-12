@@ -1,12 +1,10 @@
-import { DEMO_GARAGE_BRAND } from "@/lib/demo/demo-brand";
-
 export function TrustLogosRow() {
   const brands = [
-    { id: "vda", label: DEMO_GARAGE_BRAND.shortName, highlight: true },
-    { id: "n", label: "NordMoto Service", highlight: false },
-    { id: "r", label: "RapidBrake", highlight: false },
-    { id: "c", label: "CityGarage Coöp", highlight: false },
-    { id: "e", label: "EuroTech Werkplaats", highlight: false },
+    { id: "hl", label: "Het Loket", highlight: true },
+    { id: "st", label: "Studio Twintig", highlight: false },
+    { id: "mp", label: "Mondzorg Park", highlight: false },
+    { id: "vk", label: "Van Kessel Montage", highlight: false },
+    { id: "rh", label: "Roos Huidtherapie", highlight: false },
   ];
 
   return (

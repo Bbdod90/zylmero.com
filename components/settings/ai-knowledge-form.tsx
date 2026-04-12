@@ -36,10 +36,11 @@ export function AiKnowledgeForm({
   return (
     <form action={action} className="cf-dashboard-panel max-w-3xl space-y-8 p-6 sm:p-8">
       <div className="space-y-2">
-        <h2 className="text-lg font-semibold tracking-tight">Bronnen voor AI</h2>
+        <h2 className="text-lg font-semibold tracking-tight">Train je AI op jouw site</h2>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          Deze informatie wordt meegenomen bij suggesties en automatische antwoorden,
-          naast FAQ en playbooks.
+          Voeg je publieke website toe en vul hieronder praktische info: openingstijden, tarieven,
+          product- of materiaalkeuzes, levertijden en verzendkosten — wat bij jouw branche past. Dat
+          voedt antwoorden en vervolgvragen richting klanten, naast playbooks en inbox.
         </p>
       </div>
 
@@ -67,7 +68,8 @@ export function AiKnowledgeForm({
           autoComplete="off"
         />
         <p className="text-2xs text-muted-foreground">
-          Publieke URL van je bedrijf; de AI gebruikt dit als referentie (geen live crawl).
+          Publieke URL van je shop of bedrijfsite — als vaste referentie bij antwoorden (geen
+          volledige live crawl; vul aan met tekst hieronder waar nodig).
         </p>
       </div>
 

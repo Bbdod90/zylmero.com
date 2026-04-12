@@ -83,7 +83,7 @@ const STEP_HEADINGS = [
 export function OnboardingWizard() {
   const [step, setStep] = useState(0);
   const [companyName, setCompanyName] = useState("");
-  const [niche, setNiche] = useState<NicheId>("garage");
+  const [niche, setNiche] = useState<NicheId>("general_services");
   const [nicheCustom, setNicheCustom] = useState("");
   const [channels, setChannels] = useState<Set<string>>(new Set(["whatsapp"]));
   const [avgOrder, setAvgOrder] = useState("250");

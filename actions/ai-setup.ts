@@ -176,7 +176,7 @@ async function persistAiSetup(
   const nicheKey: NicheId =
     auth.company.niche && isNicheId(auth.company.niche)
       ? auth.company.niche
-      : "garage";
+      : "general_services";
   const cfg = getNicheConfig(nicheKey);
 
   let servicesOut = [...services];
@@ -288,7 +288,7 @@ export async function runAiSetupAction(
   const nicheKey: NicheId =
     auth.company.niche && isNicheId(auth.company.niche)
       ? auth.company.niche
-      : "garage";
+      : "general_services";
   const cfg = getNicheConfig(nicheKey);
 
   const services = [...cfg.defaultServices];
@@ -313,7 +313,7 @@ export async function skipAiSetupAction(): Promise<AiSetupState> {
   const nicheKey: NicheId =
     auth.company.niche && isNicheId(auth.company.niche)
       ? auth.company.niche
-      : "garage";
+      : "general_services";
   const cfg = getNicheConfig(nicheKey);
 
   const services = [...cfg.defaultServices];

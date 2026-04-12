@@ -48,7 +48,7 @@ export function ReferralInviteSection({
         <div className="min-w-0">
           <p className="cf-eyebrow text-[0.625rem]">Referrals</p>
           <CardTitle className="mt-1 text-xl font-bold tracking-tight sm:text-2xl">
-            Nodig andere garages uit
+            Nodig andere ondernemers uit
           </CardTitle>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
             Deel je unieke link. Per nieuwe klant die via jou start, tellen we{" "}
