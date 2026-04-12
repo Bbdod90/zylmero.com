@@ -11,7 +11,8 @@ import {
   AnonymousDemoForm,
   useDemoRole,
 } from "@/components/landing/demo-role-context";
-import { LANDING_DEMO_ROLES } from "@/lib/demo/landing-demo-roles";
+import { DemoSituationMenu } from "@/components/landing/demo-situation-menu";
+import { getLandingChatHints } from "@/lib/demo/hero-mock-copy";
 import { getNicheConfig, type NicheId } from "@/lib/niches";
 import type { RdwVehicleSnapshot } from "@/lib/rdw/kenteken";
 
@@ -147,6 +148,7 @@ function nid() {
 
 export function LandingInteractiveChat() {
   const { demoRole } = useDemoRole();
+  const chatHints = getLandingChatHints(demoRole);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [busy, setBusy] = useState(false);
@@ -181,13 +183,7 @@ export function LandingInteractiveChat() {
     let resultTitle: string;
     let valueLine: string;
 
-    if (isGreetingOnly(text)) {
-      const s = greetingReply(demoRole);
-      reply = s.reply;
-      resultTitle = s.resultTitle;
-      valueLine = s.valueLine;
-    } else {
-      try {
+    try {
         const chat_history = messages.map((m) => ({
           role: m.role as "user" | "assistant",
           content: m.text,
@@ -284,16 +280,15 @@ export function LandingInteractiveChat() {
           resultTitle = s.resultTitle;
           valueLine = s.valueLine;
         }
-      } catch {
-        const combinedForFallback = [
-          ...messages.filter((m) => m.role === "user").map((m) => m.text),
-          text,
-        ].join(" ");
-        const s = simulateResponse(combinedForFallback, demoRole);
-        reply = s.reply;
-        resultTitle = s.resultTitle;
-        valueLine = s.valueLine;
-      }
+    } catch {
+      const combinedForFallback = [
+        ...messages.filter((m) => m.role === "user").map((m) => m.text),
+        text,
+      ].join(" ");
+      const s = simulateResponse(combinedForFallback, demoRole);
+      reply = s.reply;
+      resultTitle = s.resultTitle;
+      valueLine = s.valueLine;
     }
 
     window.setTimeout(() => {
@@ -306,7 +301,7 @@ export function LandingInteractiveChat() {
       };
       setMessages((prev) => [...prev, bot]);
       setBusy(false);
-    }, 380);
+    }, 120);
   }
 
   return (
@@ -315,17 +310,14 @@ export function LandingInteractiveChat() {
         <div className="mx-auto max-w-xl text-center">
           <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">Demo</p>
           <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-            Van bericht naar afspraak
+            {chatHints.sectionTitle}
           </h2>
-          <p className="mt-4 text-base text-muted-foreground">
-            Kies eerst een rol — de demo antwoordt dan in die branche. Stuur daarna een korte aanvraag,
-            zoals je klant zou doen.
-          </p>
+          <p className="mt-4 text-base text-muted-foreground">{chatHints.sectionSub}</p>
         </div>
 
         <div className="mx-auto mt-12 max-w-lg scroll-mt-24">
           <div className="overflow-hidden rounded-[1.35rem] border border-white/[0.08] bg-[#0c0f14] shadow-[0_24px_56px_-28px_rgba(0,0,0,0.55)] ring-1 ring-white/[0.06] dark:bg-[#080a0d]">
-            <div className="flex items-center gap-3 border-b border-white/[0.08] bg-white/[0.04] px-4 py-3">
+            <div className="flex items-center gap-2 border-b border-white/[0.08] bg-white/[0.04] px-3 py-3 sm:gap-3 sm:px-4">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground shadow-inner">
                 {BRAND_LOGO_MONOGRAM}
               </div>
@@ -334,15 +326,8 @@ export function LandingInteractiveChat() {
                   {BRAND_NAME} · demo
                 </p>
                 <p className="text-xs text-muted-foreground">Antwoord binnen seconden</p>
-                <p className="mt-0.5 truncate text-[0.65rem] font-medium text-zinc-500">
-                  Situatie:{" "}
-                  <span className="text-zinc-300">
-                    {LANDING_DEMO_ROLES.find((r) => r.id === demoRole)?.label ?? demoRole}
-                  </span>
-                  {" · "}
-                  <span className="font-normal text-zinc-500">wijzig rechtsboven</span>
-                </p>
               </div>
+              <DemoSituationMenu variant="compact" align="end" className="border-white/15 bg-zinc-900/80 text-zinc-100" />
             </div>
 
             <div
@@ -352,9 +337,8 @@ export function LandingInteractiveChat() {
               aria-live="polite"
             >
               {messages.length === 0 ? (
-                <p className="px-2 py-8 text-center text-sm text-zinc-500">
-                  Bijv.: &ldquo;Ik wil volgende week knippen — hebben jullie donderdag nog een plek?&rdquo;
-                  of &ldquo;Pijn aan een kies, kunnen jullie vandaag nog?&rdquo;
+                <p className="px-2 py-8 text-center text-sm leading-relaxed text-zinc-500">
+                  {chatHints.emptyExamples}
                 </p>
               ) : null}
 
@@ -401,7 +385,7 @@ export function LandingInteractiveChat() {
                 <Input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Bijv. afspraak, spoed of offerte…"
+                  placeholder={chatHints.inputPlaceholder}
                   maxLength={400}
                   disabled={busy}
                   className={cn(

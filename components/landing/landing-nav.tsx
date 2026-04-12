@@ -2,26 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Building2, ChevronDown } from "lucide-react";
-import {
-  AnonymousDemoForm,
-  useDemoRole,
-} from "@/components/landing/demo-role-context";
-import { LANDING_DEMO_ROLES } from "@/lib/demo/landing-demo-roles";
+import { AnonymousDemoForm } from "@/components/landing/demo-role-context";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { BRAND_LOGO_MONOGRAM, BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
-import type { NicheId } from "@/lib/niches";
 
 const LINKS = [
   { href: "#probleem", label: "Probleem" },
@@ -33,7 +18,6 @@ const LINKS = [
 
 export function LandingNav() {
   const [scrolled, setScrolled] = useState(false);
-  const { demoRole, setDemoRole } = useDemoRole();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -41,9 +25,6 @@ export function LandingNav() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  const currentLabel =
-    LANDING_DEMO_ROLES.find((r) => r.id === demoRole)?.label ?? "Algemeen";
 
   return (
     <header
@@ -76,38 +57,6 @@ export function LandingNav() {
         </nav>
         <div className="flex min-w-0 shrink-0 items-center justify-end gap-1 sm:gap-1.5 md:gap-2">
           <ThemeToggle />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="h-9 max-w-[min(11rem,calc(100vw-11rem))] shrink gap-1.5 rounded-lg border-border/70 px-2 text-[0.7rem] font-semibold sm:h-9 sm:max-w-[13rem] sm:px-2.5 sm:text-[0.75rem]"
-                aria-label="Kies demo-situatie"
-              >
-                <Building2 className="size-3.5 shrink-0 opacity-80" aria-hidden />
-                <span className="hidden min-w-0 truncate sm:inline">{currentLabel}</span>
-                <span className="sm:hidden">Situatie</span>
-                <ChevronDown className="size-3.5 shrink-0 opacity-60" aria-hidden />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[min(calc(100vw-2rem),16rem)]">
-              <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-                Demo-situatie (chat hieronder)
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuRadioGroup
-                value={demoRole}
-                onValueChange={(v) => setDemoRole(v as NicheId)}
-              >
-                {LANDING_DEMO_ROLES.map((r) => (
-                  <DropdownMenuRadioItem key={r.id} value={r.id} className="text-sm">
-                    {r.label}
-                  </DropdownMenuRadioItem>
-                ))}
-              </DropdownMenuRadioGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
           <AnonymousDemoForm>
             <Button
               type="submit"

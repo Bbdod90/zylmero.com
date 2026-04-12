@@ -3,19 +3,18 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Check, ChevronDown, Sparkles } from "lucide-react";
-import { AnonymousDemoForm } from "@/components/landing/demo-role-context";
+import { AnonymousDemoForm, useDemoRole } from "@/components/landing/demo-role-context";
 import { HeroInboxMock } from "@/components/landing/hero-inbox-mock";
 import { LandingInteractiveChat } from "@/components/landing/landing-interactive-chat";
 import { LandingNav } from "@/components/landing/landing-nav";
 import { StickyConversionBar } from "@/components/landing/sticky-conversion-bar";
 import { Button } from "@/components/ui/button";
 import { BILLING_PLANS } from "@/lib/billing/plans";
+import { heroSubtitleForRole } from "@/lib/demo/hero-mock-copy";
 import { BRAND_CONTACT_EMAIL, BRAND_LOGO_MONOGRAM, BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
 const HERO_H1 = "Je reageert te laat — en dat kost je klanten";
-
-const HERO_SUB = `Kapper, praktijk, garage of monteur: aanvragen komen binnen terwijl jij aan het werk bent. Zonder snelle reactie kiest je klant iemand anders. ${BRAND_NAME} vangt berichten op, kwalificeert kort en helpt om afspraken te boeken — ook als je agenda vol zit.`;
 
 const HERO_TRUST = "Vaak al terugverdiend met één extra afspraak";
 
@@ -27,6 +26,9 @@ const fadeUp = {
 };
 
 export function ZylmeroLanding() {
+  const { demoRole } = useDemoRole();
+  const heroSub = heroSubtitleForRole(demoRole, BRAND_NAME);
+
   return (
     <div className="min-h-dvh bg-background pb-32 text-foreground md:pb-24">
       <LandingNav />
@@ -45,7 +47,7 @@ export function ZylmeroLanding() {
               {HERO_H1}
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground md:text-xl">
-              {HERO_SUB}
+              {heroSub}
             </p>
             <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
               <Button

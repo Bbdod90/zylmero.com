@@ -203,9 +203,9 @@ Er is eerdere chatgeschiedenis in dit gesprek — lees die mee. Herhaal NIET dez
   const landingRules = landingDemo
     ? demoNiche
       ? `
-Homepage-demo: korte, natuurlijke zinnen in het Nederlands (2–5 waar nodig).
+Homepage-demo: natuurlijke zinnen in het Nederlands — kort bij een simpele intake, iets uitgebreider als de klant een inhoudelijke vraag stelt (prijs, diensten, werkwijze).
 Blijf in de gekozen demo-rol; antwoord alsof je daar werkt. Geen rollen door elkaar.
-Waarde: snelle duidelijkheid — concrete afspraak, tijdvak of duidelijke volgende stap.
+Waarde: snelle duidelijkheid — concrete afspraak, tijdvak of duidelijke volgende stap; op informerende vragen gewoon inhoudelijk antwoord binnen de bedrijfskennis.
 ${historyNote}
 ${rdwBlock}${sectorBlock}
 `
