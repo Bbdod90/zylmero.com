@@ -40,7 +40,7 @@ export default async function SettingsPage({
   return (
     <PageFrame
       title="Instellingen"
-      subtitle="Bedrijfsprofiel, kennis, WhatsApp en facturatie"
+      subtitle="Alle details: bedrijf, kennis, WhatsApp, widget en facturatie. Voor het stappenplan: zie AI & koppelingen."
     >
       <SettingsTabs
         company={auth.company}

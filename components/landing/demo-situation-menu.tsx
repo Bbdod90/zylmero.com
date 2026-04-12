@@ -41,9 +41,9 @@ export function DemoSituationMenu({
           variant="outline"
           size="sm"
           className={cn(
-            "shrink-0 gap-1 rounded-lg font-semibold",
+            "shrink-0 gap-1.5 rounded-lg font-semibold transition-colors",
             compact
-              ? "h-8 border-white/[0.12] bg-white/[0.04] px-2 text-[0.65rem] text-foreground hover:bg-white/[0.07] dark:text-zinc-100"
+              ? "h-9 min-h-9 min-w-[6.75rem] border-primary/45 bg-primary/18 px-2.5 text-[0.7rem] text-white shadow-sm ring-1 ring-primary/35 hover:bg-primary/28 sm:min-w-[7.5rem] sm:text-xs"
               : "h-9 max-w-[min(11rem,calc(100vw-8rem))] border-border/70 px-2 text-[0.7rem] sm:max-w-[13rem] sm:px-2.5 sm:text-[0.75rem]",
             className,
           )}
@@ -58,7 +58,7 @@ export function DemoSituationMenu({
       </DropdownMenuTrigger>
       <DropdownMenuContent align={align} className="w-[min(calc(100vw-2rem),16rem)]">
         <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-          Kies je branche (demo)
+          Demo — welke branche?
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuRadioGroup

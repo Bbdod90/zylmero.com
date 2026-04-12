@@ -10,7 +10,6 @@ import {
   Inbox,
   LayoutGrid,
   LogOut,
-  Plug,
   Settings2,
   Sparkles,
   Users,
@@ -53,11 +52,10 @@ const GROUPS: { title: string; items: NavItem[] }[] = [
     ],
   },
   {
-    title: "Kennis & koppelingen",
+    title: "AI & klanten",
     items: [
+      { href: "/dashboard/ai-koppelingen", label: "AI & koppelingen", icon: Brain },
       { href: "/dashboard/playbooks", label: "Playbooks", icon: BookOpen },
-      { href: "/dashboard/ai-knowledge", label: "AI-kennis", icon: Brain },
-      { href: "/dashboard/integrations", label: "Integraties", icon: Plug },
     ],
   },
   {
@@ -94,8 +92,8 @@ const ANONYMOUS_PREVIEW_GROUPS: { title: string; items: NavItem[] }[] = [
   {
     title: "AI voor klanten",
     items: [
-      { href: "/dashboard/ai-knowledge", label: "AI trainen · website", icon: Brain },
-      { href: "/dashboard/ai", label: "AI-instellingen", icon: Sparkles },
+      { href: "/dashboard/ai-koppelingen", label: "AI & koppelingen", icon: Brain },
+      { href: "/dashboard/ai-knowledge", label: "AI-kennis (detail)", icon: Sparkles },
     ],
   },
 ];

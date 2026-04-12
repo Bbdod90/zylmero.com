@@ -17,6 +17,38 @@ import {
 
 export type OnboardingState = { error?: string };
 
+/**
+ * Bestaand bedrijf: door naar dashboard als alles klopt.
+ * Anders (alleen company-rij, geen settings — mislukte eerdere poging): opruimen zodat onboarding opnieuw kan.
+ */
+async function resolveExistingCompanyForOnboarding(
+  supabase: SupabaseClient,
+  userId: string,
+  companyId: string,
+): Promise<{ error?: string }> {
+  const { data: existingSettings } = await supabase
+    .from("company_settings")
+    .select("company_id")
+    .eq("company_id", companyId)
+    .maybeSingle();
+  if (existingSettings) {
+    redirect("/dashboard");
+  }
+  const { error } = await supabase
+    .from("companies")
+    .delete()
+    .eq("id", companyId)
+    .eq("owner_user_id", userId);
+  if (error) {
+    return {
+      error:
+        "Je account heeft een incompleet bedrijfsprofiel. Vernieuw de pagina of neem contact op met support.",
+    };
+  }
+  revalidatePath("/", "layout");
+  return {};
+}
+
 const QUICK_START_COMPANY_NAME = "Mijn bedrijf";
 const QUICK_START_NICHE: NicheId = "general_services";
 
@@ -170,8 +202,15 @@ export async function skipOnboardingWizardAction(): Promise<OnboardingState> {
   if (!auth.user) {
     redirect("/login");
   }
+
+  const supabase = await createClient();
   if (auth.company) {
-    redirect("/dashboard");
+    const r = await resolveExistingCompanyForOnboarding(
+      supabase,
+      auth.user.id,
+      auth.company.id,
+    );
+    if (r.error) return { error: r.error };
   }
 
   const niche_key = QUICK_START_NICHE;
@@ -186,7 +225,6 @@ export async function skipOnboardingWizardAction(): Promise<OnboardingState> {
     })
     .filter((row) => row.q && row.a);
 
-  const supabase = await createClient();
   const now = new Date();
   const trialEnd = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
 
@@ -239,6 +277,8 @@ export async function skipOnboardingWizardAction(): Promise<OnboardingState> {
     settingsRow,
   );
   if (sErr) {
+    await supabase.from("companies").delete().eq("id", company.id).eq("owner_user_id", auth.user.id);
+    revalidatePath("/", "layout");
     return { error: sErr.message };
   }
 
@@ -257,8 +297,15 @@ export async function completeOnboardingAction(
   if (!auth.user) {
     redirect("/login");
   }
+
+  const supabase = await createClient();
   if (auth.company) {
-    redirect("/dashboard");
+    const r = await resolveExistingCompanyForOnboarding(
+      supabase,
+      auth.user.id,
+      auth.company.id,
+    );
+    if (r.error) return { error: r.error };
   }
 
   const name = String(formData.get("company_name") || "").trim();
@@ -354,7 +401,6 @@ export async function completeOnboardingAction(
 
   const nicheLabel = displayNicheLabel(niche_key, niche_custom);
 
-  const supabase = await createClient();
   const now = new Date();
   const trialEnd = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
   const { data: company, error: cErr } = await supabase
@@ -409,6 +455,8 @@ export async function completeOnboardingAction(
   );
 
   if (sErr) {
+    await supabase.from("companies").delete().eq("id", company.id).eq("owner_user_id", auth.user.id);
+    revalidatePath("/", "layout");
     return { error: sErr.message };
   }
 

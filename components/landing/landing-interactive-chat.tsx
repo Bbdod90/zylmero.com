@@ -308,7 +308,7 @@ export function LandingInteractiveChat() {
     <section className="border-b border-border/40 py-16 dark:border-white/[0.06] md:py-24">
       <div className="mx-auto max-w-[1200px] px-4 md:px-8">
         <div className="mx-auto max-w-xl text-center">
-          <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">Demo</p>
+          <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">Live demo</p>
           <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
             {chatHints.sectionTitle}
           </h2>
@@ -327,7 +327,12 @@ export function LandingInteractiveChat() {
                 </p>
                 <p className="text-xs text-muted-foreground">Antwoord binnen seconden</p>
               </div>
-              <DemoSituationMenu variant="compact" align="end" className="border-white/15 bg-zinc-900/80 text-zinc-100" />
+              <div className="flex shrink-0 flex-col items-end gap-1">
+                <span className="text-[0.65rem] font-semibold uppercase tracking-wider text-zinc-500">
+                  Branche
+                </span>
+                <DemoSituationMenu variant="compact" align="end" />
+              </div>
             </div>
 
             <div

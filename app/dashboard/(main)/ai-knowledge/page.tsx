@@ -20,7 +20,9 @@ export default async function AiKnowledgePage() {
   return (
     <PageFrame
       title="AI-kennis"
-      subtitle="Train je AI op jouw bedrijf: website-URL en tekst met openingstijden, tarieven en praktische info (wat bij jouw branche past). Zo antwoordt de assistent klanten consistenter — of je nu vol zit in de stoelen, de spreekuur of op de klus."
+      subtitle="Website-URL en tekst: openingstijden, tarieven en praktische info — onderdeel van AI & koppelingen."
+      dismissHref="/dashboard/ai-koppelingen"
+      dismissLabel="AI & koppelingen"
     >
       <AiKnowledgeForm
         demoMode={demo}

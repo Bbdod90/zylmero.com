@@ -117,7 +117,7 @@ export function SignupForm() {
         email,
         password,
         options: {
-          emailRedirectTo: `${base}/auth/callback?next=/dashboard`,
+          emailRedirectTo: `${base}/auth/callback?next=/dashboard/onboarding`,
         },
       });
 
@@ -141,6 +141,7 @@ export function SignupForm() {
       router.push("/dashboard/onboarding");
     } finally {
       setPending(false);
+      submitLock.current = false;
     }
   }
 

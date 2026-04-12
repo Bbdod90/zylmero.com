@@ -27,7 +27,9 @@ export default async function AiSettingsPage() {
   return (
     <PageFrame
       title="AI-instellingen"
-      subtitle="Toon, antwoordstijl en voorkeuren voor je AI-closer."
+      subtitle="Toon en antwoordstijl — onderdeel van AI & koppelingen."
+      dismissHref="/dashboard/ai-koppelingen"
+      dismissLabel="AI & koppelingen"
     >
       <AiPanel
         tone={s?.tone ?? null}

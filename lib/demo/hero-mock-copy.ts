@@ -156,25 +156,26 @@ export function getLandingChatHints(role: NicheId): {
 } {
   const cfg = getNicheConfig(role);
   const short =
-    LANDING_DEMO_ROLES.find((r) => r.id === role)?.label ?? cfg.label.replace(/\s*\/.*$/, "").trim();
+    LANDING_DEMO_ROLES.find((r) => r.id === role)?.label ??
+    cfg.label.replace(/\s*\/.*$/, "").trim();
 
   const EXAMPLES: Partial<Record<NicheId, string>> = {
     general_services:
-      "Bijv.: “Hoe snel kunnen jullie reageren?” of “Ik wil volgende week langskomen — wat past?”",
+      "Schrijf hier je eerste bericht — zoals een klant die net appt. Een tijd voorstellen, spoed melden, of kort vragen hoe jullie werken: alles is goed.",
     hair_salon:
-      "Bijv.: “Donderdag knippen met kleur — nog plek?” of “Wat kost een balayage ongeveer?”",
+      "Zet erin wat je wilt laten doen en wanneer het ongeveer past — kleur, knippen, baard, of alleen een vraag over beschikbaarheid.",
     dentist:
-      "Bijv.: “Pijn aan een kies — vandaag nog iemand vrij?” of “Wanneer is de volgende controle?”",
+      "Noem wat er speelt: spoed en pijn, een controle, of cosmetisch — hoe concreter, hoe strakker het antwoord.",
     garage:
-      "Bijv.: “Winterbanden laten zetten — kenteken …” of “APK volgende week combineren met kleine beurt?”",
+      "Combineer gerust klacht of onderhoud met je kenteken of een gewenste dag — APK, banden, geluid: noem wat van toepassing is.",
     plumber:
-      "Bijv.: “Lekkage bij de douche — kunnen jullie vandaag?” of “Wat kost een spoedbezoek ongeveer?”",
+      "Beschrijf kort waar het lekt of wat er misgaat en of het haast heeft — adres of wijk helpt om een monteur te plannen.",
     cleaning:
-      "Bijv.: “Wekelijkse schoonmaak kantoor — kunnen jullie een rondleiding inplannen?” of “Wat zijn jullie tarieven per uur?”",
+      "Vertel wat voor ruimte het is en hoe vaak je schoonmaak zoekt — kantoor, eenmalig, of een vraag over tarief.",
     electrician:
-      "Bijv.: “Groepenkast uitbreiden voor laadpaal” of “Stroomuitval keuken — wanneer kan een monteur?”",
+      "Schrijf wat er uitvalt of wat je wilt laten doen — groepenkast, laadpaal, of iets dat niet veilig voelt.",
     coach:
-      "Bijv.: “Kennismaking loopbaancoaching” of “Wat kost een traject van 6 sessies ongeveer?”",
+      "Noem je doel in één zin en of je een kennismaking zoekt — traject, losse sessies, of alleen even sparren.",
   };
 
   const PLACEHOLDERS: Partial<Record<NicheId, string>> = {
@@ -190,11 +191,11 @@ export function getLandingChatHints(role: NicheId): {
 
   return {
     sectionTitle: "Van bericht naar afspraak",
-    sectionSub: `Demo als ${short}: ${cfg.description} Stel gerust normale vragen — prijzen, planning, spoed — het antwoord blijft binnen deze rol.`,
+    sectionSub: `Nu: ${short}. Kies je branche in het venster hieronder en stuur een bericht — net als je klant zou doen.`,
     emptyExamples: EXAMPLES[role] ?? EXAMPLES_FALLBACK,
     inputPlaceholder: PLACEHOLDERS[role] ?? "Typ je vraag of afspraak…",
   };
 }
 
 const EXAMPLES_FALLBACK =
-  "Bijv.: een concrete vraag over je planning, prijs of spoed — net als bij een echte klant.";
+  "Eén kort bericht volstaat — denk aan planning, prijs of spoed, zoals een echte klant zou typen.";

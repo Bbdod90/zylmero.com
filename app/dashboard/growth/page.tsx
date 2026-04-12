@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { getAuth } from "@/lib/auth";
 import { isDemoCompanyId } from "@/lib/billing/trial";
 import { isSalesMode } from "@/lib/env";
@@ -10,7 +11,15 @@ import { resolveSiteUrl } from "@/lib/site-url";
 
 export default async function GrowthPage() {
   const auth = await getAuth();
-  if (!auth.company) return null;
+  if (!auth.user) {
+    redirect("/login");
+  }
+  if (!auth.company) {
+    redirect("/dashboard/onboarding");
+  }
+  if (!auth.company.onboarding_completed) {
+    redirect("/dashboard/onboarding");
+  }
 
   const siteUrl = resolveSiteUrl();
 

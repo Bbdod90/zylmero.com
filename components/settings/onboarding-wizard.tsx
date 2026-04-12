@@ -163,10 +163,10 @@ export function OnboardingWizard() {
             <Sparkles className="size-5" />
           </div>
           <div>
-            <p className="font-semibold text-foreground">Dit levert jou direct geld op</p>
+            <p className="font-semibold text-foreground">Welkom — laten we je profiel afmaken</p>
             <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-              In vijf korte stappen zie je waar je omzet blijft liggen — daarna richten we {BRAND_NAME} voor je
-              in.
+              Vijf korte stappen: je omzetlek inzichtelijk, daarna staat {BRAND_NAME} voor je klaar in het
+              dashboard.
             </p>
             <div className="mt-4 flex flex-col gap-2 border-t border-primary/15 pt-4 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-xs text-muted-foreground">
@@ -509,7 +509,7 @@ export function OnboardingWizard() {
                 disabled={pending || !canStep0}
                 onClick={submit}
               >
-                {pending ? "Account aanmaken…" : `${BRAND_NAME} activeren`}
+                {pending ? "Bezig met opslaan…" : `${BRAND_NAME} activeren`}
               </Button>
             )}
           </div>
