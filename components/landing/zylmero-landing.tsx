@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Check, ChevronDown, Sparkles } from "lucide-react";
-import { enterAnonymousDemo } from "@/actions/demo";
+import { AnonymousDemoForm } from "@/components/landing/demo-role-context";
 import { HeroInboxMock } from "@/components/landing/hero-inbox-mock";
 import { LandingInteractiveChat } from "@/components/landing/landing-interactive-chat";
 import { LandingNav } from "@/components/landing/landing-nav";
@@ -55,7 +55,7 @@ export function ZylmeroLanding() {
               >
                 <Link href="/signup">Start gratis proefperiode</Link>
               </Button>
-              <form action={enterAnonymousDemo} className="w-full sm:w-auto">
+              <AnonymousDemoForm className="w-full sm:w-auto">
                 <Button
                   type="submit"
                   size="lg"
@@ -65,7 +65,7 @@ export function ZylmeroLanding() {
                   Bekijk hoe het werkt
                   <ArrowRight className="ml-2 size-4 opacity-80" />
                 </Button>
-              </form>
+              </AnonymousDemoForm>
             </div>
             <p className="mt-8 text-sm text-muted-foreground">
               Geen creditcard. Je stopt wanneer je wilt.
@@ -370,7 +370,7 @@ export function ZylmeroLanding() {
             <Button asChild size="lg" className="h-12 rounded-xl px-8 text-base font-semibold sm:h-14">
               <Link href="/signup">Start gratis proefperiode</Link>
             </Button>
-            <form action={enterAnonymousDemo}>
+            <AnonymousDemoForm>
               <Button
                 type="submit"
                 size="lg"
@@ -379,7 +379,7 @@ export function ZylmeroLanding() {
               >
                 Bekijk hoe het werkt
               </Button>
-            </form>
+            </AnonymousDemoForm>
           </div>
         </div>
       </motion.section>

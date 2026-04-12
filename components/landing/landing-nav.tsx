@@ -2,11 +2,26 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { enterAnonymousDemo } from "@/actions/demo";
+import { Building2, ChevronDown } from "lucide-react";
+import {
+  AnonymousDemoForm,
+  useDemoRole,
+} from "@/components/landing/demo-role-context";
+import { LANDING_DEMO_ROLES } from "@/lib/demo/landing-demo-roles";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { BRAND_LOGO_MONOGRAM, BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
+import type { NicheId } from "@/lib/niches";
 
 const LINKS = [
   { href: "#probleem", label: "Probleem" },
@@ -18,6 +33,7 @@ const LINKS = [
 
 export function LandingNav() {
   const [scrolled, setScrolled] = useState(false);
+  const { demoRole, setDemoRole } = useDemoRole();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -25,6 +41,9 @@ export function LandingNav() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const currentLabel =
+    LANDING_DEMO_ROLES.find((r) => r.id === demoRole)?.label ?? "Algemeen";
 
   return (
     <header
@@ -35,7 +54,7 @@ export function LandingNav() {
           : "border-transparent bg-background/80 backdrop-blur-md dark:bg-background/[0.78]",
       )}
     >
-      <div className="mx-auto flex h-14 max-w-[1200px] items-center justify-between gap-4 px-4 md:h-[3.75rem] md:px-8">
+      <div className="mx-auto flex h-14 max-w-[1200px] items-center justify-between gap-2 px-4 md:h-[3.75rem] md:gap-4 md:px-8">
         <Link href="/" className="flex min-w-0 shrink-0 items-center gap-2.5">
           <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-xs font-semibold text-primary ring-1 ring-primary/20">
             {BRAND_LOGO_MONOGRAM}
@@ -55,18 +74,51 @@ export function LandingNav() {
             </a>
           ))}
         </nav>
-        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+        <div className="flex min-w-0 shrink-0 items-center justify-end gap-1 sm:gap-1.5 md:gap-2">
           <ThemeToggle />
-          <form action={enterAnonymousDemo}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="h-9 max-w-[min(11rem,calc(100vw-11rem))] shrink gap-1.5 rounded-lg border-border/70 px-2 text-[0.7rem] font-semibold sm:h-9 sm:max-w-[13rem] sm:px-2.5 sm:text-[0.75rem]"
+                aria-label="Kies demo-situatie"
+              >
+                <Building2 className="size-3.5 shrink-0 opacity-80" aria-hidden />
+                <span className="hidden min-w-0 truncate sm:inline">{currentLabel}</span>
+                <span className="sm:hidden">Situatie</span>
+                <ChevronDown className="size-3.5 shrink-0 opacity-60" aria-hidden />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[min(calc(100vw-2rem),16rem)]">
+              <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+                Demo-situatie (chat hieronder)
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuRadioGroup
+                value={demoRole}
+                onValueChange={(v) => setDemoRole(v as NicheId)}
+              >
+                {LANDING_DEMO_ROLES.map((r) => (
+                  <DropdownMenuRadioItem key={r.id} value={r.id} className="text-sm">
+                    {r.label}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <AnonymousDemoForm>
             <Button
               type="submit"
               size="sm"
               variant="ghost"
-              className="rounded-lg px-2.5 text-[0.7rem] font-medium leading-snug text-muted-foreground hover:bg-muted/60 hover:text-foreground sm:px-3 sm:text-[0.8125rem]"
+              className="rounded-lg px-2 text-[0.7rem] font-medium leading-snug text-muted-foreground hover:bg-muted/60 hover:text-foreground sm:px-2.5 sm:text-[0.8125rem]"
             >
-              Bekijk hoe het werkt
+              <span className="hidden sm:inline">Bekijk hoe het werkt</span>
+              <span className="sm:hidden">Demo</span>
             </Button>
-          </form>
+          </AnonymousDemoForm>
           <Button
             variant="ghost"
             size="sm"
@@ -77,7 +129,7 @@ export function LandingNav() {
           </Button>
           <Button
             size="sm"
-            className="rounded-lg px-4 text-[0.8125rem] font-semibold shadow-sm"
+            className="rounded-lg px-3 text-[0.75rem] font-semibold shadow-sm sm:px-4 sm:text-[0.8125rem]"
             asChild
           >
             <Link href="/signup">Start gratis proefperiode</Link>

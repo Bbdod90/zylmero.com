@@ -7,7 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BRAND_LOGO_MONOGRAM, BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
-import { enterAnonymousDemo } from "@/actions/demo";
+import {
+  AnonymousDemoForm,
+  useDemoRole,
+} from "@/components/landing/demo-role-context";
+import { LANDING_DEMO_ROLES } from "@/lib/demo/landing-demo-roles";
+import { getNicheConfig, type NicheId } from "@/lib/niches";
 import type { RdwVehicleSnapshot } from "@/lib/rdw/kenteken";
 
 type ChatMsg =
@@ -36,27 +41,28 @@ function isGreetingOnly(raw: string): boolean {
   );
 }
 
-function greetingReply(): {
+function greetingReply(nicheId: NicheId): {
   reply: string;
   resultTitle: string;
   valueLine: string;
 } {
+  const cfg = getNicheConfig(nicheId);
   return {
-    reply:
-      "Hoi! Leuk dat je even kijkt. Waarmee kan ik je helpen — bijvoorbeeld een afspraak, een spoedvraag of iets dat je wilt laten plannen?",
+    reply: `Hoi! Je bekijkt de demo als ${cfg.label}. Waarmee kan ik je helpen — afspraak, vraag of spoed?`,
     resultTitle: "Intake",
     valueLine: "—",
   };
 }
 
-function simulateResponse(userText: string): {
+function simulateResponse(userText: string, nicheId: NicheId): {
   reply: string;
   resultTitle: string;
   valueLine: string;
 } {
   const t = userText.toLowerCase();
+  const cfg = getNicheConfig(nicheId);
   if (isGreetingOnly(userText)) {
-    return greetingReply();
+    return greetingReply(nicheId);
   }
   if (/\b(tand|tandarts|gebit|kies|vulling|controle|bleken|mond)\b/i.test(t)) {
     return {
@@ -89,6 +95,17 @@ function simulateResponse(userText: string): {
       valueLine: "€35 – €180",
     };
   }
+  if (
+    /\b(lekkage|loodgieter|douche|badkamer|keuken|riool|sanitair|langskomen|langskom)\b/i.test(t) ||
+    (/\blekkage\b/i.test(t) && /\b(douche|bad|wc|keuken|goot|kraan)\b/i.test(t))
+  ) {
+    return {
+      reply:
+        "Helder — een lekkage pakken we liever vandaag nog aan. Morgenochtend kan ik een monteur tussen 08:00–12:00 inplannen, of wil je liever een kort belmoment straks? Mag ik je postcode of wijk voor de route?",
+      resultTitle: "Spoed monteur",
+      valueLine: "€95 – €340",
+    };
+  }
   if (/band|winter|zomer|profiel|montage/i.test(t)) {
     return {
       reply:
@@ -111,11 +128,14 @@ function simulateResponse(userText: string): {
       valueLine: "€95 – €210",
     };
   }
+  const diensten =
+    cfg.defaultServices.length > 0
+      ? ` We doen o.a. ${cfg.defaultServices.slice(0, 4).join(", ")}.`
+      : "";
   return {
-    reply:
-      "Dank je! Kun je in één zin zeggen waar het om gaat (bijv. afspraak, spoed, offerte) en wat je voorkeur is qua moment?",
-    resultTitle: "Vervolgvraag",
-    valueLine: "Op aanvraag",
+    reply: `Dank je!${diensten} ${cfg.ai.qualifyingQuestions.slice(0, 2).join(" ")} Zo plannen we snel iets dat past.`,
+    resultTitle: cfg.label,
+    valueLine: cfg.defaultPricingHints?.slice(0, 56) || "Op aanvraag",
   };
 }
 
@@ -126,10 +146,15 @@ function nid() {
 }
 
 export function LandingInteractiveChat() {
+  const { demoRole } = useDemoRole();
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [busy, setBusy] = useState(false);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setMessages([]);
+  }, [demoRole]);
 
   /** Alleen binnen de chat-scroll — instant i.p.v. smooth (voorkomt scroll-anker/jank op de pagina). */
   const scrollMessagesToEnd = useCallback(() => {
@@ -157,18 +182,27 @@ export function LandingInteractiveChat() {
     let valueLine: string;
 
     if (isGreetingOnly(text)) {
-      const s = greetingReply();
+      const s = greetingReply(demoRole);
       reply = s.reply;
       resultTitle = s.resultTitle;
       valueLine = s.valueLine;
     } else {
       try {
+        const chat_history = messages.map((m) => ({
+          role: m.role as "user" | "assistant",
+          content: m.text,
+        }));
+
+        const allUserText = [...messages.filter((m) => m.role === "user").map((m) => m.text), text].join(
+          " ",
+        );
+
         let vehicle: RdwVehicleSnapshot | undefined;
         try {
           const rv = await fetch("/api/rdw/resolve", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: text }),
+            body: JSON.stringify({ message: allUserText }),
           });
           const rvData = (await rv.json()) as { vehicle?: RdwVehicleSnapshot };
           if (rv.ok && rvData.vehicle) vehicle = rvData.vehicle;
@@ -176,23 +210,41 @@ export function LandingInteractiveChat() {
           /* RDW optioneel */
         }
 
+        const tireLeak =
+          /\b(lekkage|lek)\b/i.test(allUserText) &&
+          /\b(band|wiel|voorband|achterband)\b/i.test(allUserText);
+        const plumbingHint =
+          !tireLeak &&
+          (/\b(douche|badkamer|keuken|loodgieter|riool|sanitair|wasbak|wc\b|toilet|vocht)\b/i.test(
+            allUserText,
+          ) ||
+            (/\blekkage\b/i.test(allUserText) &&
+              !/\b(apk|kenteken|auto|voertuig)\b/i.test(allUserText)));
+
         const autoHint =
-          /\b(band|banden|apk|kenteken|auto|voorband|achterband|lek|lekkage|lekkende|montage|winterband|zomerband|rechter|linker|voertuig|garage|wiel)\b/i.test(
-            text,
-          ) || Boolean(vehicle);
+          (!plumbingHint &&
+            (/\b(band|banden|apk|kenteken|auto|voorband|achterband|montage|winterband|zomerband|rechter|linker|voertuig|garage|wiel)\b/i.test(
+              allUserText,
+            ) ||
+              Boolean(vehicle))) ||
+          tireLeak;
         const dentalHint = /\b(tand|tandarts|gebit|kies|vulling|controle|bleken|mond)\b/i.test(
-          text,
+          allUserText,
         );
         const beautyHint =
-          /\b(knip|knippen|kapper|salon|kleur|balayage|baard|highlights)\b/i.test(text);
+          /\b(knip|knippen|kapper|salon|kleur|balayage|baard|highlights)\b/i.test(allUserText);
 
-        let branche =
-          "lokaal bedrijf met afspraken (kapper, praktijk, garage, ambacht — pas aan op de vraag)";
-        let prijsrange = "€45–€650 (richting afhankelijk van dienst)";
+        const baseCfg = getNicheConfig(demoRole);
+        let branche = `${baseCfg.label}: ${baseCfg.description}`;
+        let prijsrange =
+          baseCfg.defaultPricingHints?.slice(0, 140) || "€45–€650 (richting afhankelijk van dienst)";
 
         if (autoHint) {
           branche = "garage / banden / autotechniek (kenteken kan via RDW)";
           prijsrange = "€75–€550 (band/montage; exact na inspectie)";
+        } else if (plumbingHint) {
+          branche = "loodgieter / sanitair / service aan huis";
+          prijsrange = "€95–€385 (spoed en werkbreedte)";
         } else if (dentalHint) {
           branche = "tandartspraktijk / mondhygiëne";
           prijsrange = "€85–€450 (afhankelijk van behandeling)";
@@ -207,6 +259,8 @@ export function LandingInteractiveChat() {
           body: JSON.stringify({
             message: text,
             landing_demo: true,
+            demo_niche: demoRole,
+            chat_history,
             context: {
               branche,
               prijsrange,
@@ -219,18 +273,23 @@ export function LandingInteractiveChat() {
           resultTitle?: string;
           valueLine?: string;
         };
-        if (res.ok && data.reply) {
+        const combinedForFallback = allUserText;
+        if (res.ok && data.reply && String(data.reply).trim()) {
           reply = data.reply;
           resultTitle = data.resultTitle || "Afspraak";
           valueLine = data.valueLine || "€120 – €600";
         } else {
-          const s = simulateResponse(text);
+          const s = simulateResponse(combinedForFallback, demoRole);
           reply = s.reply;
           resultTitle = s.resultTitle;
           valueLine = s.valueLine;
         }
       } catch {
-        const s = simulateResponse(text);
+        const combinedForFallback = [
+          ...messages.filter((m) => m.role === "user").map((m) => m.text),
+          text,
+        ].join(" ");
+        const s = simulateResponse(combinedForFallback, demoRole);
         reply = s.reply;
         resultTitle = s.resultTitle;
         valueLine = s.valueLine;
@@ -259,8 +318,8 @@ export function LandingInteractiveChat() {
             Van bericht naar afspraak
           </h2>
           <p className="mt-4 text-base text-muted-foreground">
-            Of je nu zaak, praktijk of werkplaats hebt: stuur een korte aanvraag — zo zou je klant het
-            sturen.
+            Kies eerst een rol — de demo antwoordt dan in die branche. Stuur daarna een korte aanvraag,
+            zoals je klant zou doen.
           </p>
         </div>
 
@@ -275,6 +334,14 @@ export function LandingInteractiveChat() {
                   {BRAND_NAME} · demo
                 </p>
                 <p className="text-xs text-muted-foreground">Antwoord binnen seconden</p>
+                <p className="mt-0.5 truncate text-[0.65rem] font-medium text-zinc-500">
+                  Situatie:{" "}
+                  <span className="text-zinc-300">
+                    {LANDING_DEMO_ROLES.find((r) => r.id === demoRole)?.label ?? demoRole}
+                  </span>
+                  {" · "}
+                  <span className="font-normal text-zinc-500">wijzig rechtsboven</span>
+                </p>
               </div>
             </div>
 
@@ -360,7 +427,7 @@ export function LandingInteractiveChat() {
           <Button asChild size="lg" className="h-12 rounded-xl px-8 text-base font-semibold sm:flex-1">
             <Link href="/signup">Start gratis proefperiode</Link>
           </Button>
-          <form action={enterAnonymousDemo} className="sm:flex-1">
+          <AnonymousDemoForm className="sm:flex-1">
             <Button
               type="submit"
               variant="outline"
@@ -369,7 +436,7 @@ export function LandingInteractiveChat() {
             >
               Bekijk hoe het werkt
             </Button>
-          </form>
+          </AnonymousDemoForm>
         </div>
       </div>
     </section>

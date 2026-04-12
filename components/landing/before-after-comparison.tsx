@@ -14,7 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
-import { enterAnonymousDemo } from "@/actions/demo";
+import { AnonymousDemoForm } from "@/components/landing/demo-role-context";
 
 const BEFORE = [
   {
@@ -131,7 +131,7 @@ export function BeforeAfterComparison() {
           >
             <Link href="/signup">Start — pak je eerste klant</Link>
           </Button>
-          <form action={enterAnonymousDemo} className="flex-1 sm:flex-initial">
+          <AnonymousDemoForm className="flex-1 sm:flex-initial">
             <Button
               type="submit"
               variant="outline"
@@ -140,7 +140,7 @@ export function BeforeAfterComparison() {
             >
               Zie hoe het werkt
             </Button>
-          </form>
+          </AnonymousDemoForm>
         </div>
       </div>
     </section>

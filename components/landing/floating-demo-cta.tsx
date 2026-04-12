@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ArrowRight, Play } from "lucide-react";
-import { enterAnonymousDemo } from "@/actions/demo";
+import { AnonymousDemoForm } from "@/components/landing/demo-role-context";
 import { Button } from "@/components/ui/button";
 
 export function FloatingDemoCta() {
@@ -15,7 +15,7 @@ export function FloatingDemoCta() {
             Elke gemiste aanvraag = verloren omzet. Reageer eerder dan je concurrent.
           </p>
           <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:justify-end">
-            <form action={enterAnonymousDemo} className="w-full sm:w-auto">
+            <AnonymousDemoForm className="w-full sm:w-auto">
               <Button
                 type="submit"
                 size="lg"
@@ -24,7 +24,7 @@ export function FloatingDemoCta() {
                 <Play className="mr-2 size-4 fill-current" />
                 Zie hoe het werkt
               </Button>
-            </form>
+            </AnonymousDemoForm>
             <Button
               size="lg"
               variant="outline"

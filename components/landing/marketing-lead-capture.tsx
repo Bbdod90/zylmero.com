@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { enterAnonymousDemo } from "@/actions/demo";
+import { AnonymousDemoForm } from "@/components/landing/demo-role-context";
 import { BRAND_NAME } from "@/lib/brand";
 
 function Submit() {
@@ -41,7 +41,7 @@ export function MarketingLeadCapture() {
           <Button asChild className="h-12 rounded-2xl font-bold">
             <Link href="/signup">Start — pak je eerste klant</Link>
           </Button>
-          <form action={enterAnonymousDemo}>
+          <AnonymousDemoForm>
             <Button
               type="submit"
               variant="outline"
@@ -49,7 +49,7 @@ export function MarketingLeadCapture() {
             >
               Zie hoe het werkt
             </Button>
-          </form>
+          </AnonymousDemoForm>
         </div>
       </div>
     );

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { enterAnonymousDemo } from "@/actions/demo";
+import { AnonymousDemoForm } from "@/components/landing/demo-role-context";
 import { Button } from "@/components/ui/button";
 
 export function StickyConversionBar() {
@@ -17,7 +17,7 @@ export function StickyConversionBar() {
             <Button size="lg" className="h-11 w-full rounded-xl text-sm font-semibold sm:min-w-[200px]" asChild>
               <Link href="/signup">Start gratis proefperiode</Link>
             </Button>
-            <form action={enterAnonymousDemo} className="w-full sm:w-auto">
+            <AnonymousDemoForm className="w-full sm:w-auto">
               <Button
                 type="submit"
                 variant="outline"
@@ -26,7 +26,7 @@ export function StickyConversionBar() {
               >
                 Bekijk hoe het werkt
               </Button>
-            </form>
+            </AnonymousDemoForm>
           </div>
         </div>
       </div>

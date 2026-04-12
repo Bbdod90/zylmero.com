@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
-import { enterAnonymousDemo } from "@/actions/demo";
+import { AnonymousDemoForm } from "@/components/landing/demo-role-context";
 
 function clamp(n: number, min: number, max: number) {
   return Math.min(max, Math.max(min, n));
@@ -161,7 +161,7 @@ export function RoiLossCalculator() {
           >
             <Link href="/signup">Start — pak je eerste klant</Link>
           </Button>
-          <form action={enterAnonymousDemo} className="flex-1 sm:flex-initial">
+          <AnonymousDemoForm className="flex-1 sm:flex-initial">
             <Button
               type="submit"
               variant="outline"
@@ -170,7 +170,7 @@ export function RoiLossCalculator() {
             >
               Zie hoe het werkt
             </Button>
-          </form>
+          </AnonymousDemoForm>
         </div>
       </div>
     </section>

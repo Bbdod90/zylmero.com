@@ -53,6 +53,28 @@ export async function enterAnonymousDemo() {
   redirect("/dashboard");
 }
 
+/** Zelfde als enterAnonymousDemo, maar niche vanuit homepage-demo (verborgen formulier). */
+export async function enterAnonymousDemoWithNiche(formData: FormData) {
+  const raw = String(formData.get("niche") || "").trim();
+  const niche = isNicheId(raw) ? raw : DEMO_NICHE_DEFAULT;
+  cookies().set(COOKIE_ANON_DEMO, "1", {
+    path: "/",
+    maxAge: 60 * 60 * 4,
+    sameSite: "lax",
+  });
+  cookies().set(COOKIE_DEMO, "1", {
+    path: "/",
+    maxAge: 60 * 60 * 4,
+    sameSite: "lax",
+  });
+  cookies().set(NICHE_COOKIE, niche, {
+    path: "/",
+    maxAge: 60 * 60 * 4,
+    sameSite: "lax",
+  });
+  redirect("/dashboard");
+}
+
 export async function exitAnonymousDemo() {
   cookies().set(COOKIE_ANON_DEMO, "", { path: "/", maxAge: 0 });
   cookies().set(COOKIE_DEMO, "", { path: "/", maxAge: 0 });

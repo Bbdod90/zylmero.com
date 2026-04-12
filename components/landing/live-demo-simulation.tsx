@@ -5,7 +5,7 @@ import Link from "next/link";
 import { CalendarCheck, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { enterAnonymousDemo } from "@/actions/demo";
+import { AnonymousDemoForm } from "@/components/landing/demo-role-context";
 
 type Scenario = {
   id: string;
@@ -186,7 +186,7 @@ export function LiveDemoSimulation() {
           >
             <Link href="/signup">Start — pak je eerste klant</Link>
           </Button>
-          <form action={enterAnonymousDemo} className="flex-1 sm:flex-initial">
+          <AnonymousDemoForm className="flex-1 sm:flex-initial">
             <Button
               type="submit"
               variant="outline"
@@ -195,7 +195,7 @@ export function LiveDemoSimulation() {
             >
               Zie hoe het werkt
             </Button>
-          </form>
+          </AnonymousDemoForm>
         </div>
       </div>
     </section>
