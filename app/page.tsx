@@ -1,16 +1,22 @@
 import { redirect } from "next/navigation";
 import { getAuth } from "@/lib/auth";
+import { ANONYMOUS_DEMO_USER_ID } from "@/lib/auth/constants";
 import { hasSubscriptionAccess, isDemoCompanyId } from "@/lib/billing/trial";
 import { LandingPage } from "@/components/landing/landing-page";
 
 export default async function Home() {
   const auth = await getAuth();
 
-  if (auth.user && !auth.company) {
-    redirect("/dashboard/onboarding");
-  }
+  /**
+   * Alleen echte Supabase-sessies naar dashboard sturen.
+   * Anonieme demo (cookie na “Bekijk demo”) is géén login: homepage blijft zichtbaar op `/`.
+   */
+  const isRealUser = auth.user && auth.user.id !== ANONYMOUS_DEMO_USER_ID;
 
-  if (auth.user && auth.company) {
+  if (isRealUser) {
+    if (!auth.company) {
+      redirect("/dashboard/onboarding");
+    }
     if (!auth.company.onboarding_completed) {
       redirect("/dashboard/onboarding");
     }
