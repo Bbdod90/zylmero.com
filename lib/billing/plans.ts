@@ -44,7 +44,7 @@ export const BILLING_PLANS: PlanDefinition[] = [
   {
     id: "pro",
     name: "Pro",
-    description: "Teams die maximaal uit elke aanvraag willen halen.",
+    description: "Maximaal uit elke aanvraag.",
     priceEur: 299,
     leadCapLabel: "Onbeperkt leads",
     features: [

@@ -98,7 +98,7 @@ export function ZylmeroLanding() {
               className="pointer-events-none absolute -inset-3 rounded-[1.75rem] bg-gradient-to-br from-primary/[0.07] via-primary/[0.02] to-transparent blur-2xl dark:-inset-4 dark:from-primary/12 dark:via-primary/5 dark:to-transparent"
               aria-hidden
             />
-            <div className="relative rounded-[1.5rem] border border-border/35 bg-gradient-to-b from-card via-card/95 to-muted/25 p-2 shadow-[0_22px_56px_-28px_hsl(222_48%_32%/0.12)] dark:border-transparent dark:bg-transparent dark:from-transparent dark:via-transparent dark:to-transparent dark:p-0 dark:shadow-none">
+            <div className="relative">
               <HeroInboxMock />
             </div>
           </div>

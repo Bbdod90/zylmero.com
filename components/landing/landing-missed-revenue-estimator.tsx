@@ -52,15 +52,9 @@ export function LandingMissedRevenueEstimator({ className }: { className?: strin
           <Sparkles className="size-4" aria-hidden strokeWidth={1.75} />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">
-            Indicatie
-          </p>
-          <h2 className="mt-1 text-lg font-bold leading-tight tracking-tight text-foreground md:text-xl">
-            Trage reactie kost geld
+          <h2 className="text-lg font-bold leading-tight tracking-tight text-foreground md:text-xl">
+            Wat traagheid kost <span className="text-primary">(indicatie)</span>
           </h2>
-          <p className="mt-1.5 text-xs leading-relaxed text-foreground md:text-sm">
-            Twee sliders — direct zicht op een bandbreedte. Geen grafieken, wél jouw situatie.
-          </p>
         </div>
       </div>
 
@@ -117,31 +111,10 @@ export function LandingMissedRevenueEstimator({ className }: { className?: strin
         <p className="mt-1 text-xl font-extrabold tabular-nums tracking-tight text-foreground md:text-2xl">
           {formatCurrency(missed.low)} – {formatCurrency(missed.high)}
         </p>
-        <p className="mt-2 text-xs leading-relaxed text-foreground">
-          Zelfde bedragen als de titel hierboven: dat komt neer op <strong>{missedLowPct}%</strong> tot{" "}
-          <strong>{missedHighPct}%</strong> van je maandomzetpotentie (
-          <span className="tabular-nums">{formatCurrency(monthlyPotential)}</span>) — die percentages zijn direct uit
-          die euro’s berekend.
-        </p>
-
-        <p className="mt-4 text-xs font-medium leading-snug text-foreground">
-          <span className="text-primary">Maandomzetpotentie</span>{" "}
-          <span className="tabular-nums font-semibold">{formatCurrency(monthlyPotential)}</span>
-          {" — "}
-          als elke week alle <strong>{leadsPerWeek}</strong> aanvragen worden omgezet tegen{" "}
-          <span className="tabular-nums">{formatCurrency(avgInvoice)}</span> per stuk:{" "}
-          <span className="tabular-nums">{leadsPerWeek}</span> × 4 ×{" "}
-          <span className="tabular-nums">{formatCurrency(avgInvoice)}</span>.
-        </p>
-
-        <p className="mt-3 text-xs leading-relaxed text-foreground">
-          <span className="font-medium text-destructive">Rood op de balk</span> is hetzelfde geld als hierboven: het
-          deel van die <span className="tabular-nums">{formatCurrency(monthlyPotential)}</span> dat dit model{" "}
-          <strong>kwijt door traagheid</strong> schat — tussen{" "}
-          <span className="tabular-nums font-medium">{formatCurrency(missed.low)}</span> en{" "}
-          <span className="tabular-nums font-medium">{formatCurrency(missed.high)}</span>.{" "}
-          <span className="font-medium text-primary">Blauw</span> is wat overblijft van dat potentieel in deze
-          vereenvoudigde weergave (niet automatisch “winst”).
+        <p className="mt-2 text-xs text-muted-foreground">
+          ~{missedLowPct}%–{missedHighPct}% van ca.{" "}
+          <span className="tabular-nums text-foreground">{formatCurrency(monthlyPotential)}</span>{" "}
+          maandomzetpotentie
         </p>
 
         <div className="mt-3" role="img" aria-label="Verhouding gemiste omzet tot maandomzetpotentie">
@@ -158,20 +131,11 @@ export function LandingMissedRevenueEstimator({ className }: { className?: strin
               />
             ) : null}
           </div>
-          <div className="mt-1.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-[0.65rem] text-foreground">
-            <span className="tabular-nums">€&nbsp;0</span>
-            <span>
-              Lijn = ondergrens <span className="tabular-nums font-medium">{formatCurrency(missed.low)}</span> · einde
-              rood = bovengrens <span className="tabular-nums font-medium">{formatCurrency(missed.high)}</span>
-            </span>
-            <span className="tabular-nums font-medium">{formatCurrency(monthlyPotential)}</span>
-          </div>
+          <p className="mt-1.5 text-[0.65rem] text-muted-foreground">Rood = geschat gemist · licht = rest potentieel</p>
         </div>
       </div>
 
-      <p className="mt-3 text-[0.65rem] leading-snug text-foreground md:text-xs">
-        Indicatief model — geen garantie. Één extra klant betaalt je abonnement vaak terug.
-      </p>
+      <p className="mt-3 text-[0.65rem] text-muted-foreground md:text-xs">Indicatief — geen garantie.</p>
     </div>
   );
 }
