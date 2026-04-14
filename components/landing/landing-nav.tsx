@@ -8,12 +8,12 @@ import { Button } from "@/components/ui/button";
 import { BRAND_LOGO_MONOGRAM, BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
+/** Korte labels — minder woorden in de balk; FAQ via footer. */
 const LINKS = [
-  { href: "#probleem", label: "Probleem" },
-  { href: "#oplossing", label: "Oplossing" },
+  { href: "#probleem", label: "Waarom" },
+  { href: "#hoe-het-werkt", label: "Hoe" },
   { href: "#demo", label: "Demo" },
   { href: "#prijzen", label: "Prijzen" },
-  { href: "#faq", label: "FAQ" },
 ] as const;
 
 export function LandingNav() {
@@ -36,20 +36,23 @@ export function LandingNav() {
       )}
     >
       <div className="mx-auto flex h-14 max-w-[1200px] items-center justify-between gap-2 px-4 md:h-[3.75rem] md:gap-4 md:px-8">
-        <Link href="/" className="flex min-w-0 shrink-0 items-center gap-2.5">
-          <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-xs font-semibold text-primary ring-1 ring-primary/20">
+        <Link
+          href="/"
+          className="flex min-w-0 shrink-0 items-center gap-2.5 text-foreground"
+        >
+          <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-xs font-semibold text-foreground ring-1 ring-primary/20">
             {BRAND_LOGO_MONOGRAM}
           </div>
           <span className="truncate text-[0.9375rem] font-semibold tracking-tight">
             {BRAND_NAME}
           </span>
         </Link>
-        <nav className="hidden items-center gap-1 lg:flex lg:gap-2">
+        <nav className="hidden items-center gap-0.5 lg:flex">
           {LINKS.map((l) => (
             <a
               key={l.href}
               href={l.href}
-              className="rounded-lg px-4 py-2.5 text-[0.8125rem] font-medium tracking-tight text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+              className="rounded-lg px-3 py-2 text-[0.8125rem] font-medium tracking-tight text-foreground transition-colors hover:bg-muted/70 hover:text-foreground"
             >
               {l.label}
             </a>
@@ -61,17 +64,16 @@ export function LandingNav() {
             <Button
               type="submit"
               size="sm"
-              variant="ghost"
-              className="rounded-lg px-2 text-[0.7rem] font-medium leading-snug text-muted-foreground hover:bg-muted/60 hover:text-foreground sm:px-2.5 sm:text-[0.8125rem]"
+              variant="demo"
+              className="rounded-lg px-2.5 text-[0.7rem] sm:text-[0.8125rem]"
             >
-              <span className="hidden sm:inline">Bekijk hoe het werkt</span>
-              <span className="sm:hidden">Demo</span>
+              Demo
             </Button>
           </AnonymousDemoForm>
           <Button
             variant="ghost"
             size="sm"
-            className="hidden rounded-lg px-3 text-[0.8125rem] font-medium text-muted-foreground hover:bg-muted/60 md:inline-flex"
+            className="hidden rounded-lg px-3 text-[0.8125rem] font-medium text-foreground hover:bg-muted/70 hover:text-foreground md:inline-flex"
             asChild
           >
             <Link href="/login">Inloggen</Link>
@@ -81,7 +83,7 @@ export function LandingNav() {
             className="rounded-lg px-3 text-[0.75rem] font-semibold shadow-sm sm:px-4 sm:text-[0.8125rem]"
             asChild
           >
-            <Link href="/signup">Start gratis proefperiode</Link>
+            <Link href="/signup">Start gratis</Link>
           </Button>
         </div>
       </div>

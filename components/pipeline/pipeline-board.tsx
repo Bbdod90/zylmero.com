@@ -84,7 +84,7 @@ function LeadCard({ lead, demoMode }: { lead: Lead; demoMode: boolean }) {
           <AiTagBadges tags={lead.ai_tags} size="xs" />
           <div className="flex flex-wrap gap-x-3 gap-y-1 text-2xs text-muted-foreground">
             {lead.estimated_value != null ? (
-              <span className="tabular-nums font-medium text-foreground/90">
+              <span className="tabular-nums font-medium text-foreground">
                 {formatCurrency(lead.estimated_value)}
               </span>
             ) : (

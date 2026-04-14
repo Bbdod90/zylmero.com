@@ -369,30 +369,47 @@ export function LandingInteractiveChat() {
   }
 
   return (
-    <section className="border-b border-border/40 py-16 dark:border-white/[0.06] md:py-24">
+    <section
+      className={cn(
+        "border-b border-border/40 py-16 md:py-24 dark:border-white/[0.06]",
+        "bg-gradient-to-b from-primary/[0.04] via-muted/30 to-background dark:from-transparent dark:via-transparent dark:to-transparent",
+      )}
+    >
       <div className="mx-auto max-w-[1200px] px-4 md:px-8">
         <div className="mx-auto max-w-xl text-center">
-          <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">Live demo</p>
+          <p className="text-xs font-medium uppercase tracking-widest text-foreground">Live demo</p>
           <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
             {chatHints.sectionTitle}
           </h2>
-          <p className="mt-4 text-base text-muted-foreground">{chatHints.sectionSub}</p>
+          <p className="mt-4 text-base text-foreground">{chatHints.sectionSub}</p>
         </div>
 
         <div className="mx-auto mt-12 max-w-lg scroll-mt-24">
-          <div className="overflow-hidden rounded-[1.35rem] border border-white/[0.08] bg-[#0c0f14] shadow-[0_24px_56px_-28px_rgba(0,0,0,0.55)] ring-1 ring-white/[0.06] dark:bg-[#080a0d]">
-            <div className="flex items-center gap-2 border-b border-white/[0.08] bg-white/[0.04] px-3 py-3 sm:gap-3 sm:px-4">
+          <div
+            className={cn(
+              "overflow-hidden rounded-[1.35rem] shadow-xl",
+              "border border-border/70 bg-card text-foreground shadow-[0_24px_52px_-28px_hsl(222_48%_32%/0.14),0_0_0_1px_hsl(var(--border)/0.35)]",
+              "dark:border-white/[0.08] dark:bg-[#080a0d] dark:text-white dark:shadow-[0_24px_56px_-28px_rgba(0,0,0,0.55)] dark:ring-1 dark:ring-white/[0.06]",
+            )}
+          >
+            <div
+              className={cn(
+                "flex items-center gap-2 border-b px-3 py-3 sm:gap-3 sm:px-4",
+                "border-border/60 bg-gradient-to-b from-muted/45 to-muted/15",
+                "dark:border-white/[0.08] dark:from-transparent dark:to-transparent dark:bg-white/[0.04]",
+              )}
+            >
               <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground shadow-inner">
                 {BRAND_LOGO_MONOGRAM}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-bold text-white">
+                <p className="truncate text-sm font-bold text-foreground dark:text-white">
                   {BRAND_NAME} · demo
                 </p>
-                <p className="text-xs text-muted-foreground">Antwoord binnen seconden</p>
+                <p className="text-xs text-foreground dark:text-white">Antwoord binnen seconden</p>
               </div>
               <div className="flex shrink-0 flex-col items-end gap-1">
-                <span className="text-[0.65rem] font-semibold uppercase tracking-wider text-zinc-500">
+                <span className="text-[0.65rem] font-semibold uppercase tracking-wider text-foreground dark:text-white">
                   Branche
                 </span>
                 <DemoSituationMenu variant="compact" align="end" />
@@ -401,12 +418,15 @@ export function LandingInteractiveChat() {
 
             <div
               ref={messagesContainerRef}
-              className="max-h-[min(420px,55vh)] space-y-3 overflow-y-auto overflow-x-hidden px-3 py-4 [overflow-anchor:none] sm:px-4"
+              className={cn(
+                "max-h-[min(420px,55vh)] space-y-3 overflow-y-auto overflow-x-hidden px-3 py-4 [overflow-anchor:none] sm:px-4",
+                "bg-muted/10 dark:bg-transparent",
+              )}
               role="log"
               aria-live="polite"
             >
               {messages.length === 0 ? (
-                <p className="px-2 py-8 text-center text-sm leading-relaxed text-zinc-500">
+                <p className="px-2 py-8 text-center text-sm leading-relaxed text-foreground dark:text-white">
                   {chatHints.emptyExamples}
                 </p>
               ) : null}
@@ -421,15 +441,27 @@ export function LandingInteractiveChat() {
                 ) : (
                   <div key={m.id} className="space-y-2">
                     <div className="flex justify-start">
-                      <div className="max-w-[88%] rounded-2xl rounded-bl-sm border border-white/[0.08] bg-zinc-800/90 px-3.5 py-2.5 text-sm leading-relaxed text-zinc-100">
+                      <div
+                        className={cn(
+                          "max-w-[88%] rounded-2xl rounded-bl-sm border px-3.5 py-2.5 text-sm leading-relaxed",
+                          "border-border/70 bg-background text-foreground shadow-sm",
+                          "dark:border-white/[0.08] dark:bg-zinc-800/90 dark:text-white",
+                        )}
+                      >
                         {m.text}
                       </div>
                     </div>
                     <div className="flex justify-start">
-                      <div className="max-w-[88%] rounded-xl border border-white/[0.1] bg-white/[0.06] px-3.5 py-2 text-xs text-zinc-200">
-                        <span className="font-medium text-primary">{m.resultTitle}</span>
-                        <span className="mx-2 text-zinc-500">·</span>
-                        <span className="tabular-nums text-zinc-300">~{m.valueLine}</span>
+                      <div
+                        className={cn(
+                          "max-w-[88%] rounded-xl border px-3.5 py-2 text-xs",
+                          "border-border/60 bg-muted/50 text-foreground",
+                          "dark:border-white/[0.1] dark:bg-white/[0.06] dark:text-white",
+                        )}
+                      >
+                        <span className="font-medium text-foreground dark:text-white">{m.resultTitle}</span>
+                        <span className="mx-2 text-foreground dark:text-white">·</span>
+                        <span className="tabular-nums text-foreground dark:text-white">~{m.valueLine}</span>
                       </div>
                     </div>
                   </div>
@@ -438,7 +470,13 @@ export function LandingInteractiveChat() {
 
               {busy ? (
                 <div className="flex justify-start pl-1">
-                  <div className="flex items-center gap-2 rounded-2xl border border-white/[0.06] bg-zinc-800/60 px-3 py-2 text-xs text-zinc-400">
+                  <div
+                    className={cn(
+                      "flex items-center gap-2 rounded-2xl border px-3 py-2 text-xs",
+                      "border-border/60 bg-muted/40 text-foreground",
+                      "dark:border-white/[0.06] dark:bg-zinc-800/60 dark:text-white",
+                    )}
+                  >
                     <Loader2 className="size-3.5 animate-spin" />
                     Even geduld…
                   </div>
@@ -448,7 +486,11 @@ export function LandingInteractiveChat() {
 
             <form
               onSubmit={onSubmit}
-              className="border-t border-white/[0.08] bg-black/20 p-3 sm:p-4"
+              className={cn(
+                "border-t p-3 sm:p-4",
+                "border-border/60 bg-muted/25",
+                "dark:border-white/[0.08] dark:bg-black/20",
+              )}
             >
               <div className="flex gap-2">
                 <Input
@@ -458,7 +500,9 @@ export function LandingInteractiveChat() {
                   maxLength={400}
                   disabled={busy}
                   className={cn(
-                    "h-12 min-h-[48px] flex-1 rounded-2xl border-white/10 bg-zinc-900/80 text-sm text-white placeholder:text-zinc-500 focus-visible:ring-primary/40",
+                    "h-12 min-h-[48px] flex-1 rounded-2xl text-sm focus-visible:ring-primary/40",
+                    "border-border/80 bg-background text-foreground placeholder:text-muted-foreground",
+                    "dark:border-white/10 dark:bg-zinc-900/80 dark:text-white dark:placeholder:text-white",
                   )}
                   autoComplete="off"
                   aria-label="Bericht aan demo-assistent"
@@ -478,16 +522,11 @@ export function LandingInteractiveChat() {
 
         <div className="mx-auto mt-10 flex max-w-md flex-col items-stretch gap-3 sm:flex-row sm:justify-center">
           <Button asChild size="lg" className="h-12 rounded-xl px-8 text-base font-semibold sm:flex-1">
-            <Link href="/signup">Start gratis proefperiode</Link>
+            <Link href="/signup">Start gratis</Link>
           </Button>
           <AnonymousDemoForm className="sm:flex-1">
-            <Button
-              type="submit"
-              variant="outline"
-              size="lg"
-              className="h-12 w-full rounded-xl border-border/80 px-8 text-base font-semibold"
-            >
-              Bekijk hoe het werkt
+            <Button type="submit" variant="demo" size="lg" className="h-12 w-full rounded-xl px-8 text-base font-semibold">
+              Bekijk demo
             </Button>
           </AnonymousDemoForm>
         </div>

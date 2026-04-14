@@ -739,7 +739,7 @@ export function LeadWorkspace({
                       )}
                     >
                       <div className="mb-2 flex items-center justify-between gap-6 text-2xs text-muted-foreground">
-                        <span className="font-semibold uppercase tracking-wide text-foreground/90">
+                        <span className="font-semibold uppercase tracking-wide text-foreground">
                           {m.role === "staff"
                             ? "Team"
                             : m.role === "user"

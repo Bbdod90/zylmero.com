@@ -43,7 +43,7 @@ export function DemoSituationMenu({
           className={cn(
             "shrink-0 gap-1.5 rounded-lg font-semibold transition-colors",
             compact
-              ? "h-9 min-h-9 min-w-[6.75rem] border-primary/45 bg-primary/18 px-2.5 text-[0.7rem] text-white shadow-sm ring-1 ring-primary/35 hover:bg-primary/28 sm:min-w-[7.5rem] sm:text-xs"
+              ? "h-9 min-h-9 min-w-[6.75rem] border-primary/35 bg-background px-2.5 text-[0.7rem] text-foreground shadow-sm ring-1 ring-primary/20 hover:bg-primary/[0.08] dark:border-primary/45 dark:bg-primary/18 dark:text-white dark:ring-primary/35 dark:hover:bg-primary/28 sm:min-w-[7.5rem] sm:text-xs"
               : "h-9 max-w-[min(11rem,calc(100vw-8rem))] border-border/70 px-2 text-[0.7rem] sm:max-w-[13rem] sm:px-2.5 sm:text-[0.75rem]",
             className,
           )}

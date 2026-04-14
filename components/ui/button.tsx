@@ -19,6 +19,9 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/[0.93]",
         link: "text-primary underline-offset-4 hover:underline",
+        /** Secundaire CTA (demo): zelfde blauwe familie als primary, geen extra accentkleur. */
+        demo:
+          "border-2 border-primary/50 bg-primary/[0.14] font-semibold text-foreground shadow-[0_2px_14px_-4px_hsl(var(--primary)/0.28),0_1px_0_0_hsl(var(--primary)/0.1)] hover:bg-primary/[0.2] hover:border-primary/60 active:translate-y-px dark:border-primary/55 dark:bg-primary/22 dark:shadow-[0_1px_0_0_hsl(0_0%_0%/0.35)] dark:hover:bg-primary/30 dark:hover:border-primary/70",
       },
       size: {
         default: "h-11 min-h-[44px] px-5 py-2",

@@ -19,9 +19,7 @@ export function TrustLogosRow() {
           }`}
         >
           <span
-            className={`text-[11px] font-semibold uppercase tracking-wider md:text-xs ${
-              b.highlight ? "text-primary" : "text-zinc-500"
-            }`}
+            className="text-[11px] font-semibold uppercase tracking-wider text-foreground md:text-xs"
           >
             {b.label}
           </span>

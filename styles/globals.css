@@ -7,18 +7,20 @@
 */
 @layer base {
   :root {
-    --background: 210 32% 98%;
-    --foreground: 224 64% 5%;
+    /* Iets koeler dan wit — minder fel, beter bij cards en demo-blokken. */
+    --background: 220 24% 97%;
+    /* Body- en UI-tekst: puur zwart (geen grijs via muted). */
+    --foreground: 0 0% 0%;
     --card: 0 0% 100%;
-    --card-foreground: 224 64% 5%;
+    --card-foreground: 0 0% 0%;
     --popover: 0 0% 100%;
-    --popover-foreground: 224 64% 5%;
+    --popover-foreground: 0 0% 0%;
     --primary: 222 48% 32%;
     --primary-foreground: 210 40% 99%;
     --secondary: 220 16% 95%;
-    --secondary-foreground: 224 50% 8%;
+    --secondary-foreground: 0 0% 0%;
     --muted: 220 14% 94%;
-    --muted-foreground: 220 10% 36%;
+    --muted-foreground: 0 0% 0%;
     --accent: 262 48% 48%;
     --accent-foreground: 210 40% 99%;
     --destructive: 0 72% 42%;
@@ -44,17 +46,17 @@
 
   .dark {
     --background: 228 32% 4%;
-    --foreground: 210 36% 98%;
+    --foreground: 0 0% 100%;
     --card: 222 26% 7%;
-    --card-foreground: 210 36% 98%;
+    --card-foreground: 0 0% 100%;
     --popover: 222 26% 7.5%;
-    --popover-foreground: 210 36% 98%;
+    --popover-foreground: 0 0% 100%;
     --primary: 220 42% 58%;
     --primary-foreground: 210 40% 99%;
     --secondary: 220 14% 12%;
-    --secondary-foreground: 210 36% 96%;
+    --secondary-foreground: 0 0% 100%;
     --muted: 220 14% 13%;
-    --muted-foreground: 215 14% 62%;
+    --muted-foreground: 0 0% 100%;
     --accent: 262 58% 56%;
     --accent-foreground: 210 40% 99%;
     --destructive: 0 58% 46%;
@@ -186,7 +188,7 @@
     animation: cf-slide 0.5s ease-out both;
   }
   .cf-eyebrow {
-    @apply text-[0.6875rem] font-semibold uppercase tracking-[0.2em] text-primary;
+    @apply text-[0.6875rem] font-semibold uppercase tracking-[0.2em] text-foreground;
   }
   .cf-heading-xl {
     @apply text-balance font-extrabold tracking-tight text-foreground;

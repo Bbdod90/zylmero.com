@@ -79,7 +79,7 @@ export function DailyActionsCard(props: {
             {t.done ? (
               <CheckCircle2 className="mt-0.5 size-[1.125rem] shrink-0 text-primary" />
             ) : (
-              <Circle className="mt-0.5 size-[1.125rem] shrink-0 text-muted-foreground/70" />
+              <Circle className="mt-0.5 size-[1.125rem] shrink-0 text-muted-foreground" />
             )}
             <div>
               <p className="text-sm font-semibold leading-snug text-foreground">

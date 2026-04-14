@@ -195,7 +195,7 @@ export function AppSidebar({
           <p className="truncate text-sm font-semibold leading-tight tracking-tight text-foreground">
             {companyName}
           </p>
-          <p className="text-2xs text-muted-foreground/90">{BRAND_NAME}</p>
+          <p className="text-2xs text-muted-foreground">{BRAND_NAME}</p>
           {trialDaysLeft != null && trialDaysLeft > 0 ? (
             <p className="mt-1.5 text-2xs font-medium text-amber-400/95">
               Proefperiode · nog {trialDaysLeft}{" "}
@@ -227,7 +227,7 @@ export function AppSidebar({
               gi > 0 && "mt-5 border-t border-border/50 pt-5 dark:border-white/[0.05]",
             )}
           >
-            <p className="mb-2 px-3 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground/90">
+            <p className="mb-2 px-3 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
               {group.title}
             </p>
             <div className="flex flex-col gap-0.5">
@@ -243,7 +243,7 @@ export function AppSidebar({
           </div>
         ))}
         <div className="mt-5 border-t border-border/50 pt-5 dark:border-white/[0.05]">
-          <p className="mb-2 px-3 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground/90">
+          <p className="mb-2 px-3 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
             Account
           </p>
           <Link

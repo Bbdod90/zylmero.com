@@ -145,7 +145,7 @@ export function getHeroMockConversation(role: NicheId): HeroConversation {
 
 export function heroSubtitleForRole(role: NicheId, brandName: string): string {
   const cfg = getNicheConfig(role);
-  return `${cfg.description} Aanvragen komen binnen terwijl jij aan het werk bent. Zonder snelle reactie kiest je klant iemand anders. ${brandName} vangt berichten op, kwalificeert kort en helpt om afspraken te boeken — ook als je agenda vol zit.`;
+  return `${cfg.description} ${brandName} antwoordt direct, kwalificeert kort en helpt afspraken plannen — jij blijft op de klus.`;
 }
 
 export function getLandingChatHints(role: NicheId): {
@@ -161,7 +161,7 @@ export function getLandingChatHints(role: NicheId): {
 
   const EXAMPLES: Partial<Record<NicheId, string>> = {
     general_services:
-      "Schrijf hier je eerste bericht — zoals een klant die net appt. Een tijd voorstellen, spoed melden, of kort vragen hoe jullie werken: alles is goed.",
+      "Typ een kort bericht zoals je klant zou doen — tijd, spoed, of een vraag.",
     hair_salon:
       "Zet erin wat je wilt laten doen en wanneer het ongeveer past — kleur, knippen, baard, of alleen een vraag over beschikbaarheid.",
     dentist:
@@ -191,7 +191,7 @@ export function getLandingChatHints(role: NicheId): {
 
   return {
     sectionTitle: "Van bericht naar afspraak",
-    sectionSub: `Nu: ${short}. Kies je branche in het venster hieronder en stuur een bericht — net als je klant zou doen.`,
+    sectionSub: `${short}: kies branche, typ een bericht zoals je klant zou doen.`,
     emptyExamples: EXAMPLES[role] ?? EXAMPLES_FALLBACK,
     inputPlaceholder: PLACEHOLDERS[role] ?? "Typ je vraag of afspraak…",
   };
