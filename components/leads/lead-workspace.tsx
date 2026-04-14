@@ -26,6 +26,7 @@ import {
 import { refreshLeadAiTags } from "@/actions/ai-tags";
 import {
   updateLeadCustomFields,
+  updateLeadInsightFields,
   updateLeadNotes,
   updateLeadProfile,
 } from "@/actions/leads";
@@ -58,7 +59,148 @@ import {
   TrendingUp,
   Trophy,
   Zap,
+  Pencil,
 } from "lucide-react";
+
+type LeadInsightKey =
+  | "summary"
+  | "intent"
+  | "suggested_next_action"
+  | "status_recommendation";
+
+function LeadInsightRow({
+  leadId,
+  field,
+  label,
+  placeholder,
+  value,
+  demoMode,
+  multiline = true,
+  onPatch,
+}: {
+  leadId: string;
+  field: LeadInsightKey;
+  label: string;
+  placeholder?: string;
+  value: string | null;
+  demoMode: boolean;
+  multiline?: boolean;
+  onPatch: (next: string | null) => void;
+}) {
+  const router = useRouter();
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(value ?? "");
+  const [pending, start] = useTransition();
+
+  useEffect(() => {
+    if (!editing) setDraft(value ?? "");
+  }, [value, editing]);
+
+  const trimmedDisplay = (value ?? "").trim();
+  const empty = !trimmedDisplay;
+
+  const save = () => {
+    const trimmed = draft.trim() || null;
+    start(async () => {
+      if (demoMode) {
+        onPatch(trimmed);
+        toast.success("Opgeslagen (demo)");
+        setEditing(false);
+        return;
+      }
+      const patch =
+        field === "summary"
+          ? { summary: trimmed }
+          : field === "intent"
+            ? { intent: trimmed }
+            : field === "suggested_next_action"
+              ? { suggested_next_action: trimmed }
+              : { status_recommendation: trimmed };
+      const res = await updateLeadInsightFields(leadId, patch);
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      onPatch(trimmed);
+      toast.success("Opgeslagen");
+      setEditing(false);
+      router.refresh();
+    });
+  };
+
+  return (
+    <div className="rounded-lg border border-white/[0.06] bg-background/20 px-3 py-2">
+      <div className="flex items-start justify-between gap-2">
+        <p className="text-2xs font-semibold uppercase tracking-wide text-muted-foreground">
+          {label}
+        </p>
+        {!editing ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-7 shrink-0 text-muted-foreground hover:text-foreground"
+            onClick={() => setEditing(true)}
+            aria-label={`${label} bewerken`}
+          >
+            <Pencil className="size-3.5" aria-hidden />
+          </Button>
+        ) : null}
+      </div>
+      {!editing ? (
+        <p
+          className={cn(
+            "mt-1 whitespace-pre-wrap text-sm leading-snug",
+            empty ? "text-muted-foreground" : "text-foreground",
+          )}
+        >
+          {empty ? placeholder ?? "—" : (value ?? "")}
+        </p>
+      ) : (
+        <div className="mt-2 space-y-2">
+          {multiline ? (
+            <Textarea
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              rows={3}
+              className="rounded-lg text-sm"
+            />
+          ) : (
+            <Input
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              className="rounded-lg text-sm"
+            />
+          )}
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              size="sm"
+              className="rounded-lg"
+              onClick={save}
+              disabled={pending}
+            >
+              {pending ? "Bezig…" : "Opslaan"}
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="rounded-lg"
+              disabled={pending}
+              onClick={() => {
+                setEditing(false);
+                setDraft(value ?? "");
+              }}
+            >
+              Annuleren
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function waHref(phone: string | null) {
   if (!phone) return null;
@@ -130,9 +272,9 @@ export function LeadWorkspace({
   const highValue = isHighValueLead(lead, displayScore);
 
   return (
-    <div className="space-y-10">
-      <div className="grid gap-4 lg:grid-cols-3">
-        <div className="rounded-2xl border border-white/[0.06] bg-gradient-to-br from-primary/[0.1] to-transparent px-5 py-4 text-sm font-medium leading-snug">
+    <div className="space-y-5">
+      <div className="grid gap-3 lg:grid-cols-3">
+        <div className="rounded-2xl border border-white/[0.06] bg-gradient-to-br from-primary/[0.1] to-transparent px-4 py-3 text-sm font-medium leading-snug">
           Deze lead is{" "}
           <span className="font-semibold text-foreground">
             {lead.estimated_value != null
@@ -140,26 +282,26 @@ export function LeadWorkspace({
               : "nog niet ingeschat — voeg een waarde toe"}
           </span>
         </div>
-        <div className="rounded-2xl border border-amber-500/25 bg-amber-500/[0.08] px-5 py-4 text-sm font-medium leading-snug text-amber-100">
+        <div className="rounded-2xl border border-amber-500/25 bg-amber-500/[0.08] px-4 py-3 text-sm font-medium leading-snug text-amber-100">
           Antwoord binnen 2 minuten om deze klus te winnen
         </div>
-        <div className="rounded-2xl border border-destructive/25 bg-destructive/[0.08] px-5 py-4 text-sm font-medium leading-snug text-destructive">
+        <div className="rounded-2xl border border-destructive/25 bg-destructive/[0.08] px-4 py-3 text-sm font-medium leading-snug text-destructive">
           {staleReply
             ? "Je kunt deze klant verliezen — antwoord nu"
             : "Trage antwoorden lekken omzet naar concurrenten"}
         </div>
       </div>
-      <div className="grid gap-10 xl:grid-cols-[minmax(0,420px)_1fr] xl:gap-14">
-      <div className="space-y-8">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,420px)_1fr] xl:gap-8">
+      <div className="space-y-5">
         <Card className="rounded-2xl border-white/[0.06] bg-gradient-to-b from-card to-secondary/[0.04]">
-          <CardHeader>
+          <CardHeader className="space-y-1 pb-3">
             <div className="flex flex-col gap-3">
               <div className="flex flex-col gap-3 min-[420px]:flex-row min-[420px]:items-start min-[420px]:justify-between">
                 <div className="min-w-0 flex-1">
-                  <CardTitle className="truncate text-2xl font-semibold tracking-tight" title={lead.full_name}>
+                  <CardTitle className="truncate text-xl font-semibold tracking-tight" title={lead.full_name}>
                     {lead.full_name}
                   </CardTitle>
-                  <p className="mt-2 break-words text-sm text-muted-foreground">
+                  <p className="mt-1 break-words text-sm text-muted-foreground">
                     {lead.email || "—"} · {lead.phone || "—"}
                   </p>
                 </div>
@@ -189,7 +331,7 @@ export function LeadWorkspace({
               <AiTagBadges tags={lead.ai_tags} className="mt-2" />
             </div>
           </CardHeader>
-          <CardContent className="grid gap-3 sm:grid-cols-2">
+          <CardContent className="grid gap-2 sm:grid-cols-2">
             <Field
               label="CRM-score (ruw)"
               value={lead.score != null ? `${lead.score}/100` : "—"}
@@ -201,6 +343,7 @@ export function LeadWorkspace({
                   ? formatCurrency(lead.estimated_value)
                   : "—"
               }
+              editHref={!demoMode ? "#edit_estimated_value" : undefined}
             />
             <Field
               label="Laatste activiteit"
@@ -215,21 +358,34 @@ export function LeadWorkspace({
 
         {!demoMode ? (
           <Card className="rounded-2xl border-white/[0.06]">
-            <CardHeader>
-              <CardTitle className="text-base">Contact & bron</CardTitle>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">Contact & bron</CardTitle>
             </CardHeader>
             <CardContent>
               <form
-                className="grid gap-4 sm:grid-cols-2"
+                className="grid gap-3 sm:grid-cols-2"
                 onSubmit={(e) => {
                   e.preventDefault();
                   const fd = new FormData(e.currentTarget);
                   start(async () => {
+                    const evRaw = String(fd.get("estimated_value") ?? "").trim();
+                    let estimated_value: number | null | undefined;
+                    if (evRaw === "") {
+                      estimated_value = null;
+                    } else {
+                      const n = parseFloat(evRaw.replace(",", "."));
+                      if (Number.isNaN(n) || n < 0) {
+                        toast.error("Ongeldige geschatte waarde.");
+                        return;
+                      }
+                      estimated_value = n;
+                    }
                     const res = await updateLeadProfile(lead.id, {
                       full_name: String(fd.get("full_name") || ""),
                       email: String(fd.get("email") || ""),
                       phone: String(fd.get("phone") || ""),
                       source: String(fd.get("source") || ""),
+                      estimated_value,
                     });
                     if (!res.ok) {
                       toast.error(res.error);
@@ -241,6 +397,7 @@ export function LeadWorkspace({
                       email: String(fd.get("email") || "").trim() || null,
                       phone: String(fd.get("phone") || "").trim() || null,
                       source: String(fd.get("source") || "").trim() || null,
+                      estimated_value: estimated_value ?? null,
                     }));
                     toast.success("Wijzigingen opgeslagen");
                     router.refresh();
@@ -286,6 +443,22 @@ export function LeadWorkspace({
                     className="rounded-xl"
                   />
                 </div>
+                <div className="space-y-2 sm:col-span-2">
+                  <Label htmlFor="edit_estimated_value">Geschatte kluswaarde (€)</Label>
+                  <Input
+                    id="edit_estimated_value"
+                    name="estimated_value"
+                    type="text"
+                    inputMode="decimal"
+                    defaultValue={
+                      lead.estimated_value != null
+                        ? String(lead.estimated_value)
+                        : ""
+                    }
+                    placeholder="Leeg laten om te wissen"
+                    className="rounded-xl"
+                  />
+                </div>
                 <div className="sm:col-span-2">
                   <Button type="submit" variant="secondary" className="rounded-xl">
                     Wijzigingen opslaan
@@ -298,8 +471,8 @@ export function LeadWorkspace({
 
         {!demoMode ? (
           <Card className="rounded-2xl border-white/[0.06]">
-            <CardHeader>
-              <CardTitle className="text-base">Extra klantvelden</CardTitle>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">Extra klantvelden</CardTitle>
               <p className="text-sm text-muted-foreground">
                 Niche-specifieke gegevens — één regel per veld:{" "}
                 <span className="font-medium text-foreground">label || waarde</span>
@@ -334,7 +507,7 @@ export function LeadWorkspace({
                 <Textarea
                   id="custom_fields"
                   name="custom_fields"
-                  className="min-h-[120px] rounded-xl"
+                  className="min-h-[96px] rounded-xl"
                   defaultValue={serializeCustomFields(lead.custom_fields)}
                   key={lead.id}
                   placeholder={`Postcode || 1234 AB\nAdres || Voorbeeldstraat 12`}
@@ -347,54 +520,102 @@ export function LeadWorkspace({
           </Card>
         ) : null}
 
-        <ConversionInsightPanel insight={insight} />
+        <ConversionInsightPanel insight={insight} compact />
 
         <Card className="rounded-2xl border-white/[0.06]">
-          <CardHeader>
-            <CardTitle className="text-base">Samenvatting</CardTitle>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm">Samenvatting & context</CardTitle>
+            <p className="text-xs text-muted-foreground">
+              Bewerk handmatig of vul aan via AI-acties rechts.
+            </p>
           </CardHeader>
-          <CardContent className="text-sm text-muted-foreground">
-            {lead.summary || "Klik op Samenvatten om te genereren."}
+          <CardContent className="space-y-2 pt-0">
+            <LeadInsightRow
+              leadId={lead.id}
+              field="summary"
+              label="Samenvatting"
+              placeholder="Klik rechts op Samenvatten om te genereren."
+              value={lead.summary}
+              demoMode={demoMode}
+              onPatch={(next) => setLead((l) => ({ ...l, summary: next }))}
+            />
+            <LeadInsightRow
+              leadId={lead.id}
+              field="intent"
+              label="Intentie"
+              placeholder="—"
+              value={lead.intent}
+              demoMode={demoMode}
+              onPatch={(next) => setLead((l) => ({ ...l, intent: next }))}
+            />
+            <LeadInsightRow
+              leadId={lead.id}
+              field="suggested_next_action"
+              label="Voorgestelde volgende stap"
+              placeholder="—"
+              value={lead.suggested_next_action}
+              demoMode={demoMode}
+              onPatch={(next) =>
+                setLead((l) => ({ ...l, suggested_next_action: next }))
+              }
+            />
+            <LeadInsightRow
+              leadId={lead.id}
+              field="status_recommendation"
+              label="AI-fasevoorstel"
+              placeholder="bijv. new, quote_sent, won"
+              value={lead.status_recommendation}
+              demoMode={demoMode}
+              multiline={false}
+              onPatch={(next) =>
+                setLead((l) => ({ ...l, status_recommendation: next }))
+              }
+            />
           </CardContent>
         </Card>
 
         <Card className="rounded-2xl border-white/[0.06]">
-          <CardHeader>
-            <CardTitle className="text-base">Intentie</CardTitle>
-          </CardHeader>
-          <CardContent className="text-sm text-muted-foreground">
-            {lead.intent || "—"}
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-2xl border-white/[0.06]">
-          <CardHeader>
-            <CardTitle className="text-base">Voorgestelde volgende stap</CardTitle>
-          </CardHeader>
-          <CardContent className="text-sm text-muted-foreground">
-            {lead.suggested_next_action || "—"}
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-2xl border-white/[0.06]">
-          <CardHeader>
-            <CardTitle className="text-base">Interne notities</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm">Interne notities</CardTitle>
+            <span className="text-muted-foreground" title="Vrij te bewerken">
+              <Pencil className="size-3.5" aria-hidden />
+            </span>
           </CardHeader>
           <CardContent>
             <form
-              action={async (fd) => {
-                const text = String(fd.get("notes") || "");
-                const res = await updateLeadNotes(lead.id, text);
-                if (!res.ok) toast.error(res.error);
-                else toast.success("Notities opgeslagen");
+              className="space-y-2"
+              onSubmit={(e) => {
+                e.preventDefault();
+                const text = String(
+                  new FormData(e.currentTarget).get("notes") || "",
+                );
+                start(async () => {
+                  if (demoMode) {
+                    setLead((l) => ({
+                      ...l,
+                      notes: text.trim() || null,
+                    }));
+                    toast.success("Notities opgeslagen (demo)");
+                    return;
+                  }
+                  const res = await updateLeadNotes(lead.id, text);
+                  if (!res.ok) {
+                    toast.error(res.error);
+                    return;
+                  }
+                  setLead((l) => ({ ...l, notes: text.trim() || null }));
+                  toast.success("Notities opgeslagen");
+                  router.refresh();
+                });
               }}
             >
               <Textarea
                 name="notes"
                 defaultValue={lead.notes || ""}
-                className="min-h-[120px] rounded-xl"
+                key={`${lead.id}-notes`}
+                className="min-h-[88px] rounded-xl text-sm"
               />
-              <Button type="submit" variant="secondary" className="mt-3 rounded-xl">
+              <Button type="submit" variant="secondary" className="rounded-xl">
                 Notities opslaan
               </Button>
             </form>
@@ -402,11 +623,11 @@ export function LeadWorkspace({
         </Card>
       </div>
 
-      <div className="space-y-8">
+      <div className="space-y-5">
         <Card className="rounded-2xl border-white/[0.06]">
-          <CardHeader>
-            <CardTitle className="text-base">Acties met één klik</CardTitle>
-            <p className="text-sm text-muted-foreground">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm">Acties met één klik</CardTitle>
+            <p className="text-xs text-muted-foreground">
               Snelle stappen die omzet beschermen — zonder door menu&apos;s te zoeken.
             </p>
           </CardHeader>
@@ -512,9 +733,9 @@ export function LeadWorkspace({
         </Card>
 
         <Card className="rounded-2xl border-amber-500/20 bg-amber-500/[0.06]">
-          <CardHeader>
-            <CardTitle className="text-base">Opvolgingsradar</CardTitle>
-            <p className="text-sm text-muted-foreground">{risk.detail}</p>
+          <CardHeader className="space-y-1 pb-2">
+            <CardTitle className="text-sm">Opvolgingsradar</CardTitle>
+            <p className="text-xs text-muted-foreground">{risk.detail}</p>
           </CardHeader>
           <CardContent className="space-y-3">
             {risk.tag ? (
@@ -561,9 +782,9 @@ export function LeadWorkspace({
         </Card>
 
         <Card className="rounded-2xl border-white/[0.06]">
-          <CardHeader>
-            <CardTitle className="text-base">AI-closer</CardTitle>
-            <p className="text-sm text-muted-foreground">
+          <CardHeader className="space-y-1 pb-2">
+            <CardTitle className="text-sm">AI-closer</CardTitle>
+            <p className="text-xs text-muted-foreground">
               Output is afgestemd op boekingen en offerte-acceptatie — geen
               generieke chat.
             </p>
@@ -697,8 +918,8 @@ export function LeadWorkspace({
         </Card>
 
         <Card className="rounded-2xl border-white/[0.06]">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0">
-            <CardTitle className="text-base">AI-antwoordconcept</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm">AI-antwoordconcept</CardTitle>
             <Button
               type="button"
               size="sm"
@@ -715,29 +936,29 @@ export function LeadWorkspace({
               value={reply}
               onChange={(e) => setReply(e.target.value)}
               placeholder="Genereer een antwoord of slimme opvolging…"
-              className="min-h-[160px] rounded-xl"
+              className="min-h-[120px] rounded-xl text-sm"
             />
           </CardContent>
         </Card>
 
-        <Card className="flex max-h-[560px] flex-col rounded-2xl border-white/[0.06]">
-          <CardHeader>
-            <CardTitle className="text-base">Gesprek</CardTitle>
-            <p className="text-sm text-muted-foreground">
+        <Card className="flex max-h-[480px] flex-col rounded-2xl border-white/[0.06]">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm">Gesprek</CardTitle>
+            <p className="text-xs text-muted-foreground">
               {messages.length} berichten
             </p>
           </CardHeader>
           <Separator className="bg-white/[0.06]" />
           <CardContent className="flex-1 overflow-hidden p-0">
-            <ScrollArea className="h-[440px] px-4 py-4">
-              <div className="space-y-4 pr-2">
+            <ScrollArea className="h-[360px] px-3 py-3">
+              <div className="space-y-2.5 pr-2">
                 {messages.map((m) => {
                   const inbound = m.role === "user";
                   return (
                     <div
                       key={m.id}
                       className={cn(
-                        "max-w-[min(100%,520px)] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm",
+                        "max-w-[min(100%,520px)] rounded-xl px-3 py-2 text-sm leading-snug shadow-sm",
                         inbound
                           ? "rounded-tl-md border border-white/[0.06] bg-muted/25"
                           : "ml-auto rounded-tr-md border border-primary/20 bg-primary/[0.07]",
@@ -764,10 +985,10 @@ export function LeadWorkspace({
           </CardContent>
         </Card>
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-2">
           <Card className="rounded-2xl border-white/[0.06]">
-            <CardHeader>
-              <CardTitle className="text-base">Lopende deals</CardTitle>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">Lopende deals</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               {initial.quotes.length === 0 ? (
@@ -778,7 +999,7 @@ export function LeadWorkspace({
                 initial.quotes.map((q) => (
                   <div
                     key={q.id}
-                    className="rounded-xl border border-white/[0.06] bg-background/30 p-3"
+                    className="rounded-lg border border-white/[0.06] bg-background/30 p-2.5"
                   >
                     <Link
                       href={`/dashboard/quotes/${q.id}`}
@@ -798,8 +1019,8 @@ export function LeadWorkspace({
             </CardContent>
           </Card>
           <Card className="rounded-2xl border-white/[0.06]">
-            <CardHeader>
-              <CardTitle className="text-base">Afspraken</CardTitle>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">Afspraken</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               {initial.appointments.length === 0 ? (
@@ -810,7 +1031,7 @@ export function LeadWorkspace({
                 initial.appointments.map((a) => (
                   <div
                     key={a.id}
-                    className="rounded-xl border border-white/[0.06] bg-background/30 p-3"
+                    className="rounded-lg border border-white/[0.06] bg-background/30 p-2.5"
                   >
                     <p className="font-medium">{formatDateTime(a.starts_at)}</p>
                     <p className="text-xs text-muted-foreground">
@@ -831,13 +1052,33 @@ export function LeadWorkspace({
   );
 }
 
-function Field({ label, value }: { label: string; value: string }) {
+function Field({
+  label,
+  value,
+  editHref,
+}: {
+  label: string;
+  value: string;
+  /** Anker naar bijv. contactformulier voor dit veld */
+  editHref?: string;
+}) {
   return (
-    <div className="rounded-xl border border-white/[0.06] bg-background/25 p-4">
-      <p className="text-2xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-        {label}
-      </p>
-      <p className="mt-1.5 text-sm font-medium text-foreground">{value}</p>
+    <div className="rounded-xl border border-white/[0.06] bg-background/25 p-3">
+      <div className="flex items-start justify-between gap-2">
+        <p className="text-2xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+          {label}
+        </p>
+        {editHref ? (
+          <a
+            href={editHref}
+            className="inline-flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted/40 hover:text-foreground"
+            aria-label={`${label} wijzigen`}
+          >
+            <Pencil className="size-3.5" aria-hidden />
+          </a>
+        ) : null}
+      </div>
+      <p className="mt-1 text-sm font-medium text-foreground">{value}</p>
     </div>
   );
 }

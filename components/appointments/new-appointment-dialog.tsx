@@ -16,19 +16,57 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CalendarPlus } from "lucide-react";
+import type { AgendaAppointment } from "@/components/appointments/agenda-types";
+
+function buildDemoAppointment(
+  fd: FormData,
+  leads: Lead[],
+): AgendaAppointment {
+  const lead_id = String(fd.get("lead_id") || "");
+  const lead = leads.find((l) => l.id === lead_id);
+  const starts_at_raw = String(fd.get("starts_at") || "");
+  const ends_at_raw = String(fd.get("ends_at") || "");
+  const notesRaw = String(fd.get("notes") || "").trim();
+  const notes = notesRaw.length > 0 ? notesRaw : null;
+
+  const starts = new Date(starts_at_raw);
+  let ends: Date;
+  if (ends_at_raw) {
+    ends = new Date(ends_at_raw);
+    if (Number.isNaN(ends.getTime())) {
+      ends = new Date(starts.getTime() + 60 * 60 * 1000);
+    }
+  } else {
+    ends = new Date(starts.getTime() + 60 * 60 * 1000);
+  }
+  const now = new Date().toISOString();
+  return {
+    id: `demo-appt-${crypto.randomUUID()}`,
+    company_id: lead?.company_id ?? "demo",
+    lead_id: lead_id.length > 0 ? lead_id : null,
+    starts_at: starts.toISOString(),
+    ends_at: ends.toISOString(),
+    status: "scheduled",
+    notes,
+    created_at: now,
+    updated_at: now,
+    lead_name: lead?.full_name ?? null,
+  };
+}
 
 export function NewAppointmentDialog({
   leads,
-  disabled,
+  demoMode = false,
   defaultLeadId,
   initialOpen,
+  onDemoAppointmentCreated,
 }: {
   leads: Lead[];
-  disabled?: boolean;
-  /** Preselect lead (bijv. vanuit lead-werkruimte) */
+  demoMode?: boolean;
   defaultLeadId?: string | null;
-  /** Open dialoog bij eerste render */
   initialOpen?: boolean;
+  /** Alleen demo: voegt afspraak toe aan lokale agenda */
+  onDemoAppointmentCreated?: (appointment: AgendaAppointment) => void;
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(Boolean(initialOpen));
@@ -50,24 +88,34 @@ export function NewAppointmentDialog({
       <DialogTrigger asChild>
         <Button
           type="button"
-          variant="outline"
-          className="h-12 min-h-[44px] rounded-xl"
-          disabled={disabled || leads.length === 0}
+          variant="default"
+          className="h-10 min-h-10 rounded-lg px-4 text-sm font-semibold shadow-md shadow-primary/18 transition-[box-shadow,transform] hover:shadow-lg hover:shadow-primary/22 active:scale-[0.99] disabled:opacity-60"
+          disabled={leads.length === 0}
         >
-          <CalendarPlus className="mr-2 size-4" />
+          <CalendarPlus className="mr-2 size-4 shrink-0" />
           Nieuwe afspraak
         </Button>
       </DialogTrigger>
-      <DialogContent className="rounded-2xl sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Nieuwe afspraak</DialogTitle>
+      <DialogContent className="max-h-[min(90vh,640px)] overflow-y-auto rounded-2xl p-5 sm:max-w-[400px]">
+        <DialogHeader className="space-y-1 pb-1">
+          <DialogTitle className="text-lg">Nieuwe afspraak</DialogTitle>
         </DialogHeader>
         <form
-          className="space-y-4 pt-2"
+          className="space-y-3 pt-1"
           onSubmit={(e) => {
             e.preventDefault();
             const fd = new FormData(e.currentTarget);
             start(async () => {
+              if (demoMode) {
+                const appt = buildDemoAppointment(fd, leads);
+                onDemoAppointmentCreated?.(appt);
+                toast.success("Afspraak toegevoegd aan je agenda (demo).", {
+                  description:
+                    "Zo ziet het eruit voor je klanten — echte opslag na het verlaten van de demo.",
+                });
+                setOpen(false);
+                return;
+              }
               const lead_id = String(fd.get("lead_id") || "");
               const starts_at = String(fd.get("starts_at") || "");
               const ends_at = String(fd.get("ends_at") || "");
@@ -82,19 +130,21 @@ export function NewAppointmentDialog({
                 toast.error(res.error);
                 return;
               }
-              toast.success("Afspraak aangemaakt");
+              toast.success("Afspraak toegevoegd aan je agenda");
               setOpen(false);
-              router.refresh();
+              await router.refresh();
             });
           }}
         >
-          <div className="space-y-2">
-            <Label htmlFor="appt_lead">Lead</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="appt_lead" className="text-xs font-medium">
+              Klant
+            </Label>
             <select
               id="appt_lead"
               name="lead_id"
               required
-              className="flex h-12 w-full rounded-xl border border-white/[0.08] bg-background/50 px-3 text-sm"
+              className="flex h-10 w-full rounded-lg border border-white/[0.08] bg-background/50 px-3 text-sm"
               defaultValue={
                 defaultLeadId && leads.some((l) => l.id === defaultLeadId)
                   ? defaultLeadId
@@ -102,7 +152,7 @@ export function NewAppointmentDialog({
               }
               key={defaultLeadId || "none"}
             >
-              <option value="">Kies een lead</option>
+              <option value="">Kies een klant</option>
               {leads.map((l) => (
                 <option key={l.id} value={l.id}>
                   {l.full_name}
@@ -110,37 +160,47 @@ export function NewAppointmentDialog({
               ))}
             </select>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="starts_at">Start</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="starts_at" className="text-xs font-medium">
+              Start
+            </Label>
             <Input
               id="starts_at"
               name="starts_at"
               type="datetime-local"
               required
               defaultValue={defaultStart()}
-              className="rounded-xl"
+              className="h-10 rounded-lg text-sm"
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="ends_at">Einde (optioneel)</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="ends_at" className="text-xs font-medium">
+              Einde (optioneel)
+            </Label>
             <Input
               id="ends_at"
               name="ends_at"
               type="datetime-local"
-              className="rounded-xl"
+              className="h-10 rounded-lg text-sm"
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="notes">Notitie</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="notes" className="text-xs font-medium">
+              Notitie
+            </Label>
             <Input
               id="notes"
               name="notes"
-              className="rounded-xl"
-              placeholder="Korte context voor de balie"
+              className="h-10 rounded-lg text-sm"
+              placeholder="Korte context (optioneel)"
             />
           </div>
-          <Button type="submit" className="w-full rounded-xl" disabled={pending}>
-            {pending ? "Opslaan…" : "Afspraak opslaan"}
+          <Button
+            type="submit"
+            className="mt-1 w-full rounded-lg font-semibold"
+            disabled={pending}
+          >
+            {pending ? "Bezig…" : "Afspraak toevoegen"}
           </Button>
         </form>
       </DialogContent>

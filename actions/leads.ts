@@ -130,6 +130,7 @@ export async function updateLeadProfile(
     email?: string | null;
     phone?: string | null;
     source?: string | null;
+    estimated_value?: number | null;
   },
 ): Promise<ActionResult<{ saved: true }>> {
   if (isDemoMode()) {
@@ -143,20 +144,77 @@ export async function updateLeadProfile(
   if (!full_name) {
     return { ok: false, error: "Naam is verplicht." };
   }
+  let estimated: number | null | undefined = input.estimated_value;
+  if (estimated !== undefined && estimated !== null) {
+    if (Number.isNaN(estimated) || estimated < 0) {
+      return { ok: false, error: "Ongeldige geschatte waarde." };
+    }
+  }
   const supabase = await createClient();
+  const updateRow: Record<string, unknown> = {
+    full_name,
+    email: input.email?.trim() || null,
+    phone: input.phone?.trim() || null,
+    source: input.source?.trim() || null,
+  };
+  if (input.estimated_value !== undefined) {
+    updateRow.estimated_value = estimated ?? null;
+  }
   const { error } = await supabase
     .from("leads")
-    .update({
-      full_name,
-      email: input.email?.trim() || null,
-      phone: input.phone?.trim() || null,
-      source: input.source?.trim() || null,
-    })
+    .update(updateRow)
     .eq("id", leadId)
     .eq("company_id", auth.company.id);
   if (error) return { ok: false, error: error.message };
   revalidatePath("/dashboard/leads");
   revalidatePath(`/dashboard/leads/${leadId}`);
+  revalidatePath("/dashboard/pipeline");
+  return { ok: true, data: { saved: true } };
+}
+
+export async function updateLeadInsightFields(
+  leadId: string,
+  patch: Partial<{
+    summary: string | null;
+    intent: string | null;
+    suggested_next_action: string | null;
+    status_recommendation: string | null;
+  }>,
+): Promise<ActionResult<{ saved: true }>> {
+  if (isDemoMode()) {
+    return { ok: false, error: "Niet beschikbaar in demo-modus." };
+  }
+  const auth = await getAuth();
+  if (!auth.user || !auth.company) {
+    return { ok: false, error: "Niet ingelogd." };
+  }
+  const allowed = [
+    "summary",
+    "intent",
+    "suggested_next_action",
+    "status_recommendation",
+  ] as const;
+  const updateRow: Record<string, string | null> = {};
+  for (const key of allowed) {
+    if (key in patch) {
+      const v = patch[key];
+      updateRow[key] =
+        typeof v === "string" ? (v.trim() || null) : v ?? null;
+    }
+  }
+  if (Object.keys(updateRow).length === 0) {
+    return { ok: false, error: "Geen velden om bij te werken." };
+  }
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("leads")
+    .update(updateRow)
+    .eq("id", leadId)
+    .eq("company_id", auth.company.id);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/dashboard/leads");
+  revalidatePath(`/dashboard/leads/${leadId}`);
+  revalidatePath("/dashboard/pipeline");
   return { ok: true, data: { saved: true } };
 }
 

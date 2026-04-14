@@ -44,7 +44,7 @@ export async function fetchDashboardBundle(
         .select("*")
         .eq("company_id", companyId)
         .order("starts_at", { ascending: true })
-        .limit(40),
+        .limit(120),
     ]);
 
   const leadRows = (leads || []).map((r) =>

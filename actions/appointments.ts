@@ -108,3 +108,101 @@ export async function createAppointment(input: {
   revalidatePath("/dashboard");
   return { ok: true, data: { appointmentId: row.id as string } };
 }
+
+export async function updateAppointmentDetails(input: {
+  appointmentId: string;
+  starts_at: string;
+  ends_at?: string | null;
+  notes?: string | null;
+}): Promise<ActionResult<{ appointmentId: string }>> {
+  if (isDemoMode()) {
+    return { ok: false, error: "Niet beschikbaar in demo-modus." };
+  }
+  const auth = await getAuth();
+  if (!auth.user || !auth.company) {
+    return { ok: false, error: "Niet ingelogd." };
+  }
+  const starts = new Date(input.starts_at);
+  if (Number.isNaN(starts.getTime())) {
+    return { ok: false, error: "Ongeldige starttijd." };
+  }
+  let ends: Date | null = null;
+  if (input.ends_at) {
+    ends = new Date(input.ends_at);
+    if (Number.isNaN(ends.getTime())) {
+      return { ok: false, error: "Ongeldige eindtijd." };
+    }
+  }
+
+  const supabase = await createClient();
+  const { data: existing, error: fetchErr } = await supabase
+    .from("appointments")
+    .select("id, lead_id")
+    .eq("id", input.appointmentId)
+    .eq("company_id", auth.company.id)
+    .maybeSingle();
+  if (fetchErr || !existing) {
+    return { ok: false, error: "Afspraak niet gevonden." };
+  }
+  const leadId = (existing as { lead_id: string | null }).lead_id;
+
+  const endsIso =
+    ends != null
+      ? ends.toISOString()
+      : new Date(starts.getTime() + 60 * 60 * 1000).toISOString();
+
+  const { error } = await supabase
+    .from("appointments")
+    .update({
+      starts_at: starts.toISOString(),
+      ends_at: endsIso,
+      notes: input.notes?.trim() ? input.notes.trim() : null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", input.appointmentId)
+    .eq("company_id", auth.company.id);
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/dashboard/appointments");
+  revalidatePath("/dashboard");
+  if (leadId) {
+    revalidatePath(`/dashboard/leads/${leadId}`);
+  }
+  return { ok: true, data: { appointmentId: input.appointmentId } };
+}
+
+export async function deleteAppointment(
+  appointmentId: string,
+): Promise<ActionResult<{ deleted: true }>> {
+  if (isDemoMode()) {
+    return { ok: false, error: "Niet beschikbaar in demo-modus." };
+  }
+  const auth = await getAuth();
+  if (!auth.user || !auth.company) {
+    return { ok: false, error: "Niet ingelogd." };
+  }
+  const supabase = await createClient();
+  const { data: row, error: fetchErr } = await supabase
+    .from("appointments")
+    .select("id, lead_id")
+    .eq("id", appointmentId)
+    .eq("company_id", auth.company.id)
+    .maybeSingle();
+  if (fetchErr || !row) {
+    return { ok: false, error: "Afspraak niet gevonden." };
+  }
+  const leadId = (row as { lead_id: string | null }).lead_id;
+  const { error } = await supabase
+    .from("appointments")
+    .delete()
+    .eq("id", appointmentId)
+    .eq("company_id", auth.company.id);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/dashboard/appointments");
+  revalidatePath("/dashboard");
+  if (leadId) {
+    revalidatePath(`/dashboard/leads/${leadId}`);
+  }
+  return { ok: true, data: { deleted: true } };
+}

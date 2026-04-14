@@ -27,7 +27,7 @@ import { AiTagBadges } from "@/components/leads/ai-tag-badges";
 import { cn, formatCurrency } from "@/lib/utils";
 import { toast } from "sonner";
 import { LeadStatusMenu } from "@/components/leads/lead-status-menu";
-import Link from "next/link";
+import { LeadPipelineDetailDialog } from "@/components/pipeline/lead-pipeline-detail-dialog";
 import { GripVertical, Phone } from "lucide-react";
 
 /** Visuele taal per kolom — voelt premium aan zonder data te wijzigen */
@@ -115,10 +115,12 @@ function LeadCard({
   lead,
   demoMode,
   onDemoLeadStatus,
+  onOpenDetail,
 }: {
   lead: Lead;
   demoMode: boolean;
   onDemoLeadStatus?: (next: LeadStatus) => void;
+  onOpenDetail: (lead: Lead) => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
@@ -160,26 +162,39 @@ function LeadCard({
             aria-label="Verslepen"
             {...listeners}
             {...attributes}
+            onClick={(e) => e.stopPropagation()}
           >
             <GripVertical className="size-4 opacity-70 group-hover:opacity-100" />
           </button>
         ) : null}
-        <div className="min-w-0 flex-1 space-y-3 p-4 pl-3">
-          <Link
-            href={`/dashboard/leads/${lead.id}`}
-            className="block min-w-0 text-[0.9375rem] font-semibold leading-snug tracking-tight text-foreground transition-colors hover:text-primary"
-            title={lead.full_name}
+        <div
+          role="button"
+          tabIndex={0}
+          aria-label={`Details van ${lead.full_name}`}
+          onClick={() => onOpenDetail(lead)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              onOpenDetail(lead);
+            }
+          }}
+          className="min-w-0 flex-1 cursor-pointer space-y-3 p-4 pl-3 text-left outline-none transition-colors hover:bg-muted/[0.08] focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 focus-visible:ring-offset-background dark:focus-visible:ring-offset-background"
+        >
+          <p className="min-w-0 text-[0.9375rem] font-semibold leading-snug tracking-tight text-foreground">
+            <span className="block line-clamp-2 break-words">{lead.full_name}</span>
+          </p>
+          <div
+            className="min-w-0"
+            onPointerDown={(e) => e.stopPropagation()}
             onClick={(e) => e.stopPropagation()}
           >
-            <span className="block line-clamp-2 break-words">{lead.full_name}</span>
-          </Link>
-          <div className="min-w-0">
             <LeadStatusMenu
               leadId={lead.id}
               status={lead.status}
               demoMode={demoMode}
               compact
               className="max-w-full"
+              stopPropagation
               onDemoStatusChange={onDemoLeadStatus}
             />
           </div>
@@ -277,6 +292,8 @@ export function PipelineBoard({
   const [leads, setLeads] = useState(initialLeads);
   const [demoStatusById, setDemoStatusById] = useState<Record<string, LeadStatus>>({});
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [pipelineDetailId, setPipelineDetailId] = useState<string | null>(null);
+  const [pipelineDetailOpen, setPipelineDetailOpen] = useState(false);
   const [pending, start] = useTransition();
 
   useEffect(() => {
@@ -317,6 +334,19 @@ export function PipelineBoard({
         : leads,
     [leads, demoMode, demoStatusById],
   );
+
+  const pipelineDetailLead = useMemo(
+    () =>
+      pipelineDetailId
+        ? leadsForView.find((l) => l.id === pipelineDetailId) ?? null
+        : null,
+    [pipelineDetailId, leadsForView],
+  );
+
+  const openPipelineDetail = (l: Lead) => {
+    setPipelineDetailId(l.id);
+    setPipelineDetailOpen(true);
+  };
 
   const byColumn = useMemo(() => {
     const map = new Map<PipelineColumnId, Lead[]>();
@@ -413,6 +443,7 @@ export function PipelineBoard({
                   key={lead.id}
                   lead={lead}
                   demoMode={demoMode}
+                  onOpenDetail={openPipelineDetail}
                   onDemoLeadStatus={
                     demoMode
                       ? (next) =>
@@ -457,6 +488,26 @@ export function PipelineBoard({
         <p className="sr-only" aria-live="polite">
           Bijwerken…
         </p>
+      ) : null}
+      {pipelineDetailLead ? (
+        <LeadPipelineDetailDialog
+          lead={pipelineDetailLead}
+          open={pipelineDetailOpen}
+          onOpenChange={(o) => {
+            setPipelineDetailOpen(o);
+            if (!o) setPipelineDetailId(null);
+          }}
+          demoMode={demoMode}
+          onDemoStatusChange={
+            demoMode
+              ? (next) =>
+                  setDemoStatusById((m) => ({
+                    ...m,
+                    [pipelineDetailLead.id]: next,
+                  }))
+              : undefined
+          }
+        />
       ) : null}
     </DndContext>
   );
