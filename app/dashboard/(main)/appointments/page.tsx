@@ -34,7 +34,7 @@ export default async function AppointmentsPage({
   return (
     <PageFrame
       title="Afspraken"
-      subtitle="Geplande tijd die omzet wordt — overzicht per dag."
+      subtitle="Geplande tijd die omzet wordt — strak weekoverzicht, klaar om te schalen."
     >
       <div className="mb-8 flex flex-wrap items-center justify-end gap-3">
         <NewAppointmentDialog
@@ -64,7 +64,11 @@ export default async function AppointmentsPage({
           </Link>
         </div>
       ) : (
-        <div className="cf-dashboard-panel p-4 sm:p-6">
+        <div className="relative overflow-hidden rounded-3xl border border-border/50 bg-gradient-to-b from-card/80 to-muted/15 p-5 shadow-[0_12px_48px_-28px_rgb(0_0_0/0.2)] dark:border-white/[0.09] dark:from-white/[0.04] dark:to-transparent dark:shadow-[0_16px_56px_-32px_rgb(0_0_0/0.55)] sm:p-8">
+          <div
+            className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/25 to-transparent"
+            aria-hidden
+          />
           <AppointmentsWeekAgenda items={agendaItems} demoMode={demo} />
         </div>
       )}

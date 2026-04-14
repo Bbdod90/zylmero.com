@@ -29,13 +29,19 @@ export default async function PipelinePage() {
   return (
     <PageFrame
       title="Pipeline"
-      subtitle="Sleep leads tussen fases — gekoppeld aan inbox, offertes en rapportage."
+      subtitle="Sleep leads tussen fases — visueel overzicht, direct gekoppeld aan inbox, offertes en rapportage."
     >
-      <PipelineBoard
-        initialLeads={leads}
-        companyId={auth.company.id}
-        demoMode={demo}
-      />
+      <div className="relative overflow-hidden rounded-3xl border border-border/50 bg-gradient-to-b from-card/60 to-transparent p-4 dark:border-white/[0.09] dark:from-white/[0.03] sm:p-6 lg:p-8">
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"
+          aria-hidden
+        />
+        <PipelineBoard
+          initialLeads={leads}
+          companyId={auth.company.id}
+          demoMode={demo}
+        />
+      </div>
     </PageFrame>
   );
 }
