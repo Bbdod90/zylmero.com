@@ -501,3 +501,76 @@ export async function updateAiKnowledgeAction(
   revalidatePath("/dashboard/settings");
   return { ok: true };
 }
+
+export async function updateQuoteTemplateAction(
+  _prev: SettingsFormState,
+  formData: FormData,
+): Promise<SettingsFormState> {
+  if (isDemoMode()) {
+    return { error: "Niet beschikbaar in demo-modus." };
+  }
+  const auth = await getAuth();
+  if (!auth.user || !auth.company) {
+    return { error: "Niet ingelogd." };
+  }
+
+  const quote_intro = String(formData.get("quote_intro") || "").trim() || null;
+  const quote_footer = String(formData.get("quote_footer") || "").trim() || null;
+  const quote_include_pricing_hints =
+    formData.get("quote_include_pricing_hints") === "on";
+  const quote_include_zylmero_notice =
+    formData.get("quote_include_zylmero_notice") === "on";
+
+  const supabase = await createClient();
+  const { data: settingsRow } = await supabase
+    .from("company_settings")
+    .select("*")
+    .eq("company_id", auth.company.id)
+    .maybeSingle();
+  const prev = mapCompanySettingsRow(settingsRow as Record<string, unknown>);
+  const prevPrefs =
+    (settingsRow?.automation_preferences as Record<string, unknown>) || {};
+
+  const automation_preferences = {
+    ...prevPrefs,
+    quote_intro,
+    quote_footer,
+    quote_include_pricing_hints,
+    quote_include_zylmero_notice,
+    niche_key: auth.company.niche ?? prevPrefs.niche_key,
+  };
+
+  const { error } = await supabase.from("company_settings").upsert(
+    {
+      company_id: auth.company.id,
+      niche: prev?.niche ?? null,
+      services: prev?.services ?? [],
+      faq: prev?.faq ?? [],
+      pricing_hints: prev?.pricing_hints ?? null,
+      business_hours: prev?.business_hours ?? {},
+      booking_link: prev?.booking_link ?? null,
+      tone: prev?.tone ?? null,
+      reply_style: prev?.reply_style ?? null,
+      language: prev?.language ?? "nl",
+      automation_preferences,
+      whatsapp_channel: prev?.whatsapp_channel ?? {
+        provider: "mock",
+        connected: false,
+      },
+      auto_reply_enabled: prev?.auto_reply_enabled ?? false,
+      auto_reply_delay_seconds: prev?.auto_reply_delay_seconds ?? 30,
+      ai_usage_count: prev?.ai_usage_count ?? 0,
+      ai_setup_completed_at: prev?.ai_setup_completed_at ?? null,
+      niche_intake: prev?.niche_intake ?? {},
+      knowledge_snippets: prev?.knowledge_snippets ?? [],
+      white_label_logo_url: prev?.white_label_logo_url ?? null,
+      white_label_primary: prev?.white_label_primary ?? null,
+    },
+    { onConflict: "company_id" },
+  );
+
+  if (error) return { error: error.message };
+  revalidatePath("/dashboard/settings");
+  revalidatePath("/dashboard/quotes");
+  return { ok: true };
+}

@@ -29,9 +29,12 @@ const SOURCES = [
 export function NewLeadDialog({
   disabled,
   demoMode = false,
+  demoSampleLeadId = null,
 }: {
   disabled?: boolean;
   demoMode?: boolean;
+  /** Demo: na submit naar dit voorbeeld navigeren. */
+  demoSampleLeadId?: string | null;
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -64,7 +67,13 @@ export function NewLeadDialog({
               const phone = String(fd.get("phone") || "").trim();
               const source = String(fd.get("source") || "").trim();
               if (demoMode) {
-                toast.message("Demo-modus: lead aanmaken is uitgeschakeld.");
+                toast.success(
+                  `Demo: “${full_name || "Nieuwe lead"}” — zo werkt aanmaken. In je echte account wordt dit opgeslagen.`,
+                );
+                setOpen(false);
+                if (demoSampleLeadId) {
+                  router.push(`/dashboard/leads/${demoSampleLeadId}`);
+                }
                 return;
               }
               const res = await createLead({
@@ -129,9 +138,9 @@ export function NewLeadDialog({
           <Button
             type="submit"
             className="w-full rounded-xl"
-            disabled={pending || demoMode}
+            disabled={pending}
           >
-            {pending ? "Opslaan…" : demoMode ? "Demo: alleen lezen" : "Lead aanmaken"}
+            {pending ? "Opslaan…" : demoMode ? "Demo: voorbeeld doorlopen" : "Lead aanmaken"}
           </Button>
         </form>
       </DialogContent>

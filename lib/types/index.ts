@@ -104,6 +104,14 @@ export interface CompanySettings {
   email_inbound_enabled: boolean;
   white_label_logo_url: string | null;
   white_label_primary: string | null;
+  /** Vaste intro op PDF/offertepagina (automation_preferences.quote_intro) */
+  quote_intro: string | null;
+  /** Voettekst: voorwaarden, betalingstermijn (automation_preferences.quote_footer) */
+  quote_footer: string | null;
+  /** Prijshints uit Kennis op offerte/PDF tonen */
+  quote_include_pricing_hints: boolean;
+  /** Standaard Zylmero-vermelding onderaan offerte/PDF */
+  quote_include_zylmero_notice: boolean;
   created_at: string;
   updated_at: string;
 }

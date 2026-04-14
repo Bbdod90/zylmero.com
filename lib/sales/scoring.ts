@@ -21,6 +21,10 @@ export function computeDisplayScore(
 }
 
 export function leadTemperature(lead: Lead, displayScore?: number): LeadTemperature {
+  const raw = lead.custom_fields?.priority_override;
+  if (raw === "hot" || raw === "warm" || raw === "cold") {
+    return raw;
+  }
   const score = displayScore ?? computeDisplayScore(lead);
   const last = lead.last_message_at
     ? (Date.now() - new Date(lead.last_message_at).getTime()) / 3600000

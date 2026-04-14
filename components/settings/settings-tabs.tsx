@@ -4,6 +4,7 @@ import { useFormState, useFormStatus } from "react-dom";
 import {
   updateBusinessProfileAction,
   updateKnowledgeAction,
+  updateQuoteTemplateAction,
   updateWhiteLabelAction,
   type SettingsFormState,
 } from "@/actions/settings";
@@ -37,6 +38,7 @@ const VALID_TABS = new Set([
   "email",
   "billing",
   "widget",
+  "quotes",
 ]);
 
 export function SettingsTabs({
@@ -64,6 +66,10 @@ export function SettingsTabs({
     knowledge_snippets: { title: string; body: string }[];
     white_label_logo_url: string | null;
     white_label_primary: string | null;
+    quote_intro: string | null;
+    quote_footer: string | null;
+    quote_include_pricing_hints: boolean;
+    quote_include_zylmero_notice: boolean;
   };
   leadsThisMonth: number;
   leadCap: number;
@@ -73,6 +79,7 @@ export function SettingsTabs({
   const [s1, a1] = useFormState(updateBusinessProfileAction, initial);
   const [s2, a2] = useFormState(updateKnowledgeAction, initial);
   const [s4, a4] = useFormState(updateWhiteLabelAction, initial);
+  const [s5, a5] = useFormState(updateQuoteTemplateAction, initial);
 
   const faqText =
     settings.faq?.map((f) => `${f.q} || ${f.a}`).join("\n\n") || "";
@@ -102,6 +109,12 @@ export function SettingsTabs({
           className="rounded-xl px-4 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-primary/20 dark:data-[state=active]:bg-card dark:data-[state=active]:ring-primary/25"
         >
           Kennis
+        </TabsTrigger>
+        <TabsTrigger
+          value="quotes"
+          className="rounded-xl px-4 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-primary/20 dark:data-[state=active]:bg-card dark:data-[state=active]:ring-primary/25"
+        >
+          Offertes
         </TabsTrigger>
         <TabsTrigger
           value="branding"
@@ -239,6 +252,73 @@ export function SettingsTabs({
           ) : null}
           {s2.ok ? <p className="text-sm text-primary">Opgeslagen.</p> : null}
           <Submit label="Kennis opslaan" />
+        </form>
+      </TabsContent>
+      <TabsContent value="quotes" className="mt-6">
+        <form action={a5} className="cf-dashboard-panel space-y-5 p-6 sm:p-8">
+          <div className="space-y-2">
+            <Label htmlFor="quote_intro">Vaste intro (bovenaan PDF)</Label>
+            <Textarea
+              id="quote_intro"
+              name="quote_intro"
+              className="min-h-[100px] rounded-xl"
+              defaultValue={settings.quote_intro || ""}
+              placeholder="Bedankt voor uw aanvraag. Onderstaande offerte is vrijblijvend…"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="quote_footer">
+              Voorwaarden, betalingstermijn, garantie (onderaan PDF)
+            </Label>
+            <Textarea
+              id="quote_footer"
+              name="quote_footer"
+              className="min-h-[140px] rounded-xl"
+              defaultValue={settings.quote_footer || ""}
+              placeholder="Betaling binnen 14 dagen. Werkzaamheden volgens afspraak…"
+            />
+          </div>
+          <div className="flex flex-col gap-3 rounded-xl border border-border/50 bg-muted/20 p-4 dark:border-white/[0.08]">
+            <label className="flex cursor-pointer items-start gap-3 text-sm">
+              <input
+                type="checkbox"
+                name="quote_include_pricing_hints"
+                defaultChecked={settings.quote_include_pricing_hints}
+                className="mt-1 size-4 rounded border-border"
+              />
+              <span>
+                <span className="font-medium text-foreground">
+                  Prijshints uit Kennis meenemen
+                </span>
+                <span className="mt-0.5 block text-muted-foreground">
+                  Voegt het veld &quot;Prijshints&quot; uit het tabblad Kennis toe op de PDF
+                  (richtlijnen en tarieven).
+                </span>
+              </span>
+            </label>
+            <label className="flex cursor-pointer items-start gap-3 text-sm">
+              <input
+                type="checkbox"
+                name="quote_include_zylmero_notice"
+                defaultChecked={settings.quote_include_zylmero_notice}
+                className="mt-1 size-4 rounded border-border"
+              />
+              <span>
+                <span className="font-medium text-foreground">
+                  Zylmero-platformvermelding
+                </span>
+                <span className="mt-0.5 block text-muted-foreground">
+                  Korte standaardtekst dat de offerte via Zylmero loopt (aanbevolen voor
+                  transparantie).
+                </span>
+              </span>
+            </label>
+          </div>
+          {s5.error ? (
+            <p className="text-sm text-destructive">{s5.error}</p>
+          ) : null}
+          {s5.ok ? <p className="text-sm text-primary">Opgeslagen.</p> : null}
+          <Submit label="Offerte-template opslaan" />
         </form>
       </TabsContent>
       <TabsContent value="branding" className="mt-6">

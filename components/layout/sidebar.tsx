@@ -86,6 +86,7 @@ const ANONYMOUS_PREVIEW_GROUPS: { title: string; items: NavItem[] }[] = [
       { href: "/dashboard/inbox", label: "Berichten", icon: Inbox },
       { href: "/dashboard/pipeline", label: "Pipeline", icon: Kanban },
       { href: "/dashboard/leads", label: "Leads", icon: Users },
+      { href: "/dashboard/quotes", label: "Offertes", icon: FileText },
       { href: "/dashboard/appointments", label: "Afspraken", icon: CalendarDays },
     ],
   },

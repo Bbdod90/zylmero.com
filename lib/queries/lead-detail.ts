@@ -7,6 +7,7 @@ import type {
   Quote,
 } from "@/lib/types";
 import { fetchLeadRow } from "@/lib/queries/mappers";
+import { parseQuoteRow } from "@/lib/quotes/parse-quote";
 
 export interface LeadDetailPayload {
   lead: Lead;
@@ -67,7 +68,9 @@ export async function fetchLeadDetail(
     lead: fetchLeadRow(leadRow as Record<string, unknown>),
     conversation: conv ? (conv as Conversation) : null,
     messages,
-    quotes: (quoteRows || []) as Quote[],
+    quotes: (quoteRows || []).map((r) =>
+      parseQuoteRow(r as Record<string, unknown>),
+    ),
     appointments: (apptRows || []) as Appointment[],
   };
 }

@@ -1,68 +1,196 @@
 "use client";
 
-import { useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import type { Lead, Quote, QuoteStatus } from "@/lib/types";
-import { updateQuoteStatus } from "@/actions/quotes";
-import { Badge } from "@/components/ui/badge";
+import type { Lead, Quote, QuoteLineItem, QuoteStatus } from "@/lib/types";
+import { updateQuoteContent, updateQuoteStatus } from "@/actions/quotes";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn, formatCurrencyDetailed, formatDateTime } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  formatCurrencyDetailed,
+  formatDateTime,
+} from "@/lib/utils";
 import { quoteStatusNl } from "@/lib/i18n/nl-labels";
+import { getDefaultZylmeroQuoteNoticeNl } from "@/lib/pdf/zylmero-quote-notice";
+import { Plus, Save, Trash2 } from "lucide-react";
 
 const STATUS_OPTS: QuoteStatus[] = ["draft", "sent", "accepted", "declined"];
 
-function statusStyle(s: QuoteStatus) {
-  switch (s) {
-    case "draft":
-      return "border-white/[0.12] bg-white/[0.06] text-foreground";
-    case "sent":
-      return "border-amber-500/30 bg-amber-500/10 text-amber-100";
-    case "accepted":
-      return "border-primary/35 bg-primary/12 text-primary";
-    case "declined":
-      return "border-white/[0.1] bg-muted/30 text-muted-foreground";
-    default:
-      return "";
-  }
+const VAT_OPTS = [
+  { value: 0, label: "0%" },
+  { value: 0.09, label: "9%" },
+  { value: 0.21, label: "21%" },
+] as const;
+
+function snapVat(r: number) {
+  const hit = VAT_OPTS.find((o) => Math.abs(o.value - r) < 1e-6);
+  return hit?.value ?? 0.21;
 }
+
+type DraftState = {
+  title: string;
+  description: string;
+  internal_notes: string;
+  vat_rate: number;
+  lines: QuoteLineItem[];
+};
+
+function buildDraft(q: Quote): DraftState {
+  return {
+    title: q.title,
+    description: q.description ?? "",
+    internal_notes: q.internal_notes ?? "",
+    vat_rate: snapVat(q.vat_rate),
+    lines: q.line_items.map((li) => ({ ...li })),
+  };
+}
+
+export type QuoteTemplatePreview = {
+  quote_intro: string | null;
+  quote_footer: string | null;
+  quote_include_pricing_hints: boolean;
+  quote_include_zylmero_notice: boolean;
+  pricing_hints: string | null;
+};
 
 export function QuoteDetailClient({
   quote,
   lead,
   demoMode,
+  template,
 }: {
   quote: Quote;
   lead: Lead | null;
   demoMode: boolean;
+  template: QuoteTemplatePreview | null;
 }) {
   const router = useRouter();
   const [pending, start] = useTransition();
+  const [draft, setDraft] = useState<DraftState>(() => buildDraft(quote));
+  const [demoStatus, setDemoStatus] = useState<QuoteStatus>(() => quote.status);
+
+  useEffect(() => {
+    setDraft(buildDraft(quote));
+    setDemoStatus(quote.status);
+  }, [quote.id, quote.updated_at]);
+
+  const previewTotals = useMemo(() => {
+    const sub = draft.lines.reduce((s, li) => s + li.line_total, 0);
+    const subR = Math.round(sub * 100) / 100;
+    const vat = Math.round(subR * draft.vat_rate * 100) / 100;
+    return { subtotal: subR, vat, total: subR + vat };
+  }, [draft.lines, draft.vat_rate]);
+
+  const updateLine = (index: number, patch: Partial<QuoteLineItem>) => {
+    setDraft((d) => {
+      const lines = d.lines.map((li, i) => {
+        if (i !== index) return li;
+        const next = { ...li, ...patch };
+        const q = Math.max(0, Number(next.quantity) || 0);
+        const u = Math.max(0, Number(next.unit_price) || 0);
+        return {
+          ...next,
+          quantity: q,
+          unit_price: u,
+          line_total: Math.round(q * u * 100) / 100,
+        };
+      });
+      return { ...d, lines };
+    });
+  };
+
+  const addLine = () => {
+    setDraft((d) => ({
+      ...d,
+      lines: [
+        ...d.lines,
+        {
+          id: `li-new-${crypto.randomUUID().slice(0, 8)}`,
+          description: "",
+          quantity: 1,
+          unit_price: 0,
+          line_total: 0,
+        },
+      ],
+    }));
+  };
+
+  const removeLine = (index: number) => {
+    setDraft((d) => ({
+      ...d,
+      lines: d.lines.filter((_, i) => i !== index),
+    }));
+  };
+
+  const save = () => {
+    if (demoMode) {
+      toast.success(
+        "Opgeslagen in de demo (alleen in dit scherm — geen database).",
+      );
+      return;
+    }
+    start(async () => {
+      const res = await updateQuoteContent(quote.id, {
+        title: draft.title,
+        description: draft.description.trim() || null,
+        internal_notes: draft.internal_notes.trim() || null,
+        vat_rate: draft.vat_rate,
+        line_items: draft.lines,
+      });
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      toast.success("Offerte opgeslagen");
+      router.refresh();
+    });
+  };
 
   return (
     <div className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h2 className="text-xl font-semibold tracking-tight">{quote.title}</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
+        <div className="min-w-0 flex-1 space-y-3">
+          <div className="space-y-2">
+            <Label htmlFor="qt_title">Titel</Label>
+            <Input
+              id="qt_title"
+              value={draft.title}
+              onChange={(e) =>
+                setDraft((d) => ({ ...d, title: e.target.value }))
+              }
+              className="rounded-xl text-lg font-semibold"
+            />
+          </div>
+          <p className="text-sm text-muted-foreground">
             Bijgewerkt {formatDateTime(quote.updated_at)}
           </p>
         </div>
         {demoMode ? (
-          <Badge
-            variant="outline"
-            className={cn(
-              "rounded-full border px-3 py-1 text-2xs font-semibold uppercase",
-              statusStyle(quote.status),
-            )}
+          <select
+            aria-label="Offertestatus (demo)"
+            className="h-11 min-h-[44px] rounded-xl border border-border bg-background px-3 text-sm font-medium shadow-sm"
+            value={demoStatus}
+            onChange={(e) => {
+              const v = e.target.value as QuoteStatus;
+              setDemoStatus(v);
+              toast.message(`Status (demo): ${quoteStatusNl(v)}`);
+            }}
           >
-            {quoteStatusNl(quote.status)}
-          </Badge>
+            {STATUS_OPTS.map((s) => (
+              <option key={s} value={s}>
+                {quoteStatusNl(s)}
+              </option>
+            ))}
+          </select>
         ) : (
           <select
             aria-label="Offertestatus"
-            className="h-11 min-h-[44px] rounded-xl border border-white/[0.1] bg-background/60 px-3 text-sm font-medium"
+            className="h-11 min-h-[44px] rounded-xl border border-border bg-background px-3 text-sm font-medium shadow-sm dark:border-white/[0.1] dark:bg-background/60"
             value={quote.status}
             disabled={pending}
             onChange={(e) => {
@@ -73,7 +201,7 @@ export function QuoteDetailClient({
                   toast.error(res.error);
                   return;
                 }
-                toast.success("Offerte bijgewerkt");
+                toast.success("Status bijgewerkt");
                 router.refresh();
               });
             }}
@@ -103,86 +231,260 @@ export function QuoteDetailClient({
         </Card>
       ) : null}
 
-      {quote.description ? (
-        <Card className="rounded-2xl border-white/[0.06]">
+      {template ? (
+        <Card className="rounded-2xl border-primary/20 bg-primary/[0.04]">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">Omschrijving</CardTitle>
+            <CardTitle className="text-base">Jouw offerte-template (Instellingen)</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Dit staat op de PDF naast de offerte zelf. Bewerk onder{" "}
+              <Link href="/dashboard/settings?tab=quotes" className="font-medium text-primary hover:underline">
+                Instellingen → Offertes
+              </Link>
+              .
+            </p>
           </CardHeader>
-          <CardContent className="whitespace-pre-wrap text-sm text-muted-foreground">
-            {quote.description}
+          <CardContent className="space-y-3 text-sm">
+            {template.quote_intro?.trim() ? (
+              <div>
+                <p className="text-2xs font-semibold uppercase text-muted-foreground">
+                  Intro
+                </p>
+                <p className="mt-1 whitespace-pre-wrap text-muted-foreground">
+                  {template.quote_intro}
+                </p>
+              </div>
+            ) : (
+              <p className="text-muted-foreground">
+                Nog geen vaste intro — voeg die toe bij Instellingen.
+              </p>
+            )}
+            {template.quote_include_pricing_hints &&
+            template.pricing_hints?.trim() ? (
+              <div>
+                <p className="text-2xs font-semibold uppercase text-muted-foreground">
+                  Prijshints (uit kennisbank)
+                </p>
+                <p className="mt-1 whitespace-pre-wrap text-muted-foreground">
+                  {template.pricing_hints}
+                </p>
+              </div>
+            ) : null}
+            {template.quote_footer?.trim() ? (
+              <div>
+                <p className="text-2xs font-semibold uppercase text-muted-foreground">
+                  Voorwaarden / voet
+                </p>
+                <p className="mt-1 whitespace-pre-wrap text-muted-foreground">
+                  {template.quote_footer}
+                </p>
+              </div>
+            ) : null}
+            {template.quote_include_zylmero_notice ? (
+              <div>
+                <p className="text-2xs font-semibold uppercase text-muted-foreground">
+                  Zylmero-vermelding (op PDF)
+                </p>
+                <p className="mt-1 text-2xs italic text-muted-foreground">
+                  {getDefaultZylmeroQuoteNoticeNl()}
+                </p>
+              </div>
+            ) : (
+              <p className="text-2xs text-muted-foreground">
+                Platformvermelding uitgeschakeld in instellingen.
+              </p>
+            )}
           </CardContent>
         </Card>
       ) : null}
 
       <Card className="rounded-2xl border-white/[0.06]">
         <CardHeader className="pb-2">
-          <CardTitle className="text-base">Regels</CardTitle>
+          <CardTitle className="text-base">Omschrijving</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          {quote.line_items?.length ? (
-            <div className="overflow-x-auto rounded-xl border border-white/[0.06]">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-white/[0.06] text-left text-2xs uppercase tracking-wide text-muted-foreground">
-                    <th className="px-4 py-3">Omschrijving</th>
-                    <th className="px-4 py-3 text-right">Aantal</th>
-                    <th className="px-4 py-3 text-right">Prijs</th>
-                    <th className="px-4 py-3 text-right">Totaal</th>
+        <CardContent>
+          <Textarea
+            value={draft.description}
+            onChange={(e) =>
+              setDraft((d) => ({ ...d, description: e.target.value }))
+            }
+            placeholder="Korte toelichting voor de klant…"
+            className="min-h-[100px] rounded-xl"
+          />
+        </CardContent>
+      </Card>
+
+      <Card className="rounded-2xl border-white/[0.06]">
+        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3 pb-2">
+          <CardTitle className="text-base">Regels (samenstellen)</CardTitle>
+          <div className="flex flex-wrap items-center gap-2">
+            <Label htmlFor="vat" className="text-2xs text-muted-foreground">
+              BTW
+            </Label>
+            <select
+              id="vat"
+              className="h-9 rounded-lg border border-white/[0.1] bg-background/60 px-2 text-sm"
+              value={String(snapVat(draft.vat_rate))}
+              onChange={(e) =>
+                setDraft((d) => ({
+                  ...d,
+                  vat_rate: Number(e.target.value),
+                }))
+              }
+            >
+              {VAT_OPTS.map((o) => (
+                <option key={o.value} value={String(o.value)}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              className="rounded-lg"
+              onClick={addLine}
+            >
+              <Plus className="mr-1 size-4" />
+              Regel
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="overflow-x-auto rounded-xl border border-white/[0.06]">
+            <table className="w-full min-w-[640px] text-sm">
+              <thead>
+                <tr className="border-b border-white/[0.06] text-left text-2xs uppercase tracking-wide text-muted-foreground">
+                  <th className="px-3 py-2">Omschrijving</th>
+                  <th className="w-24 px-3 py-2 text-right">Aantal</th>
+                  <th className="w-32 px-3 py-2 text-right">Prijs (ex.)</th>
+                  <th className="w-32 px-3 py-2 text-right">Totaal</th>
+                  <th className="w-12 px-1 py-2" />
+                </tr>
+              </thead>
+              <tbody>
+                {draft.lines.map((li, i) => (
+                  <tr key={li.id} className="border-b border-white/[0.04]">
+                    <td className="px-3 py-2 align-top">
+                      <Input
+                        value={li.description}
+                        onChange={(e) =>
+                          updateLine(i, { description: e.target.value })
+                        }
+                        className="rounded-lg"
+                        placeholder="Omschrijving"
+                      />
+                    </td>
+                    <td className="px-3 py-2 align-top">
+                      <Input
+                        type="number"
+                        min={0}
+                        step="any"
+                        value={li.quantity || ""}
+                        onChange={(e) =>
+                          updateLine(i, {
+                            quantity: Number(e.target.value),
+                          })
+                        }
+                        className="rounded-lg text-right tabular-nums"
+                      />
+                    </td>
+                    <td className="px-3 py-2 align-top">
+                      <Input
+                        type="number"
+                        min={0}
+                        step="0.01"
+                        value={li.unit_price || ""}
+                        onChange={(e) =>
+                          updateLine(i, {
+                            unit_price: Number(e.target.value),
+                          })
+                        }
+                        className="rounded-lg text-right tabular-nums"
+                      />
+                    </td>
+                    <td className="px-3 py-2 align-middle text-right font-medium tabular-nums">
+                      {formatCurrencyDetailed(li.line_total, quote.currency)}
+                    </td>
+                    <td className="px-1 py-2 align-middle">
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        className="size-8 text-muted-foreground hover:text-destructive"
+                        disabled={draft.lines.length <= 1}
+                        onClick={() => removeLine(i)}
+                        aria-label="Regel verwijderen"
+                      >
+                        <Trash2 className="size-4" />
+                      </Button>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {quote.line_items.map((li) => (
-                    <tr
-                      key={li.id}
-                      className="border-b border-white/[0.04] last:border-0"
-                    >
-                      <td className="px-4 py-3">{li.description}</td>
-                      <td className="px-4 py-3 text-right tabular-nums">
-                        {li.quantity}
-                      </td>
-                      <td className="px-4 py-3 text-right tabular-nums text-muted-foreground">
-                        {formatCurrencyDetailed(li.unit_price)}
-                      </td>
-                      <td className="px-4 py-3 text-right font-medium tabular-nums">
-                        {formatCurrencyDetailed(li.line_total)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground">Geen regels</p>
-          )}
+                ))}
+              </tbody>
+            </table>
+          </div>
+
           <div className="flex flex-col gap-2 border-t border-white/[0.06] pt-4 text-sm">
             <div className="flex justify-between tabular-nums">
-              <span className="text-muted-foreground">Subtotaal</span>
-              <span>{formatCurrencyDetailed(quote.subtotal)}</span>
+              <span className="text-muted-foreground">Subtotaal (preview)</span>
+              <span>{formatCurrencyDetailed(previewTotals.subtotal, quote.currency)}</span>
             </div>
             <div className="flex justify-between tabular-nums">
               <span className="text-muted-foreground">
-                BTW ({Math.round(quote.vat_rate * 100)}%)
+                BTW ({Math.round(draft.vat_rate * 100)}%)
               </span>
-              <span>{formatCurrencyDetailed(quote.vat_amount)}</span>
+              <span>
+                {formatCurrencyDetailed(previewTotals.vat, quote.currency)}
+              </span>
             </div>
             <div className="flex justify-between text-base font-semibold tabular-nums text-foreground">
-              <span>Totaal</span>
-              <span>{formatCurrencyDetailed(quote.total)}</span>
+              <span>Totaal (preview)</span>
+              <span>
+                {formatCurrencyDetailed(previewTotals.total, quote.currency)}
+              </span>
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Button
+              type="button"
+              className="rounded-xl"
+              disabled={pending && !demoMode}
+              onClick={save}
+            >
+              {pending && !demoMode ? (
+                "Opslaan…"
+              ) : (
+                <>
+                  <Save className="mr-2 size-4" />
+                  {demoMode ? "Demo: wijzigingen vastleggen" : "Wijzigingen opslaan"}
+                </>
+              )}
+            </Button>
+            {demoMode ? (
+              <p className="text-sm text-muted-foreground">
+                Demo: aanpassingen blijven in dit scherm; het overzicht toont de
+                vaste voorbeelddata.
+              </p>
+            ) : null}
           </div>
         </CardContent>
       </Card>
 
-      {quote.internal_notes ? (
-        <Card className="rounded-2xl border-white/[0.06]">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">Interne notities</CardTitle>
-          </CardHeader>
-          <CardContent className="whitespace-pre-wrap text-sm text-muted-foreground">
-            {quote.internal_notes}
-          </CardContent>
-        </Card>
-      ) : null}
+      <Card className="rounded-2xl border-white/[0.06]">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">Interne notities</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Textarea
+            value={draft.internal_notes}
+            onChange={(e) =>
+              setDraft((d) => ({ ...d, internal_notes: e.target.value }))
+            }
+            className="min-h-[80px] rounded-xl"
+          />
+        </CardContent>
+      </Card>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
         {!demoMode ? (

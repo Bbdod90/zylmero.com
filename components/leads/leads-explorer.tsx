@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { Lead, LeadStatus } from "@/lib/types";
 import { Input } from "@/components/ui/input";
 import {
@@ -16,8 +16,11 @@ import { LeadStatusMenu } from "@/components/leads/lead-status-menu";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
 import { useDebouncedValue } from "@/hooks/use-debounce";
 import { Inbox, Search } from "lucide-react";
-import { computeDisplayScore, leadTemperature } from "@/lib/sales/scoring";
-import { TemperatureBadge } from "@/components/sales/temperature-badge";
+import {
+  type LeadTemperature,
+  computeDisplayScore,
+} from "@/lib/sales/scoring";
+import { LeadPriorityMenu } from "@/components/leads/lead-priority-menu";
 import { NewLeadDialog } from "@/components/leads/new-lead-dialog";
 import { BRAND_NAME } from "@/lib/brand";
 
@@ -32,16 +35,38 @@ const SOURCES = [
   "Cold call",
 ];
 
+function withDemoPriority(
+  lead: Lead,
+  map: Record<string, LeadTemperature>,
+): Lead {
+  const p = map[lead.id];
+  if (!p) return lead;
+  return {
+    ...lead,
+    custom_fields: {
+      ...lead.custom_fields,
+      priority_override: p,
+    },
+  };
+}
+
 export function LeadsExplorer({
   leads,
   staleReplyLeadIds = [],
   demoMode = false,
+  demoSampleLeadId = null,
 }: {
   leads: Lead[];
   staleReplyLeadIds?: string[];
   demoMode?: boolean;
+  /** Demo: navigatie na “nieuwe lead” (voorbeeld openen). */
+  demoSampleLeadId?: string | null;
 }) {
+  const router = useRouter();
   const [q, setQ] = useState("");
+  const [demoPriority, setDemoPriority] = useState<
+    Record<string, LeadTemperature>
+  >({});
   const [status, setStatus] = useState<LeadStatus | "all">("all");
   const [source, setSource] = useState<string>("all");
   const [sort, setSort] = useState<"activity" | "value" | "score">("activity");
@@ -98,7 +123,10 @@ export function LeadsExplorer({
               className="h-12 pl-11"
             />
           </div>
-          <NewLeadDialog demoMode={demoMode} />
+          <NewLeadDialog
+            demoMode={demoMode}
+            demoSampleLeadId={demoSampleLeadId}
+          />
         </div>
         <div className="flex flex-wrap gap-3">
           <select
@@ -145,7 +173,7 @@ export function LeadsExplorer({
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-white/[0.06] bg-card/40 shadow-premium">
+      <div className="overflow-hidden rounded-2xl border border-border/60 bg-card/40 shadow-premium dark:border-white/[0.06]">
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center px-8 py-16 text-center">
             <div className="mb-5 flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
@@ -174,30 +202,57 @@ export function LeadsExplorer({
             </TableHeader>
             <TableBody>
               {filtered.map((l) => {
-                const display = computeDisplayScore(l, {
+                const rowLead = withDemoPriority(l, demoPriority);
+                const display = computeDisplayScore(rowLead, {
                   staleReply: stale.has(l.id),
                 });
-                const temp = leadTemperature(l, display);
                 return (
-                  <TableRow key={l.id}>
+                  <TableRow
+                    key={l.id}
+                    className="cursor-pointer border-b border-border/35 transition-colors hover:bg-muted/50 dark:border-white/[0.04] dark:hover:bg-white/[0.04]"
+                    role="link"
+                    tabIndex={0}
+                    aria-label={`Lead openen: ${l.full_name}`}
+                    onClick={() => router.push(`/dashboard/leads/${l.id}`)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        router.push(`/dashboard/leads/${l.id}`);
+                      }
+                    }}
+                  >
                     <TableCell className="max-w-[min(42vw,16rem)] min-w-0 font-medium">
-                      <Link
-                        href={`/dashboard/leads/${l.id}`}
-                        className="block truncate text-foreground transition-colors hover:text-primary"
+                      <span
+                        className="block truncate text-primary underline-offset-4 hover:underline"
                         title={l.full_name}
                       >
                         {l.full_name}
-                      </Link>
+                      </span>
                     </TableCell>
                     <TableCell className="max-w-[10rem] min-w-0 truncate text-muted-foreground" title={l.source || ""}>
                       {l.source || "—"}
                     </TableCell>
-                    <TableCell className="min-w-0 max-w-[11rem]">
+                    <TableCell
+                      className="min-w-0 max-w-[11rem]"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <LeadStatusMenu leadId={l.id} status={l.status} demoMode={demoMode} compact />
                     </TableCell>
-                    <TableCell className="min-w-0 max-w-[12rem]">
+                    <TableCell
+                      className="min-w-0 max-w-[12rem]"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <div className="flex flex-wrap items-center gap-2">
-                        <TemperatureBadge temp={temp} />
+                        <LeadPriorityMenu
+                          lead={rowLead}
+                          demoMode={demoMode}
+                          staleReply={stale.has(l.id)}
+                          compact
+                          stopPropagation
+                          onDemoPriorityChange={(next) =>
+                            setDemoPriority((m) => ({ ...m, [l.id]: next }))
+                          }
+                        />
                         {stale.has(l.id) ? (
                           <span className="shrink-0 rounded-full border border-destructive/25 bg-destructive/10 px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wide text-destructive">
                             Te laat

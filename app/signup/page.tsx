@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { X } from "lucide-react";
 import { SignupForm } from "@/app/signup/signup-form";
 import { LocalhostMobileHint } from "@/components/auth/localhost-mobile-hint";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +10,15 @@ import { BRAND_LOGO_MONOGRAM } from "@/lib/brand";
 export default function SignupPage() {
   return (
     <div className="relative flex min-h-dvh items-center justify-center bg-background px-safe py-8 sm:p-6">
+      <div className="absolute left-[max(1rem,env(safe-area-inset-left))] top-[max(1rem,env(safe-area-inset-top))] z-10">
+        <Link
+          href="/"
+          className="inline-flex size-10 items-center justify-center rounded-xl border border-border/60 bg-background/90 text-muted-foreground shadow-sm backdrop-blur-sm transition hover:bg-muted hover:text-foreground"
+          aria-label="Terug naar home"
+        >
+          <X className="size-5" strokeWidth={2} />
+        </Link>
+      </div>
       <div className="absolute right-[max(1rem,env(safe-area-inset-right))] top-[max(1rem,env(safe-area-inset-top))] z-10">
         <ThemeToggle />
       </div>
@@ -18,7 +28,7 @@ export default function SignupPage() {
             {BRAND_LOGO_MONOGRAM}
           </div>
           <h1 className="mt-4 text-balance text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
-            Start gratis proefperiode
+            Account aanmaken
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Binnen 5 minuten live · Geen creditcard · Annuleer wanneer je wilt
@@ -27,7 +37,7 @@ export default function SignupPage() {
         <LocalhostMobileHint />
         <Card className="rounded-2xl border-border/70 bg-card/70">
           <CardHeader>
-            <CardTitle className="text-base">Account</CardTitle>
+            <CardTitle className="text-base">Jouw gegevens</CardTitle>
           </CardHeader>
           <CardContent>
             <Suspense

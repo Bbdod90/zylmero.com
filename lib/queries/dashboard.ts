@@ -7,6 +7,7 @@ import type {
   Quote,
 } from "@/lib/types";
 import { fetchLeadRow } from "@/lib/queries/mappers";
+import { parseQuoteRow } from "@/lib/quotes/parse-quote";
 
 export interface DashboardBundle {
   leads: Lead[];
@@ -37,8 +38,8 @@ export async function fetchDashboardBundle(
         .from("quotes")
         .select("*")
         .eq("company_id", companyId)
-        .order("created_at", { ascending: false })
-        .limit(12),
+        .order("updated_at", { ascending: false })
+        .limit(200),
       supabase
         .from("appointments")
         .select("*")
@@ -140,7 +141,9 @@ export async function fetchDashboardBundle(
   return {
     leads: leadRows,
     conversations,
-    quotes: (quotes || []) as Quote[],
+    quotes: (quotes || []).map((r) =>
+      parseQuoteRow(r as Record<string, unknown>),
+    ),
     appointments: (apts || []) as Appointment[],
     recentMessages,
   };

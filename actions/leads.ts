@@ -8,6 +8,7 @@ import { hasSubscriptionAccess } from "@/lib/billing/trial";
 import { PAYWALL_AI_LEADS } from "@/lib/billing/paywall";
 import type { ActionResult } from "@/actions/ai";
 import type { LeadStatus } from "@/lib/types";
+import type { LeadTemperature } from "@/lib/sales/scoring";
 import { logTeamActivity } from "@/lib/team-activity";
 
 const LEAD_STATUSES: LeadStatus[] = [
@@ -21,6 +22,10 @@ const LEAD_STATUSES: LeadStatus[] = [
 
 function isLeadStatus(s: string): s is LeadStatus {
   return LEAD_STATUSES.includes(s as LeadStatus);
+}
+
+function isLeadTemperature(s: string): s is LeadTemperature {
+  return s === "hot" || s === "warm" || s === "cold";
 }
 
 export async function updateLeadNotes(
@@ -214,6 +219,49 @@ export async function updateLeadInsightFields(
   if (error) return { ok: false, error: error.message };
   revalidatePath("/dashboard/leads");
   revalidatePath(`/dashboard/leads/${leadId}`);
+  revalidatePath("/dashboard/pipeline");
+  return { ok: true, data: { saved: true } };
+}
+
+export async function updateLeadPriority(
+  leadId: string,
+  priority: LeadTemperature,
+): Promise<ActionResult<{ saved: true }>> {
+  if (isDemoMode()) {
+    return { ok: false, error: "Niet beschikbaar in demo-modus." };
+  }
+  const auth = await getAuth();
+  if (!auth.user || !auth.company) {
+    return { ok: false, error: "Niet ingelogd." };
+  }
+  if (!isLeadTemperature(priority)) {
+    return { ok: false, error: "Ongeldige prioriteit." };
+  }
+  const supabase = await createClient();
+  const { data: row, error: rerr } = await supabase
+    .from("leads")
+    .select("custom_fields")
+    .eq("id", leadId)
+    .eq("company_id", auth.company.id)
+    .maybeSingle();
+  if (rerr || !row) {
+    return { ok: false, error: rerr?.message || "Lead niet gevonden." };
+  }
+  const raw = row.custom_fields;
+  const prev =
+    raw && typeof raw === "object" && !Array.isArray(raw)
+      ? (raw as Record<string, string>)
+      : {};
+  const custom_fields = { ...prev, priority_override: priority };
+  const { error } = await supabase
+    .from("leads")
+    .update({ custom_fields })
+    .eq("id", leadId)
+    .eq("company_id", auth.company.id);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/dashboard/leads");
+  revalidatePath(`/dashboard/leads/${leadId}`);
+  revalidatePath("/dashboard/inbox");
   revalidatePath("/dashboard/pipeline");
   return { ok: true, data: { saved: true } };
 }

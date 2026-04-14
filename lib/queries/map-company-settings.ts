@@ -72,6 +72,16 @@ export function mapCompanySettingsRow(
     email_inbound_enabled: Boolean(prefs.email_inbound_enabled),
     white_label_logo_url: (data.white_label_logo_url as string) ?? null,
     white_label_primary: (data.white_label_primary as string) ?? null,
+    quote_intro:
+      typeof prefs.quote_intro === "string" && prefs.quote_intro.trim()
+        ? String(prefs.quote_intro).trim()
+        : null,
+    quote_footer:
+      typeof prefs.quote_footer === "string" && prefs.quote_footer.trim()
+        ? String(prefs.quote_footer).trim()
+        : null,
+    quote_include_pricing_hints: Boolean(prefs.quote_include_pricing_hints),
+    quote_include_zylmero_notice: prefs.quote_include_zylmero_notice !== false,
     created_at: data.created_at as string,
     updated_at: data.updated_at as string,
   };

@@ -97,6 +97,11 @@ export function SignupForm() {
         submitLock.current = false;
         return;
       }
+      if (passwordConfirm.length === 0) {
+        setError("Herhaal je wachtwoord om door te gaan.");
+        submitLock.current = false;
+        return;
+      }
       if (password !== passwordConfirm) {
         setError("De wachtwoorden komen niet overeen.");
         submitLock.current = false;
@@ -145,6 +150,9 @@ export function SignupForm() {
     }
   }
 
+  const passwordsMismatch =
+    passwordConfirm.length > 0 && password !== passwordConfirm;
+
   if (success) {
     return (
       <div className="space-y-3 rounded-xl border border-border/60 bg-muted/30 p-5 text-sm">
@@ -188,14 +196,30 @@ export function SignupForm() {
         autoComplete="new-password"
         disabled={pending}
       />
-      <SignupPasswordField
-        id="password-confirm"
-        label="Herhaal wachtwoord"
-        value={passwordConfirm}
-        onChange={setPasswordConfirm}
-        autoComplete="new-password"
-        disabled={pending}
-      />
+      <div className="space-y-1">
+        <SignupPasswordField
+          id="password-confirm"
+          label="Herhaal wachtwoord"
+          value={passwordConfirm}
+          onChange={(v) => {
+            setPasswordConfirm(v);
+            if (error === "De wachtwoorden komen niet overeen.") {
+              setError(null);
+            }
+          }}
+          autoComplete="new-password"
+          disabled={pending}
+        />
+        {passwordsMismatch ? (
+          <p
+            id="password-mismatch-hint"
+            className="text-sm text-red-600 dark:text-red-400/90"
+            role="alert"
+          >
+            De wachtwoorden komen niet overeen.
+          </p>
+        ) : null}
+      </div>
       {error ? (
         <div className="space-y-2 pt-1">
           <p className="text-sm leading-relaxed text-red-600 dark:text-red-400/90">{error}</p>
@@ -212,8 +236,12 @@ export function SignupForm() {
           ) : null}
         </div>
       ) : null}
-      <Button type="submit" className="w-full rounded-xl" disabled={pending}>
-        {pending ? "Account aanmaken…" : "Start gratis proefperiode"}
+      <Button
+        type="submit"
+        className="w-full rounded-xl"
+        disabled={pending || passwordsMismatch}
+      >
+        {pending ? "Account aanmaken…" : "Account aanmaken"}
       </Button>
     </form>
   );

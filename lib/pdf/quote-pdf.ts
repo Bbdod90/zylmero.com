@@ -3,12 +3,25 @@ import type { Quote } from "@/lib/types";
 import { formatCurrencyDetailed } from "@/lib/utils";
 import { quoteStatusNl } from "@/lib/i18n/nl-labels";
 
+export type QuotePdfExtras = {
+  /** Vaste intro uit instellingen */
+  quoteIntro: string | null;
+  /** Voettekst bedrijf (voorwaarden, betaling) */
+  quoteFooter: string | null;
+  /** Prijshints uit Kennis (company_settings.pricing_hints) */
+  pricingHints: string | null;
+  includePricingHints: boolean;
+  includeZylmeroNotice: boolean;
+  zylmeroNoticeText: string;
+};
+
 export function buildQuotePdfBytes(params: {
   quote: Quote;
   companyName: string;
   leadName: string | null;
+  extras?: QuotePdfExtras | null;
 }): Uint8Array {
-  const { quote, companyName, leadName } = params;
+  const { quote, companyName, leadName, extras } = params;
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const margin = 18;
   let y = margin;
@@ -52,6 +65,19 @@ export function buildQuotePdfBytes(params: {
     addParagraph(`Klant: ${leadName}`, 10);
   }
 
+  if (extras?.quoteIntro?.trim()) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    if (y > 250) {
+      doc.addPage();
+      y = margin;
+    }
+    doc.text("Introductie", margin, y);
+    y += 7;
+    doc.setFont("helvetica", "normal");
+    addParagraph(extras.quoteIntro.trim(), 10);
+  }
+
   if (quote.description) {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(11);
@@ -63,6 +89,23 @@ export function buildQuotePdfBytes(params: {
     y += 7;
     doc.setFont("helvetica", "normal");
     addParagraph(quote.description, 10);
+  }
+
+  if (
+    extras?.includePricingHints &&
+    extras.pricingHints &&
+    extras.pricingHints.trim()
+  ) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    if (y > 250) {
+      doc.addPage();
+      y = margin;
+    }
+    doc.text("Prijzen en richtlijnen (uit je kennisbank)", margin, y);
+    y += 7;
+    doc.setFont("helvetica", "normal");
+    addParagraph(extras.pricingHints.trim(), 9);
   }
 
   doc.setFont("helvetica", "bold");
@@ -151,6 +194,37 @@ export function buildQuotePdfBytes(params: {
     y,
     { align: "right" },
   );
+  y += 14;
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  doc.setTextColor(60, 60, 60);
+
+  if (extras?.quoteFooter?.trim()) {
+    if (y > 240) {
+      doc.addPage();
+      y = margin;
+    }
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    doc.text("Voorwaarden en opmerkingen", margin, y);
+    y += 6;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(60, 60, 60);
+    addParagraph(extras.quoteFooter.trim(), 9);
+  }
+
+  if (extras?.includeZylmeroNotice && extras.zylmeroNoticeText.trim()) {
+    if (y > 250) {
+      doc.addPage();
+      y = margin;
+    }
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(8);
+    doc.setTextColor(90, 90, 90);
+    addParagraph(extras.zylmeroNoticeText.trim(), 8);
+  }
 
   const buf = doc.output("arraybuffer");
   return new Uint8Array(buf);

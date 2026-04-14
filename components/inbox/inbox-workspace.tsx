@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 import Link from "next/link";
 import type { InboxThread } from "@/lib/queries/inbox";
-import type { Message, ReplyTemplate } from "@/lib/types";
+import type { Lead, Message, ReplyTemplate } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -21,8 +21,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { sendInboxMessage, generateInboxReply } from "@/actions/inbox";
 import { useRouter } from "next/navigation";
-import { computeDisplayScore, leadTemperature } from "@/lib/sales/scoring";
-import { TemperatureBadge } from "@/components/sales/temperature-badge";
+import type { LeadTemperature } from "@/lib/sales/scoring";
+import { LeadPriorityMenu } from "@/components/leads/lead-priority-menu";
 import { describeFollowUpRisk } from "@/lib/sales/followup-risk";
 import { channelLabelNl } from "@/lib/i18n/channel-nl";
 import { AiTagBadges } from "@/components/leads/ai-tag-badges";
@@ -40,6 +40,9 @@ export function InboxWorkspace({
 }) {
   const router = useRouter();
   const stale = useMemo(() => new Set(staleReplyLeadIds), [staleReplyLeadIds]);
+  const [demoPriority, setDemoPriority] = useState<
+    Record<string, LeadTemperature>
+  >({});
   const [selected, setSelected] = useState(threads[0]?.conversation.id ?? "");
   const [q, setQ] = useState("");
   const [draft, setDraft] = useState("");
@@ -81,6 +84,15 @@ export function InboxWorkspace({
       )
     : null;
 
+  const augmentLead = (lead: Lead): Lead => {
+    const p = demoPriority[lead.id];
+    if (!p) return lead;
+    return {
+      ...lead,
+      custom_fields: { ...lead.custom_fields, priority_override: p },
+    };
+  };
+
   return (
     <div className="grid min-h-[min(680px,90dvh)] gap-6 pb-24 md:min-h-[620px] md:pb-6 lg:grid-cols-[minmax(0,400px)_minmax(0,1fr)] lg:gap-8">
       <Card className="glass flex flex-col overflow-hidden rounded-3xl shadow-premium">
@@ -97,58 +109,79 @@ export function InboxWorkspace({
           <div className="space-y-2 p-3">
             {filtered.map((t) => {
               const on = t.conversation.id === active?.conversation.id;
-              const score = computeDisplayScore(t.lead, {
-                staleReply: stale.has(t.lead.id),
-              });
-              const temp = leadTemperature(t.lead, score);
+              const rowLead = augmentLead(t.lead);
               return (
-                <button
+                <div
                   key={t.conversation.id}
-                  type="button"
-                  onClick={() => setSelected(t.conversation.id)}
                   className={cn(
-                    "w-full rounded-2xl border p-4 text-left transition-all duration-200",
+                    "rounded-2xl border p-4 transition-all duration-200",
                     on
                       ? "border-primary/30 bg-primary/[0.07] shadow-inner-soft"
-                      : "border-transparent bg-transparent hover:border-white/[0.06] hover:bg-white/[0.03]",
+                      : "border-border/40 bg-card/20 hover:border-border hover:bg-muted/30 dark:border-transparent dark:bg-transparent dark:hover:border-white/[0.08] dark:hover:bg-white/[0.04]",
                   )}
                 >
-                  <div className="flex items-start justify-between gap-2">
-                    <p className="text-sm font-semibold tracking-tight">
-                      {t.lead.full_name}
-                    </p>
-                    <LeadStatusMenu
-                      leadId={t.lead.id}
-                      status={t.lead.status}
-                      demoMode={demoMode}
-                      compact
-                      stopPropagation
-                      className="max-w-[min(100%,9rem)]"
-                    />
+                  <div className="flex gap-2">
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      className="min-w-0 flex-1 cursor-pointer rounded-lg text-left outline-none ring-offset-2 ring-offset-background focus-visible:ring-2 focus-visible:ring-primary/40"
+                      onClick={() => setSelected(t.conversation.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          setSelected(t.conversation.id);
+                        }
+                      }}
+                    >
+                      <p className="text-sm font-semibold tracking-tight text-primary underline-offset-2 hover:underline">
+                        {t.lead.full_name}
+                      </p>
+                      <div className="mt-2">
+                        <span className="inline-flex rounded-full border border-border/60 bg-background/60 px-2 py-0.5 text-2xs font-medium text-muted-foreground dark:border-white/[0.08]">
+                          {channelLabelNl(t.conversation.channel)}
+                        </span>
+                      </div>
+                      <div className="mt-2">
+                        <AiTagBadges tags={t.lead.ai_tags} size="xs" />
+                      </div>
+                      <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+                        {t.preview}
+                      </p>
+                      <p className="mt-2 text-2xs tabular-nums text-muted-foreground">
+                        {formatDateTime(t.lastAt)}
+                      </p>
+                    </div>
+                    <div
+                      className="flex shrink-0 flex-col items-end gap-2 self-start"
+                      onClick={(e) => e.stopPropagation()}
+                      onPointerDown={(e) => e.stopPropagation()}
+                    >
+                      <LeadStatusMenu
+                        leadId={t.lead.id}
+                        status={t.lead.status}
+                        demoMode={demoMode}
+                        compact
+                        stopPropagation
+                        className="max-w-[min(100%,9rem)]"
+                      />
+                      <LeadPriorityMenu
+                        lead={rowLead}
+                        demoMode={demoMode}
+                        staleReply={stale.has(t.lead.id)}
+                        compact
+                        stopPropagation
+                        onDemoPriorityChange={(next) =>
+                          setDemoPriority((m) => ({ ...m, [t.lead.id]: next }))
+                        }
+                      />
+                      {stale.has(t.lead.id) ? (
+                        <span className="rounded-full border border-destructive/25 bg-destructive/10 px-2 py-0.5 text-2xs font-semibold uppercase text-destructive">
+                          Te laat
+                        </span>
+                      ) : null}
+                    </div>
                   </div>
-                  <div className="mt-2">
-                    <span className="inline-flex rounded-full border border-white/[0.08] bg-background/50 px-2 py-0.5 text-2xs font-medium text-muted-foreground">
-                      {channelLabelNl(t.conversation.channel)}
-                    </span>
-                  </div>
-                  <div className="mt-2">
-                    <AiTagBadges tags={t.lead.ai_tags} size="xs" />
-                  </div>
-                  <div className="mt-3 flex flex-wrap items-center gap-2">
-                    <TemperatureBadge temp={temp} />
-                    {stale.has(t.lead.id) ? (
-                      <span className="rounded-full border border-destructive/25 bg-destructive/10 px-2 py-0.5 text-2xs font-semibold uppercase text-destructive">
-                        Te laat
-                      </span>
-                    ) : null}
-                  </div>
-                  <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
-                    {t.preview}
-                  </p>
-                  <p className="mt-2 text-2xs tabular-nums text-muted-foreground">
-                    {formatDateTime(t.lastAt)}
-                  </p>
-                </button>
+                </div>
               );
             })}
           </div>
@@ -200,6 +233,25 @@ export function InboxWorkspace({
                   </p>
                   <div className="mt-3">
                     <AiTagBadges tags={active.lead.ai_tags} />
+                  </div>
+                  <div className="mt-4 flex flex-wrap items-center gap-2">
+                    <LeadStatusMenu
+                      leadId={active.lead.id}
+                      status={active.lead.status}
+                      demoMode={demoMode}
+                      compact
+                    />
+                    <LeadPriorityMenu
+                      lead={augmentLead(active.lead)}
+                      demoMode={demoMode}
+                      staleReply={stale.has(active.lead.id)}
+                      onDemoPriorityChange={(next) =>
+                        setDemoPriority((m) => ({
+                          ...m,
+                          [active.lead.id]: next,
+                        }))
+                      }
+                    />
                   </div>
                 </div>
                 <Button variant="outline" size="sm" className="rounded-xl" asChild>

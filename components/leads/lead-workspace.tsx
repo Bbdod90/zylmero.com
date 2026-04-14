@@ -700,8 +700,9 @@ export function LeadWorkspace({
                     return;
                   }
                   setLead((l) => ({ ...l, status: "quote_sent" }));
-                  toast.success("Offerte gegenereerd en als verstuurd gemarkeerd");
+                  toast.success("Offerte klaar — je gaat nu naar het document.");
                   router.refresh();
+                  router.push(`/dashboard/quotes/${res.data.quoteId}`);
                 });
               }}
             >
@@ -861,8 +862,9 @@ export function LeadWorkspace({
                     toast.error(res.error);
                     return;
                   }
-                  toast.success("Offerteconcept opgeslagen");
+                  toast.success("Offerteconcept opgeslagen — open om te bewerken.");
                   router.refresh();
+                  router.push(`/dashboard/quotes/${res.data.quoteId}`);
                 });
               }}
             >

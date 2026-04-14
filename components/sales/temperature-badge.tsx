@@ -8,12 +8,12 @@ const styles: Record<
   hot: {
     label: "Prioriteit",
     dot: "bg-amber-500/90",
-    ring: "border-amber-500/25 bg-amber-500/[0.08] text-amber-100/95",
+    ring: "border-amber-800/25 bg-amber-100 text-amber-950 dark:border-amber-500/25 dark:bg-amber-500/[0.08] dark:text-amber-100/95",
   },
   warm: {
     label: "Warm",
     dot: "bg-sky-500/80",
-    ring: "border-sky-500/20 bg-sky-500/[0.08] text-sky-100/90",
+    ring: "border-sky-700/20 bg-sky-50 text-sky-950 dark:border-sky-500/20 dark:bg-sky-500/[0.08] dark:text-sky-100/90",
   },
   cold: {
     label: "Koud",

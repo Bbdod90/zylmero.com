@@ -32,6 +32,7 @@ export default async function LeadsPage() {
         leads={bundle.leads}
         staleReplyLeadIds={Array.from(sla.staleReplyLeadIds)}
         demoMode={demo}
+        demoSampleLeadId={bundle.leads[0]?.id ?? null}
       />
     </PageFrame>
   );

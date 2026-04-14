@@ -34,7 +34,8 @@ export default async function SettingsPage({
     searchParams?.tab === "knowledge" ||
     searchParams?.tab === "branding" ||
     searchParams?.tab === "business" ||
-    searchParams?.tab === "widget"
+    searchParams?.tab === "widget" ||
+    searchParams?.tab === "quotes"
       ? searchParams.tab
       : "business";
 
@@ -68,6 +69,10 @@ export default async function SettingsPage({
           knowledge_snippets: mapped?.knowledge_snippets ?? [],
           white_label_logo_url: mapped?.white_label_logo_url ?? null,
           white_label_primary: mapped?.white_label_primary ?? null,
+          quote_intro: mapped?.quote_intro ?? null,
+          quote_footer: mapped?.quote_footer ?? null,
+          quote_include_pricing_hints: mapped?.quote_include_pricing_hints ?? false,
+          quote_include_zylmero_notice: mapped?.quote_include_zylmero_notice !== false,
         }}
       />
     </PageFrame>
