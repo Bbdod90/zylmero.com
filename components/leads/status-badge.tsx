@@ -31,7 +31,7 @@ const styles: Record<LeadStatus, string> = {
 
 export function leadStatusBadgeClass(status: LeadStatus, className?: string) {
   return cn(
-    "inline-flex items-center rounded-full border px-3 py-1 text-2xs font-semibold uppercase tracking-wide",
+    "inline-flex min-w-0 max-w-full items-center rounded-full border px-3 py-1 text-2xs font-semibold uppercase tracking-wide",
     styles[status],
     className,
   );
@@ -45,8 +45,8 @@ export function LeadStatusBadge({
   className?: string;
 }) {
   return (
-    <span className={leadStatusBadgeClass(status, className)}>
-      {LEAD_STATUS_LABELS[status]}
+    <span className={leadStatusBadgeClass(status, className)} title={LEAD_STATUS_LABELS[status]}>
+      <span className="min-w-0 truncate">{LEAD_STATUS_LABELS[status]}</span>
     </span>
   );
 }

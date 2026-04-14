@@ -39,7 +39,7 @@ export function TemperatureBadge({
       )}
     >
       <span className={cn("size-1.5 shrink-0 rounded-full", s.dot)} aria-hidden />
-      {s.label}
+      <span className="min-w-0 truncate">{s.label}</span>
     </span>
   );
 }

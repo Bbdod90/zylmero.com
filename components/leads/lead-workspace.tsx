@@ -154,20 +154,25 @@ export function LeadWorkspace({
         <Card className="rounded-2xl border-white/[0.06] bg-gradient-to-b from-card to-secondary/[0.04]">
           <CardHeader>
             <div className="flex flex-col gap-3">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <CardTitle className="text-2xl font-semibold tracking-tight">
+              <div className="flex flex-col gap-3 min-[420px]:flex-row min-[420px]:items-start min-[420px]:justify-between">
+                <div className="min-w-0 flex-1">
+                  <CardTitle className="truncate text-2xl font-semibold tracking-tight" title={lead.full_name}>
                     {lead.full_name}
                   </CardTitle>
-                  <p className="mt-2 text-sm text-muted-foreground">
+                  <p className="mt-2 break-words text-sm text-muted-foreground">
                     {lead.email || "—"} · {lead.phone || "—"}
                   </p>
                 </div>
-                <LeadStatusMenu
-                  leadId={lead.id}
-                  status={lead.status}
-                  demoMode={demoMode}
-                />
+                <div className="shrink-0 self-start">
+                  <LeadStatusMenu
+                    leadId={lead.id}
+                    status={lead.status}
+                    demoMode={demoMode}
+                    onDemoStatusChange={
+                      demoMode ? (next) => setLead((l) => ({ ...l, status: next })) : undefined
+                    }
+                  />
+                </div>
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <TemperatureBadge temp={temp} />

@@ -118,7 +118,7 @@ function NavLink({
       className={cn(
         "group relative flex min-h-11 touch-manipulation items-center gap-3 rounded-lg px-3 py-2 text-[0.8125rem] font-medium transition-colors duration-200 active:bg-muted/50",
         active
-          ? "bg-primary/[0.09] text-foreground before:absolute before:left-0 before:top-1/2 before:h-7 before:w-[3px] before:-translate-y-1/2 before:rounded-full before:bg-primary dark:bg-white/[0.06]"
+          ? "bg-muted/90 text-foreground before:absolute before:left-0 before:top-1/2 before:h-7 before:w-[3px] before:-translate-y-1/2 before:rounded-full before:bg-primary dark:bg-white/[0.06]"
           : "text-muted-foreground hover:bg-muted/60 hover:text-foreground dark:hover:bg-white/[0.04]",
       )}
     >

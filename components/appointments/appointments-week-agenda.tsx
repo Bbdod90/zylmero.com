@@ -70,8 +70,8 @@ export function AppointmentsWeekAgenda({
   }, [visible, days]);
 
   return (
-    <div className="space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/50 bg-muted/20 px-4 py-3 dark:border-white/[0.08] dark:bg-white/[0.03]">
         <div className="flex flex-wrap items-center gap-2">
           <Button
             type="button"
@@ -93,9 +93,7 @@ export function AppointmentsWeekAgenda({
           >
             <ChevronRight className="size-4" />
           </Button>
-          <p className="text-sm font-semibold tracking-tight text-foreground">
-            {labelRange}
-          </p>
+          <p className="text-sm font-semibold tracking-tight text-foreground">{labelRange}</p>
         </div>
         <Button
           type="button"
@@ -108,7 +106,7 @@ export function AppointmentsWeekAgenda({
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-7">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
         {days.map((day) => {
           const key = format(day, "yyyy-MM-dd");
           const list = byDay.get(key) || [];
@@ -117,60 +115,68 @@ export function AppointmentsWeekAgenda({
             <div
               key={key}
               className={cn(
-                "flex min-h-[220px] flex-col rounded-2xl border bg-card/50 p-3 shadow-sm",
-                "border-border/70 dark:border-white/[0.1]",
-                today && "ring-1 ring-primary/35",
+                "group flex min-h-[200px] min-w-0 flex-col overflow-hidden rounded-2xl border bg-card shadow-sm transition-shadow",
+                "border-border/60 dark:border-white/[0.1] dark:bg-[hsl(228_24%_8%/0.85)]",
+                today && "ring-2 ring-primary/40 ring-offset-2 ring-offset-background dark:ring-offset-background",
               )}
             >
-              <div className="mb-3 border-b border-border/60 pb-2 dark:border-white/[0.08]">
+              <div
+                className={cn(
+                  "border-b px-3 py-3 dark:border-white/[0.08]",
+                  today
+                    ? "bg-gradient-to-br from-primary/15 to-primary/[0.04]"
+                    : "bg-gradient-to-br from-muted/50 to-transparent dark:from-white/[0.04]",
+                )}
+              >
                 <p className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                   {format(day, "EEEE", { locale: nl })}
                 </p>
                 <p
                   className={cn(
-                    "text-xl font-semibold tabular-nums tracking-tight",
+                    "mt-0.5 text-lg font-bold tabular-nums tracking-tight",
                     today ? "text-primary" : "text-foreground",
                   )}
                 >
                   {format(day, "d MMM", { locale: nl })}
                 </p>
               </div>
-              <div className="flex flex-1 flex-col gap-2 overflow-y-auto">
+              <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overflow-x-hidden p-2.5">
                 {list.length === 0 ? (
-                  <p className="text-2xs text-muted-foreground">—</p>
+                  <p className="py-6 text-center text-2xs text-muted-foreground">Geen afspraken</p>
                 ) : (
                   list.map((a) => (
                     <div
                       key={a.id}
-                      className="rounded-xl border border-border/60 bg-background/80 p-2.5 dark:border-white/[0.08]"
+                      className="overflow-hidden rounded-xl border border-border/50 bg-background/90 p-2.5 shadow-sm dark:border-white/[0.08] dark:bg-white/[0.03]"
                     >
-                      <div className="flex items-start justify-between gap-2">
-                        <span className="font-mono text-[0.65rem] font-medium text-muted-foreground">
-                          {format(new Date(a.starts_at), "HH:mm")}
-                        </span>
-                        <AppointmentStatusSelect
-                          appointmentId={a.id}
-                          current={a.status}
-                          demoMode={demoMode}
-                        />
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="shrink-0 font-mono text-[0.65rem] font-semibold tabular-nums text-muted-foreground">
+                            {format(new Date(a.starts_at), "HH:mm")}
+                          </span>
+                          <div className="min-w-0 max-w-[65%] shrink">
+                            <AppointmentStatusSelect
+                              appointmentId={a.id}
+                              current={a.status}
+                              demoMode={demoMode}
+                            />
+                          </div>
+                        </div>
+                        {a.lead_id && a.lead_name ? (
+                          <Link
+                            href={`/dashboard/leads/${a.lead_id}`}
+                            className="block truncate text-sm font-semibold text-foreground hover:text-primary hover:underline"
+                            title={a.lead_name}
+                          >
+                            {a.lead_name}
+                          </Link>
+                        ) : (
+                          <p className="truncate text-sm text-muted-foreground">Geen lead</p>
+                        )}
+                        {a.notes ? (
+                          <p className="line-clamp-2 text-2xs leading-relaxed text-muted-foreground">{a.notes}</p>
+                        ) : null}
                       </div>
-                      {a.lead_id && a.lead_name ? (
-                        <Link
-                          href={`/dashboard/leads/${a.lead_id}`}
-                          className="mt-1 block text-sm font-medium leading-snug text-foreground hover:text-primary hover:underline"
-                        >
-                          {a.lead_name}
-                        </Link>
-                      ) : (
-                        <p className="mt-1 text-sm text-muted-foreground">
-                          Geen lead
-                        </p>
-                      )}
-                      {a.notes ? (
-                        <p className="mt-1 line-clamp-3 text-2xs leading-relaxed text-muted-foreground">
-                          {a.notes}
-                        </p>
-                      ) : null}
                     </div>
                   ))
                 )}

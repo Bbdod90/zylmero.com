@@ -15,7 +15,7 @@ import {
   type DragStartEvent,
 } from "@dnd-kit/core";
 import { createClient } from "@/lib/supabase/client";
-import type { Lead } from "@/lib/types";
+import type { Lead, LeadStatus } from "@/lib/types";
 import {
   PIPELINE_COLUMNS,
   columnIdForLeadStatus,
@@ -30,7 +30,15 @@ import { LeadStatusMenu } from "@/components/leads/lead-status-menu";
 import Link from "next/link";
 import { GripVertical } from "lucide-react";
 
-function LeadCard({ lead, demoMode }: { lead: Lead; demoMode: boolean }) {
+function LeadCard({
+  lead,
+  demoMode,
+  onDemoLeadStatus,
+}: {
+  lead: Lead;
+  demoMode: boolean;
+  onDemoLeadStatus?: (next: LeadStatus) => void;
+}) {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
       id: `lead-${lead.id}`,
@@ -48,7 +56,7 @@ function LeadCard({ lead, demoMode }: { lead: Lead; demoMode: boolean }) {
       ref={setNodeRef}
       style={style}
       className={cn(
-        "rounded-2xl border border-border/50 bg-card/90 p-4 shadow-sm transition-shadow dark:border-white/[0.07]",
+        "overflow-hidden rounded-2xl border border-border/50 bg-card/90 p-4 shadow-sm transition-shadow dark:border-white/[0.07]",
         isDragging && "z-50 opacity-90 ring-2 ring-primary/40",
       )}
     >
@@ -65,21 +73,25 @@ function LeadCard({ lead, demoMode }: { lead: Lead; demoMode: boolean }) {
           </button>
         ) : null}
         <div className="min-w-0 flex-1 space-y-2">
-          <div className="flex items-start justify-between gap-2">
+          <div className="flex flex-col gap-2 min-[300px]:flex-row min-[300px]:items-start min-[300px]:justify-between min-[300px]:gap-2">
             <Link
               href={`/dashboard/leads/${lead.id}`}
-              className="text-sm font-semibold leading-tight hover:text-primary hover:underline"
+              className="min-w-0 text-sm font-semibold leading-snug hover:text-primary hover:underline line-clamp-2 min-[320px]:line-clamp-none min-[320px]:truncate min-[320px]:leading-tight"
+              title={lead.full_name}
               onClick={(e) => e.stopPropagation()}
             >
               {lead.full_name}
             </Link>
-            <LeadStatusMenu
-              leadId={lead.id}
-              status={lead.status}
-              demoMode={demoMode}
-              compact
-              className="max-w-[min(100%,11rem)] shrink-0"
-            />
+            <div className="min-w-0 shrink-0 self-start min-[300px]:max-w-[min(100%,12rem)]">
+              <LeadStatusMenu
+                leadId={lead.id}
+                status={lead.status}
+                demoMode={demoMode}
+                compact
+                className="max-w-full"
+                onDemoStatusChange={onDemoLeadStatus}
+              />
+            </div>
           </div>
           <AiTagBadges tags={lead.ai_tags} size="xs" />
           <div className="flex flex-wrap gap-x-3 gap-y-1 text-2xs text-muted-foreground">
@@ -90,7 +102,11 @@ function LeadCard({ lead, demoMode }: { lead: Lead; demoMode: boolean }) {
             ) : (
               <span>—</span>
             )}
-            {lead.phone ? <span>{lead.phone}</span> : null}
+            {lead.phone ? (
+              <span className="max-w-full truncate" title={lead.phone}>
+                {lead.phone}
+              </span>
+            ) : null}
           </div>
         </div>
       </div>
@@ -111,7 +127,7 @@ function ColumnDrop({
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: `col-${id}` });
   return (
-    <div className="flex min-h-[420px] w-[min(85vw,280px)] shrink-0 flex-col min-[1100px]:w-auto min-[1100px]:min-w-0 min-[1100px]:max-w-none min-[1100px]:flex-1">
+    <div className="flex min-h-[420px] w-[min(85vw,280px)] min-w-0 shrink-0 flex-col min-[1100px]:w-auto min-[1100px]:min-w-0 min-[1100px]:max-w-none min-[1100px]:flex-1">
       <div className="mb-3 flex items-center justify-between px-1">
         <h3 className="text-sm font-semibold tracking-tight">{label}</h3>
         <span className="rounded-full bg-muted/80 px-2 py-0.5 text-2xs font-medium text-muted-foreground">
@@ -121,7 +137,7 @@ function ColumnDrop({
       <div
         ref={setNodeRef}
         className={cn(
-          "flex flex-1 flex-col gap-2.5 overflow-y-auto rounded-2xl border border-dashed border-border/60 bg-muted/20 p-2.5 dark:border-white/[0.08] dark:bg-white/[0.02]",
+          "flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto overflow-x-hidden rounded-2xl border border-dashed border-border/60 bg-muted/20 p-2.5 dark:border-white/[0.08] dark:bg-white/[0.02]",
           isOver && "border-primary/50 bg-primary/[0.04]",
         )}
       >
@@ -142,11 +158,13 @@ export function PipelineBoard({
 }) {
   const router = useRouter();
   const [leads, setLeads] = useState(initialLeads);
+  const [demoStatusById, setDemoStatusById] = useState<Record<string, LeadStatus>>({});
   const [activeId, setActiveId] = useState<string | null>(null);
   const [pending, start] = useTransition();
 
   useEffect(() => {
     setLeads(initialLeads);
+    setDemoStatusById({});
   }, [initialLeads]);
 
   useEffect(() => {
@@ -172,12 +190,23 @@ export function PipelineBoard({
     };
   }, [companyId, demoMode, router]);
 
+  const leadsForView = useMemo(
+    () =>
+      demoMode
+        ? leads.map((l) => ({
+            ...l,
+            status: demoStatusById[l.id] ?? l.status,
+          }))
+        : leads,
+    [leads, demoMode, demoStatusById],
+  );
+
   const byColumn = useMemo(() => {
     const map = new Map<PipelineColumnId, Lead[]>();
     for (const col of PIPELINE_COLUMNS) {
       map.set(col.id, []);
     }
-    for (const lead of leads) {
+    for (const lead of leadsForView) {
       const cid = columnIdForLeadStatus(lead.status);
       const list = map.get(cid) || [];
       list.push(lead);
@@ -187,7 +216,7 @@ export function PipelineBoard({
       map.set(col.id, sortLeadsInColumn(map.get(col.id) || []));
     }
     return map;
-  }, [leads]);
+  }, [leadsForView]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -196,8 +225,8 @@ export function PipelineBoard({
   const activeLead = useMemo(() => {
     if (!activeId?.startsWith("lead-")) return null;
     const id = activeId.slice(5);
-    return leads.find((l) => l.id === id) ?? null;
-  }, [activeId, leads]);
+    return leadsForView.find((l) => l.id === id) ?? null;
+  }, [activeId, leadsForView]);
 
   function onDragStart(e: DragStartEvent) {
     setActiveId(String(e.active.id));
@@ -214,7 +243,7 @@ export function PipelineBoard({
       targetCol = overId.slice(4) as PipelineColumnId;
     } else if (overId.startsWith("lead-")) {
       const lid = overId.slice(5);
-      const l = leads.find((x) => x.id === lid);
+      const l = leadsForView.find((x) => x.id === lid);
       if (l) targetCol = columnIdForLeadStatus(l.status);
     }
     if (!targetCol) return;
@@ -223,7 +252,7 @@ export function PipelineBoard({
     const col = PIPELINE_COLUMNS.find((c) => c.id === targetCol);
     if (!col) return;
 
-    const lead = leads.find((l) => l.id === leadId);
+    const lead = leadsForView.find((l) => l.id === leadId);
     if (!lead || lead.status === col.dropStatus) return;
 
     start(async () => {
@@ -263,7 +292,20 @@ export function PipelineBoard({
               count={list.length}
             >
               {list.map((lead) => (
-                <LeadCard key={lead.id} lead={lead} demoMode={demoMode} />
+                <LeadCard
+                  key={lead.id}
+                  lead={lead}
+                  demoMode={demoMode}
+                  onDemoLeadStatus={
+                    demoMode
+                      ? (next) =>
+                          setDemoStatusById((m) => ({
+                            ...m,
+                            [lead.id]: next,
+                          }))
+                      : undefined
+                  }
+                />
               ))}
             </ColumnDrop>
           );
@@ -272,7 +314,9 @@ export function PipelineBoard({
       <DragOverlay dropAnimation={null}>
         {activeLead ? (
           <div className="w-[min(100vw-2rem,280px)] rounded-2xl border border-primary/30 bg-card p-4 shadow-xl">
-            <p className="text-sm font-semibold">{activeLead.full_name}</p>
+            <p className="truncate text-sm font-semibold" title={activeLead.full_name}>
+              {activeLead.full_name}
+            </p>
             <AiTagBadges tags={activeLead.ai_tags} className="mt-2" size="xs" />
           </div>
         ) : null}

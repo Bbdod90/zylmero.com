@@ -6,18 +6,10 @@ import { getDemoDashboardBundle } from "@/lib/demo/dashboard-data";
 import { isDemoMode } from "@/lib/env";
 import { PageFrame } from "@/components/layout/page-frame";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import { simpleDashboardStatus } from "@/components/dashboard/simple-lead-status";
+import { DashboardTopLeadsTable } from "@/components/dashboard/dashboard-top-leads-table";
 
 export default async function DashboardPage() {
   const auth = await getAuth();
@@ -45,7 +37,7 @@ export default async function DashboardPage() {
       subtitle={demo ? "Demo — zo zie je waar je geld ligt." : "Hier verdien je geld."}
     >
       <div className="space-y-10">
-        <Card className="rounded-2xl border-border/50 bg-card/80 dark:border-white/[0.08]">
+        <Card className="min-w-0 overflow-hidden rounded-2xl border-border/50 bg-card/80 dark:border-white/[0.08]">
           <CardHeader className="pb-2">
             <CardTitle className="text-2xl font-bold tracking-tight md:text-3xl">
               Hier verdien je geld
@@ -75,56 +67,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-border/50 bg-card/80 dark:border-white/[0.08]">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle className="text-lg font-semibold">Top 3 leads</CardTitle>
-            <Button variant="ghost" size="sm" className="rounded-lg text-muted-foreground" asChild>
-              <Link href="/dashboard/leads">
-                Alles bekijken
-                <ArrowRight className="ml-1 size-4" />
-              </Link>
-            </Button>
-          </CardHeader>
-          <CardContent className="px-0 pb-6">
-            {topThree.length === 0 ? (
-              <p className="px-6 pb-2 text-sm text-muted-foreground">
-                Nog geen leads. Zodra er aanvragen binnenkomen, zie je hier waar de meeste waarde zit.
-              </p>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Naam</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Waarde</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {topThree.map((l) => (
-                    <TableRow key={l.id}>
-                      <TableCell className="font-medium">
-                        <Link
-                          href={`/dashboard/leads/${l.id}`}
-                          className="text-foreground hover:text-primary hover:underline"
-                        >
-                          {l.full_name}
-                        </Link>
-                      </TableCell>
-                      <TableCell>
-                        <span className="inline-flex rounded-md border border-border/60 bg-muted/40 px-2.5 py-1 text-xs font-medium text-foreground">
-                          {simpleDashboardStatus(l.status)}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right text-base font-semibold tabular-nums">
-                        {l.estimated_value != null ? formatCurrency(l.estimated_value) : "—"}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
+        <DashboardTopLeadsTable leads={topThree} demoMode={demo} />
       </div>
     </PageFrame>
   );

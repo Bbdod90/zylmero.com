@@ -180,29 +180,26 @@ export function LeadsExplorer({
                 const temp = leadTemperature(l, display);
                 return (
                   <TableRow key={l.id}>
-                    <TableCell className="font-medium">
+                    <TableCell className="max-w-[min(42vw,16rem)] min-w-0 font-medium">
                       <Link
                         href={`/dashboard/leads/${l.id}`}
-                        className="text-foreground transition-colors hover:text-primary"
+                        className="block truncate text-foreground transition-colors hover:text-primary"
+                        title={l.full_name}
                       >
                         {l.full_name}
                       </Link>
                     </TableCell>
-                    <TableCell className="text-muted-foreground">
+                    <TableCell className="max-w-[10rem] min-w-0 truncate text-muted-foreground" title={l.source || ""}>
                       {l.source || "—"}
                     </TableCell>
-                    <TableCell>
-                      <LeadStatusMenu
-                        leadId={l.id}
-                        status={l.status}
-                        demoMode={demoMode}
-                      />
+                    <TableCell className="min-w-0 max-w-[11rem]">
+                      <LeadStatusMenu leadId={l.id} status={l.status} demoMode={demoMode} compact />
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="min-w-0 max-w-[12rem]">
                       <div className="flex flex-wrap items-center gap-2">
                         <TemperatureBadge temp={temp} />
                         {stale.has(l.id) ? (
-                          <span className="rounded-full border border-destructive/25 bg-destructive/10 px-2.5 py-0.5 text-2xs font-semibold uppercase tracking-wide text-destructive">
+                          <span className="shrink-0 rounded-full border border-destructive/25 bg-destructive/10 px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wide text-destructive">
                             Te laat
                           </span>
                         ) : null}
