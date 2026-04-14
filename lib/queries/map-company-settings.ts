@@ -69,6 +69,7 @@ export function mapCompanySettingsRow(
       prefs.ai_knowledge_document.trim()
         ? prefs.ai_knowledge_document.trim()
         : null,
+    email_inbound_enabled: Boolean(prefs.email_inbound_enabled),
     white_label_logo_url: (data.white_label_logo_url as string) ?? null,
     white_label_primary: (data.white_label_primary as string) ?? null,
     created_at: data.created_at as string,

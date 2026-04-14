@@ -30,6 +30,7 @@ export default async function SettingsPage({
   const defaultTab =
     searchParams?.tab === "billing" ||
     searchParams?.tab === "whatsapp" ||
+    searchParams?.tab === "email" ||
     searchParams?.tab === "knowledge" ||
     searchParams?.tab === "branding" ||
     searchParams?.tab === "business" ||
@@ -63,6 +64,7 @@ export default async function SettingsPage({
             },
           auto_reply_enabled: mapped?.auto_reply_enabled ?? false,
           auto_reply_delay_seconds: mapped?.auto_reply_delay_seconds ?? 30,
+          email_inbound_enabled: mapped?.email_inbound_enabled ?? false,
           knowledge_snippets: mapped?.knowledge_snippets ?? [],
           white_label_logo_url: mapped?.white_label_logo_url ?? null,
           white_label_primary: mapped?.white_label_primary ?? null,

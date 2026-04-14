@@ -54,7 +54,7 @@ export default async function AiKoppelcentrumPage() {
   return (
     <PageFrame
       title="AI & koppelingen"
-      subtitle="Train je AI, sluit WhatsApp en je website-widget aan, en zorg dat e-mail en aanvragen op één plek landen — overzichtelijk en in de juiste volgorde."
+      subtitle="Train je AI, sluit WhatsApp, e-mail (webhook) en je website-widget aan — alles landt in Berichten, met dezelfde AI-antwoordoptie waar je die aanzet."
     >
       <AiKoppelcentrumView
         demoMode={demoMode}
@@ -67,6 +67,7 @@ export default async function AiKoppelcentrumPage() {
         whatsappProvider={whatsappProvider}
         hasWidgetToken={Boolean(auth.company.widget_embed_token)}
         hasContactEmail={Boolean(auth.company.contact_email?.trim())}
+        emailInboundEnabled={Boolean(mapped?.email_inbound_enabled)}
       />
     </PageFrame>
   );

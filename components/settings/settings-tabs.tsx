@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { WhatsAppSettingsForm } from "@/components/settings/whatsapp-settings-form";
+import { EmailChannelSettingsForm } from "@/components/settings/email-channel-settings-form";
 import { BillingSettings } from "@/components/settings/billing-settings";
 import { WidgetSettings } from "@/components/settings/widget-settings";
 import type { Company, WhatsAppChannelSettings } from "@/lib/types";
@@ -33,6 +34,7 @@ const VALID_TABS = new Set([
   "knowledge",
   "branding",
   "whatsapp",
+  "email",
   "billing",
   "widget",
 ]);
@@ -58,6 +60,7 @@ export function SettingsTabs({
     whatsapp_channel: WhatsAppChannelSettings;
     auto_reply_enabled: boolean;
     auto_reply_delay_seconds: number;
+    email_inbound_enabled: boolean;
     knowledge_snippets: { title: string; body: string }[];
     white_label_logo_url: string | null;
     white_label_primary: string | null;
@@ -111,6 +114,12 @@ export function SettingsTabs({
           className="rounded-xl px-4 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-primary/20 dark:data-[state=active]:bg-card dark:data-[state=active]:ring-primary/25"
         >
           WhatsApp
+        </TabsTrigger>
+        <TabsTrigger
+          value="email"
+          className="rounded-xl px-4 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-primary/20 dark:data-[state=active]:bg-card dark:data-[state=active]:ring-primary/25"
+        >
+          E-mail
         </TabsTrigger>
         <TabsTrigger
           value="billing"
@@ -280,6 +289,14 @@ export function SettingsTabs({
             <code className="rounded bg-muted px-1">body</code>.
           </p>
         </div>
+      </TabsContent>
+      <TabsContent value="email" className="mt-6">
+        <EmailChannelSettingsForm
+          companyId={company.id}
+          emailInboundEnabled={settings.email_inbound_enabled}
+          hasContactEmail={Boolean(company.contact_email?.trim())}
+          siteOrigin={siteOrigin}
+        />
       </TabsContent>
       <TabsContent value="billing" className="mt-6">
         <BillingSettings

@@ -26,7 +26,13 @@ const SOURCES = [
   "Cold call",
 ];
 
-export function NewLeadDialog({ disabled }: { disabled?: boolean }) {
+export function NewLeadDialog({
+  disabled,
+  demoMode = false,
+}: {
+  disabled?: boolean;
+  demoMode?: boolean;
+}) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [pending, start] = useTransition();
@@ -57,6 +63,10 @@ export function NewLeadDialog({ disabled }: { disabled?: boolean }) {
               const email = String(fd.get("email") || "").trim();
               const phone = String(fd.get("phone") || "").trim();
               const source = String(fd.get("source") || "").trim();
+              if (demoMode) {
+                toast.message("Demo-modus: lead aanmaken is uitgeschakeld.");
+                return;
+              }
               const res = await createLead({
                 full_name,
                 email: email || null,
@@ -119,9 +129,9 @@ export function NewLeadDialog({ disabled }: { disabled?: boolean }) {
           <Button
             type="submit"
             className="w-full rounded-xl"
-            disabled={pending}
+            disabled={pending || demoMode}
           >
-            {pending ? "Opslaan…" : "Lead aanmaken"}
+            {pending ? "Opslaan…" : demoMode ? "Demo: alleen lezen" : "Lead aanmaken"}
           </Button>
         </form>
       </DialogContent>

@@ -106,7 +106,7 @@ export function AppointmentsWeekAgenda({
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
+      <div className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-2">
         {days.map((day) => {
           const key = format(day, "yyyy-MM-dd");
           const list = byDay.get(key) || [];
@@ -115,7 +115,7 @@ export function AppointmentsWeekAgenda({
             <div
               key={key}
               className={cn(
-                "group flex min-h-[200px] min-w-0 flex-col overflow-hidden rounded-2xl border bg-card shadow-sm transition-shadow",
+                "group flex min-h-[220px] w-[min(76vw,220px)] min-w-[190px] shrink-0 flex-col overflow-hidden rounded-2xl border bg-card shadow-sm transition-shadow",
                 "border-border/60 dark:border-white/[0.1] dark:bg-[hsl(228_24%_8%/0.85)]",
                 today && "ring-2 ring-primary/40 ring-offset-2 ring-offset-background dark:ring-offset-background",
               )}
@@ -154,7 +154,7 @@ export function AppointmentsWeekAgenda({
                           <span className="shrink-0 font-mono text-[0.65rem] font-semibold tabular-nums text-muted-foreground">
                             {format(new Date(a.starts_at), "HH:mm")}
                           </span>
-                          <div className="min-w-0 max-w-[65%] shrink">
+                          <div className="min-w-0 shrink">
                             <AppointmentStatusSelect
                               appointmentId={a.id}
                               current={a.status}

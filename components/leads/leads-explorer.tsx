@@ -98,7 +98,7 @@ export function LeadsExplorer({
               className="h-12 pl-11"
             />
           </div>
-          <NewLeadDialog disabled={demoMode} />
+          <NewLeadDialog demoMode={demoMode} />
         </div>
         <div className="flex flex-wrap gap-3">
           <select

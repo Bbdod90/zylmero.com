@@ -72,26 +72,24 @@ function LeadCard({
             <GripVertical className="size-4" />
           </button>
         ) : null}
-        <div className="min-w-0 flex-1 space-y-2">
-          <div className="flex flex-col gap-2 min-[300px]:flex-row min-[300px]:items-start min-[300px]:justify-between min-[300px]:gap-2">
-            <Link
-              href={`/dashboard/leads/${lead.id}`}
-              className="min-w-0 text-sm font-semibold leading-snug hover:text-primary hover:underline line-clamp-2 min-[320px]:line-clamp-none min-[320px]:truncate min-[320px]:leading-tight"
-              title={lead.full_name}
-              onClick={(e) => e.stopPropagation()}
-            >
-              {lead.full_name}
-            </Link>
-            <div className="min-w-0 shrink-0 self-start min-[300px]:max-w-[min(100%,12rem)]">
-              <LeadStatusMenu
-                leadId={lead.id}
-                status={lead.status}
-                demoMode={demoMode}
-                compact
-                className="max-w-full"
-                onDemoStatusChange={onDemoLeadStatus}
-              />
-            </div>
+        <div className="min-w-0 flex-1 space-y-3">
+          <Link
+            href={`/dashboard/leads/${lead.id}`}
+            className="block min-w-0 text-[0.95rem] font-semibold leading-snug text-foreground hover:text-primary hover:underline"
+            title={lead.full_name}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <span className="block line-clamp-2 break-words">{lead.full_name}</span>
+          </Link>
+          <div className="min-w-0">
+            <LeadStatusMenu
+              leadId={lead.id}
+              status={lead.status}
+              demoMode={demoMode}
+              compact
+              className="max-w-full"
+              onDemoStatusChange={onDemoLeadStatus}
+            />
           </div>
           <AiTagBadges tags={lead.ai_tags} size="xs" />
           <div className="flex flex-wrap gap-x-3 gap-y-1 text-2xs text-muted-foreground">
@@ -127,7 +125,7 @@ function ColumnDrop({
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: `col-${id}` });
   return (
-    <div className="flex min-h-[420px] w-[min(85vw,280px)] min-w-0 shrink-0 flex-col min-[1100px]:w-auto min-[1100px]:min-w-0 min-[1100px]:max-w-none min-[1100px]:flex-1">
+    <div className="flex min-h-[420px] w-[min(88vw,340px)] min-w-0 shrink-0 flex-col min-[1100px]:w-auto min-[1100px]:min-w-[260px] min-[1100px]:max-w-none min-[1100px]:flex-1">
       <div className="mb-3 flex items-center justify-between px-1">
         <h3 className="text-sm font-semibold tracking-tight">{label}</h3>
         <span className="rounded-full bg-muted/80 px-2 py-0.5 text-2xs font-medium text-muted-foreground">
@@ -281,7 +279,7 @@ export function PipelineBoard({
       onDragCancel={() => setActiveId(null)}
       onDragEnd={onDragEnd}
     >
-      <div className="-mx-2 flex gap-4 overflow-x-auto px-2 pb-4 min-[1100px]:mx-0 min-[1100px]:grid min-[1100px]:w-full min-[1100px]:grid-cols-5 min-[1100px]:gap-4 min-[1100px]:overflow-visible min-[1100px]:px-0">
+      <div className="-mx-2 flex gap-4 overflow-x-auto px-2 pb-4 min-[1100px]:mx-0 min-[1100px]:grid min-[1100px]:w-full min-[1100px]:grid-cols-5 min-[1100px]:gap-5 min-[1100px]:overflow-visible min-[1100px]:px-0">
         {PIPELINE_COLUMNS.map((col) => {
           const list = byColumn.get(col.id) || [];
           return (

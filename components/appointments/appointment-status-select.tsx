@@ -60,16 +60,16 @@ export function AppointmentStatusSelect({
             type="button"
             aria-label="Afspraakstatus (demo)"
             className={cn(
-              "flex h-9 max-w-full min-w-0 items-center gap-1 rounded-full border border-primary/25 bg-primary/[0.08] px-2.5 text-left text-2xs font-semibold text-primary",
+              "flex h-8 max-w-full min-w-[7.2rem] items-center gap-1.5 rounded-full border border-primary/25 bg-primary/[0.08] px-2.5 text-left text-xs font-semibold text-primary",
             )}
           >
             <span className="min-w-0 flex-1 truncate normal-case tracking-normal" title={displayLabel}>
               {displayLabel}
             </span>
-            <ChevronDown className="size-3 shrink-0 opacity-60" aria-hidden />
+            <ChevronDown className="size-3.5 shrink-0 opacity-60" aria-hidden />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48">
+        <DropdownMenuContent align="end" className="w-52">
           {OPTIONS.map((o) => (
             <DropdownMenuItem
               key={o.value}

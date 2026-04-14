@@ -100,6 +100,8 @@ export interface CompanySettings {
   ai_knowledge_website: string | null;
   /** Geüploade of geplakte tekst als kennis voor AI (ook in automation_preferences). */
   ai_knowledge_document: string | null;
+  /** Inkomende e-mail via webhook naar Berichten (ook in automation_preferences). */
+  email_inbound_enabled: boolean;
   white_label_logo_url: string | null;
   white_label_primary: string | null;
   created_at: string;

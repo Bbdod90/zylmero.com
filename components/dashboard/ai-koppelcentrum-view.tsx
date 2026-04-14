@@ -60,6 +60,8 @@ export type AiKoppelcentrumProps = {
   hasWidgetToken: boolean;
   /** Contactmail bij bedrijf */
   hasContactEmail: boolean;
+  /** E-mail inbound-webhook aan in automation_preferences */
+  emailInboundEnabled: boolean;
 };
 
 export function AiKoppelcentrumView({
@@ -73,9 +75,11 @@ export function AiKoppelcentrumView({
   whatsappProvider,
   hasWidgetToken,
   hasContactEmail,
+  emailInboundEnabled,
 }: AiKoppelcentrumProps) {
   const base = siteOrigin.replace(/\/$/, "");
   const webhookUrl = `${base}/api/webhooks/whatsapp`;
+  const emailWebhookUrl = `${base}/api/webhooks/inbound-email`;
 
   const waStatus: StepStatus = demoMode
     ? "demo"
@@ -87,7 +91,13 @@ export function AiKoppelcentrumView({
 
   const widgetStatus: StepStatus = demoMode ? "demo" : hasWidgetToken ? "ok" : "todo";
 
-  const mailStatus: StepStatus = demoMode ? "demo" : hasContactEmail ? "ok" : "partial";
+  const mailStatus: StepStatus = demoMode
+    ? "demo"
+    : emailInboundEnabled && hasContactEmail
+      ? "ok"
+      : emailInboundEnabled || hasContactEmail
+        ? "partial"
+        : "todo";
 
   return (
     <div className="space-y-10">
@@ -102,10 +112,11 @@ export function AiKoppelcentrumView({
             </h2>
             <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">
               Hier zie je in één oogopslag wat al klaarstaat. Begin met kennis (website + tekst), zet
-              daarna WhatsApp en je site-widget aan voor snelle antwoorden. E-mail en aanvragen
-              verzamelen we in <strong className="font-medium text-foreground">Berichten</strong> —
-              vul je contactmail in zodat klanten en je{" "}
-              <strong className="font-medium text-foreground">AI</strong> dezelfde basis gebruiken.
+              daarna WhatsApp en je site-widget aan voor snelle antwoorden. E-mail en aanvragen landen in{" "}
+              <strong className="font-medium text-foreground">Berichten</strong>: zet inbound aan
+              (webhook) en vul je contactmail in — dezelfde{" "}
+              <strong className="font-medium text-foreground">AI auto-antwoord</strong> als bij
+              WhatsApp kun je onder WhatsApp inschakelen.
             </p>
           </div>
           <div className="flex shrink-0 flex-col gap-2 sm:flex-row lg:flex-col">
@@ -278,23 +289,44 @@ export function AiKoppelcentrumView({
               </div>
               <StatusBadge
                 status={mailStatus}
-                label={hasContactEmail ? "Contactmail ingevuld" : "Vul contactmail in"}
+                label={
+                  demoMode
+                    ? "Demo"
+                    : mailStatus === "ok"
+                      ? "Webhook + contactmail"
+                      : mailStatus === "partial"
+                        ? "Nog afronden"
+                        : "Nog instellen"
+                }
               />
             </div>
             <CardDescription className="text-sm leading-relaxed">
-              Zet je <strong className="font-medium text-foreground">publieke contactmail</strong> onder
-              Bedrijf — die gebruikt de AI in antwoorden waar nodig. Inkomende leads via widget en
-              koppelingen verschijnen in <strong className="font-medium text-foreground">Berichten</strong>
-              ; directe IMAP-koppeling van je mailbox is gepland.
+              Koppel je mailprovider (Mailgun inbound, Cloudflare e-mail, Zapier, n8n, …) zodat die
+              JSON naar het webhook-endpoint voor inkomende e-mail stuurt (zie hieronder). Zet
+              daarnaast je{" "}
+              <strong className="font-medium text-foreground">contactmail</strong> onder Bedrijf —
+              die gebruikt de AI waar nodig. Leads via widget en kanalen komen ook in{" "}
+              <strong className="font-medium text-foreground">Berichten</strong>.
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-wrap gap-2">
-            <Button asChild size="sm" className="rounded-xl">
-              <Link href="/dashboard/settings?tab=business">Contactmail & bedrijf</Link>
-            </Button>
-            <Button asChild variant="outline" size="sm" className="rounded-xl">
-              <Link href="/dashboard/inbox">Inbox openen</Link>
-            </Button>
+          <CardContent className="space-y-3">
+            <div className="rounded-xl border border-border/60 bg-muted/20 px-3 py-2 font-mono text-[0.7rem] leading-relaxed text-muted-foreground break-all sm:text-xs">
+              POST {emailWebhookUrl}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button asChild size="sm" className="rounded-xl">
+                <Link href="/dashboard/settings?tab=email">
+                  E-mail inbound instellen
+                  <ArrowRight className="ml-1.5 size-3.5" />
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="sm" className="rounded-xl">
+                <Link href="/dashboard/settings?tab=business">Contactmail & bedrijf</Link>
+              </Button>
+              <Button asChild variant="outline" size="sm" className="rounded-xl">
+                <Link href="/dashboard/inbox">Inbox openen</Link>
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
