@@ -10,10 +10,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { cn, formatCurrency, formatDateTime } from "@/lib/utils";
-import { quoteStatusNl } from "@/lib/i18n/nl-labels";
-import { quoteStatusBadgeClass } from "@/lib/ui/quote-status-badge";
+import { formatCurrency, formatDateTime } from "@/lib/utils";
+import { QuoteStatusMenu } from "@/components/quotes/quote-status-menu";
 import type { QuoteStatus } from "@/lib/types";
 
 export type QuoteRowModel = {
@@ -27,7 +25,13 @@ export type QuoteRowModel = {
   lead: { id: string; full_name: string } | null;
 };
 
-export function QuotesInteractiveTable({ rows }: { rows: QuoteRowModel[] }) {
+export function QuotesInteractiveTable({
+  rows,
+  demoMode = false,
+}: {
+  rows: QuoteRowModel[];
+  demoMode?: boolean;
+}) {
   const router = useRouter();
 
   return (
@@ -85,13 +89,13 @@ export function QuotesInteractiveTable({ rows }: { rows: QuoteRowModel[] }) {
               <TableCell className="text-right text-base font-semibold tabular-nums text-foreground">
                 {formatCurrency(q.total)}
               </TableCell>
-              <TableCell>
-                <Badge
-                  variant="outline"
-                  className={cn(quoteStatusBadgeClass(q.status))}
-                >
-                  {quoteStatusNl(q.status)}
-                </Badge>
+              <TableCell onClick={(e) => e.stopPropagation()}>
+                <QuoteStatusMenu
+                  quoteId={q.id}
+                  status={q.status}
+                  demoMode={demoMode}
+                  stopPropagation
+                />
               </TableCell>
               <TableCell className="text-muted-foreground">
                 {formatDateTime(q.updated_at)}

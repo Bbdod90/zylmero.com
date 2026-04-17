@@ -18,14 +18,84 @@ export default async function UpgradePage() {
   if (!auth.company) {
     redirect("/dashboard/onboarding");
   }
-  if (isDemoCompanyId(auth.company.id)) {
-    redirect("/dashboard");
-  }
 
   const expired = !hasSubscriptionAccess(auth.company);
 
-  if (hasSubscriptionAccess(auth.company) && auth.company.plan !== "trial") {
+  if (
+    !isDemoCompanyId(auth.company.id) &&
+    hasSubscriptionAccess(auth.company) &&
+    auth.company.plan !== "trial"
+  ) {
     redirect("/dashboard");
+  }
+
+  if (isDemoCompanyId(auth.company.id)) {
+    return (
+      <div className="min-h-dvh bg-gradient-to-b from-background to-secondary/20 px-safe py-12 md:py-16">
+        <div className="mx-auto max-w-3xl px-4 text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+            {BRAND_NAME}
+          </p>
+          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
+            Upgrade (demo)
+          </h1>
+          <p className="mt-4 text-pretty text-muted-foreground">
+            In de demo zie je hoe abonnementen werken. Met een echt account kies je een plan,
+            betaal veilig via Stripe en gebruik je AI, leads en offertes zonder limiet van de
+            showcase.
+          </p>
+          <div className="mt-10 flex flex-wrap justify-center gap-3">
+            <Button asChild size="lg" className="rounded-2xl px-8">
+              <Link href="/signup">Account aanmaken</Link>
+            </Button>
+            <Button variant="outline" asChild size="lg" className="rounded-2xl">
+              <Link href="/dashboard">Terug naar dashboard</Link>
+            </Button>
+          </div>
+          <p className="mt-8 text-sm text-muted-foreground">
+            Vragen?{" "}
+            <a
+              href={`mailto:${BRAND_CONTACT_EMAIL}`}
+              className="font-medium text-primary hover:underline"
+            >
+              {BRAND_CONTACT_EMAIL}
+            </a>
+          </p>
+        </div>
+        <div className="mx-auto mt-12 max-w-5xl px-4">
+          <div className="mb-6 rounded-2xl border border-border/60 bg-muted/20 px-4 py-3 text-center text-sm text-muted-foreground">
+            Prijzen zijn indicatief — na registratie kies je je plan in het scherm hieronder.
+          </div>
+          <div className="grid gap-6 lg:grid-cols-3">
+            {BILLING_PLANS.map((plan) => (
+              <div
+                key={plan.id}
+                className={`relative flex flex-col rounded-2xl border p-6 ${
+                  plan.popular
+                    ? "border-primary/50 bg-primary/5 shadow-lg"
+                    : "border-border/70 bg-card/40"
+                }`}
+              >
+                {plan.popular ? (
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-3 py-0.5 text-xs font-semibold text-primary-foreground">
+                    Meest gekozen
+                  </span>
+                ) : null}
+                <h2 className="text-lg font-semibold">{plan.name}</h2>
+                <p className="mt-1 text-sm text-muted-foreground">{plan.description}</p>
+                <p className="mt-6">
+                  <span className="text-3xl font-semibold tabular-nums">€{plan.priceEur}</span>
+                  <span className="text-muted-foreground">/mnd</span>
+                </p>
+                <p className="mt-8 text-sm text-muted-foreground">
+                  Activeer dit na je gratis account — in de demo geen betaling.
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -417,7 +417,7 @@ export const NICHE_CATALOG: Record<NicheId, NicheDefinition> = {
       ],
       ai: {
         contextExtra:
-          "Branche: lokale dienstverlening met afspraken (kan kapper, zorg, garage, ambacht zijn). Kwalificeer kort wat de klant wil, wanneer het uitkomt, en of het spoed is. Geen prijs die niet past bij de vraag.",
+          "Branche: lokale dienstverlening met afspraken (kapper, zorg, garage, ambacht, enz.). Als de klant duidelijk over een auto, onderdeel of werkplaats vraagt: antwoord inhoudelijk als werkplaats (empathie, kenteken, planning) — niet met een lap over ‘intake en planning’ tenzij de klant daar zelf om vraagt. Kwalificeer verder kort wat ze willen, wanneer het uitkomt en of het spoed is. Geen prijs die niet past bij de vraag.",
         qualifyingQuestions: [
           "Waar kan ik je mee helpen — en hoe spoed is het?",
           "Welke dag of tijd past ongeveer?",

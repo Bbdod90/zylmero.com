@@ -90,6 +90,27 @@ function simulateResponse(
     return greetingReply(nicheId);
   }
 
+  /** Auto-onderdeel / schade — ook als demo-rol "algemeen" staat (fallback zonder API). */
+  const autoPartOrDamage =
+    /\b(achterlicht|achterlichten|koplamp|mistlamp|remlicht|stadslicht|verlichting|ruit|ruiten|glas|\blamp\b|lampje|bumper|deuk)\b/i.test(
+      t,
+    ) ||
+    (/\b(kapot|kapotte|stuk|gebroken|defect)\b/i.test(t) &&
+      /\b(auto|kenteken|voertuig|wagen)\b/i.test(t));
+  if (
+    autoPartOrDamage &&
+    (nicheId === "garage" ||
+      nicheId === "general_services" ||
+      nicheId === "trade_contractor")
+  ) {
+    return {
+      reply:
+        "Och, dat is vervelend — dat maken we gewoon voor je. Mag ik je kenteken? Dan weten we welk type achterlicht erop hoort en plannen we montage of bestellen we het onderdeel.",
+      resultTitle: "Reparatie / onderdeel",
+      valueLine: "Op aanvraag na kenteken",
+    };
+  }
+
   /** Korte bevestiging na eerdere berichten — inhoudelijk antwoorden i.p.v. herhaling. */
   if (nicheId === "electrician" && confirmationFollowUp(t) && (evChargingIntent(full) || /\blaadpaal\b/i.test(full))) {
     const hasLaadpaalService = cfg.defaultServices.some((s) => /laadpaal/i.test(s));
@@ -283,7 +304,7 @@ export function LandingInteractiveChat() {
 
         const autoHint =
           (!plumbingHint &&
-            (/\b(band|banden|apk|kenteken|auto|voorband|achterband|montage|winterband|zomerband|rechter|linker|voertuig|garage|wiel)\b/i.test(
+            (/\b(band|banden|apk|kenteken|auto|voorband|achterband|montage|winterband|zomerband|rechter|linker|voertuig|garage|wiel|achterlicht|koplamp|mistlamp|remlicht|stadslicht|verlichting|ruit|ruiten|glas|\blamp\b|lampje|bumper|deuk|carrosserie|motor|accu|uitlaat)\b/i.test(
               allUserText,
             ) ||
               Boolean(vehicle))) ||

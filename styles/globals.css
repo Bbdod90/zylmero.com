@@ -20,7 +20,8 @@
     --secondary: 220 16% 95%;
     --secondary-foreground: 0 0% 0%;
     --muted: 220 14% 94%;
-    --muted-foreground: 0 0% 0%;
+    /* Secundaire tekst: bijna zwart voor leesbaarheid in lichte modus */
+    --muted-foreground: 0 0% 12%;
     --accent: 262 48% 48%;
     --accent-foreground: 210 40% 99%;
     --destructive: 0 72% 42%;
@@ -100,6 +101,9 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: hsl(var(--primary) / 0.12);
+  }
+  :root:not(.dark) body {
+    color: hsl(0 0% 0%);
   }
   @media (prefers-reduced-motion: reduce) {
     html {
@@ -209,5 +213,66 @@
   }
   .dark .shadow-inner-soft {
     box-shadow: inset 0 1px 0 0 hsl(210 40% 100% / 0.06);
+  }
+}
+
+/**
+ * Range inputs — grotere thumb en hogere hitbox (mobiel: makkelijker swipen).
+ * Gebruikt op o.a. landing-calculator; track blijft visueel compact.
+ */
+@layer components {
+  .cf-range-touch {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 2.75rem;
+    width: 100%;
+    cursor: pointer;
+    /* Voorkomt dat de pagina het horizontale slepen van de slider “wint” op mobiel */
+    touch-action: none;
+    background: transparent;
+  }
+  .cf-range-touch:focus-visible {
+    outline: none;
+  }
+  .cf-range-touch:focus-visible::-webkit-slider-thumb {
+    box-shadow: 0 0 0 3px hsl(var(--ring) / 0.45);
+  }
+  .cf-range-touch:focus-visible::-moz-range-thumb {
+    box-shadow: 0 0 0 3px hsl(var(--ring) / 0.45);
+  }
+  .cf-range-touch::-webkit-slider-runnable-track {
+    height: 0.5rem;
+    border-radius: 9999px;
+    background: hsl(var(--muted) / 0.85);
+  }
+  .dark .cf-range-touch::-webkit-slider-runnable-track {
+    background: rgb(255 255 255 / 0.08);
+  }
+  .cf-range-touch::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 1.375rem;
+    height: 1.375rem;
+    margin-top: calc((0.5rem - 1.375rem) / 2);
+    border-radius: 9999px;
+    border: 2px solid hsl(var(--background));
+    background: hsl(var(--primary));
+    box-shadow: 0 1px 4px rgb(0 0 0 / 0.2);
+  }
+  .cf-range-touch::-moz-range-track {
+    height: 0.5rem;
+    border-radius: 9999px;
+    background: hsl(var(--muted) / 0.85);
+  }
+  .dark .cf-range-touch::-moz-range-track {
+    background: rgb(255 255 255 / 0.08);
+  }
+  .cf-range-touch::-moz-range-thumb {
+    width: 1.375rem;
+    height: 1.375rem;
+    border-radius: 9999px;
+    border: 2px solid hsl(var(--background));
+    background: hsl(var(--primary));
+    box-shadow: 0 1px 4px rgb(0 0 0 / 0.2);
   }
 }

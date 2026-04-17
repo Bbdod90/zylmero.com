@@ -45,7 +45,7 @@ function automotiveIntent(msg: string): boolean {
   const t = msg.toLowerCase();
   if (plumbingIntent(t)) return false;
   if (/\b(lekkage|lek)\b/i.test(t) && /\b(band|wiel|voorband|achterband)\b/i.test(t)) return true;
-  return /\b(band|banden|apk|kenteken|auto|voorband|achterband|voertuig|winterband|zomerband|wiel\b|remmen|motor)\b/i.test(
+  return /\b(band|banden|apk|kenteken|auto|voorband|achterband|voertuig|winterband|zomerband|wiel\b|remmen|motor|achterlicht|koplamp|mistlamp|remlicht|stadslicht|verlichting|ruit|ruiten|glas|lampje|\blamp\b|carrosserie|deuk|bumper|uitlaat|accu|startmotor)\b/i.test(
     t,
   );
 }
@@ -125,7 +125,7 @@ VASTE DEMO-ROL (verplicht volgen — dit ben jij):
 - Werkwijze: ${cfg.ai.contextExtra}
 - Toon: ${cfg.defaultTone}
 - Antwoordstijl: ${cfg.defaultReplyStyle}
-- Intake-vragen (inspiratie): ${cfg.ai.qualifyingQuestions.join(" · ")}
+- Intake-vragen (alleen als inspiratie — kies er max. één die past; nooit allemaal in één antwoord achter elkaar): ${cfg.ai.qualifyingQuestions.join(" · ")}
 Als de klant iets vraagt dat duidelijk bij een ander vak hoort dan deze rol: wees vriendelijk, geen valse expertise, kort doorverwijzen of algemene afspraak voor intake.
 
 BEDRIJFSKENNIS (enige bron voor feiten over jullie zaak in deze demo — gebruik dit volledig):
@@ -140,6 +140,11 @@ VERVOLG & BEVESTIGING (zeer belangrijk):
 - Herhaal je vorige antwoord nooit letterlijk of quasi-identiek. Als de klant een korte vervolgvraag stelt ("doen jullie dat?", "kan dat?", "maken jullie dat ook?"): antwoord eerst inhoudelijk ja/nee op basis van de dienstenlijst hierboven, in nieuwe zinnen — niet opnieuw dezelfde alinea met alle intake-vragen.
 - Vraagt de klant of jullie iets doen dat expliciet in de dienstenlijst staat (bijv. "Laadpaal"): zeg enthousiast dat jullie dat doen en koppel kort aan die dienst; daarna pas 1–2 relevante vervolgvragen (planning, week, situatie) — geen irrelevante vragen (bijv. geen vonken/stroomuitval tenzij de klant een storing meldt of het om een storing gaat).
 - De klant noemde al een onderwerp (bijv. laadpaal): sluit daar inhoudelijk op aan; stel niet opnieuw de volledige generieke intake als je dat net al deed.
+
+CONCRETE KLACHT / ONDERDEEL (zeer belangrijk — geldt altijd):
+- Noemt de klant iets specifieks (kapot achterlicht, lekke band, pijn, lekkage, enz.): begin met één korte empathische zin; bevestig dat jullie dit soort werk doen; stel daarna max. 1–2 gerichte vragen die daar logisch op volgen.
+- Verboden: een standaardzin als "We doen o.a. …" waarna je meteen de hele diensten-bullets plus alle intake-vragen achter elkaar plakt. Dat is brochuretaal en voelt niet als een echt gesprek.
+- Je schrijft als een echte medewerker aan de telefoon / WhatsApp — zoals ChatGPT natuurlijk zou antwoorden: warm, menselijk, geen marketingfloskulen.
 `;
     identityIntro = `Je bent de receptionist / planner van een ${cfg.label.toLowerCase()}.`;
   }
@@ -194,7 +199,17 @@ ${vehiclePromptBlock(vehicle)}
   }
   if (autoI && !plumbingI) {
     sectorLines.push(
-      "Automotive / garage: antwoord als receptie van een werkplaats. Herhaal de klacht kort, gebruik RDW als die er is, en werk naar inspectie of montage-afspraak. Kenteken vragen als RDW ontbreekt maar wel nodig is.",
+      "Automotive / garage: antwoord als receptie van een werkplaats. Eerst begrip bij schade; herhaal het onderdeel dat de klant noemt (bijv. rechts achterlicht). Gebruik RDW-context als die er is (merk/handelsbenaming), zonder te doen alsof je live op internet zocht. Zonder kenteken: vraag er één om het juiste onderdeel te koppelen; werk daarna naar inspectie of montage. Geen irrelevante diensten-opsomming (intake/planning tenzij de klant daarom vraagt).",
+    );
+  }
+  if (
+    landingDemo &&
+    demoNiche === "general_services" &&
+    autoI &&
+    !plumbingI
+  ) {
+    sectorLines.push(
+      "Let op: de demo-rol heet \"Dienstverlener\" met algemene planning-diensten in de kennis — maar de klant schrijft nu over een auto/reparatie. Behandel dit als garage/werkplaats. Noem die generieke planning-diensten niet als flap; dat past niet bij een kapot licht.",
     );
   }
   if (beautyI) {
@@ -248,7 +263,7 @@ Als de klant specifieker wordt of een bevestiging vraagt: reageer op dat nieuwe 
     ? demoNiche
       ? `
 Homepage-demo: natuurlijke zinnen in het Nederlands — kort bij een simpele intake, iets uitgebreider als de klant een inhoudelijke vraag stelt (prijs, diensten, werkwijze).
-Blijf in de gekozen demo-rol; antwoord alsof je daar werkt. Geen rollen door elkaar.
+Blijf in de gekozen demo-rol; antwoord alsof je daar werkt. Als sector-hint (bijv. automotive) duidelijk afwijkt van de niche-labeltekst, volg de sector-hint voor toon en inhoud — zonder hard te zeggen dat je van rol wisselt.
 Waarde: snelle duidelijkheid — concrete afspraak, tijdvak of duidelijke volgende stap; op informerende vragen gewoon inhoudelijk antwoord binnen de bedrijfskennis.
 ${antiRepeatBlock}${historyNote}
 ${rdwBlock}${sectorBlock}
@@ -281,8 +296,8 @@ Als geen sector-hint past: blijf een warme, efficiënte lokale dienstverlener; �
 
   const completion = await openai.chat.completions.create({
     model,
-    temperature: landingDemo && demoNiche ? 0.52 : 0.35,
-    max_tokens: landingDemo && demoNiche ? 520 : 380,
+    temperature: landingDemo && demoNiche ? 0.65 : 0.35,
+    max_tokens: landingDemo && demoNiche ? 560 : 380,
     response_format: { type: "json_object" },
     messages: [
       {

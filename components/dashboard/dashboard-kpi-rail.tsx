@@ -23,23 +23,35 @@ function KpiTile({
   return (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-2xl border border-border/50 bg-background/40 p-4 transition-colors",
-        "dark:border-white/[0.07] dark:bg-white/[0.03] dark:hover:bg-white/[0.05]",
+        "group relative overflow-hidden rounded-2xl border border-border/60 bg-gradient-to-br from-card via-card to-muted/30 p-4 shadow-[0_8px_30px_-18px_rgb(15_23_42/0.12)] transition-all duration-200",
+        "hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-[0_14px_40px_-20px_rgb(15_23_42/0.18)]",
+        "dark:border-white/[0.08] dark:from-card dark:via-card/90 dark:to-white/[0.02] dark:shadow-[0_12px_40px_-24px_rgb(0_0_0/0.45)] dark:hover:border-primary/30",
       )}
     >
-      <div className="flex items-start gap-3">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-primary/[0.08] text-primary dark:border-primary/25 dark:bg-primary/[0.12]">
-          <Icon className="size-[1.15rem]" aria-hidden />
+      <div
+        className="pointer-events-none absolute inset-0 opacity-40 dark:opacity-50"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 1px 1px, hsl(var(--primary) / 0.07) 1px, transparent 0)",
+          backgroundSize: "18px 18px",
+        }}
+        aria-hidden
+      />
+      <div className="relative flex items-start gap-3">
+        <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl border border-primary/25 bg-primary/[0.12] text-primary shadow-inner-soft dark:border-primary/30 dark:bg-primary/[0.15]">
+          <Icon className="size-[1.2rem]" aria-hidden />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+          <p className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-foreground/80 dark:text-foreground/85">
             {label}
           </p>
-          <p className="mt-1 text-2xl font-bold tabular-nums tracking-tight text-foreground">
+          <p className="mt-1.5 text-3xl font-bold tabular-nums tracking-tight text-foreground">
             {value}
           </p>
           {hint ? (
-            <p className="mt-0.5 text-2xs text-muted-foreground">{hint}</p>
+            <p className="mt-1 text-2xs leading-snug text-foreground/70 dark:text-foreground/75">
+              {hint}
+            </p>
           ) : null}
         </div>
       </div>
@@ -68,7 +80,7 @@ export function DashboardKpiRail({
         </Button>
       }
     >
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-3 sm:gap-3.5">
         <KpiTile icon={Users} label="Leads" value={totalLeads} />
         <KpiTile
           icon={Kanban}
@@ -94,9 +106,9 @@ export function DashboardKpiRail({
         </p>
         <div className="flex flex-col gap-1.5">
           {[
+            { href: "/dashboard/appointments", label: "Agenda openen" },
             { href: "/dashboard/inbox", label: "Inbox openen" },
             { href: "/dashboard/pipeline", label: "Pipeline bekijken" },
-            { href: "/dashboard/appointments", label: "Agenda" },
           ].map((l) => (
             <Link
               key={l.href}

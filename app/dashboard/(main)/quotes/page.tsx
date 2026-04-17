@@ -101,7 +101,7 @@ export default async function QuotesPage() {
           </div>
         </div>
       ) : (
-        <QuotesInteractiveTable rows={rows} />
+        <QuotesInteractiveTable rows={rows} demoMode={demo} />
       )}
     </PageFrame>
   );

@@ -140,7 +140,7 @@ function LeadCard({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "group relative overflow-hidden rounded-2xl border border-border/45 bg-card/95 p-0 shadow-[0_4px_24px_-14px_rgb(0_0_0/0.35)] transition-all duration-300 ease-out dark:border-white/[0.08] dark:bg-[hsl(228_22%_11%/0.92)] dark:shadow-[0_12px_40px_-22px_rgb(0_0_0/0.65)]",
+        "group relative w-full max-w-full min-w-0 overflow-hidden rounded-2xl border border-border/45 bg-card/95 p-0 shadow-[0_4px_24px_-14px_rgb(0_0_0/0.35)] transition-all duration-300 ease-out dark:border-white/[0.08] dark:bg-[hsl(228_22%_11%/0.92)] dark:shadow-[0_12px_40px_-22px_rgb(0_0_0/0.65)]",
         "before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/25 before:to-transparent dark:before:via-white/10",
         "hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-glow",
         isDragging &&
@@ -239,7 +239,7 @@ function ColumnDrop({
   const { setNodeRef, isOver } = useDroppable({ id: `col-${id}` });
   const theme = COLUMN_THEME[id];
   return (
-    <div className="flex min-h-[460px] w-[min(88vw,340px)] min-w-0 shrink-0 flex-col min-[1100px]:w-auto min-[1100px]:min-w-[260px] min-[1100px]:max-w-none min-[1100px]:flex-1">
+    <div className="flex min-h-[420px] w-[min(82vw,300px)] max-w-full shrink-0 snap-start flex-col sm:w-[min(78vw,280px)] lg:min-h-[460px] xl:w-auto xl:min-w-0 xl:max-w-none xl:flex-1">
       <div className="relative mb-3 overflow-hidden rounded-2xl border border-border/40 bg-card/40 px-3.5 py-3 shadow-sm backdrop-blur-md dark:border-white/[0.08] dark:bg-white/[0.03]">
         <div
           className={cn(
@@ -268,9 +268,9 @@ function ColumnDrop({
       <div
         ref={setNodeRef}
         className={cn(
-          "flex min-h-[min(52vh,520px)] flex-1 flex-col gap-3 overflow-y-auto overflow-x-hidden rounded-2xl border border-dashed p-3 shadow-inner transition-all duration-300 ease-out",
+          "flex min-h-[min(52vh,520px)] flex-1 flex-col gap-3 overflow-y-auto overflow-x-hidden rounded-2xl border border-dashed p-3 shadow-inner transition-all duration-300 ease-out [contain:layout]",
           theme.dropIdle,
-          isOver && cn("scale-[1.01] border-solid", theme.dropOver),
+          isOver && cn("border-solid ring-2 ring-primary/20", theme.dropOver),
         )}
       >
         {children}
@@ -428,7 +428,7 @@ export function PipelineBoard({
       onDragCancel={() => setActiveId(null)}
       onDragEnd={onDragEnd}
     >
-      <div className="-mx-2 flex gap-4 overflow-x-auto px-2 pb-6 pt-1 min-[1100px]:mx-0 min-[1100px]:grid min-[1100px]:w-full min-[1100px]:grid-cols-5 min-[1100px]:gap-6 min-[1100px]:overflow-visible min-[1100px]:px-0 min-[1100px]:pb-8">
+      <div className="-mx-1 flex snap-x snap-mandatory gap-4 overflow-x-auto overflow-y-visible px-1 pb-8 pt-1 [scrollbar-gutter:stable] [-webkit-overflow-scrolling:touch] min-[1200px]:mx-0 min-[1200px]:grid min-[1200px]:w-full min-[1200px]:snap-none min-[1200px]:grid-cols-5 min-[1200px]:gap-5 min-[1200px]:overflow-visible min-[1200px]:px-0 min-[1200px]:pb-10">
         {PIPELINE_COLUMNS.map((col) => {
           const list = byColumn.get(col.id) || [];
           return (

@@ -18,6 +18,8 @@ import {
 import { quoteStatusNl } from "@/lib/i18n/nl-labels";
 import { getDefaultZylmeroQuoteNoticeNl } from "@/lib/pdf/zylmero-quote-notice";
 import { Plus, Save, Trash2 } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
 
 const STATUS_OPTS: QuoteStatus[] = ["draft", "sent", "accepted", "declined"];
 
@@ -73,6 +75,8 @@ export function QuoteDetailClient({
   const [pending, start] = useTransition();
   const [draft, setDraft] = useState<DraftState>(() => buildDraft(quote));
   const [demoStatus, setDemoStatus] = useState<QuoteStatus>(() => quote.status);
+  /** Invoer per regel: exclusief of inclusief BTW (opslag blijft altijd exclusief). */
+  const [linePricesInclTax, setLinePricesInclTax] = useState(false);
 
   useEffect(() => {
     setDraft(buildDraft(quote));
@@ -125,6 +129,29 @@ export function QuoteDetailClient({
       ...d,
       lines: d.lines.filter((_, i) => i !== index),
     }));
+  };
+
+  const displayUnitForInput = (unitEx: number) => {
+    if (!linePricesInclTax) {
+      return unitEx === 0 ? "" : String(unitEx);
+    }
+    const incl = unitEx * (1 + draft.vat_rate);
+    return incl === 0 ? "" : String(Math.round(incl * 100) / 100);
+  };
+
+  const setUnitPriceFromInput = (index: number, raw: string) => {
+    const v = Number(String(raw).replace(",", "."));
+    if (!Number.isFinite(v)) {
+      updateLine(index, { unit_price: 0 });
+      return;
+    }
+    if (!linePricesInclTax) {
+      updateLine(index, { unit_price: v });
+      return;
+    }
+    const rate = 1 + draft.vat_rate;
+    const ex = rate > 0 ? v / rate : v;
+    updateLine(index, { unit_price: Math.round(ex * 10000) / 10000 });
   };
 
   const save = () => {
@@ -314,39 +341,70 @@ export function QuoteDetailClient({
       </Card>
 
       <Card className="rounded-2xl border-white/[0.06]">
-        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3 pb-2">
-          <CardTitle className="text-base">Regels (samenstellen)</CardTitle>
-          <div className="flex flex-wrap items-center gap-2">
-            <Label htmlFor="vat" className="text-2xs text-muted-foreground">
-              BTW
-            </Label>
-            <select
-              id="vat"
-              className="h-9 rounded-lg border border-white/[0.1] bg-background/60 px-2 text-sm"
-              value={String(snapVat(draft.vat_rate))}
-              onChange={(e) =>
-                setDraft((d) => ({
-                  ...d,
-                  vat_rate: Number(e.target.value),
-                }))
-              }
-            >
-              {VAT_OPTS.map((o) => (
-                <option key={o.value} value={String(o.value)}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-            <Button
-              type="button"
-              size="sm"
-              variant="secondary"
-              className="rounded-lg"
-              onClick={addLine}
-            >
-              <Plus className="mr-1 size-4" />
-              Regel
-            </Button>
+        <CardHeader className="space-y-4 pb-2">
+          <div className="flex flex-row flex-wrap items-center justify-between gap-3">
+            <CardTitle className="text-base">Regels (samenstellen)</CardTitle>
+            <div className="flex flex-wrap items-center gap-2">
+              <Label htmlFor="vat" className="text-2xs text-muted-foreground">
+                BTW
+              </Label>
+              <select
+                id="vat"
+                className="h-9 rounded-lg border border-border bg-background px-2 text-sm shadow-sm dark:border-white/[0.1] dark:bg-background/60"
+                value={String(snapVat(draft.vat_rate))}
+                onChange={(e) =>
+                  setDraft((d) => ({
+                    ...d,
+                    vat_rate: Number(e.target.value),
+                  }))
+                }
+              >
+                {VAT_OPTS.map((o) => (
+                  <option key={o.value} value={String(o.value)}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+              <Button
+                type="button"
+                size="sm"
+                variant="secondary"
+                className="rounded-lg"
+                onClick={addLine}
+              >
+                <Plus className="mr-1 size-4" />
+                Regel
+              </Button>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/60 bg-muted/25 px-4 py-3 dark:border-white/[0.08] dark:bg-white/[0.03]">
+            <p className="text-sm font-medium text-foreground">
+              Prijzen per regel
+            </p>
+            <div className="flex items-center gap-3">
+              <span
+                className={cn(
+                  "text-sm",
+                  !linePricesInclTax ? "font-semibold text-foreground" : "text-muted-foreground",
+                )}
+              >
+                Excl. BTW
+              </span>
+              <Switch
+                id="quote-line-price-mode"
+                checked={linePricesInclTax}
+                onCheckedChange={setLinePricesInclTax}
+                aria-label="Schakel tussen prijs excl. of incl. BTW"
+              />
+              <span
+                className={cn(
+                  "text-sm",
+                  linePricesInclTax ? "font-semibold text-foreground" : "text-muted-foreground",
+                )}
+              >
+                Incl. BTW
+              </span>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -356,7 +414,9 @@ export function QuoteDetailClient({
                 <tr className="border-b border-white/[0.06] text-left text-2xs uppercase tracking-wide text-muted-foreground">
                   <th className="px-3 py-2">Omschrijving</th>
                   <th className="w-24 px-3 py-2 text-right">Aantal</th>
-                  <th className="w-32 px-3 py-2 text-right">Prijs (ex.)</th>
+                  <th className="w-36 px-3 py-2 text-right">
+                    {linePricesInclTax ? "Prijs (incl.)" : "Prijs (ex.)"}
+                  </th>
                   <th className="w-32 px-3 py-2 text-right">Totaal</th>
                   <th className="w-12 px-1 py-2" />
                 </tr>
@@ -393,11 +453,9 @@ export function QuoteDetailClient({
                         type="number"
                         min={0}
                         step="0.01"
-                        value={li.unit_price || ""}
+                        value={displayUnitForInput(li.unit_price)}
                         onChange={(e) =>
-                          updateLine(i, {
-                            unit_price: Number(e.target.value),
-                          })
+                          setUnitPriceFromInput(i, e.target.value)
                         }
                         className="rounded-lg text-right tabular-nums"
                       />

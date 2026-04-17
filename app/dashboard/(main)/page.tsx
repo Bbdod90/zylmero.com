@@ -127,20 +127,20 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* Top leads + inbox */}
+        {/* Top leads + planning (agenda eerst in de rij) */}
         <div className="grid gap-6 lg:grid-cols-12 lg:gap-8">
           <div className="min-w-0 lg:col-span-7">
             <DashboardTopLeadsTable leads={topThree} demoMode={demo} />
           </div>
           <div className="min-w-0 lg:col-span-5">
-            <DashboardInboxPanel messages={inboxMessages} />
+            <DashboardAgendaPeek items={agendaPeek} />
           </div>
         </div>
 
-        {/* Agenda + offertes */}
+        {/* Inbox + offertes */}
         <div className="grid gap-6 lg:grid-cols-12 lg:gap-8">
           <div className="min-w-0 lg:col-span-6">
-            <DashboardAgendaPeek items={agendaPeek} />
+            <DashboardInboxPanel messages={inboxMessages} />
           </div>
           <div className="min-w-0 lg:col-span-6">
             <DashboardQuotesPeek quotes={recentQuotes} />

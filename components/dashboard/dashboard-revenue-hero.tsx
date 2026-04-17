@@ -97,10 +97,18 @@ export function DashboardRevenueHero({
             className="h-11 rounded-full px-6 text-sm font-semibold shadow-lg shadow-primary/25"
             asChild
           >
-            <Link href="/dashboard/inbox">
-              Inbox
+            <Link href="/dashboard/appointments">
+              Planning
               <ArrowRight className="ml-1.5 size-4" aria-hidden />
             </Link>
+          </Button>
+          <Button
+            variant="outline"
+            size="default"
+            className="h-11 rounded-full border-border/80 bg-background/50 px-6 text-sm font-semibold backdrop-blur-md dark:border-white/[0.12] dark:bg-white/[0.04]"
+            asChild
+          >
+            <Link href="/dashboard/inbox">Inbox</Link>
           </Button>
           <Button
             variant="outline"

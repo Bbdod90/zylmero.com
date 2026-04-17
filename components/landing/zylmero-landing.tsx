@@ -310,17 +310,20 @@ export function ZylmeroLanding() {
               {
                 name: "Marco van den Berg",
                 role: "Autoservice, Rotterdam",
-                quote: "Minder gemiste aanvragen — de afspraak staat er vaak al voordat ik ’s avonds inhaal.",
+                quote:
+                  "Minder gemiste aanvragen — vaak staat de afspraak al ingepland voordat ik ernaar kijk.",
               },
               {
                 name: "Linda Visser",
                 role: "Salon, Utrecht",
-                quote: "Klanten krijgen meteen antwoord. Minder stress over ‘te laat’.",
+                quote:
+                  "Mensen krijgen dezelfde dag nog antwoord. Ik hoef niet bang te zijn dat ze intussen elders bellen.",
               },
               {
                 name: "Tom Jansen",
                 role: "Installatie, Eindhoven",
-                quote: "In één oogopslag zie ik welke leads ertoe doen. Scheelt zoekwerk.",
+                quote:
+                  "Spoed hang ik meteen aan de juiste monteur. Geen half uur meer zoeken in losse appjes.",
               },
             ].map((t) => (
               <blockquote
@@ -413,20 +416,20 @@ export function ZylmeroLanding() {
           <div className="mt-8 space-y-2">
             {[
               {
-                q: "Hoe snel start ik?",
-                a: "Vaak binnen minuten. Geen creditcard nodig om te proberen.",
+                q: "Hoe snel kan ik starten?",
+                a: "Vandaag nog: account openen, je kanalen koppelen en je eerste antwoord versturen. Geen creditcard nodig om te proberen.",
               },
               {
-                q: "Wat merk ik?",
-                a: "Minder blijven-liggen, meer geboekte afspraken.",
+                q: "Wat levert het mij concreet op?",
+                a: "Minder aanvragen die stilvallen omdat je te laat reageert—en daardoor meer kans dat iemand bij jou boekt. Alles wat nog opvolging nodig heeft, staat overzichtelijk op één plek.",
               },
               {
-                q: "Past dit bij mij?",
-                a: "Heb je aanvragen en niet altijd tijd om direct te antwoorden? Dan meestal wel.",
+                q: "Werkt dit voor mijn bedrijf?",
+                a: "Zinvol als je aanvragen via mail, WhatsApp, social of je site binnenkrijgt en niet altijd binnen minuten kunt antwoorden. Voor zzp’ers en kleine teams die het samen willen bijhouden, niet voor grote callcenters.",
               },
               {
-                q: "Kan ik stoppen?",
-                a: "Ja — nergens aan vast.",
+                q: "Zit ik ergens aan vast?",
+                a: "Nee. Gratis uitproberen zonder creditcard, en een betaald abonnement zet je per maand stop—geen jaarcontract of kleine lettertjes over een minimale looptijd.",
               },
             ].map((item) => (
               <details
