@@ -99,7 +99,7 @@ function EditableMetricChip({
     if (digits === "") {
       onCommit(value);
       } else {
-        let n = parseInt(digits, 10);
+        const n = parseInt(digits, 10);
         if (Number.isNaN(n)) {
           onCommit(value);
         } else {
