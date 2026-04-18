@@ -144,7 +144,11 @@ VERVOLG & BEVESTIGING (zeer belangrijk):
 CONCRETE KLACHT / ONDERDEEL (zeer belangrijk — geldt altijd):
 - Noemt de klant iets specifieks (kapot achterlicht, lekke band, pijn, lekkage, enz.): begin met één korte empathische zin; bevestig dat jullie dit soort werk doen; stel daarna max. 1–2 gerichte vragen die daar logisch op volgen.
 - Verboden: een standaardzin als "We doen o.a. …" waarna je meteen de hele diensten-bullets plus alle intake-vragen achter elkaar plakt. Dat is brochuretaal en voelt niet als een echt gesprek.
-- Je schrijft als een echte medewerker aan de telefoon / WhatsApp — zoals ChatGPT natuurlijk zou antwoorden: warm, menselijk, geen marketingfloskulen.
+- Je schrijft als een echte medewerker aan de telefoon / WhatsApp — inhoudelijk zoals ChatGPT: bij een inhoudelijke vraag nuttig uitleggen uit VAKKENNIS en context; bij een korte vraag niet opblazen.
+
+VARIATIE (zeer belangrijk):
+- Herhaal nooit dezelfde openingszin of dezelfde paragraafstructuur als in je vorige bericht — andere woorden, andere invalshoek.
+- Twee klanten met vergelijkbare vragen krijgen niet hetzelfde bloktekst; pas voorbeelden en volgorde aan.
 `;
     identityIntro = `Je bent de receptionist / planner van een ${cfg.label.toLowerCase()}.`;
   }
@@ -171,7 +175,13 @@ CONCRETE KLACHT / ONDERDEEL (zeer belangrijk — geldt altijd):
 
   if (!openai) {
     return NextResponse.json(
-      { reply: "", resultTitle: "", valueLine: "", error: "Geen AI" },
+      {
+        reply: "",
+        resultTitle: "",
+        valueLine: "",
+        error: "Geen AI",
+        hint: "Zet OPENAI_API_KEY in .env.local (zie .env.example) en herstart de server.",
+      },
       { status: 503 },
     );
   }
@@ -296,13 +306,17 @@ Als geen sector-hint past: blijf een warme, efficiënte lokale dienstverlener; �
 
   const completion = await openai.chat.completions.create({
     model,
-    temperature: landingDemo && demoNiche ? 0.65 : 0.35,
-    max_tokens: landingDemo && demoNiche ? 560 : 380,
+    temperature: landingDemo && demoNiche ? 0.72 : 0.35,
+    max_tokens: landingDemo && demoNiche ? 900 : 380,
     response_format: { type: "json_object" },
     messages: [
       {
         role: "system",
-        content: `${identityIntro} Schrijf zoals een ondernemer: kort, duidelijk, geen moeilijke woorden, geen marketingtaal.${personaBlock}${landingRules}
+        content: `${
+          landingDemo && demoNiche
+            ? `${identityIntro} Antwoord natuurlijk en inhoudelijk sterk in het Nederlands — vergelijkbaar met ChatGPT in dit vak: bij een inhoudelijke vraag mag je gerust meerdere zinnen en nuttige nuance gebruiken (opties, veiligheid, planning); bij alleen "hoi" of een minimale begroeting blijf je kort. Geen marketingtaal. Varieer telkens formulering en structuur — geen vast sjabloon per bericht.`
+            : `${identityIntro} Schrijf zoals een ondernemer: kort, duidelijk, geen moeilijke woorden, geen marketingtaal.`
+        }${personaBlock}${landingRules}
 Als het laatste bericht alleen een begroeting is (bijv. "hoi", "hallo", "hey") zonder concrete vraag én er is geen eerdere context: groet vriendelijk en vraag één zin wat ze nodig hebben. Geen afspraaktijden, geen "morgen om …", geen prijs in reply. Zet resultTitle op "Intake" en valueLine op "—".
 Als wél een concrete vraag of klacht genoemd wordt: bij een inhoudelijke vervolgvraag eerst antwoord geven (ja/nee/uitleg), niet opnieuw hetzelfde intake-blok. Anders: hooguit één gerichte vervolgvraag als iets echt ontbreekt; zo niet, werk naar afspraak of tijdvoorstel. Herhaal nooit je vorige antwoord letterlijk.
 ${extraServicesRule}

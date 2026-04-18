@@ -73,6 +73,33 @@ function hasServiceKeyword(full: string, service: string): boolean {
   return full.toLowerCase().includes(s);
 }
 
+/** Volledige thread (user + assistant) — nodig om vervolg op eerdere bot-vraag te herkennen in offline-fallback. */
+function buildTranscriptForSimulation(
+  prior: ChatMsg[],
+  latestUserText: string,
+): string {
+  return [...prior.map((m) => m.text), latestUserText].join("\n");
+}
+
+/**
+ * Salon/kapper: tweede bericht met bijv. alleen knippen + tijd — niet opnieuw dezelfde intake-vraag.
+ * Vereist dat `full` ook assistent-tekst bevat (transcript, niet alleen user-berichten).
+ */
+function beautySalonRefinement(full: string, last: string): boolean {
+  const l = last.toLowerCase();
+  const f = full.toLowerCase();
+  if (!/\b(knip|knippen|kleur|baard|highlights|balayage|kapper|salon)\b/i.test(l)) return false;
+  const assistantAlreadyAsked =
+    /welke behandeling|welke dag of tijdstip|passend slot|zoek ik een passend/i.test(f);
+  const hasPreference =
+    /\b\d{1,2}\s*[:.h]\s*\d{2}\b/.test(l) ||
+    /\b\d{4}\b/.test(l) ||
+    /\b(rond|ongeveer|liever|als dat kan|uur|u\.)\b/i.test(l) ||
+    /\b(morgen|vandaag|middag|ochtend|avond|maandag|dinsdag|woensdag|donderdag|vrijdag|zaterdag|zondag)\b/i.test(l) ||
+    /\balleen\s+(knippen|knip)\b/i.test(l);
+  return assistantAlreadyAsked && hasPreference;
+}
+
 function simulateResponse(
   fullConversationText: string,
   nicheId: NicheId,
@@ -138,6 +165,14 @@ function simulateResponse(
         "Dat kan ik je helpen plannen. Is het spoed (pijn) of een reguliere controle? Welke dag of week komt het beste uit?",
       resultTitle: "Praktijk",
       valueLine: "€85 – €220",
+    };
+  }
+  if (beautySalonRefinement(full, last)) {
+    return {
+      reply:
+        "Helder — ik noteer dit zo en zoek een passend slot in de agenda. Ik bevestig het zo bij je; mag ik nog je voor- en achternaam voor de afspraak?",
+      resultTitle: "Salon",
+      valueLine: "€35 – €195",
     };
   }
   if (/\b(knip|knippen|kapper|salon|kleur|balayage|baard|highlights)\b/i.test(t)) {
@@ -259,6 +294,8 @@ export function LandingInteractiveChat() {
     const text = input.trim();
     if (!text || busy) return;
 
+    const transcriptForSimulation = buildTranscriptForSimulation(messages, text);
+
     const userMsg: ChatMsg = { id: nid(), role: "user", text };
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
@@ -353,24 +390,32 @@ export function LandingInteractiveChat() {
           reply?: string;
           resultTitle?: string;
           valueLine?: string;
+          error?: string;
+          hint?: string;
         };
-        const combinedForFallback = allUserText;
+        const openAiMissing = res.status === 503 || data.error === "Geen AI";
+
         if (res.ok && data.reply && String(data.reply).trim()) {
           reply = data.reply;
           resultTitle = data.resultTitle || "Afspraak";
           valueLine = data.valueLine || "€120 – €600";
+        } else if (openAiMissing) {
+          reply = [
+            "Op deze omgeving is nog geen OpenAI-koppeling actief, daarom kan de slimme demo niet op het model draaien.",
+            data.hint ||
+              "Voeg OPENAI_API_KEY toe aan je .env.local (zie .env.example), zet eventueel OPENAI_MODEL (bijv. gpt-4o-mini) en herstart de dev-server.",
+            "Daarna reageert deze chat per gekozen branche — elektricien, tandarts, garage enz. — met echte vakcontext in plaats van vaste voorbeeldzinnen.",
+          ].join(" ");
+          resultTitle = "OpenAI vereist";
+          valueLine = "—";
         } else {
-          const s = simulateResponse(combinedForFallback, demoRole, { lastUserMessage: text });
+          const s = simulateResponse(transcriptForSimulation, demoRole, { lastUserMessage: text });
           reply = s.reply;
           resultTitle = s.resultTitle;
           valueLine = s.valueLine;
         }
     } catch {
-      const combinedForFallback = [
-        ...messages.filter((m) => m.role === "user").map((m) => m.text),
-        text,
-      ].join(" ");
-      const s = simulateResponse(combinedForFallback, demoRole, { lastUserMessage: text });
+      const s = simulateResponse(transcriptForSimulation, demoRole, { lastUserMessage: text });
       reply = s.reply;
       resultTitle = s.resultTitle;
       valueLine = s.valueLine;

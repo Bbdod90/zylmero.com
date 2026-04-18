@@ -60,6 +60,11 @@ export interface NicheDefinition {
     quoteInstructions: string;
     /** System voor slimme opvolging */
     followUpSystemPersona: string;
+    /**
+     * Alleen homepage-demo-chat: feitelijke vakcontext (NL) zodat OpenAI inhoudelijk kan antwoorden
+     * per branche — geen medische/autotechnische diagnose; wel uitleg en planning zoals een receptionist.
+     */
+    landingVakKennis?: string;
   };
   quote: {
     /** Hoe regels te structureren */
@@ -170,6 +175,13 @@ export const NICHE_CATALOG: Record<NicheId, NicheDefinition> = {
         "Structureer als automotive: arbeid (uren), onderdelen, kleine materialen, eventueel APK apart. BTW 21%.",
       followUpSystemPersona:
         "Je schrijft follow-ups voor een garage: richting inspectie, offerte of geboekt moment.",
+      landingVakKennis: [
+        "APK: periodieke keuring volgens schema; bij afkeur herkeuring / herstel afhankelijk van bevindingen.",
+        "Banden: seizoenwissel, profiel/diepte, uitlijning bij trekken stuur of oneven slijtage.",
+        "Remmen: geluiden (piepen/tikken), voelbare trilling — inspectie remblokken/schijven op de brug.",
+        "Motor/diagnose: storingscodes uitlezen op werkplaats; klant kan symptomen beschrijven (rook, lampjes, trekkracht).",
+        "Elektronica verlichting: lampjes defect vaak combinatie lamp/houder/moduul — exact onderdeel na identificatie voertuig.",
+      ].join("\n"),
     },
     quote: {
       lineItemGuidance:
@@ -210,6 +222,12 @@ export const NICHE_CATALOG: Record<NicheId, NicheDefinition> = {
           "Je bent een salon-professional in tekst: vriendelijk, stijlvol, kort. Geen medische claims.",
         quoteInstructions:
           "Regels per behandeling (knippen, verven, producten). Gebruik duidelijke salon-termen.",
+        landingVakKennis: [
+          "Knippen vs kleur: kleurbehandeling vraagt vaak langere tijd slot + patch-test bij gevoelige hoofdhuid kan horen bij sommige salons.",
+          "Balayage / highlights: meerdere technieken; duur en onderhoud verschillen — globaal uitleggen, exact op afspraak.",
+          "Baard / fade: contour en frequentie onderhoud; skin fade vraagt korter interval.",
+          "Extensions / permanent: altijd intake over haarkwaliteit en verwachting.",
+        ].join("\n"),
       },
       quote: {
         lineItemGuidance: "Per behandeling een regel; producten apart vermelden indien nodig.",
@@ -240,6 +258,16 @@ export const NICHE_CATALOG: Record<NicheId, NicheDefinition> = {
         "Je bent een praktijkassistent in woord: empathisch, professioneel, voorzichtig met medische details.",
       quoteInstructions:
         "Conceptofferte: beschrijf onderzoek/consult en eventuele globale richting — geen medische garanties.",
+      landingVakKennis: [
+        "Mondgezondheid algemeen: dagelijks poetsen, interdentale reiniging, periodieke controle om problemen vroeg te zien.",
+        "Controle / recall: vaak halfjaarlijks (kan per praktijk verschillen); bij klacht eerder langskomen.",
+        "Hygiënist / mondhygiëne: tandsteen, gingivitispreventie; los van de periodieke controle bij de tandarts.",
+        "Vullingen / restauratief: materiaal en globale aanpak worden na onderzoek besproken — geen detailadvies via chat.",
+        "Spoed bij acute pijn, zwelling of trauma: eerst intake/spoedslot; geen diagnose of medicatie-advies via bericht.",
+        "Cosmetisch (bleken): geschiktheid afhankelijk van gebit/vullingen; eerst onderzoek en verwachtingen bespreken.",
+        "Orthodontie / implantologie: alleen algemene uitleg dat dit trajecten zijn met planning en nazorg — geen medische beloftes.",
+        "Kindertandheelkundige zorg: meldingsplicht bij val op gebit; kalmerende toon bij angst.",
+      ].join("\n"),
     },
     quote: {
       lineItemGuidance: "Consult/onderzoek, hygiëne, eventueel vervolg als indicatie — geen medische claims.",
@@ -279,6 +307,12 @@ export const NICHE_CATALOG: Record<NicheId, NicheDefinition> = {
           "Je bent een ervaren monteur in communicatie: helder, rustig, planmatig. Veiligheid eerst.",
         quoteInstructions:
           "Arbeid (uren), voorrijden, materiaal, eventuele onderdelen. Vermeld indicatief vs definitief na inspectie.",
+        landingVakKennis: [
+          "Lekkage / CV / sanitair: eerst bron en urgentie (actief lekwater vs druppel); hoofdkraan dicht bij acute lekkage.",
+          "Verstopping: mechanisch vs chemisch — vaak inspectie camera/hogedruk op locatie.",
+          "CV-ketel: storingscodes fabrikant-specifiek; onderhoud volgens voorschriften.",
+          "Sanitair vervangen: maatwerk en afvoerhoogte — offerte na opname.",
+        ].join("\n"),
       },
       quote: {
         lineItemGuidance: "Uurloon + voorrijden + materiaal als aparte regels.",
@@ -306,6 +340,15 @@ export const NICHE_CATALOG: Record<NicheId, NicheDefinition> = {
         "Is er sprake van vonken of stroomuitval? (alleen als de klant een storing meldt)",
       ],
       quoteInstructions: "Arbeid, materialen (kabels, componenten), keuring indien relevant.",
+      landingVakKennis: [
+        "Meterkast / groepenkast: hoofdschakelaar, groepen per circuit, aardlekautomaten (bv. 30 mA), aparte krachtgroep voor fornuis/oven/inductie waar nodig.",
+        "Renovatie vs nieuwbouw: bij uitbreiden oude bak eerst inspectie — verdeelpunten, belasting net, fase-aansluiting (1-fase vs 3-fase).",
+        "Laadpaal / wallbox thuis: vaak eigen groep; vermogen afhankelijk van aansluiting en netcontract — typisch 3,7 kW (1-fase 16A), 11 kW of 22 kW (3-fase); fabrikant-app voor laden/sessies.",
+        "EV / laadinfrastructuur: geen stap-voor-stap montage voor leken; wel uitleg dat installatie door erkende installateur en evt. melding netbeheerder hoort waar van toepassing.",
+        "Storingen: groep die eruit slaat → last beperken (apparaten los), daarna inspectie; vonken/geur/rook → niet zelf sleutelen, ruimte verlaten indien nodig, direct hulp inschakelen.",
+        "Verlichting dimmen LED: compatibiliteit trafo/dimmer; knipperen kan dimmer of driver zijn — diagnose op locatie.",
+        "NEN 1010 / arbeid veiligheid: verwijs bij ingrijpende klussen altijd naar inspectie en offerte — geen klus-instructies voor onervaren gebruikers.",
+      ].join("\n"),
     },
     quote: {
       lineItemGuidance: "Arbeid + materiaal + eventuele voorrij/inspectie.",

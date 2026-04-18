@@ -42,7 +42,7 @@ Vink af wat klaar is. Doel: live gaan zonder verrassingen bij gebruikers, betali
 
 ## 5. Omgeving & secrets
 
-- [ ] Alle **Railway / hosting** env vars gevuld (`OPENAI_*`, Supabase, Stripe, cron secrets, …).
+- [ ] Alle **Railway / hosting** env vars gevuld — minimaal dezelfde namen als `.env.example` (o.a. Supabase, **`OPENAI_API_KEY`** + optioneel **`OPENAI_MODEL`**, Stripe, cron secrets, …). Zie `docs/OPENAI-DEPLOY.md` als de live demo-chat geen AI gebruikt.
 - [ ] Geen secrets in Git; `.env.example` bijgewerkt waar dat helpt teammates.
 - [ ] `npm run build` slaagt op CI of lokaal vóór elke deploy.
 

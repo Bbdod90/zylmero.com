@@ -10,8 +10,7 @@ export function formatLandingDemoKnowledgeBlock(cfg: NicheDefinition): string {
       ? cfg.defaultServices.map((s) => `• ${s}`).join("\n")
       : "• Vraag gerust wat we voor je kunnen doen — we kwalificeren kort je aanvraag.";
   const faq = cfg.defaultFaqTemplate.trim() || "(Geen apart FAQ-blok in config — gebruik algemene intake.)";
-
-  return [
+  const chunks: string[] = [
     `Zaaktype: ${cfg.label}`,
     `Omschrijving: ${cfg.description}`,
     `Diensten / werkzaamheden (dit bied je aan):\n${services}`,
@@ -22,5 +21,11 @@ export function formatLandingDemoKnowledgeBlock(cfg: NicheDefinition): string {
     `Voorbeeld intake-vragen: ${cfg.ai.qualifyingQuestions.join(" · ")}`,
     `Toon: ${cfg.defaultTone}`,
     `Stijl: ${cfg.defaultReplyStyle}`,
-  ].join("\n\n");
+  ];
+  if (cfg.ai.landingVakKennis?.trim()) {
+    chunks.push(
+      `VAKKENNIS (gebruik dit voor inhoudelijke antwoorden — zoals ChatGPT dat zou doen binnen dit vak; varieer formulering, geen vaste standaardparagraph):\n${cfg.ai.landingVakKennis.trim()}`,
+    );
+  }
+  return chunks.join("\n\n");
 }
