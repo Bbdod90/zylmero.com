@@ -25,7 +25,7 @@ import { LandingNav } from "@/components/landing/landing-nav";
 import { LandingMissedRevenueEstimator } from "@/components/landing/landing-missed-revenue-estimator";
 import { LandingPainCostSection } from "@/components/landing/landing-pain-cost-section";
 import { LandingDashboardPeek } from "@/components/landing/landing-dashboard-peek";
-import { LandingModulesTeaser } from "@/components/landing/landing-modules-teaser";
+import { LandingWebsiteServices } from "@/components/landing/landing-website-services";
 import { LandingWithoutWithSection } from "@/components/landing/landing-without-with-section";
 import { StickyConversionBar } from "@/components/landing/sticky-conversion-bar";
 import { Button } from "@/components/ui/button";
@@ -36,13 +36,13 @@ import { cn } from "@/lib/utils";
 const HERO_H1 = "Jouw website naar een niveau hoger tillen?";
 
 const HERO_SUB =
-  "Klanten wachten niet tot vanavond. Mail, WhatsApp of formulier: wie eerst een helder antwoord geeft, boekt de afspraak. Zylmero geeft zzp’ers en kleine teams overzicht en snellere opvolging — zonder de hele dag aan je telefoon vast te zitten.";
+  "Een chatbot op je site die meteen antwoord geeft — plus overzicht wanneer het via mail of WhatsApp binnenkomt. Zylmero helpt zzp’ers en kleine teams om sneller te reageren en minder aanvragen te missen, zonder de hele dag online te hoeven zijn.";
 
 const HERO_TRUST = "Voor garages, salons, monteurs, praktijken — iedereen die klanten via meerdere kanalen binnen krijgt";
 
 const HERO_PILLS = [
+  "Website-chatbot · eerste antwoord direct",
   "Mail · WhatsApp · site → één overzicht",
-  "Sneller eerste antwoord",
   "Minder zoeken, meer geboekt",
 ] as const;
 
@@ -196,7 +196,7 @@ export function ZylmeroLanding() {
                 {
                   step: "2",
                   title: `${BRAND_NAME} helpt je antwoorden`,
-                  body: "Snel een eerste reactie die past bij jouw zaak — geen uren stilte voor de klant.",
+                  body: "Via je site-chat en je kanalen: een eerste reactie in jouw branchetaal — geen uren stilte voor de klant.",
                   Icon: MessageCircle,
                 },
                 {
@@ -310,6 +310,8 @@ export function ZylmeroLanding() {
           </ul>
         </div>
       </motion.section>
+
+      <LandingWebsiteServices />
 
       <div id="demo">
         <LandingInteractiveChat />
@@ -436,7 +438,13 @@ export function ZylmeroLanding() {
             ))}
           </div>
 
-          <LandingModulesTeaser className="mt-16" />
+          <p className="mx-auto mt-14 max-w-xl text-center text-xs leading-relaxed text-muted-foreground md:text-sm">
+            Chatbot, inbox en extra modules kun je gefaseerd inzetten — zie{" "}
+            <a href="#diensten-website" className="font-medium text-foreground underline decoration-primary/50 underline-offset-4 hover:decoration-primary">
+              diensten voor websites
+            </a>{" "}
+            hierboven.
+          </p>
         </div>
       </motion.section>
 
