@@ -153,6 +153,7 @@ export function getLandingChatHints(role: NicheId): {
   sectionSub: string;
   emptyExamples: string;
   inputPlaceholder: string;
+  quickPrompts: string[];
 } {
   const cfg = getNicheConfig(role);
   const short =
@@ -176,6 +177,14 @@ export function getLandingChatHints(role: NicheId): {
       "Schrijf wat er uitvalt of wat je wilt laten doen — groepenkast, laadpaal, of iets dat niet veilig voelt.",
     coach:
       "Noem je doel in één zin en of je een kennismaking zoekt — traject, losse sessies, of alleen even sparren.",
+    consultancy:
+      "Schrijf wat je wilt bespreken — traject, second opinion, of een korte sparring — en welke termijn je voor ogen hebt.",
+    trade_contractor:
+      "Noem je klus, locatie en of je spoed of alleen een offerte wilt — hoe concreter, hoe beter de planning.",
+    realtor:
+      "Noem wat je zoekt — bezichtiging, waardebepaling, verkoop — en je voorkeur voor moment of wijk.",
+    other:
+      "Typ wat een klant zou typen: afspraak, prijs, spoed, of een korte vraag over beschikbaarheid.",
   };
 
   const PLACEHOLDERS: Partial<Record<NicheId, string>> = {
@@ -187,13 +196,87 @@ export function getLandingChatHints(role: NicheId): {
     cleaning: "Bijv. kantoor, eenmalig, frequentie…",
     electrician: "Bijv. storing, laadpaal, groepenkast…",
     coach: "Bijv. intake, doel, beschikbaarheid…",
+    consultancy: "Bijv. traject, second opinion, termijn…",
+    trade_contractor: "Bijv. offerte, startdatum, spoed…",
+    realtor: "Bijv. bezichtiging, waardebepaling, verkoop…",
+    other: "Bijv. afspraak, prijs, beschikbaarheid…",
   };
 
+  const QUICK_PROMPTS: Partial<Record<NicheId, readonly string[]>> = {
+    general_services: [
+      "Ik wil volgende week een afspraak — wat past?",
+      "Wat kost een kleine klus ongeveer?",
+      "Kan iemand vandaag nog langskomen?",
+    ],
+    garage: [
+      "APK volgende week — is er leenvervoer?",
+      "Ik hoor tikken bij het remmen — inspectie graag.",
+      "Winterbanden monteren — kenteken staat klaar.",
+    ],
+    hair_salon: [
+      "Knippen + kleur donderdag rond 16:00 — lukt dat?",
+      "Fade en baard vrijdagmiddag nog een plekje?",
+      "Highlights — hoe lang moet ik rekenen?",
+    ],
+    dentist: [
+      "Pijn linksonder — kan het vandaag nog?",
+      "Half jaarlijkse controle — liever dinsdagochtend.",
+      "Bleken — eerst intake of kan het direct?",
+    ],
+    plumber: [
+      "Lekkage onder de douche — vandaag nog monteur?",
+      "CV geeft een storingscode — spoed?",
+      "Nieuwe kraan in de keuken — offerte graag.",
+    ],
+    electrician: [
+      "Groep valt uit als oven + kookplaat aan staan.",
+      "Laadpaal 11 kW thuis — inspectie meterkast nodig?",
+      "Meterkast uitbreiden bij keukenrenovatie.",
+    ],
+    cleaning: [
+      "Wekelijks kantoor ca. 120 m² — start volgende week?",
+      "Eenmalige dieptereiniging zaterdag — lukt dat?",
+      "Offerte ramen + vloer op m² graag.",
+    ],
+    coach: [
+      "Kennismaking rond stress op werk — wanneer ruimte?",
+      "Workshop leiderschap voor een klein team — indicatie?",
+      "6 sessies vitaliteit — hoe ziet zo’n traject eruit?",
+    ],
+    consultancy: [
+      "Kort adviesgesprek deze maand — wat kost dat?",
+      "Second opinion op ons IT-plan — kunnen jullie dat?",
+      "Offerte voor een traject van 8 weken.",
+    ],
+    trade_contractor: [
+      "Offerte badkamer compleet renoveren — wanneer start?",
+      "Lekkage plat dak — spoedinspectie deze week?",
+      "Kunnen jullie montage volgende maand inplannen?",
+    ],
+    realtor: [
+      "Bezichtiging dit weekend — nog een slot vrij?",
+      "Waardebepaling voor verkoop — hoe werkt dat?",
+      "Wat vragen jullie aan courtage bij verkoop?",
+    ],
+    other: [
+      "Ik wil een afspraak — wat hebben jullie vrij?",
+      "Wat zijn jullie tarieven voor een standaardklus?",
+      "Ik heb spoed — kan ik vandaag nog terecht?",
+    ],
+  };
+
+  const quickFallback = [
+    "Ik wil een afspraak — wat past deze week?",
+    "Korte vraag over prijs en beschikbaarheid.",
+    "Hoe snel kan iemand reageren?",
+  ] as const;
+
   return {
-    sectionTitle: "Van bericht naar afspraak",
-    sectionSub: `${short}: kies branche, typ een bericht zoals je klant zou doen.`,
+    sectionTitle: "Proef het zelf: zo voelt snelle opvolging",
+    sectionSub: `Kies je branche (${short}), tik een voorbeeld aan of typ zelf — je ziet meteen een eerste antwoord en wat de aanvraag ongeveer waard kan zijn.`,
     emptyExamples: EXAMPLES[role] ?? EXAMPLES_FALLBACK,
     inputPlaceholder: PLACEHOLDERS[role] ?? "Typ je vraag of afspraak…",
+    quickPrompts: [...(QUICK_PROMPTS[role] ?? quickFallback)],
   };
 }
 

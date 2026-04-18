@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 
 /** Korte labels — minder woorden in de balk; FAQ via footer. */
 const LINKS = [
-  { href: "#probleem", label: "Waarom" },
+  { href: "#wat-het-kost", label: "Waarom" },
   { href: "#hoe-het-werkt", label: "Hoe" },
   { href: "#demo", label: "Demo" },
   { href: "#prijzen", label: "Prijzen" },

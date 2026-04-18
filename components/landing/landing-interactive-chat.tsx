@@ -392,34 +392,48 @@ export function LandingInteractiveChat() {
   return (
     <section
       className={cn(
-        "border-b border-border/40 py-16 md:py-24 dark:border-white/[0.06]",
-        "bg-gradient-to-b from-primary/[0.04] via-muted/30 to-background dark:from-transparent dark:via-transparent dark:to-transparent",
+        "relative overflow-hidden border-b border-border/40 py-16 md:py-24 dark:border-white/[0.06]",
+        "bg-gradient-to-b from-primary/[0.06] via-muted/25 to-background",
+        "dark:from-primary/[0.07] dark:via-[hsl(228_28%_6%/0.9)] dark:to-background",
       )}
     >
-      <div className="mx-auto max-w-[1200px] px-4 md:px-8">
-        <div className="mx-auto max-w-xl text-center">
-          <p className="text-xs font-medium uppercase tracking-widest text-foreground">Live demo</p>
-          <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_-10%,hsl(var(--primary)/0.14),transparent_58%)]"
+        aria-hidden
+      />
+      <div className="relative mx-auto max-w-[1200px] px-4 md:px-8">
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="inline-flex items-center gap-2 rounded-full border border-border/50 bg-muted/40 px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground backdrop-blur-sm dark:border-white/[0.08] dark:bg-white/[0.04]">
+            Live demo · geen account nodig
+          </p>
+          <h2 className="mt-5 text-balance text-3xl font-bold tracking-tight text-foreground md:text-4xl">
             {chatHints.sectionTitle}
           </h2>
-          <p className="mt-4 text-base text-foreground">{chatHints.sectionSub}</p>
+          <p className="mt-4 text-base leading-relaxed text-muted-foreground md:text-[1.0625rem]">
+            {chatHints.sectionSub}
+          </p>
         </div>
 
         <div className="mx-auto mt-12 max-w-lg scroll-mt-24">
           <div
             className={cn(
               "overflow-hidden rounded-[1.35rem] shadow-xl",
-              "border border-border/70 bg-card text-foreground shadow-[0_24px_52px_-28px_hsl(222_48%_32%/0.14),0_0_0_1px_hsl(var(--border)/0.35)]",
-              "dark:border-white/[0.08] dark:bg-[#080a0d] dark:text-white dark:shadow-[0_24px_56px_-28px_rgba(0,0,0,0.55)] dark:ring-1 dark:ring-white/[0.06]",
+              "border border-border/70 bg-card text-foreground shadow-[0_28px_64px_-32px_hsl(var(--primary)/0.35),0_24px_52px_-28px_hsl(222_48%_32%/0.14),0_0_0_1px_hsl(var(--border)/0.35)]",
+              "dark:border-white/[0.1] dark:bg-[linear-gradient(180deg,hsl(228_26%_9%/0.98),hsl(228_28%_5%/0.96))] dark:text-white dark:shadow-[0_28px_70px_-36px_rgba(0,0,0,0.65)] dark:ring-1 dark:ring-white/[0.07]",
             )}
           >
             <div
               className={cn(
                 "flex items-center gap-2 border-b px-3 py-3 sm:gap-3 sm:px-4",
-                "border-border/60 bg-gradient-to-b from-muted/45 to-muted/15",
-                "dark:border-white/[0.08] dark:from-transparent dark:to-transparent dark:bg-white/[0.04]",
+                "border-border/60 bg-gradient-to-b from-muted/50 to-muted/15",
+                "dark:border-white/[0.08] dark:from-white/[0.06] dark:to-transparent",
               )}
             >
+              <div className="flex gap-1.5 pl-0.5 opacity-70">
+                <span className="size-2.5 rounded-full bg-red-500/80" aria-hidden />
+                <span className="size-2.5 rounded-full bg-amber-400/90" aria-hidden />
+                <span className="size-2.5 rounded-full bg-emerald-500/75" aria-hidden />
+              </div>
               <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground shadow-inner">
                 {BRAND_LOGO_MONOGRAM}
               </div>
@@ -427,7 +441,9 @@ export function LandingInteractiveChat() {
                 <p className="truncate text-sm font-bold text-foreground dark:text-white">
                   {BRAND_NAME} · demo
                 </p>
-                <p className="text-xs text-foreground dark:text-white">Antwoord binnen seconden</p>
+                <p className="text-xs text-muted-foreground dark:text-white/65">
+                  Zo snel antwoord je straks ook op echte klanten
+                </p>
               </div>
               <div className="flex shrink-0 flex-col items-end gap-1">
                 <span className="text-[0.65rem] font-semibold uppercase tracking-wider text-foreground dark:text-white">
@@ -510,9 +526,27 @@ export function LandingInteractiveChat() {
               className={cn(
                 "border-t p-3 sm:p-4",
                 "border-border/60 bg-muted/25",
-                "dark:border-white/[0.08] dark:bg-black/20",
+                "dark:border-white/[0.08] dark:bg-black/25",
               )}
             >
+              <div className="mb-3 flex flex-wrap gap-2">
+                {chatHints.quickPrompts.map((prompt) => (
+                  <button
+                    key={prompt}
+                    type="button"
+                    disabled={busy}
+                    onClick={() => setInput(prompt)}
+                    className={cn(
+                      "rounded-full border border-border/60 bg-background/80 px-3 py-1.5 text-left text-[0.8125rem] leading-snug text-foreground transition-colors",
+                      "hover:border-primary/35 hover:bg-primary/[0.06]",
+                      "disabled:pointer-events-none disabled:opacity-50",
+                      "dark:border-white/[0.1] dark:bg-white/[0.04] dark:text-white dark:hover:border-primary/40",
+                    )}
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
               <div className="flex gap-2">
                 <Input
                   value={input}

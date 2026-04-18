@@ -6,33 +6,79 @@ import { motion } from "framer-motion";
 import {
   ArrowRight,
   CalendarCheck,
-  CalendarClock,
   Check,
   ChevronDown,
   ChevronRight,
-  CircleDollarSign,
-  Clock,
+  Flame,
   Inbox,
   Layers,
   MessageCircle,
   Quote,
+  ShieldCheck,
   Sparkles,
+  Zap,
 } from "lucide-react";
-import { AnonymousDemoForm, useDemoRole } from "@/components/landing/demo-role-context";
+import { AnonymousDemoForm } from "@/components/landing/demo-role-context";
 import { HeroInboxMock } from "@/components/landing/hero-inbox-mock";
 import { LandingInteractiveChat } from "@/components/landing/landing-interactive-chat";
 import { LandingNav } from "@/components/landing/landing-nav";
 import { LandingMissedRevenueEstimator } from "@/components/landing/landing-missed-revenue-estimator";
+import { LandingPainCostSection } from "@/components/landing/landing-pain-cost-section";
+import { LandingDashboardPeek } from "@/components/landing/landing-dashboard-peek";
+import { LandingModulesTeaser } from "@/components/landing/landing-modules-teaser";
+import { LandingWithoutWithSection } from "@/components/landing/landing-without-with-section";
 import { StickyConversionBar } from "@/components/landing/sticky-conversion-bar";
 import { Button } from "@/components/ui/button";
 import { BILLING_PLANS } from "@/lib/billing/plans";
-import { heroSubtitleForRole } from "@/lib/demo/hero-mock-copy";
 import { BRAND_CONTACT_EMAIL, BRAND_LOGO_MONOGRAM, BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
-const HERO_H1 = "Je reageert te laat — en dat kost je klanten";
+const HERO_H1 = "Jouw website naar een niveau hoger tillen?";
 
-const HERO_TRUST = "Vaak terugverdiend met één extra afspraak";
+const HERO_SUB =
+  "Klanten wachten niet tot vanavond. Mail, WhatsApp of formulier: wie eerst een helder antwoord geeft, boekt de afspraak. Zylmero geeft zzp’ers en kleine teams overzicht en snellere opvolging — zonder de hele dag aan je telefoon vast te zitten.";
+
+const HERO_TRUST = "Voor garages, salons, monteurs, praktijken — iedereen die klanten via meerdere kanalen binnen krijgt";
+
+const HERO_PILLS = [
+  "Mail · WhatsApp · site → één overzicht",
+  "Sneller eerste antwoord",
+  "Minder zoeken, meer geboekt",
+] as const;
+
+const VALUE_BLOCKS = [
+  {
+    text: "Sneller eerste antwoord — ook als jij op de werkvloer staat",
+    Icon: Zap,
+  },
+  {
+    text: "Minder gemiste aanvragen doordat alles op één plek staat",
+    Icon: Inbox,
+  },
+  {
+    text: "Meer afspraken uit dezelfde stroom leads en berichten",
+    Icon: CalendarCheck,
+  },
+  {
+    text: "Zien wat urgent is en wat kan wachten — minder chaotisch zoeken",
+    Icon: Flame,
+  },
+  {
+    text: "Minder rommel tussen WhatsApp, mail, site en losse briefjes",
+    Icon: Layers,
+  },
+  {
+    text: "Rust in je hoofd: je vergeet minder snel op te volgen",
+    Icon: ShieldCheck,
+  },
+] as const;
+
+function testimonialInitials(name: string) {
+  const parts = name.split(/\s+/).filter(Boolean);
+  const a = parts[0]?.[0] ?? "";
+  const b = (parts[1]?.[0] ?? parts[0]?.[1] ?? "").toString();
+  return `${a}${b}`.toUpperCase();
+}
 
 const fadeUp = {
   initial: { opacity: 0, y: 14 },
@@ -42,9 +88,6 @@ const fadeUp = {
 };
 
 export function ZylmeroLanding() {
-  const { demoRole } = useDemoRole();
-  const heroSub = heroSubtitleForRole(demoRole, BRAND_NAME);
-
   return (
     <div className="relative min-h-dvh overflow-x-hidden bg-background pb-28 text-foreground md:pb-24">
       <div
@@ -56,19 +99,37 @@ export function ZylmeroLanding() {
       <section className="relative overflow-hidden border-b border-border/40 dark:border-white/[0.06]">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_100%_55%_at_50%_-25%,hsl(var(--primary)/0.14),transparent_58%)]" />
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,transparent,hsl(var(--background)))]" />
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.4] dark:opacity-[0.28]"
+          style={{
+            backgroundImage: `linear-gradient(to right, hsl(var(--border) / 0.35) 1px, transparent 1px), linear-gradient(to bottom, hsl(var(--border) / 0.35) 1px, transparent 1px)`,
+            backgroundSize: "56px 56px",
+          }}
+          aria-hidden
+        />
 
         <div className="relative mx-auto max-w-[1200px] px-4 pb-16 pt-10 md:px-8 md:pb-24 md:pt-14 lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-14">
           <motion.div {...fadeUp}>
-            <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-border/60 bg-muted/40 px-3.5 py-1.5 text-[0.6875rem] font-semibold uppercase tracking-wider text-foreground">
-              <Sparkles className="size-3.5 shrink-0 text-foreground" />
+            <p className="mb-5 inline-flex max-w-full items-center gap-2 rounded-full border border-border/60 bg-muted/45 px-3.5 py-1.5 text-[0.6875rem] font-semibold uppercase tracking-wider text-foreground shadow-[0_0_0_1px_hsl(var(--primary)/0.08)] backdrop-blur-sm dark:border-white/[0.1] dark:bg-white/[0.05]">
+              <Sparkles className="size-3.5 shrink-0 text-primary" />
               {HERO_TRUST}
             </p>
-            <h1 className="text-balance text-4xl font-bold leading-[1.08] tracking-tight text-foreground md:text-5xl lg:text-[2.875rem]">
+            <h1 className="text-balance text-4xl font-bold leading-[1.06] tracking-tight text-foreground md:text-5xl lg:text-[3rem] dark:text-white">
               {HERO_H1}
             </h1>
-            <p className="mt-5 max-w-xl text-base leading-relaxed text-foreground md:text-lg">
-              {heroSub}
+            <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
+              {HERO_SUB}
             </p>
+            <ul className="mt-6 flex flex-wrap gap-2">
+              {HERO_PILLS.map((label) => (
+                <li
+                  key={label}
+                  className="rounded-full border border-border/55 bg-background/70 px-3 py-1.5 text-[0.8125rem] font-medium text-foreground shadow-sm backdrop-blur-sm dark:border-white/[0.1] dark:bg-white/[0.04]"
+                >
+                  {label}
+                </li>
+              ))}
+            </ul>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
               <Button
                 asChild
@@ -89,82 +150,25 @@ export function ZylmeroLanding() {
                 </Button>
               </AnonymousDemoForm>
             </div>
-            <p className="mt-6 text-sm text-foreground">
-              Geen creditcard · opzeggen wanneer je wilt
+            <p className="mt-6 text-sm text-muted-foreground">
+              Geen creditcard om te starten · maandelijks opzegbaar · geen jaarcontract
             </p>
           </motion.div>
           <div className="relative mt-16 lg:mt-0">
             <div
-              className="pointer-events-none absolute -inset-3 rounded-[1.75rem] bg-gradient-to-br from-primary/[0.07] via-primary/[0.02] to-transparent blur-2xl dark:-inset-4 dark:from-primary/12 dark:via-primary/5 dark:to-transparent"
+              className="pointer-events-none absolute -inset-4 rounded-[2rem] bg-gradient-to-br from-primary/15 via-primary/[0.06] to-violet-500/[0.06] blur-3xl dark:-inset-6 dark:from-primary/22 dark:via-primary/10 dark:to-violet-500/10"
               aria-hidden
             />
-            <div className="relative">
-              <HeroInboxMock />
+            <div className="relative rounded-[1.35rem] border border-white/10 bg-gradient-to-b from-white/[0.06] to-transparent p-[1px] shadow-[0_32px_80px_-48px_hsl(var(--primary)/0.55)] dark:border-white/[0.12] dark:from-white/[0.08]">
+              <div className="overflow-hidden rounded-[1.3rem]">
+                <HeroInboxMock />
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <motion.section
-        id="probleem"
-        className="border-b border-border/40 bg-gradient-to-b from-muted/30 via-background to-background py-16 md:py-24 dark:border-white/[0.06] dark:from-white/[0.03] dark:via-background dark:to-background"
-        {...fadeUp}
-      >
-        <div className="mx-auto max-w-[960px] px-4 md:px-8">
-          <div className="mx-auto max-w-2xl text-center">
-            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-primary">
-              Herkenbaar?
-            </p>
-            <h2 className="mt-3 text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-              Wat er misgaat
-            </h2>
-            <p className="mt-3 text-base leading-relaxed text-foreground md:text-lg">
-              Te laat gezien = klant al weg. Dat kost omzet.
-            </p>
-          </div>
-
-          <ul className="mt-10 grid gap-4 sm:grid-cols-2 sm:gap-5 lg:mt-12 lg:gap-6">
-            {(
-              [
-                { line: "Niet op tijd reageren", Icon: Clock },
-                { line: "Berichten verspreid over apps", Icon: Layers },
-                { line: "Opvolgen schuift door", Icon: CalendarClock },
-                { line: "Geen zicht op waarde per lead", Icon: CircleDollarSign },
-              ] as const
-            ).map(({ line, Icon }) => (
-              <li
-                key={line}
-                className={cn(
-                  "group flex flex-col items-center rounded-2xl border px-5 pb-6 pt-7 text-center",
-                  "border-border/45 bg-card/85 shadow-[0_4px_24px_-16px_hsl(222_48%_32%/0.14)]",
-                  "ring-1 ring-black/[0.03] transition-all duration-300",
-                  "hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-[0_16px_40px_-24px_hsl(var(--primary)/0.18)]",
-                  "dark:border-white/[0.08] dark:bg-card/50 dark:ring-white/[0.04] dark:hover:border-primary/30",
-                )}
-              >
-                <div
-                  className={cn(
-                    "relative mb-4 flex size-14 items-center justify-center rounded-2xl",
-                    "bg-gradient-to-br from-primary/22 via-primary/10 to-primary/[0.04]",
-                    "ring-2 ring-primary/12 ring-offset-2 ring-offset-card",
-                    "shadow-[inset_0_1px_0_0_hsl(0_0%_100%/0.2)] transition-transform duration-300 group-hover:scale-[1.04]",
-                    "dark:from-primary/28 dark:via-primary/14 dark:ring-primary/20 dark:ring-offset-[hsl(222_26%_7%)]",
-                  )}
-                >
-                  <Icon
-                    className="size-6 text-primary dark:text-primary-foreground/90"
-                    strokeWidth={1.65}
-                    aria-hidden
-                  />
-                </div>
-                <p className="max-w-[220px] text-sm font-semibold leading-snug text-foreground sm:max-w-none md:text-[0.9375rem]">
-                  {line}
-                </p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </motion.section>
+      <LandingPainCostSection />
 
       <motion.section
         id="hoe-het-werkt"
@@ -173,10 +177,11 @@ export function ZylmeroLanding() {
       >
         <div className="mx-auto max-w-[1200px] px-4 md:px-8">
           <h2 className="text-center text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-            Hoe het werkt
+            Hoe Zylmero je standaard pakt
           </h2>
-          <p className="mx-auto mt-3 max-w-lg text-center text-sm leading-relaxed text-foreground md:text-base">
-            Aanvraag binnen → antwoord en korte vragen → afspraak. Zonder je telefoon non-stop te checken.
+          <p className="mx-auto mt-3 max-w-2xl text-center text-sm leading-relaxed text-muted-foreground md:text-base">
+            Geen ingewikkelde software-trajecten: aanvraag binnen, rustig antwoord, duidelijke volgende stap —
+            ook als jij net op de klus staat.
           </p>
 
           <div className="mt-12 flex flex-col items-stretch md:mt-14 md:flex-row md:items-stretch md:justify-center md:gap-2 lg:gap-4">
@@ -184,20 +189,20 @@ export function ZylmeroLanding() {
               [
                 {
                   step: "1",
-                  title: "Aanvraag binnen",
-                  body: "Site, mail, WhatsApp — één inbox.",
+                  title: "Aanvraag komt binnen",
+                  body: "Via site, mail of WhatsApp — niet meer zoeken welk kanaal het was.",
                   Icon: Inbox,
                 },
                 {
                   step: "2",
-                  title: `${BRAND_NAME} antwoordt`,
-                  body: "Kort en duidelijk. Geen stilte van uren.",
+                  title: `${BRAND_NAME} helpt je antwoorden`,
+                  body: "Snel een eerste reactie die past bij jouw zaak — geen uren stilte voor de klant.",
                   Icon: MessageCircle,
                 },
                 {
                   step: "3",
-                  title: "Afspraak geboekt",
-                  body: "Klant kiest tijd; jij ziet het meteen.",
+                  title: "Van vraag naar geboekt moment",
+                  body: "Je ziet wie wat heeft gezegd en wat nog openstaat — minder vergeetmomenten.",
                   Icon: CalendarCheck,
                 },
               ] as const
@@ -265,25 +270,41 @@ export function ZylmeroLanding() {
         </div>
       </motion.section>
 
+      <LandingWithoutWithSection />
+
+      <LandingDashboardPeek />
+
       <motion.section
-        id="resultaat"
-        className="border-b border-border/40 py-14 md:py-20 dark:border-white/[0.06]"
+        id="wat-je-krijgt"
+        className="relative overflow-hidden border-b border-border/40 py-14 md:py-20 dark:border-white/[0.06]"
         {...fadeUp}
       >
-        <div className="mx-auto max-w-[720px] px-4 md:px-8">
-          <h2 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-            Wat je eraan hebt
-          </h2>
-          <ul className="mt-8 space-y-3">
-            {[
-              "Sneller dan je concurrent",
-              "Meer afspraken uit dezelfde leads",
-              "Meer omzet per aanvraag",
-              "Pipeline in één oogopslag",
-            ].map((t) => (
-              <li key={t} className="flex gap-3 text-base text-foreground md:text-lg">
-                <Check className="mt-1 size-5 shrink-0 text-foreground" />
-                <span>{t}</span>
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_100%,hsl(var(--primary)/0.08),transparent_55%)]"
+          aria-hidden
+        />
+        <div className="relative mx-auto max-w-[960px] px-4 md:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">
+              Wat je koopt — in gewone taal
+            </p>
+            <h2 className="mt-2 text-2xl font-bold tracking-tight text-foreground md:text-3xl">
+              Wat Zylmero voor je doet
+            </h2>
+            <p className="mt-4 text-base leading-relaxed text-muted-foreground md:text-[1.0625rem]">
+              Je betaalt niet voor “een dashboard” alleen — je betaalt om minder klanten te missen en meer uit de aanvragen te halen die je al binnenkrijgt.
+            </p>
+          </div>
+          <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:gap-5">
+            {VALUE_BLOCKS.map(({ text, Icon }) => (
+              <li
+                key={text}
+                className="group flex gap-4 rounded-2xl border border-border/50 bg-card/50 p-5 text-left shadow-sm transition duration-300 hover:border-primary/25 hover:shadow-md dark:border-white/[0.08] dark:bg-[hsl(228_26%_9%/0.5)]"
+              >
+                <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/22 to-primary/8 text-primary ring-1 ring-primary/15 transition group-hover:scale-[1.04]">
+                  <Icon className="size-5" strokeWidth={1.65} aria-hidden />
+                </span>
+                <span className="text-[0.9375rem] font-medium leading-snug text-foreground md:text-base">{text}</span>
               </li>
             ))}
           </ul>
@@ -300,47 +321,54 @@ export function ZylmeroLanding() {
       >
         <div className="mx-auto max-w-[1200px] px-4 md:px-8">
           <h2 className="text-center text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-            Wat anderen merken
+            Wat andere ondernemers merken
           </h2>
-          <p className="mx-auto mt-2 max-w-md text-center text-sm text-foreground">
-            Voorbeelden (demo).
+          <p className="mx-auto mt-2 max-w-lg text-center text-sm text-muted-foreground">
+            Voorbeeldreacties — geen echte klantquotes. Wel herkenbare situaties voor zzp en kleine zaken.
           </p>
           <div className="mt-10 grid gap-5 md:grid-cols-3 md:gap-6">
             {[
               {
-                name: "Marco van den Berg",
-                role: "Autoservice, Rotterdam",
+                name: "Rick de Vries",
+                role: "Garagehouder · Apeldoorn",
                 quote:
-                  "Minder gemiste aanvragen — vaak staat de afspraak al ingepland voordat ik ernaar kijk.",
+                  "Ik zie eerder welke klant haast heeft. Minder gesprekken gemist tussen twee monteurs door.",
               },
               {
-                name: "Linda Visser",
-                role: "Salon, Utrecht",
+                name: "Floor Martens",
+                role: "Fysiotherapiepraktijk · Amersfoort",
                 quote:
-                  "Mensen krijgen dezelfde dag nog antwoord. Ik hoef niet bang te zijn dat ze intussen elders bellen.",
+                  "Patiënten mailen ook buiten receptietijden — nu leggen we niet meer onbedoeld een week stil.",
               },
               {
-                name: "Tom Jansen",
-                role: "Installatie, Eindhoven",
+                name: "Soufiane El Amrani",
+                role: "Installatie · Den Haag",
                 quote:
-                  "Spoed hang ik meteen aan de juiste monteur. Geen half uur meer zoeken in losse appjes.",
+                  "Spoed staat vooraan in het overzicht. Ik hoef niet meer vijf gesprekken terug te scrollen.",
               },
             ].map((t) => (
               <blockquote
                 key={t.name}
-                className="flex gap-3 rounded-2xl border border-border/50 bg-card/50 p-6 shadow-sm shadow-black/5 ring-1 ring-primary/[0.08] transition duration-300 hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-md hover:ring-primary/15 dark:border-white/[0.08] dark:shadow-black/25"
+                className="relative flex gap-4 overflow-hidden rounded-2xl border border-border/45 bg-gradient-to-b from-card/90 to-card/40 p-6 shadow-[0_20px_50px_-34px_rgba(0,0,0,0.45)] ring-1 ring-primary/[0.06] transition duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg dark:border-white/[0.09] dark:from-[hsl(228_26%_11%/0.85)] dark:to-[hsl(228_28%_7%/0.55)]"
               >
-                <Quote
-                  className="mt-0.5 size-6 shrink-0 text-foreground/25 dark:text-foreground/35"
+                <div
+                  className="pointer-events-none absolute -right-12 -top-12 size-32 rounded-full bg-primary/[0.12] blur-2xl"
                   aria-hidden
                 />
-                <div className="min-w-0 flex-1">
+                <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/25 to-primary/10 text-sm font-bold tabular-nums text-primary ring-1 ring-primary/20">
+                  {testimonialInitials(t.name)}
+                </div>
+                <div className="relative min-w-0 flex-1">
+                  <Quote
+                    className="mb-2 size-5 text-primary/35 dark:text-primary/45"
+                    aria-hidden
+                  />
                   <p className="text-sm leading-relaxed text-foreground md:text-[0.9375rem]">
                     &ldquo;{t.quote}&rdquo;
                   </p>
                   <footer className="mt-4 border-t border-border/40 pt-4">
                     <p className="text-sm font-semibold text-foreground">{t.name}</p>
-                    <p className="mt-0.5 text-xs text-foreground">{t.role}</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">{t.role}</p>
                   </footer>
                 </div>
               </blockquote>
@@ -355,13 +383,15 @@ export function ZylmeroLanding() {
         {...fadeUp}
       >
         <div className="mx-auto max-w-[1200px] px-4 md:px-8">
-          <LandingMissedRevenueEstimator className="mb-2" />
+          <div id="indicatie" className="scroll-mt-28">
+            <LandingMissedRevenueEstimator className="mb-2" />
+          </div>
 
           <h2 className="mt-14 text-center text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-            Prijzen
+            Prijzen — je betaalt voor rust en resultaat
           </h2>
-          <p className="mx-auto mt-2 max-w-sm text-center text-sm text-foreground">
-            Start gratis — daarna bepaal jij of je door wilt.
+          <p className="mx-auto mt-3 max-w-xl text-center text-sm leading-relaxed text-muted-foreground md:text-base">
+            Start gratis. Kies een pakket als je klaar bent — klein beginnen kan, uitbreiden ook. Je betaalt voor minder gemiste aanvragen en snellere opvolging, niet voor “losse knopjes”.
           </p>
           <div className="mt-10 grid gap-6 lg:grid-cols-3 lg:items-stretch">
             {BILLING_PLANS.map((plan) => (
@@ -370,8 +400,8 @@ export function ZylmeroLanding() {
                 className={cn(
                   "relative flex flex-col rounded-2xl border p-6 transition duration-300 hover:-translate-y-0.5 md:p-7",
                   plan.popular
-                    ? "border-primary/40 bg-primary/[0.06] shadow-[0_0_0_1px_hsl(var(--primary)/0.2),0_24px_48px_-28px_hsl(var(--primary)/0.25)] lg:scale-[1.02]"
-                    : "border-border/60 bg-card/40 shadow-sm shadow-black/5 hover:border-primary/20 dark:border-white/[0.08] dark:shadow-black/20",
+                    ? "border-primary/45 bg-gradient-to-b from-primary/[0.09] to-primary/[0.03] shadow-[0_0_0_1px_hsl(var(--primary)/0.25),0_28px_56px_-32px_hsl(var(--primary)/0.35)] lg:scale-[1.02] dark:to-transparent"
+                    : "border-border/60 bg-card/45 shadow-sm shadow-black/5 hover:border-primary/25 dark:border-white/[0.09] dark:shadow-black/30",
                 )}
               >
                 {plan.popular ? (
@@ -380,15 +410,17 @@ export function ZylmeroLanding() {
                   </span>
                 ) : null}
                 <h3 className="text-lg font-semibold text-foreground">{plan.name}</h3>
-                <p className="mt-2 text-sm text-foreground">{plan.description}</p>
+                <p className="mt-2 text-sm leading-snug text-foreground">{plan.description}</p>
+                <p className="mt-2 text-xs leading-snug text-muted-foreground">{plan.audience}</p>
                 <p className="mt-6">
                   <span className="text-4xl font-bold tabular-nums md:text-5xl">€{plan.priceEur}</span>
-                  <span className="text-foreground">/mnd</span>
+                  <span className="text-muted-foreground">/mnd</span>
                 </p>
-                <ul className="mt-8 flex-1 space-y-3 text-sm text-foreground">
+                <p className="mt-2 text-[0.7rem] text-muted-foreground">{plan.leadCapLabel}</p>
+                <ul className="mt-6 flex-1 space-y-3 text-sm text-foreground">
                   {plan.features.map((f) => (
                     <li key={f} className="flex gap-2">
-                      <Check className="mt-0.5 size-4 shrink-0 text-foreground" />
+                      <Check className="mt-0.5 size-4 shrink-0 text-primary" />
                       {f}
                     </li>
                   ))}
@@ -403,6 +435,8 @@ export function ZylmeroLanding() {
               </div>
             ))}
           </div>
+
+          <LandingModulesTeaser className="mt-16" />
         </div>
       </motion.section>
 
@@ -416,25 +450,25 @@ export function ZylmeroLanding() {
           <div className="mt-8 space-y-2">
             {[
               {
-                q: "Hoe snel kan ik starten?",
-                a: "Vandaag nog: account openen, je kanalen koppelen en je eerste antwoord versturen. Geen creditcard nodig om te proberen.",
+                q: "Kost dit veel tijd om op te zetten?",
+                a: "Nee — je koppelt je kanalen en werkt vanuit één overzicht. Je hoeft geen IT-project te draaien: start klein, breid uit als het bevalt.",
               },
               {
-                q: "Wat levert het mij concreet op?",
-                a: "Minder aanvragen die stilvallen omdat je te laat reageert—en daardoor meer kans dat iemand bij jou boekt. Alles wat nog opvolging nodig heeft, staat overzichtelijk op één plek.",
+                q: "Ik ben maar klein — heb ik dit wel nodig?",
+                a: "Juist kleine zaken verliezen aanvragen omdat er niemand fulltime achter de telefoon zit. Als je genoeg hebt aan mail, WhatsApp en website om klanten binnen te krijgen, heb je genoeg aan structuur om ze niet te verliezen.",
               },
               {
-                q: "Werkt dit voor mijn bedrijf?",
-                a: "Zinvol als je aanvragen via mail, WhatsApp, social of je site binnenkrijgt en niet altijd binnen minuten kunt antwoorden. Voor zzp’ers en kleine teams die het samen willen bijhouden, niet voor grote callcenters.",
+                q: "Waarvoor betaal ik precies?",
+                a: "Voor minder chaos in je aanvragen en snellere opvolging — zodat je minder omzet laat liggen. Geen betaling voor “software om software”; wel voor grip en tempo richting klanten.",
               },
               {
                 q: "Zit ik ergens aan vast?",
-                a: "Nee. Gratis uitproberen zonder creditcard, en een betaald abonnement zet je per maand stop—geen jaarcontract of kleine lettertjes over een minimale looptijd.",
+                a: "Niet voor de proef. Betaald abonnement: maandelijks opzegbaar, geen jaarcontract. Je hoeft niet alles meteen af te nemen — later modules bijzetten kan.",
               },
             ].map((item) => (
               <details
                 key={item.q}
-                className="group rounded-xl border border-border/50 bg-card/40 px-4 backdrop-blur-[2px] transition open:bg-muted/25 hover:border-primary/20 dark:border-white/[0.08]"
+                className="group rounded-xl border border-border/50 bg-card/55 px-4 shadow-sm backdrop-blur-[2px] transition open:border-primary/30 open:bg-primary/[0.04] hover:border-primary/25 dark:border-white/[0.09] dark:open:bg-primary/[0.06]"
               >
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 py-3.5 text-[0.9375rem] font-semibold text-foreground">
                   {item.q}
@@ -448,27 +482,30 @@ export function ZylmeroLanding() {
       </motion.section>
 
       <motion.section className="border-b border-border/40 py-14 md:py-20 dark:border-white/[0.06]" {...fadeUp}>
-        <div className="mx-auto max-w-2xl px-4 text-center md:px-8">
-          <h2 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-            Zelf proberen
-          </h2>
-          <p className="mt-2 text-sm text-foreground md:text-base">
-            Zie hoe snel een aanvraag wordt opgepakt.
-          </p>
-          <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center">
-            <Button asChild size="lg" className="h-12 rounded-xl px-7 text-base font-semibold sm:h-14">
-              <Link href="/signup">Start gratis</Link>
-            </Button>
-            <AnonymousDemoForm>
-              <Button
-                type="submit"
-                size="lg"
-                variant="demo"
-                className="h-12 w-full rounded-xl px-7 text-base font-semibold sm:h-14 sm:w-auto"
-              >
-                Bekijk demo
+        <div className="relative mx-auto max-w-2xl px-4 text-center md:px-8">
+          <div className="absolute inset-0 -z-10 rounded-[1.75rem] bg-gradient-to-br from-primary/[0.08] via-transparent to-violet-500/[0.06] blur-2xl" aria-hidden />
+          <div className="rounded-[1.5rem] border border-border/45 bg-card/40 px-6 py-10 shadow-[0_24px_60px_-40px_hsl(var(--primary)/0.22)] backdrop-blur-sm dark:border-white/[0.08] dark:bg-[hsl(228_26%_9%/0.55)]">
+            <h2 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl">
+              Zelf proberen
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground md:text-base">
+              Probeer de chat hierboven of log in op de demo — zo voelt het als een klant wél snel antwoord krijgt.
+            </p>
+            <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center">
+              <Button asChild size="lg" className="h-12 rounded-xl px-7 text-base font-semibold sm:h-14">
+                <Link href="/signup">Start gratis</Link>
               </Button>
-            </AnonymousDemoForm>
+              <AnonymousDemoForm>
+                <Button
+                  type="submit"
+                  size="lg"
+                  variant="demo"
+                  className="h-12 w-full rounded-xl px-7 text-base font-semibold sm:h-14 sm:w-auto"
+                >
+                  Bekijk demo
+                </Button>
+              </AnonymousDemoForm>
+            </div>
           </div>
         </div>
       </motion.section>
@@ -482,7 +519,7 @@ export function ZylmeroLanding() {
               </div>
               <span className="font-semibold text-foreground">{BRAND_NAME}</span>
             </div>
-            <p className="text-xs text-foreground">Minder te laat · meer geboekt</p>
+            <p className="text-xs text-muted-foreground">Minder klanten missen · meer uit je aanvragen</p>
           </div>
           <nav className="flex flex-wrap justify-center gap-x-8 gap-y-2 text-sm font-medium text-foreground">
             <Link href="/login" className="transition-colors hover:text-foreground">

@@ -83,6 +83,7 @@ export default async function UpgradePage() {
                 ) : null}
                 <h2 className="text-lg font-semibold">{plan.name}</h2>
                 <p className="mt-1 text-sm text-muted-foreground">{plan.description}</p>
+                <p className="mt-2 text-xs text-muted-foreground">{plan.audience}</p>
                 <p className="mt-6">
                   <span className="text-3xl font-semibold tabular-nums">€{plan.priceEur}</span>
                   <span className="text-muted-foreground">/mnd</span>
@@ -166,6 +167,7 @@ export default async function UpgradePage() {
               <p className="mt-1 text-sm text-muted-foreground">
                 {plan.description}
               </p>
+              <p className="mt-2 text-xs text-muted-foreground">{plan.audience}</p>
               <p className="mt-6">
                 <span className="text-3xl font-semibold tabular-nums">
                   €{plan.priceEur}

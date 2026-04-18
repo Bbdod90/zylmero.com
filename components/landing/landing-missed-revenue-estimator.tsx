@@ -98,15 +98,15 @@ function EditableMetricChip({
     const digits = draft.replace(/\D/g, "");
     if (digits === "") {
       onCommit(value);
+    } else {
+      const n = parseInt(digits, 10);
+      if (Number.isNaN(n)) {
+        onCommit(value);
       } else {
-        const n = parseInt(digits, 10);
-        if (Number.isNaN(n)) {
-          onCommit(value);
-        } else {
-          const snapped = min + Math.round((n - min) / step) * step;
-          onCommit(clamp(snapped, min, max));
-        }
+        const snapped = min + Math.round((n - min) / step) * step;
+        onCommit(clamp(snapped, min, max));
       }
+    }
     setOpen(false);
   }, [draft, value, onCommit, min, max, step]);
 
@@ -262,7 +262,7 @@ export function LandingMissedRevenueEstimator({ className }: { className?: strin
   return (
     <div
       className={cn(
-        "relative mx-auto max-w-xl overflow-hidden rounded-3xl border border-border/60 bg-card/90 shadow-[0_24px_80px_-40px_hsl(var(--primary)/0.35),0_0_0_1px_hsl(var(--primary)/0.06)] backdrop-blur-md dark:border-white/[0.1] dark:bg-[linear-gradient(165deg,hsl(222_26%_9%/0.92),hsl(222_28%_6%/0.88))] dark:shadow-[0_28px_90px_-48px_rgb(0_0_0/0.65)]",
+        "relative mx-auto max-w-4xl overflow-hidden rounded-3xl border border-border/60 bg-card/90 shadow-[0_28px_90px_-44px_hsl(var(--primary)/0.38),0_0_0_1px_hsl(var(--primary)/0.08)] backdrop-blur-md dark:border-white/[0.1] dark:bg-[linear-gradient(165deg,hsl(222_26%_10%/0.94),hsl(222_28%_6%/0.9))] dark:shadow-[0_32px_100px_-52px_rgb(0_0_0/0.72)]",
         className,
       )}
     >
@@ -283,17 +283,17 @@ export function LandingMissedRevenueEstimator({ className }: { className?: strin
             </span>
             <div className="min-w-0 space-y-1">
               <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                Calculator
+                Kansverlies in euro
               </p>
               <h2 className="text-balance text-xl font-bold tracking-tight text-foreground sm:text-2xl">
-                Wat je gemiddeld misloopt{" "}
+                Wat trage reacties je ongeveer kosten{" "}
                 <span className="bg-gradient-to-r from-primary to-violet-500 bg-clip-text text-transparent dark:from-primary dark:to-violet-400">
-                  (indicatie)
+                  (ruwe schatting)
                 </span>
               </h2>
               <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
-                Sleep de schuifbalken of tik op een waarde om zelf een getal in te
-                vullen.
+                Vul je gemiddelde opdracht en aanvragen per week in — zie wat er maandelijks
+                kan weglopen als je niet op tijd volgt. Sleep of tik op de bedragen.
               </p>
             </div>
           </div>
@@ -338,7 +338,7 @@ export function LandingMissedRevenueEstimator({ className }: { className?: strin
           </div>
         </div>
 
-        <div className="mt-8 grid gap-8 border-t border-border/50 pt-8 dark:border-white/[0.08] sm:grid-cols-2">
+        <div className="mt-8 grid gap-8 border-t border-border/50 pt-8 dark:border-white/[0.08] lg:grid-cols-[1fr_minmax(260px,340px)] lg:items-start lg:gap-10">
           <div className="space-y-6">
             <div className="space-y-3">
               <div className="flex items-end justify-between gap-3">
@@ -444,14 +444,14 @@ export function LandingMissedRevenueEstimator({ className }: { className?: strin
             </div>
           </div>
 
-          <div className="flex flex-col justify-between gap-5 rounded-2xl border border-destructive/20 bg-gradient-to-br from-destructive/[0.07] via-card/80 to-primary/[0.04] p-5 shadow-inner dark:border-destructive/25 dark:from-destructive/[0.12] dark:via-card/40 dark:to-primary/[0.06]">
+          <div className="flex flex-col justify-between gap-5 rounded-2xl border border-destructive/25 bg-gradient-to-br from-destructive/[0.09] via-card/85 to-primary/[0.05] p-5 shadow-[inset_0_1px_0_0_hsl(0_0%_100%/0.06)] dark:border-destructive/30 dark:from-destructive/[0.14] dark:via-card/45 dark:to-primary/[0.07]">
             <div className="flex items-start gap-2">
               <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-destructive/15 text-destructive dark:bg-destructive/20">
                 <TrendingDown className="size-4" aria-hidden />
               </span>
               <div className="min-w-0">
                 <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-destructive dark:text-red-300">
-                  Geschat gemist / maand
+                  Bandbreedte gemiste omzet / maand
                 </p>
                 <p className="mt-2 text-2xl font-extrabold tabular-nums tracking-tight text-foreground sm:text-3xl sm:leading-tight">
                   {formatCurrency(missed.low)} – {formatCurrency(missed.high)}
