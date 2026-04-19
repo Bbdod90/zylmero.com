@@ -41,11 +41,10 @@ export default async function AuthBevestigdPage({
         </div>
         <div className="space-y-3">
           <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-            Account succesvol geactiveerd
+            Welkom bij {BRAND_NAME}
           </h1>
           <p className="text-base leading-relaxed text-muted-foreground">
-            Je e-mail is bevestigd en je bent ingelogd bij {BRAND_NAME}. Ga verder om je bedrijf in te
-            stellen — het duurt maar een paar minuten.
+            Je bent ingelogd. Ga verder om je bedrijf in te stellen — het duurt maar een paar minuten.
           </p>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
