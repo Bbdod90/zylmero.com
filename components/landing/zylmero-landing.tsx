@@ -10,7 +10,6 @@ import {
   Inbox,
   MessageCircle,
   Quote,
-  Zap,
 } from "lucide-react";
 import { AnonymousDemoForm } from "@/components/landing/demo-role-context";
 import { HeroInboxMock } from "@/components/landing/hero-inbox-mock";
@@ -18,9 +17,6 @@ import { LandingInteractiveChat } from "@/components/landing/landing-interactive
 import { LandingNav } from "@/components/landing/landing-nav";
 import { LandingMissedRevenueEstimator } from "@/components/landing/landing-missed-revenue-estimator";
 import { LandingPainCostSection } from "@/components/landing/landing-pain-cost-section";
-import { LandingDashboardPeek } from "@/components/landing/landing-dashboard-peek";
-import { LandingWebsiteServices } from "@/components/landing/landing-website-services";
-import { LandingWithoutWithSection } from "@/components/landing/landing-without-with-section";
 import { StickyConversionBar } from "@/components/landing/sticky-conversion-bar";
 import { Button } from "@/components/ui/button";
 import { BILLING_PLANS } from "@/lib/billing/plans";
@@ -33,24 +29,6 @@ const HERO_SUB =
   "Een chatbot op je site die meteen antwoord geeft — plus overzicht wanneer het via mail of WhatsApp binnenkomt. Zylmero helpt zzp’ers en kleine teams om sneller te reageren en minder aanvragen te missen, zonder de hele dag online te hoeven zijn.";
 
 const HERO_TRUST = "Voor garages, salons, monteurs, praktijken — iedereen die klanten via meerdere kanalen binnen krijgt";
-
-const VALUE_BLOCKS = [
-  {
-    title: "Sneller eerste antwoord",
-    desc: "Ook als jij op de werkvloer staat.",
-    Icon: Zap,
-  },
-  {
-    title: "Minder aanvragen missen",
-    desc: "Mail, site en WhatsApp op één plek.",
-    Icon: Inbox,
-  },
-  {
-    title: "Meer uit dezelfde leads",
-    desc: "Zien wat urgent is — minder zoeken, meer geboekt.",
-    Icon: CalendarCheck,
-  },
-] as const;
 
 const FAQ_ITEMS = [
   {
@@ -210,44 +188,6 @@ export function ZylmeroLanding() {
         </div>
       </motion.section>
 
-      <LandingWithoutWithSection />
-
-      <LandingDashboardPeek />
-
-      <motion.section
-        id="wat-je-krijgt"
-        className="border-b border-border/30 py-16 md:py-20 dark:border-white/[0.06]"
-        {...fadeUp}
-      >
-        <div className="mx-auto max-w-[1180px] px-4 md:px-8">
-          <div className="text-center">
-            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">
-              Wat je koopt — in gewone taal
-            </p>
-            <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
-              Wat Zylmero voor je doet
-            </h2>
-            <p className="mx-auto mt-5 max-w-2xl text-base leading-[1.65] text-muted-foreground">
-              Je betaalt om minder klanten te missen en meer uit de aanvragen te halen die je al binnenkrijgt — niet voor
-              losse knopjes.
-            </p>
-          </div>
-          <ul className="mt-12 grid gap-5 md:grid-cols-3 md:gap-6">
-            {VALUE_BLOCKS.map(({ title, desc, Icon }) => (
-              <li key={title} className="cf-landing-pro-card p-6 md:p-7">
-                <div className="flex size-11 items-center justify-center rounded-xl bg-primary/[0.1] text-primary ring-1 ring-primary/15">
-                  <Icon className="size-5" strokeWidth={1.75} aria-hidden />
-                </div>
-                <p className="mt-5 font-semibold text-foreground">{title}</p>
-                <p className="mt-3 text-[0.9375rem] leading-relaxed text-muted-foreground">{desc}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </motion.section>
-
-      <LandingWebsiteServices />
-
       <div id="demo">
         <LandingInteractiveChat />
       </div>
@@ -359,11 +299,7 @@ export function ZylmeroLanding() {
           </div>
 
           <p className="mx-auto mt-12 max-w-lg text-center text-sm leading-relaxed text-muted-foreground">
-            Modules zoals chatbot en inbox zet je gefaseerd in — zie{" "}
-            <a href="#diensten-website" className="font-medium text-foreground underline underline-offset-4 hover:text-primary">
-              diensten
-            </a>
-            .
+            Start klein en breid uit wanneer het past.
           </p>
         </div>
       </motion.section>

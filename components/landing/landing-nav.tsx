@@ -12,7 +12,6 @@ import { cn } from "@/lib/utils";
 const LINKS = [
   { href: "#wat-het-kost", label: "Waarom" },
   { href: "#hoe-het-werkt", label: "Hoe" },
-  { href: "#diensten-website", label: "Diensten" },
   { href: "#demo", label: "Demo" },
   { href: "#prijzen", label: "Prijzen" },
 ] as const;
