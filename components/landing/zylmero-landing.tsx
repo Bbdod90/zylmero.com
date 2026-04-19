@@ -4,12 +4,14 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
+  Bot,
   CalendarCheck,
   Check,
   ChevronDown,
   Inbox,
   MessageCircle,
   Quote,
+  Sparkles,
 } from "lucide-react";
 import { AnonymousDemoForm } from "@/components/landing/demo-role-context";
 import { HeroInboxMock } from "@/components/landing/hero-inbox-mock";
@@ -185,6 +187,53 @@ export function ZylmeroLanding() {
               </li>
             ))}
           </ol>
+        </div>
+      </motion.section>
+
+      <motion.section
+        id="chatbots"
+        className="scroll-mt-28 border-b border-border/30 py-16 md:py-20 dark:border-white/[0.06]"
+        {...fadeUp}
+      >
+        <div className="mx-auto max-w-[1180px] px-4 md:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">Chatbots bouwen</p>
+            <h2 className="mt-3 text-balance text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
+              Chatbots voor bedrijven — én voor jezelf
+            </h2>
+            <p className="mt-5 text-base leading-[1.65] text-muted-foreground md:text-lg">
+              Met {BRAND_NAME} zet je een chatbot op die in de taal van de branche praat: afspraken, prijsindicaties,
+              veelgestelde vragen. Ideaal om voor klanten te leveren, en net zo handig om voor je eigen zaak (of je eigen
+              side-project) snel live te zetten zonder eerst een heel bouwproject te hoeven starten.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-5 md:grid-cols-2 md:gap-6">
+            <div className="cf-landing-pro-card p-6 md:p-8">
+              <div className="flex size-11 items-center justify-center rounded-xl bg-primary/[0.1] text-primary ring-1 ring-primary/15">
+                <Bot className="size-5" strokeWidth={1.75} aria-hidden />
+              </div>
+              <h3 className="mt-6 text-lg font-semibold text-foreground">Voor andere bedrijven</h3>
+              <p className="mt-3 text-[0.9375rem] leading-relaxed text-muted-foreground">
+                Bouw chatbots voor salons, garages, monteurs, praktijken — waar ook maar mensen via de site en WhatsApp
+                binnenstromen. Dezelfde bouwstenen, steeds passend bij de klant.
+              </p>
+            </div>
+            <div className="cf-landing-pro-card p-6 md:p-8">
+              <div className="flex size-11 items-center justify-center rounded-xl bg-primary/[0.1] text-primary ring-1 ring-primary/15">
+                <Sparkles className="size-5" strokeWidth={1.75} aria-hidden />
+              </div>
+              <h3 className="mt-6 text-lg font-semibold text-foreground">Voor jezelf</h3>
+              <p className="mt-3 text-[0.9375rem] leading-relaxed text-muted-foreground">
+                Test uit voor je eigen onderneming, zet een eerste versie live, en trek het bij als je meer wilt
+                automatiseren — zonder dat het een tweede baan wordt om bij te houden.
+              </p>
+            </div>
+          </div>
+
+          <p className="mx-auto mt-10 max-w-xl text-center text-sm leading-relaxed text-muted-foreground">
+            Hieronder kun je meteen een voorbeeld-chat uitproberen (branche kiezen en een klantbericht typen).
+          </p>
         </div>
       </motion.section>
 
