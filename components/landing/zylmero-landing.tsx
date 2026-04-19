@@ -78,6 +78,13 @@ const fadeUp = {
   transition: { duration: 0.28, ease: [0.22, 1, 0.36, 1] },
 };
 
+function testimonialInitials(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  const a = parts[0]?.[0];
+  const b = parts.length > 1 ? parts[parts.length - 1]?.[0] : parts[0]?.[1];
+  return [a, b].filter(Boolean).join("").toUpperCase();
+}
+
 export function ZylmeroLanding() {
   return (
     <div className="relative min-h-dvh overflow-x-hidden bg-background pb-28 text-foreground md:pb-24">
@@ -90,21 +97,32 @@ export function ZylmeroLanding() {
 
       <section className="relative overflow-hidden border-b border-border/30 dark:border-white/[0.06]">
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,transparent,hsl(var(--background)))]" />
+        <div
+          className="pointer-events-none absolute -left-1/3 top-0 h-[min(520px,70vh)] w-[70%] max-w-3xl rounded-full bg-[radial-gradient(ellipse_at_center,hsl(var(--primary)/0.12),transparent_68%)] blur-3xl dark:bg-[radial-gradient(ellipse_at_center,hsl(var(--primary)/0.16),transparent_70%)]"
+          aria-hidden
+        />
 
         <div className="relative mx-auto max-w-[1200px] px-4 pb-16 pt-10 md:px-8 md:pb-24 md:pt-14 lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-14">
           <motion.div {...fadeUp}>
-            <p className="mb-6 max-w-xl text-[0.6875rem] font-semibold uppercase tracking-[0.18em] text-primary">
+            <span className="mb-6 inline-flex max-w-full rounded-full border border-primary/25 bg-primary/[0.06] px-4 py-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-primary">
               {HERO_TRUST}
-            </p>
-            <h1 className="text-balance text-4xl font-semibold leading-[1.08] tracking-tight text-foreground md:text-5xl lg:text-[3rem] dark:text-white">
+            </span>
+            <h1 className="text-balance text-4xl font-semibold leading-[1.06] tracking-tight text-foreground md:text-5xl lg:text-[3.25rem] dark:bg-gradient-to-b dark:from-white dark:to-zinc-400 dark:bg-clip-text dark:text-transparent">
               {HERO_H1}
             </h1>
             <p className="mt-6 max-w-xl text-base leading-[1.65] text-muted-foreground md:text-lg">
               {HERO_SUB}
             </p>
-            <p className="mt-6 max-w-xl text-sm leading-relaxed text-muted-foreground">
-              Chatbot op je site · mail & WhatsApp op één plek · minder aanvragen missen.
-            </p>
+            <div className="mt-6 flex max-w-xl flex-wrap gap-2">
+              {["Chatbot op je site", "Mail & WhatsApp samen", "Minder leads missen"].map((label) => (
+                <span
+                  key={label}
+                  className="rounded-full border border-border/50 bg-muted/35 px-3 py-1 text-xs text-muted-foreground shadow-sm dark:border-white/[0.08] dark:bg-white/[0.04]"
+                >
+                  {label}
+                </span>
+              ))}
+            </div>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
               <Button
                 asChild
@@ -130,7 +148,11 @@ export function ZylmeroLanding() {
             </p>
           </motion.div>
           <div className="relative mt-16 lg:mt-0">
-            <div className="relative overflow-hidden rounded-2xl border border-border/40 shadow-lg dark:border-white/[0.1] dark:shadow-black/40">
+            <div
+              className="pointer-events-none absolute -inset-6 rounded-[2rem] bg-[radial-gradient(ellipse_at_40%_35%,hsl(var(--primary)/0.22),transparent_62%)] blur-2xl dark:bg-[radial-gradient(ellipse_at_45%_30%,hsl(var(--primary)/0.28),transparent_65%)]"
+              aria-hidden
+            />
+            <div className="relative overflow-hidden rounded-[1.35rem] border border-border/45 shadow-[0_28px_90px_-42px_rgb(0_0_0/0.72)] ring-1 ring-black/[0.04] dark:border-white/[0.12] dark:shadow-black/55 dark:ring-white/[0.06]">
               <HeroInboxMock />
             </div>
           </div>
@@ -141,18 +163,18 @@ export function ZylmeroLanding() {
 
       <motion.section
         id="hoe-het-werkt"
-        className="border-b border-border/30 bg-muted/15 py-16 md:py-20 dark:border-white/[0.06] dark:bg-transparent"
+        className="relative border-b border-border/30 bg-gradient-to-b from-muted/25 via-muted/10 to-transparent py-16 md:py-24 dark:border-white/[0.06] dark:from-white/[0.03] dark:via-transparent dark:to-transparent"
         {...fadeUp}
       >
-        <div className="mx-auto max-w-[640px] px-4 md:px-8">
+        <div className="mx-auto max-w-[1180px] px-4 md:px-8">
           <h2 className="text-center text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
             Zo werkt het
           </h2>
-          <p className="mx-auto mt-4 max-w-lg text-center text-base leading-[1.65] text-muted-foreground">
+          <p className="mx-auto mt-4 max-w-2xl text-center text-base leading-[1.65] text-muted-foreground">
             Aanvraag binnen, snel antwoord, duidelijke volgende stap — ook als jij net op de klus staat.
           </p>
 
-          <ol className="mx-auto mt-12 max-w-xl space-y-0 divide-y divide-border/35 rounded-xl border border-border/40 dark:divide-white/[0.08] dark:border-white/[0.08]">
+          <ol className="mt-12 grid gap-5 md:grid-cols-3 md:gap-6">
             {(
               [
                 {
@@ -175,13 +197,13 @@ export function ZylmeroLanding() {
                 },
               ] as const
             ).map((item) => (
-              <li key={item.step} className="flex gap-4 px-5 py-6 md:gap-5 md:px-6">
-                <item.Icon className="mt-0.5 size-5 shrink-0 text-primary/75" strokeWidth={1.5} aria-hidden />
-                <div>
-                  <p className="text-[0.65rem] font-semibold uppercase tracking-[0.15em] text-primary">Stap {item.step}</p>
-                  <h3 className="mt-1 font-medium text-foreground">{item.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.body}</p>
+              <li key={item.step} className="cf-landing-pro-card p-6 md:p-7">
+                <div className="flex size-11 items-center justify-center rounded-xl bg-primary/[0.1] text-primary ring-1 ring-primary/15">
+                  <item.Icon className="size-5" strokeWidth={1.75} aria-hidden />
                 </div>
+                <p className="mt-5 text-[0.65rem] font-semibold uppercase tracking-[0.15em] text-primary">Stap {item.step}</p>
+                <h3 className="mt-2 text-lg font-semibold tracking-tight text-foreground">{item.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{item.body}</p>
               </li>
             ))}
           </ol>
@@ -197,7 +219,7 @@ export function ZylmeroLanding() {
         className="border-b border-border/30 py-16 md:py-20 dark:border-white/[0.06]"
         {...fadeUp}
       >
-        <div className="mx-auto max-w-[640px] px-4 md:px-8">
+        <div className="mx-auto max-w-[1180px] px-4 md:px-8">
           <div className="text-center">
             <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">
               Wat je koopt — in gewone taal
@@ -205,19 +227,19 @@ export function ZylmeroLanding() {
             <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
               Wat Zylmero voor je doet
             </h2>
-            <p className="mx-auto mt-5 max-w-lg text-base leading-[1.65] text-muted-foreground">
+            <p className="mx-auto mt-5 max-w-2xl text-base leading-[1.65] text-muted-foreground">
               Je betaalt om minder klanten te missen en meer uit de aanvragen te halen die je al binnenkrijgt — niet voor
               losse knopjes.
             </p>
           </div>
-          <ul className="mx-auto mt-12 max-w-xl space-y-8">
+          <ul className="mt-12 grid gap-5 md:grid-cols-3 md:gap-6">
             {VALUE_BLOCKS.map(({ title, desc, Icon }) => (
-              <li key={title} className="flex gap-4 md:gap-5">
-                <Icon className="mt-0.5 size-5 shrink-0 text-primary/75" strokeWidth={1.5} aria-hidden />
-                <div>
-                  <p className="font-medium text-foreground">{title}</p>
-                  <p className="mt-2 text-[0.9375rem] leading-relaxed text-muted-foreground">{desc}</p>
+              <li key={title} className="cf-landing-pro-card p-6 md:p-7">
+                <div className="flex size-11 items-center justify-center rounded-xl bg-primary/[0.1] text-primary ring-1 ring-primary/15">
+                  <Icon className="size-5" strokeWidth={1.75} aria-hidden />
                 </div>
+                <p className="mt-5 font-semibold text-foreground">{title}</p>
+                <p className="mt-3 text-[0.9375rem] leading-relaxed text-muted-foreground">{desc}</p>
               </li>
             ))}
           </ul>
@@ -231,14 +253,14 @@ export function ZylmeroLanding() {
       </div>
 
       <motion.section className="border-b border-border/30 py-16 md:py-20 dark:border-white/[0.06]" {...fadeUp}>
-        <div className="mx-auto max-w-[640px] px-4 md:px-8">
+        <div className="mx-auto max-w-[1180px] px-4 md:px-8">
           <h2 className="text-center text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
             Wat andere ondernemers merken
           </h2>
-          <p className="mx-auto mt-3 max-w-lg text-center text-sm leading-relaxed text-muted-foreground">
+          <p className="mx-auto mt-3 max-w-2xl text-center text-sm leading-relaxed text-muted-foreground">
             Voorbeelden — geen echte klantquotes. Wel herkenbare situaties.
           </p>
-          <div className="mt-12 space-y-12">
+          <div className="mt-12 grid gap-5 md:grid-cols-3 md:gap-6">
             {[
               {
                 name: "Rick de Vries",
@@ -259,12 +281,17 @@ export function ZylmeroLanding() {
                   "Spoed staat vooraan in het overzicht. Ik hoef niet meer vijf gesprekken terug te scrollen.",
               },
             ].map((t) => (
-              <blockquote key={t.name} className="border-l-2 border-primary/25 pl-6 dark:border-primary/35">
-                <Quote className="mb-3 size-4 text-primary/40" aria-hidden />
-                <p className="text-[0.9375rem] leading-relaxed text-foreground">&ldquo;{t.quote}&rdquo;</p>
-                <footer className="mt-4 text-sm">
-                  <p className="font-medium text-foreground">{t.name}</p>
-                  <p className="mt-0.5 text-muted-foreground">{t.role}</p>
+              <blockquote key={t.name} className="cf-landing-pro-card flex h-full flex-col p-6 md:p-7">
+                <Quote className="size-5 text-primary/45" aria-hidden />
+                <p className="mt-4 flex-1 text-[0.9375rem] leading-relaxed text-foreground">&ldquo;{t.quote}&rdquo;</p>
+                <footer className="mt-6 flex items-center gap-3 border-t border-border/40 pt-5 dark:border-white/[0.07]">
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/[0.12] text-xs font-semibold text-primary ring-1 ring-primary/20">
+                    {testimonialInitials(t.name)}
+                  </span>
+                  <div className="min-w-0 text-sm">
+                    <p className="font-semibold text-foreground">{t.name}</p>
+                    <p className="mt-0.5 text-muted-foreground">{t.role}</p>
+                  </div>
                 </footer>
               </blockquote>
             ))}
@@ -293,14 +320,14 @@ export function ZylmeroLanding() {
               <div
                 key={plan.id}
                 className={cn(
-                  "relative flex flex-col rounded-xl border p-6 md:p-7",
+                  "relative flex flex-col rounded-2xl border p-6 transition-[transform,box-shadow] duration-200 md:p-7",
                   plan.popular
-                    ? "border-primary/35 bg-primary/[0.06] dark:bg-primary/[0.08]"
-                    : "border-border/40 bg-card/40 dark:border-white/[0.08] dark:bg-white/[0.02]",
+                    ? "z-[1] border-primary/40 bg-primary/[0.07] shadow-[0_24px_70px_-40px_hsl(var(--primary)/0.55)] ring-1 ring-primary/25 dark:bg-primary/[0.1] lg:scale-[1.02]"
+                    : "border-border/40 bg-card/50 shadow-[0_18px_50px_-38px_rgb(0_0_0/0.45)] dark:border-white/[0.09] dark:bg-white/[0.03] dark:shadow-black/50",
                 )}
               >
                 {plan.popular ? (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-primary px-4 py-1 text-xs font-semibold text-primary-foreground">
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-primary px-4 py-1 text-xs font-semibold text-primary-foreground shadow-lg shadow-primary/25">
                     Meest gekozen
                   </span>
                 ) : null}
@@ -346,18 +373,23 @@ export function ZylmeroLanding() {
         className="border-b border-border/30 py-16 md:py-20 dark:border-white/[0.06]"
         {...fadeUp}
       >
-        <div className="mx-auto max-w-[640px] px-4 md:px-8">
+        <div className="mx-auto max-w-3xl px-4 md:px-8">
           <div className="text-center">
             <h2 className="text-2xl font-semibold tracking-tight text-foreground md:text-3xl">Veelgestelde vragen</h2>
           </div>
-          <div className="mt-10 divide-y divide-border/35 border-y border-border/35 dark:divide-white/[0.08] dark:border-white/[0.08]">
+          <div className="mt-10 space-y-3">
             {FAQ_ITEMS.map((item) => (
-              <details key={item.q} className="group py-1">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 py-4 text-[0.9375rem] font-medium text-foreground">
+              <details
+                key={item.q}
+                className="group cf-landing-pro-card open:shadow-[0_26px_70px_-42px_rgb(0_0_0/0.55)] [&[open]]:ring-1 [&[open]]:ring-primary/15"
+              >
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 text-[0.9375rem] font-medium text-foreground md:px-6">
                   {item.q}
                   <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" />
                 </summary>
-                <p className="pb-4 text-sm leading-relaxed text-muted-foreground">{item.a}</p>
+                <p className="border-t border-border/35 px-5 pb-5 pt-4 text-sm leading-relaxed text-muted-foreground dark:border-white/[0.07] md:px-6">
+                  {item.a}
+                </p>
               </details>
             ))}
           </div>
@@ -365,25 +397,27 @@ export function ZylmeroLanding() {
       </motion.section>
 
       <motion.section className="border-b border-border/30 py-16 md:py-20 dark:border-white/[0.06]" {...fadeUp}>
-        <div className="mx-auto max-w-[520px] px-4 text-center md:px-8">
-          <h2 className="text-2xl font-semibold tracking-tight text-foreground md:text-3xl">Zelf proberen</h2>
-          <p className="mt-4 text-base leading-[1.65] text-muted-foreground">
-            Probeer de chat hierboven — zo voelt snelle opvolging voor je klant.
-          </p>
-          <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center">
-            <Button asChild size="lg" className="h-12 rounded-xl px-7 text-base font-semibold sm:h-14">
-              <Link href="/signup">Start gratis</Link>
-            </Button>
-            <AnonymousDemoForm>
-              <Button
-                type="submit"
-                size="lg"
-                variant="demo"
-                className="h-12 w-full rounded-xl px-7 text-base font-semibold sm:h-14 sm:w-auto"
-              >
-                Bekijk demo
+        <div className="mx-auto max-w-xl px-4 text-center md:px-8">
+          <div className="cf-landing-pro-card px-6 py-10 md:px-10 md:py-12">
+            <h2 className="text-2xl font-semibold tracking-tight text-foreground md:text-3xl">Zelf proberen</h2>
+            <p className="mt-4 text-base leading-[1.65] text-muted-foreground">
+              Probeer de chat hierboven — zo voelt snelle opvolging voor je klant.
+            </p>
+            <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center">
+              <Button asChild size="lg" className="h-12 rounded-xl px-7 text-base font-semibold sm:h-14">
+                <Link href="/signup">Start gratis</Link>
               </Button>
-            </AnonymousDemoForm>
+              <AnonymousDemoForm>
+                <Button
+                  type="submit"
+                  size="lg"
+                  variant="demo"
+                  className="h-12 w-full rounded-xl px-7 text-base font-semibold sm:h-14 sm:w-auto"
+                >
+                  Bekijk demo
+                </Button>
+              </AnonymousDemoForm>
+            </div>
           </div>
         </div>
       </motion.section>

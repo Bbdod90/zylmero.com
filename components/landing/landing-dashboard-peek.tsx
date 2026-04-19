@@ -35,8 +35,8 @@ export function LandingDashboardPeek({ className }: { className?: string }) {
       id="wat-je-ziet"
       className={cn("border-b border-border/30 py-16 md:py-20 lg:py-24 dark:border-white/[0.06]", className)}
     >
-      <div className="relative mx-auto max-w-[640px] px-4 md:px-8">
-        <motion.div className="text-center" {...fade}>
+      <div className="relative mx-auto max-w-[1180px] px-4 md:px-8">
+        <motion.div className="mx-auto max-w-2xl text-center" {...fade}>
           <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">Na inloggen</p>
           <h2 className="mt-3 text-balance text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
             Wat je ziet zodra je inlogt
@@ -46,27 +46,27 @@ export function LandingDashboardPeek({ className }: { className?: string }) {
           </p>
         </motion.div>
 
-        <motion.div
-          {...fade}
-          transition={{ ...fade.transition, delay: 0.06 }}
-          className="mt-12 overflow-hidden rounded-xl border border-border/40 bg-card/30 dark:border-white/[0.08] dark:bg-white/[0.02]"
-        >
-          <div className="flex items-center gap-2 border-b border-border/35 px-4 py-3 dark:border-white/[0.07]">
-            <span className="size-2 rounded-full bg-red-500/70" aria-hidden />
-            <span className="size-2 rounded-full bg-amber-400/80" aria-hidden />
-            <span className="size-2 rounded-full bg-emerald-500/65" aria-hidden />
+        <motion.div {...fade} transition={{ ...fade.transition, delay: 0.06 }} className="mt-12 cf-dashboard-panel">
+          <div className="flex items-center gap-2 border-b border-border/50 px-4 py-3.5 dark:border-white/[0.08]">
+            <span className="size-2.5 rounded-full bg-red-500/75" aria-hidden />
+            <span className="size-2.5 rounded-full bg-amber-400/85" aria-hidden />
+            <span className="size-2.5 rounded-full bg-emerald-500/70" aria-hidden />
+            <span className="ml-3 text-xs font-medium text-muted-foreground">Dashboard</span>
           </div>
-          <ul className="divide-y divide-border/35 dark:divide-white/[0.06]">
+          <div className="grid gap-px bg-border/35 p-px dark:bg-white/[0.06] sm:grid-cols-2">
             {ROWS.map(({ title, body }) => (
-              <li key={title} className="px-5 py-5 md:px-6">
-                <p className="font-medium text-foreground">{title}</p>
+              <div
+                key={title}
+                className="bg-background/80 p-5 dark:bg-[hsl(228_26%_7%/0.88)] md:p-6"
+              >
+                <p className="font-semibold text-foreground">{title}</p>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{body}</p>
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         </motion.div>
 
-        <p className="mx-auto mt-10 max-w-lg text-center text-sm leading-relaxed text-muted-foreground">
+        <p className="mx-auto mt-10 max-w-2xl text-center text-sm leading-relaxed text-muted-foreground">
           De demo hieronder laat een eerste reactie zien; in het dashboard werk je door tot concrete afspraken.
         </p>
       </div>

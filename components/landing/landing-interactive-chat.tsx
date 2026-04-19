@@ -437,26 +437,34 @@ export function LandingInteractiveChat() {
   return (
     <section
       className={cn(
-        "border-b border-border/30 py-16 md:py-20 dark:border-white/[0.06]",
-        "bg-muted/20 dark:bg-transparent",
+        "relative overflow-hidden border-b border-border/30 py-16 md:py-24 dark:border-white/[0.06]",
+        "bg-gradient-to-b from-muted/25 via-muted/10 to-transparent dark:from-white/[0.035] dark:via-transparent dark:to-transparent",
       )}
     >
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-[min(520px,70%)] bg-[radial-gradient(ellipse_at_50%_0%,hsl(var(--primary)/0.14),transparent_62%)] dark:bg-[radial-gradient(ellipse_at_50%_0%,hsl(var(--primary)/0.18),transparent_65%)]"
+        aria-hidden
+      />
       <div className="relative mx-auto max-w-[1200px] px-4 md:px-8">
-        <div className="mx-auto max-w-xl text-center">
+        <div className="mx-auto max-w-2xl text-center">
           <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">Live demo</p>
           <h2 className="mt-3 text-balance text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
             {chatHints.sectionTitle}
           </h2>
-          <p className="mt-4 text-base leading-[1.65] text-muted-foreground">
+          <p className="mt-4 text-base leading-[1.65] text-muted-foreground md:text-lg">
             {chatHints.sectionSub}
           </p>
         </div>
 
-        <div className="mx-auto mt-10 max-w-lg scroll-mt-24">
+        <div className="relative mx-auto mt-12 max-w-2xl scroll-mt-24">
+          <div
+            className="pointer-events-none absolute -inset-5 rounded-[1.65rem] bg-[radial-gradient(ellipse_at_45%_30%,hsl(var(--primary)/0.26),transparent_62%)] blur-2xl dark:bg-[radial-gradient(ellipse_at_45%_28%,hsl(var(--primary)/0.32),transparent_65%)]"
+            aria-hidden
+          />
           <div
             className={cn(
-              "overflow-hidden rounded-2xl border border-border/50 bg-card text-foreground shadow-md",
-              "dark:border-white/[0.1] dark:bg-card",
+              "relative overflow-hidden rounded-[1.35rem] border border-border/55 bg-card text-foreground shadow-[0_34px_100px_-44px_rgb(0_0_0/0.72)] ring-1 ring-black/[0.05]",
+              "dark:border-white/[0.11] dark:bg-[hsl(228_26%_8%/0.96)] dark:shadow-black/60 dark:ring-white/[0.06]",
             )}
           >
             <div
@@ -612,7 +620,7 @@ export function LandingInteractiveChat() {
           </div>
         </div>
 
-        <div className="mx-auto mt-10 flex max-w-md flex-col items-stretch gap-3 sm:flex-row sm:justify-center">
+        <div className="relative mx-auto mt-12 flex max-w-lg flex-col items-stretch gap-3 sm:flex-row sm:justify-center">
           <Button asChild size="lg" className="h-12 rounded-xl px-8 text-base font-semibold sm:flex-1">
             <Link href="/signup">Start gratis</Link>
           </Button>

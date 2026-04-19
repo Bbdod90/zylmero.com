@@ -33,8 +33,8 @@ export function LandingWithoutWithSection({ className }: { className?: string })
       id="vergelijking"
       className={cn("border-b border-border/30 py-16 md:py-20 dark:border-white/[0.06]", className)}
     >
-      <div className="relative mx-auto max-w-[900px] px-4 md:px-8">
-        <motion.div className="mx-auto max-w-xl text-center" {...fade}>
+      <div className="relative mx-auto max-w-[1180px] px-4 md:px-8">
+        <motion.div className="mx-auto max-w-2xl text-center" {...fade}>
           <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">Even scherp</p>
           <h2 className="mt-3 text-balance text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
             Zonder Zylmero · met Zylmero
@@ -44,24 +44,33 @@ export function LandingWithoutWithSection({ className }: { className?: string })
           </p>
         </motion.div>
 
-        <div className="mt-12 grid gap-10 md:grid-cols-2 md:gap-12">
-          <motion.div {...fade} transition={{ ...fade.transition, delay: 0.05 }}>
+        <div className="mt-12 grid gap-5 md:grid-cols-2 md:gap-6">
+          <motion.div
+            className="cf-landing-pro-card p-6 md:p-7"
+            {...fade}
+            transition={{ ...fade.transition, delay: 0.05 }}
+          >
             <p className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">Zonder</p>
-            <ul className="mt-4 space-y-3 text-sm leading-relaxed text-foreground md:text-[0.9375rem]">
+            <ul className="mt-5 space-y-3.5 text-sm leading-relaxed text-foreground md:text-[0.9375rem]">
               {ZONDER.map((line) => (
-                <li key={line} className="flex gap-2.5">
-                  <X className="mt-0.5 size-4 shrink-0 text-destructive/80" strokeWidth={2} aria-hidden />
+                <li key={line} className="flex gap-3">
+                  <X className="mt-0.5 size-4 shrink-0 text-destructive/85" strokeWidth={2} aria-hidden />
                   <span>{line}</span>
                 </li>
               ))}
             </ul>
           </motion.div>
 
-          <motion.div {...fade} transition={{ ...fade.transition, delay: 0.1 }}>
+          <motion.div
+            className="relative overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/[0.09] via-card/80 to-card/60 p-6 shadow-[0_22px_60px_-38px_hsl(var(--primary)/0.45)] ring-1 ring-primary/15 dark:from-primary/[0.14] dark:via-card/50 dark:to-[hsl(228_28%_6%/0.95)] md:p-7"
+            {...fade}
+            transition={{ ...fade.transition, delay: 0.1 }}
+          >
+            <div className="pointer-events-none absolute -right-16 -top-16 size-40 rounded-full bg-primary/20 blur-3xl" aria-hidden />
             <p className="text-xs font-semibold uppercase tracking-[0.15em] text-primary">Met Zylmero</p>
-            <ul className="mt-4 space-y-3 text-sm leading-relaxed text-foreground md:text-[0.9375rem]">
+            <ul className="relative mt-5 space-y-3.5 text-sm leading-relaxed text-foreground md:text-[0.9375rem]">
               {MET.map((line) => (
-                <li key={line} className="flex gap-2.5">
+                <li key={line} className="flex gap-3">
                   <Check className="mt-0.5 size-4 shrink-0 text-primary" strokeWidth={2} aria-hidden />
                   <span>{line}</span>
                 </li>

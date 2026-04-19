@@ -225,6 +225,23 @@
   .dark .cf-landing-grain {
     opacity: 0.055;
   }
+
+  /** Landing — gepolijste kaarten (depth + top highlight, zonder drukte) */
+  .cf-landing-pro-card {
+    @apply relative overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-b from-card/95 via-card/90 to-card/80 shadow-[0_22px_60px_-36px_rgb(15_23_42/0.55)] backdrop-blur-sm dark:border-white/[0.09] dark:from-[hsl(228_26%_12%/0.92)] dark:via-[hsl(228_28%_9%/0.94)] dark:to-[hsl(228_30%_6%/0.96)] dark:shadow-[0_28px_70px_-40px_rgb(0_0_0/0.75)];
+  }
+  .cf-landing-pro-card::before {
+    content: "";
+    @apply pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent;
+  }
+
+  /** Sticky CTA — zwevende dock (desktop) */
+  .cf-sticky-dock {
+    @apply fixed bottom-0 left-0 right-0 z-50 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 md:px-6 md:pb-5;
+  }
+  .cf-sticky-dock-inner {
+    @apply mx-3 flex max-w-[1180px] flex-col gap-3 rounded-2xl border border-border/35 bg-background/90 px-4 py-3 shadow-[0_24px_80px_-40px_rgb(0_0_0/0.45)] backdrop-blur-xl dark:border-white/[0.1] dark:bg-[hsl(228_32%_6%/0.82)] dark:shadow-black/60 sm:mx-auto sm:flex-row sm:items-center sm:justify-between sm:gap-6;
+  }
 }
 
 /**

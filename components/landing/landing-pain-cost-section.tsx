@@ -48,8 +48,8 @@ export function LandingPainCostSection({ className }: { className?: string }) {
         className,
       )}
     >
-      <div className="relative mx-auto max-w-[640px] px-4 md:px-8">
-        <motion.div className="text-center" {...fade}>
+      <div className="relative mx-auto max-w-[1180px] px-4 md:px-8">
+        <motion.div className="mx-auto max-w-2xl text-center" {...fade}>
           <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">
             Dit herken je vast
           </p>
@@ -62,19 +62,23 @@ export function LandingPainCostSection({ className }: { className?: string }) {
         </motion.div>
 
         <motion.ul
-          className="mt-14 space-y-0 divide-y divide-border/35 border-y border-border/35 dark:divide-white/[0.08] dark:border-white/[0.08]"
+          className="mt-14 grid gap-4 sm:grid-cols-2"
           {...fade}
           transition={{ ...fade.transition, delay: 0.06 }}
         >
-          {ITEMS.map(({ title, body, Icon }) => (
-            <li key={title} className="flex gap-4 py-7 first:pt-8 last:pb-8 md:gap-5">
-              <Icon
-                className="mt-0.5 size-5 shrink-0 text-primary/70"
-                strokeWidth={1.5}
-                aria-hidden
-              />
-              <div>
-                <h3 className="font-medium leading-snug text-foreground">{title}</h3>
+          {ITEMS.map(({ title, body, Icon }, idx) => (
+            <li
+              key={title}
+              className={cn(
+                "cf-landing-pro-card flex gap-4 p-6 md:gap-5 md:p-7",
+                idx === ITEMS.length - 1 && "sm:col-span-2",
+              )}
+            >
+              <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/[0.1] text-primary ring-1 ring-primary/15">
+                <Icon className="size-5" strokeWidth={1.75} aria-hidden />
+              </div>
+              <div className="min-w-0">
+                <h3 className="font-semibold leading-snug text-foreground">{title}</h3>
                 <p className="mt-2 text-[0.9375rem] leading-relaxed text-muted-foreground">{body}</p>
                 {title === "Het voelt minder erg dan het is" ? (
                   <p className="mt-4 text-[0.9375rem] leading-relaxed text-muted-foreground">
