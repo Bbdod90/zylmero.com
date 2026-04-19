@@ -224,7 +224,7 @@ ${vehiclePromptBlock(vehicle)}
   }
   if (beautyI) {
     sectorLines.push(
-      "Kapper / salon: vriendelijk en concreet; vraag naar gewenste behandeling en tijd; geen medische claims.",
+      "Kapper / salon: vriendelijk en concreet; geen medische claims. Als de klant in eerdere berichten al een tijd én behandeling noemde: bevestig die samen in één zin en vraag alleen wat nog ontbreekt (vaak naam/telefoon) — niet opnieuw 'welke behandeling en welk tijdstip?' als dat al in de thread staat.",
     );
   }
   if (dentalI) {
@@ -269,20 +269,31 @@ Als de klant specifieker wordt of een bevestiging vraagt: reageer op dat nieuwe 
 `
       : "";
 
+  /** Homepage-demo miste soms context (tijd/behandeling al genoemd) — model sprong terug naar generieke intake. */
+  const threadMemoryBlock =
+    landingDemo && historySanitized.length > 0
+      ? `
+THREAD-GEHEUGEN (strikt):
+- Alle USER-berichten in deze thread blijven gelden. Zoek daarin naar tijd/datum ("morgen", "15:00"), behandeling ("knippen", "kleur"), naam — neem die over in je antwoord als ze nog van toepassing zijn.
+- Stel niet opnieuw dezelfde brede intake-vraag (welke behandeling + welk tijdstip) als de klant dat al deels of volledig gegeven heeft; vul alleen het ontbrekende aan (bv. nog alleen naam).
+- Kort vervolgbericht ("alleen knippen", een naam): sluit direct aan op wat eerder gezegd is — geen nieuwe ronde diensten-brochure.
+`
+      : "";
+
   const landingRules = landingDemo
     ? demoNiche
       ? `
 Homepage-demo: natuurlijke zinnen in het Nederlands — kort bij een simpele intake, iets uitgebreider als de klant een inhoudelijke vraag stelt (prijs, diensten, werkwijze).
 Blijf in de gekozen demo-rol; antwoord alsof je daar werkt. Als sector-hint (bijv. automotive) duidelijk afwijkt van de niche-labeltekst, volg de sector-hint voor toon en inhoud — zonder hard te zeggen dat je van rol wisselt.
 Waarde: snelle duidelijkheid — concrete afspraak, tijdvak of duidelijke volgende stap; op informerende vragen gewoon inhoudelijk antwoord binnen de bedrijfskennis.
-${antiRepeatBlock}${historyNote}
+${antiRepeatBlock}${historyNote}${threadMemoryBlock}
 ${rdwBlock}${sectorBlock}
 `
       : `
 Homepage-demo: korte, natuurlijke zinnen in het Nederlands (meestal 2–5 zinnen).
 Je vertegenwoordigt een lokaal bedrijf met afspraken — dat kan overal op lijken: kapper, praktijk, garage, monteur, schoonmaak, ambacht. Herken wat de klant vraagt en blijf daarbij; geen vakjargon uit een andere sector "pushen".
 Waarde voor de klant: snelle duidelijkheid — ook als de agenda vol zit, bied een eerlijk alternatief (andere dag, korte callback, wachtlijst).
-${historyNote}
+${historyNote}${threadMemoryBlock}
 ${rdwBlock}${sectorBlock}
 Als geen sector-hint past: blijf een warme, efficiënte lokale dienstverlener; één duidelijke volgende stap.
 `

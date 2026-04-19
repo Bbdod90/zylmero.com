@@ -222,8 +222,28 @@ export function ZylmeroLanding() {
             ))}
           </ul>
 
+          <div className="mx-auto mt-10 max-w-lg rounded-2xl border border-primary/35 bg-primary/[0.07] p-6 text-center shadow-[0_20px_60px_-40px_hsl(var(--primary)/0.45)] dark:border-primary/30 dark:bg-primary/[0.09]">
+            <p className="text-sm font-semibold text-foreground">Hier maak je je echte website-chatbot</p>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              Niet op deze marketingpagina — in je <strong className="text-foreground">dashboard</strong> onder{" "}
+              <strong className="text-foreground">Website-chat</strong>. Geen account? Start gratis, daarna bot aanmaken en één regel code
+              plakken.
+            </p>
+            <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:justify-center">
+              <Button asChild className="h-11 rounded-xl px-6 font-semibold">
+                <Link href="/dashboard/chatbots">Ga naar Website-chat</Link>
+              </Button>
+              <Button asChild variant="outline" className="h-11 rounded-xl px-6 font-semibold">
+                <Link href="/signup">Account aanmaken</Link>
+              </Button>
+            </div>
+            <p className="mt-4 text-xs text-muted-foreground">
+              Niet ingelogd? Je wordt doorgestuurd naar inloggen — daarna direct bouwen.
+            </p>
+          </div>
+
           <p className="mx-auto mt-12 max-w-2xl text-center text-sm leading-relaxed text-muted-foreground md:text-[0.9375rem]">
-            In je account bouw je de bot in het dashboard onder <strong className="text-foreground">Website-chat</strong>. Plak één regel code op je site — actief met een geldige proef of betaald abonnement.
+            Plak één regel code op je site — actief met een geldige proef of betaald abonnement.
           </p>
 
           <div className="mt-10 grid gap-5 md:grid-cols-2 md:gap-6">

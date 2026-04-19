@@ -15,6 +15,8 @@ const LINKS = [
   { href: "#chatbots", label: "Chatbots" },
   { href: "#demo", label: "Demo" },
   { href: "#prijzen", label: "Prijzen" },
+  /** Eigen bot bouwen — zonder ingelogd: middleware → /login */
+  { href: "/dashboard/chatbots", label: "Website-chat" },
 ] as const;
 
 export function LandingNav() {
