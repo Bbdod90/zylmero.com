@@ -1,11 +1,14 @@
 -- Seed realistic data for the first auth user (run in Supabase SQL editor after signup)
 -- Safe to re-run: only fills when the company has no leads yet.
+--
+-- Let op: het blok moet beginnen met exact `do $$` — geen letter ervoor (geen `o do $$`, dat geeft syntax error).
+-- Run ALTIJD het hele bestand (regel 6 t/m einde). Geen fragment vanaf het midden — dan ontbreken declare + variabelen.
 
 do $$
 declare
-  uid uuid;
+  -- In INSERT … VALUES gebruik je (SELECT cid) / (SELECT owner_uuid) — bare namen worden soms als tabellen gelezen (42P01).
+  owner_uuid uuid;
   cid uuid;
-  conv uuid;
   i int;
   lead_ids uuid[] := array[
     'b1111111-1111-4111-8111-111111111101'::uuid,
@@ -28,29 +31,28 @@ declare
     'c2222222-2222-4222-8222-222222222208'::uuid
   ];
 begin
-  select id into uid from auth.users order by created_at asc limit 1;
-  if uid is null then
+  select id into owner_uuid from auth.users order by created_at asc limit 1;
+  if owner_uuid is null then
     raise notice 'Seed skipped: no auth.users yet.';
     return;
   end if;
 
-  select id into cid from public.companies where owner_user_id = uid limit 1;
+  select id into cid from public.companies where owner_user_id = owner_uuid limit 1;
   if cid is null then
     insert into public.companies (name, owner_user_id, onboarding_completed, contact_email, contact_phone, niche)
-    values (
+    select
       'Van Dijk AutoService',
-      uid,
+      owner_uuid,
       true,
       'planning@vandijk-autoservice.nl',
       '+31 297 820 014',
       'garage'
-    )
     returning id into cid;
   end if;
 
   insert into public.company_settings (company_id, niche, services, faq, pricing_hints, business_hours, booking_link, tone, reply_style, language, automation_preferences)
   values (
-    cid,
+    (select cid),
     'Van Dijk AutoService — onafhankelijk autobedrijf in Mijdrecht: APK, onderhoud, diagnose en banden.',
     array[
       'APK-keuring',
@@ -91,28 +93,28 @@ begin
 
   insert into public.leads (id, company_id, full_name, email, phone, source, status, score, summary, intent, estimated_value, suggested_next_action, status_recommendation, last_message_at, notes)
   values
-    (lead_ids[1], cid, 'Sophie de Vries', 'sophie.devries@email.nl', '+31 6 12 34 56 78', 'Website', 'active', 78,
+    (lead_ids[1], (select cid), 'Sophie de Vries', 'sophie.devries@email.nl', '+31 6 12 34 56 78', 'Website', 'active', 78,
      'APK + remcheck; wil woensdag ochtend.', 'APK + remmen', 420, 'Bevestig 45 min werkplaats en kenteken.', 'active', now() - interval '35 minutes', 'Terugbel 12:00–14:00'),
-    (lead_ids[2], cid, 'Mark Janssen', 'mark.j@werk.nl', '+31 6 98 76 54 32', 'Google Maps', 'quote_sent', 64,
+    (lead_ids[2], (select cid), 'Mark Janssen', 'mark.j@werk.nl', '+31 6 98 76 54 32', 'Google Maps', 'quote_sent', 64,
      'Fleet 3 voertuigen; vraagt jaarplan.', 'Fleet onderhoud', 2400, 'Stuur pakketofferte met vaste jaarprijs.', 'quote_sent', now() - interval '6 hours', null),
-    (lead_ids[3], cid, 'Aya El-Khatib', 'aya.elkhatib@gmail.com', '+31 6 55 44 33 22', 'WhatsApp', 'appointment_booked', 88,
+    (lead_ids[3], (select cid), 'Aya El-Khatib', 'aya.elkhatib@gmail.com', '+31 6 55 44 33 22', 'WhatsApp', 'appointment_booked', 88,
      'Airco ruikt muf; wil dinsdag 14:30.', 'Airco reiniging', 185, 'Bevestig afspraak + kenteken.', 'appointment_booked', now() - interval '50 minutes', 'Afspraak bevestigd'),
-    (lead_ids[4], cid, 'Tom Vermeulen', 'tom.vermeulen@outlook.com', '+31 6 22 11 00 99', 'Referral', 'new', 52,
+    (lead_ids[4], (select cid), 'Tom Vermeulen', 'tom.vermeulen@outlook.com', '+31 6 22 11 00 99', 'Referral', 'new', 52,
      'Gekraak voorwiel; twijfelt nog.', 'Diagnose vering', 320, 'Bied gratis visuele check.', 'active', now() - interval '2 hours', null),
-    (lead_ids[5], cid, 'Lisa Hoekstra', 'lisa.h@email.nl', '+31 6 77 88 99 00', 'Facebook', 'won', 92,
+    (lead_ids[5], (select cid), 'Lisa Hoekstra', 'lisa.h@email.nl', '+31 6 77 88 99 00', 'Facebook', 'won', 92,
      'Grote beurt + distributie geaccepteerd.', 'Onderhoud pakket', 980, 'Werkorder openen + onderdelen.', 'won', now() - interval '20 hours', 'Foto''s oude onderdelen'),
-    (lead_ids[6], cid, 'Daan Bakker', 'daan.bakker@zzp.nl', '+31 6 44 33 22 11', 'Website', 'active', 71,
+    (lead_ids[6], (select cid), 'Daan Bakker', 'daan.bakker@zzp.nl', '+31 6 44 33 22 11', 'Website', 'active', 71,
      'Elektronica storing intermitterend.', 'Diagnose OBD', 150, 'Plan diagnose 60 min.', 'active', now() - interval '4 hours', null),
-    (lead_ids[7], cid, 'Emma van Dijk', 'emma.vandijk@mail.nl', '+31 6 10 20 30 40', 'Instagram', 'quote_sent', 58,
+    (lead_ids[7], (select cid), 'Emma van Dijk', 'emma.vandijk@mail.nl', '+31 6 10 20 30 40', 'Instagram', 'quote_sent', 58,
      'Ruitschade klein; verzekering wil offerte.', 'Schade spot repair', 310, 'Maak foto-offerte + uitleg polis.', 'quote_sent', now() - interval '30 hours', null),
-    (lead_ids[8], cid, 'Jeroen Smits', 'jeroon.smits@werk.nl', '+31 6 90 80 70 60', 'Cold call', 'lost', 33,
+    (lead_ids[8], (select cid), 'Jeroen Smits', 'jeroon.smits@werk.nl', '+31 6 90 80 70 60', 'Cold call', 'lost', 33,
      'Prijs te hoog; gaat naar concurrent.', 'APK alleen', 69, 'Nurture na 30 dagen.', 'lost', now() - interval '5 days', 'Closed lost');
 
   for i in 1..8 loop
     insert into public.conversations (id, company_id, lead_id, channel, title, last_message_at)
     values (
       conv_ids[i],
-      cid,
+      (select cid),
       lead_ids[i],
       'inbox',
       'Thread ' || i::text,
@@ -170,27 +172,27 @@ begin
 
   insert into public.quotes (company_id, lead_id, title, description, status, currency, subtotal, vat_rate, vat_amount, total, line_items, internal_notes)
   values
-    (cid, lead_ids[2], 'Fleet onderhoud — jaarplan (3 voertuigen)', 'Jaarplan volgens fabriek + APK-termijnen.', 'sent', 'EUR', 2100, 0.21, 441, 2541,
+    ((select cid), lead_ids[2], 'Fleet onderhoud — jaarplan (3 voertuigen)', 'Jaarplan volgens fabriek + APK-termijnen.', 'sent', 'EUR', 2100, 0.21, 441, 2541,
      '[{"id":"1","description":"Jaaronderhoud pakket (per voertuig)","quantity":3,"unit_price":600,"line_total":1800},{"id":"2","description":"APK + admin","quantity":3,"unit_price":90,"line_total":270},{"id":"3","description":"Planning prioriteit","quantity":1,"unit_price":30,"line_total":30}]'::jsonb,
      'Check lease parts policy.'),
-    (cid, lead_ids[1], 'APK + reminspectie (VW Golf)', 'APK + visuele reminspectie.', 'draft', 'EUR', 189, 0.21, 40, 229,
+    ((select cid), lead_ids[1], 'APK + reminspectie (VW Golf)', 'APK + visuele reminspectie.', 'draft', 'EUR', 189, 0.21, 40, 229,
      '[{"id":"1","description":"APK","quantity":1,"unit_price":59,"line_total":59},{"id":"2","description":"Reminspectie","quantity":1,"unit_price":85,"line_total":85},{"id":"3","description":"Materialen","quantity":1,"unit_price":45,"line_total":45}]'::jsonb,
      'Als remblokken: foto + offerte deel 2.'),
-    (cid, lead_ids[7], 'Spot repair voorruit (klein)', 'Reparatie kleine steenslag.', 'sent', 'EUR', 95, 0.21, 20, 115,
+    ((select cid), lead_ids[7], 'Spot repair voorruit (klein)', 'Reparatie kleine steenslag.', 'sent', 'EUR', 95, 0.21, 20, 115,
      '[{"id":"1","description":"Spot repair","quantity":1,"unit_price":95,"line_total":95}]'::jsonb,
      'Wacht op polis akkoord.');
 
   insert into public.appointments (company_id, lead_id, starts_at, ends_at, status, notes)
   values
-    (cid, lead_ids[3], now() + interval '1 day', now() + interval '1 day' + interval '45 minutes', 'confirmed', 'Airco — BMW YY-999-Z'),
-    (cid, lead_ids[1], now() + interval '3 days', now() + interval '3 days' + interval '45 minutes', 'tentative', 'APK + rem — nog bevestigen'),
-    (cid, lead_ids[5], now() + interval '7 days', now() + interval '7 days' + interval '4 hours', 'scheduled', 'Grote beurt + distributie');
+    ((select cid), lead_ids[3], now() + interval '1 day', now() + interval '1 day' + interval '45 minutes', 'confirmed', 'Airco — BMW YY-999-Z'),
+    ((select cid), lead_ids[1], now() + interval '3 days', now() + interval '3 days' + interval '45 minutes', 'tentative', 'APK + rem — nog bevestigen'),
+    ((select cid), lead_ids[5], now() + interval '7 days', now() + interval '7 days' + interval '4 hours', 'scheduled', 'Grote beurt + distributie');
 
   insert into public.automations (company_id, name, trigger_type, delay_minutes, template_text, enabled)
   values
-    (cid, 'Follow-up na lead', 'lead_created', 10, 'Hi {{name}}, bedankt voor je bericht. Kunnen we vandaag nog 10 minuten afstemmen over je APK/onderhoud?', true),
-    (cid, 'Reminder offerte', 'quote_sent', 1440, 'Hi {{name}}, even checken: heb je de offerte kunnen bekijken? Ik kan morgen kort bellen als je wilt.', true),
-    (cid, 'Laatste duw', 'no_reply', 4320, 'Hi {{name}}, ik sluit je dossier bij geen reactie. Zal ik je over 2 weken een seintje geven voor APK?', true);
+    ((select cid), 'Follow-up na lead', 'lead_created', 10, 'Hi {{name}}, bedankt voor je bericht. Kunnen we vandaag nog 10 minuten afstemmen over je APK/onderhoud?', true),
+    ((select cid), 'Reminder offerte', 'quote_sent', 1440, 'Hi {{name}}, even checken: heb je de offerte kunnen bekijken? Ik kan morgen kort bellen als je wilt.', true),
+    ((select cid), 'Laatste duw', 'no_reply', 4320, 'Hi {{name}}, ik sluit je dossier bij geen reactie. Zal ik je over 2 weken een seintje geven voor APK?', true);
 
   raise notice 'Seed complete for company %', cid;
 end $$;

@@ -204,9 +204,9 @@ export function getLandingChatHints(role: NicheId): {
 
   const QUICK_PROMPTS: Partial<Record<NicheId, readonly string[]>> = {
     general_services: [
-      "Ik wil volgende week een afspraak — wat past?",
-      "Wat kost een kleine klus ongeveer?",
-      "Kan iemand vandaag nog langskomen?",
+      "Ik wil een afspraak maken",
+      "Wat kost het?",
+      "Wanneer hebben jullie plek?",
     ],
     garage: [
       "APK volgende week — is er leenvervoer?",
@@ -272,8 +272,8 @@ export function getLandingChatHints(role: NicheId): {
   ] as const;
 
   return {
-    sectionTitle: "Proef het zelf: zo voelt snelle opvolging",
-    sectionSub: `Kies je branche (${short}), tik een voorbeeld aan of typ zelf — je ziet meteen een eerste antwoord en wat de aanvraag ongeveer waard kan zijn.`,
+    sectionTitle: "Probeer het zelf — binnen 10 seconden",
+    sectionSub: `Kies je branche (${short}), tik een voorbeeld aan of typ zelf. Je ziet direct hoe snel en duidelijk je reactie kan zijn.`,
     emptyExamples: EXAMPLES[role] ?? EXAMPLES_FALLBACK,
     inputPlaceholder: PLACEHOLDERS[role] ?? "Typ je vraag of afspraak…",
     quickPrompts: [...(QUICK_PROMPTS[role] ?? quickFallback)],

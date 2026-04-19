@@ -1,34 +1,29 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { AlertCircle, Clock, Inbox, MessageSquareOff, Wallet } from "lucide-react";
+import { Clock, Inbox, MessageSquareX, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const ITEMS = [
   {
-    title: "Je ziet aanvragen te laat",
-    body: "Na je werk pas mail openen — en dan is de klant al bij iemand anders geweest.",
+    title: "Je reageert te laat",
+    body: "De klant is al weg voordat jij antwoord geeft.",
     Icon: Clock,
   },
   {
-    title: "Berichten liggen verspreid",
-    body: "WhatsApp hier, mail daar, een formulier ergens anders. Geen één plek waar je rustig prioriteit kunt geven.",
+    title: "Berichten staan overal",
+    body: "WhatsApp, mail, formulier — geen overzicht.",
     Icon: Inbox,
   },
   {
-    title: "Offertes en terugbellen blijven liggen",
-    body: "Je bedoelde het goed — maar tussen twee klussen schiet opvolgen er vaak bij in.",
-    Icon: MessageSquareOff,
+    title: "Opvolging schiet erbij in",
+    body: "Druk → vergeten → gemiste omzet.",
+    Icon: MessageSquareX,
   },
   {
-    title: "Je concurrent reageert eerder",
-    body: "De klant vergelijkt niet alleen prijs — maar ook wie eerst serieus antwoord geeft.",
-    Icon: AlertCircle,
-  },
-  {
-    title: "Het voelt minder erg dan het is",
-    body: "Losse aanvragen lijken klein — bij elkaar is het maandelijks gemiste omzet waar je niet van slaapt als je het een keer uitrekent.",
-    Icon: Wallet,
+    title: "Concurrent is sneller",
+    body: "Niet de goedkoopste wint — de snelste die serieus antwoord geeft.",
+    Icon: Zap,
   },
 ] as const;
 
@@ -44,48 +39,34 @@ export function LandingPainCostSection({ className }: { className?: string }) {
     <section
       id="wat-het-kost"
       className={cn(
-        "relative overflow-hidden border-b border-border/30 py-16 md:py-20 lg:py-24 dark:border-white/[0.06]",
+        "relative overflow-hidden border-b border-border/30 py-16 md:py-24 lg:py-28 dark:border-white/[0.06]",
         className,
       )}
     >
       <div className="relative mx-auto max-w-[1180px] px-4 md:px-8">
         <motion.div className="mx-auto max-w-2xl text-center" {...fade}>
-          <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">
-            Dit herken je vast
-          </p>
-          <h2 className="mt-3 text-balance text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
-            Wat het je nu kost — zonder dat je het altijd doorhebt
+          <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">Herkenning</p>
+          <h2 className="mt-3 text-balance text-2xl font-semibold tracking-tight text-foreground md:text-4xl">
+            Wat het je nu kost (zonder dat je het ziet)
           </h2>
-          <p className="mt-5 text-base leading-[1.65] text-muted-foreground md:text-lg">
-            Geen verwijt: als kleine ondernemer ben je met je werk bezig. Maar elke gemiste of trage reactie is een opening voor een ander — en dat raakt je omzet.
+          <p className="mt-5 text-base leading-relaxed text-muted-foreground md:text-lg">
+            Geen verwijt — wel harde economie: als je niet op tijd reageert, verlies je klanten aan iemand die dat wél doet.
           </p>
         </motion.div>
 
         <motion.ul
-          className="mt-14 grid gap-4 sm:grid-cols-2"
+          className="mt-14 grid gap-4 md:grid-cols-2"
           {...fade}
           transition={{ ...fade.transition, delay: 0.06 }}
         >
-          {ITEMS.map(({ title, body, Icon }, idx) => (
-            <li
-              key={title}
-              className={cn(
-                "cf-landing-pro-card flex gap-4 p-6 md:gap-5 md:p-7",
-                idx === ITEMS.length - 1 && "sm:col-span-2",
-              )}
-            >
+          {ITEMS.map(({ title, body, Icon }) => (
+            <li key={title} className="cf-landing-pro-card flex gap-4 p-7 md:gap-5 md:p-8">
               <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/[0.1] text-primary ring-1 ring-primary/15">
                 <Icon className="size-5" strokeWidth={1.75} aria-hidden />
               </div>
               <div className="min-w-0">
-                <h3 className="font-semibold leading-snug text-foreground">{title}</h3>
+                <h3 className="text-lg font-semibold leading-snug text-foreground">{title}</h3>
                 <p className="mt-2 text-[0.9375rem] leading-relaxed text-muted-foreground">{body}</p>
-                {title === "Het voelt minder erg dan het is" ? (
-                  <p className="mt-4 text-[0.9375rem] leading-relaxed text-muted-foreground">
-                    <span className="font-medium text-foreground">Gevolg:</span> omzet die je niet ziet verdwijnen — tot je
-                    het bij elkaar optelt. Met tempo en overzicht verdwijnen minder aanvragen tussen wal en schip.
-                  </p>
-                ) : null}
               </div>
             </li>
           ))}

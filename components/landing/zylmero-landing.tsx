@@ -10,44 +10,52 @@ import {
   ChevronDown,
   Inbox,
   MessageCircle,
-  Quote,
   Sparkles,
 } from "lucide-react";
 import { AnonymousDemoForm } from "@/components/landing/demo-role-context";
 import { HeroInboxMock } from "@/components/landing/hero-inbox-mock";
+import { LandingFinalCtaSection } from "@/components/landing/landing-final-cta-section";
+import { LandingImpactSection } from "@/components/landing/landing-impact-section";
 import { LandingInteractiveChat } from "@/components/landing/landing-interactive-chat";
-import { LandingNav } from "@/components/landing/landing-nav";
 import { LandingMissedRevenueEstimator } from "@/components/landing/landing-missed-revenue-estimator";
+import { LandingModulesSection } from "@/components/landing/landing-modules-section";
+import { LandingNav } from "@/components/landing/landing-nav";
 import { LandingPainCostSection } from "@/components/landing/landing-pain-cost-section";
+import { LandingResultSection } from "@/components/landing/landing-result-section";
+import { LandingSolutionSection } from "@/components/landing/landing-solution-section";
 import { StickyConversionBar } from "@/components/landing/sticky-conversion-bar";
 import { Button } from "@/components/ui/button";
 import { BILLING_PLANS } from "@/lib/billing/plans";
 import { BRAND_CONTACT_EMAIL, BRAND_LOGO_MONOGRAM, BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
-const HERO_H1 = "Jouw website naar een niveau hoger tillen?";
+const HERO_H1 = "Elke gemiste aanvraag kost je geld — zonder dat je het doorhebt";
 
 const HERO_SUB =
-  "Een chatbot op je site die meteen antwoord geeft — plus overzicht wanneer het via mail of WhatsApp binnenkomt. Zylmero helpt zzp’ers en kleine teams om sneller te reageren en minder aanvragen te missen, zonder de hele dag online te hoeven zijn.";
+  "Zylmero reageert direct op je klanten, filtert serieuze aanvragen en helpt richting afspraak. Jij hoeft niet de hele dag online te zijn — maar mist geen klant meer onnodig.";
 
-const HERO_TRUST = "Voor garages, salons, monteurs, praktijken — iedereen die klanten via meerdere kanalen binnen krijgt";
+const HERO_BULLETS = [
+  "Reageert binnen seconden",
+  "Meer afspraken zonder extra werk",
+  "Werkt via je website, mail en WhatsApp",
+] as const;
 
 const FAQ_ITEMS = [
   {
-    q: "Kost dit veel tijd om op te zetten?",
-    a: "Nee — je koppelt je kanalen en werkt vanuit één overzicht. Je hoeft geen IT-project te draaien: start klein, breid uit als het bevalt.",
+    q: "Is dit moeilijk om te gebruiken?",
+    a: "Nee. Je start binnen enkele minuten: overzicht, eerste antwoorden, en later optioneel een website-chat. Geen IT-project.",
   },
   {
-    q: "Ik ben maar klein — heb ik dit wel nodig?",
-    a: "Juist kleine zaken verliezen aanvragen omdat er niemand fulltime achter de telefoon zit. Als je genoeg hebt aan mail, WhatsApp en website om klanten binnen te krijgen, heb je genoeg aan structuur om ze niet te verliezen.",
+    q: "Werkt dit voor mijn bedrijf?",
+    a: "Als je aanvragen krijgt — mail, WhatsApp of website — dan wel. Het gaat om snelheid en overzicht, niet om je sectorlabel.",
   },
   {
-    q: "Waarvoor betaal ik precies?",
-    a: "Voor minder chaos in je aanvragen en snellere opvolging — zodat je minder omzet laat liggen. Geen betaling voor “software om software”; wel voor grip en tempo richting klanten.",
+    q: "Wat levert het echt op?",
+    a: "Minder gemiste klanten en snellere opvolging: meer geboekte momenten uit dezelfde stroom aanvragen. Geen belofte van magie — wél minder omzet laten liggen.",
   },
   {
-    q: "Zit ik ergens aan vast?",
-    a: "Niet voor de proef. Betaald abonnement: maandelijks opzegbaar, geen jaarcontract. Je hoeft niet alles meteen af te nemen — later modules bijzetten kan.",
+    q: "Kan ik stoppen?",
+    a: "Ja. Betaald abonnement is maandelijks opzegbaar. Geen kleine letter-fratsen in deze uitleg — check wel je bevestiging bij start.",
   },
 ] as const;
 
@@ -57,13 +65,6 @@ const fadeUp = {
   viewport: { once: true, margin: "-50px" },
   transition: { duration: 0.28, ease: [0.22, 1, 0.36, 1] },
 };
-
-function testimonialInitials(name: string) {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  const a = parts[0]?.[0];
-  const b = parts.length > 1 ? parts[parts.length - 1]?.[0] : parts[0]?.[1];
-  return [a, b].filter(Boolean).join("").toUpperCase();
-}
 
 export function ZylmeroLanding() {
   return (
@@ -82,28 +83,25 @@ export function ZylmeroLanding() {
           aria-hidden
         />
 
-        <div className="relative mx-auto max-w-[1200px] px-4 pb-16 pt-10 md:px-8 md:pb-24 md:pt-14 lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-14">
+        <div className="relative mx-auto max-w-[1200px] px-4 pb-20 pt-12 md:px-8 md:pb-28 md:pt-16 lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16">
           <motion.div {...fadeUp}>
-            <span className="mb-6 inline-flex max-w-full rounded-full border border-primary/25 bg-primary/[0.06] px-4 py-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-primary">
-              {HERO_TRUST}
-            </span>
-            <h1 className="text-balance text-4xl font-semibold leading-[1.06] tracking-tight text-foreground md:text-5xl lg:text-[3.25rem] dark:bg-gradient-to-b dark:from-white dark:to-zinc-400 dark:bg-clip-text dark:text-transparent">
+            <h1 className="text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-foreground md:text-5xl lg:text-[3.45rem] lg:leading-[1.02] dark:bg-gradient-to-b dark:from-white dark:to-zinc-400 dark:bg-clip-text dark:text-transparent">
               {HERO_H1}
             </h1>
-            <p className="mt-6 max-w-xl text-base leading-[1.65] text-muted-foreground md:text-lg">
+            <p className="mt-8 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg lg:text-xl">
               {HERO_SUB}
             </p>
-            <div className="mt-6 flex max-w-xl flex-wrap gap-2">
-              {["Chatbot op je site", "Mail & WhatsApp samen", "Minder leads missen"].map((label) => (
-                <span
-                  key={label}
-                  className="rounded-full border border-border/50 bg-muted/35 px-3 py-1 text-xs text-muted-foreground shadow-sm dark:border-white/[0.08] dark:bg-white/[0.04]"
-                >
+            <ul className="mt-10 max-w-xl space-y-3">
+              {HERO_BULLETS.map((label) => (
+                <li key={label} className="flex gap-3 text-[0.9375rem] font-medium leading-snug text-foreground md:text-base">
+                  <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary ring-1 ring-primary/25">
+                    <Check className="size-3.5" aria-hidden strokeWidth={2.5} />
+                  </span>
                   {label}
-                </span>
+                </li>
               ))}
-            </div>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+            </ul>
+            <div className="mt-12 flex flex-col gap-3 sm:flex-row sm:items-center">
               <Button
                 asChild
                 size="lg"
@@ -123,9 +121,7 @@ export function ZylmeroLanding() {
                 </Button>
               </AnonymousDemoForm>
             </div>
-            <p className="mt-6 text-sm text-muted-foreground">
-              Geen creditcard om te starten · maandelijks opzegbaar · geen jaarcontract
-            </p>
+            <p className="mt-8 text-sm text-muted-foreground">Geen creditcard · maandelijks opzegbaar</p>
           </motion.div>
           <div className="relative mt-16 lg:mt-0">
             <div
@@ -141,49 +137,53 @@ export function ZylmeroLanding() {
 
       <LandingPainCostSection />
 
+      <LandingImpactSection />
+
+      <LandingSolutionSection />
+
       <motion.section
         id="hoe-het-werkt"
-        className="relative border-b border-border/30 bg-gradient-to-b from-muted/25 via-muted/10 to-transparent py-16 md:py-24 dark:border-white/[0.06] dark:from-white/[0.03] dark:via-transparent dark:to-transparent"
+        className="relative scroll-mt-28 border-b border-border/30 bg-gradient-to-b from-muted/25 via-muted/10 to-transparent py-20 md:py-24 dark:border-white/[0.06] dark:from-white/[0.03] dark:via-transparent dark:to-transparent"
         {...fadeUp}
       >
         <div className="mx-auto max-w-[1180px] px-4 md:px-8">
-          <h2 className="text-center text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
-            Zo werkt het
+          <h2 className="text-center text-2xl font-semibold tracking-tight text-foreground md:text-4xl">
+            Zo werkt het (simpel)
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-center text-base leading-[1.65] text-muted-foreground">
-            Aanvraag binnen, snel antwoord, duidelijke volgende stap — ook als jij net op de klus staat.
+          <p className="mx-auto mt-5 max-w-xl text-center text-base leading-relaxed text-muted-foreground md:text-lg">
+            Geen handleiding van twintig pagina&apos;s — drie stappen.
           </p>
 
-          <ol className="mt-12 grid gap-5 md:grid-cols-3 md:gap-6">
+          <ol className="mt-14 grid gap-6 md:grid-cols-3 md:gap-8">
             {(
               [
                 {
                   step: "1",
                   title: "Aanvraag komt binnen",
-                  body: "Via site, mail of WhatsApp — niet meer zoeken welk kanaal het was.",
+                  body: "Via je site, mail of WhatsApp.",
                   Icon: Inbox,
                 },
                 {
                   step: "2",
-                  title: `${BRAND_NAME} helpt je antwoorden`,
-                  body: "Via je site-chat en je kanalen: een eerste reactie in jouw branchetaal.",
+                  title: `${BRAND_NAME} reageert direct`,
+                  body: "Strak eerste antwoord — ook als jij op de klus staat.",
                   Icon: MessageCircle,
                 },
                 {
                   step: "3",
-                  title: "Van vraag naar geboekt moment",
-                  body: "Je ziet wie wat heeft gezegd en wat nog openstaat.",
+                  title: "Klant boekt of wacht op jou",
+                  body: "Jij ziet wat er speelt en pakt het op waar nodig.",
                   Icon: CalendarCheck,
                 },
               ] as const
             ).map((item) => (
-              <li key={item.step} className="cf-landing-pro-card p-6 md:p-7">
-                <div className="flex size-11 items-center justify-center rounded-xl bg-primary/[0.1] text-primary ring-1 ring-primary/15">
-                  <item.Icon className="size-5" strokeWidth={1.75} aria-hidden />
+              <li key={item.step} className="cf-landing-pro-card p-8 md:p-9">
+                <div className="flex size-12 items-center justify-center rounded-xl bg-primary/[0.1] text-primary ring-1 ring-primary/15">
+                  <item.Icon className="size-6" strokeWidth={1.75} aria-hidden />
                 </div>
-                <p className="mt-5 text-[0.65rem] font-semibold uppercase tracking-[0.15em] text-primary">Stap {item.step}</p>
-                <h3 className="mt-2 text-lg font-semibold tracking-tight text-foreground">{item.title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{item.body}</p>
+                <p className="mt-6 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-primary">Stap {item.step}</p>
+                <h3 className="mt-2 text-xl font-semibold tracking-tight text-foreground">{item.title}</h3>
+                <p className="mt-4 text-[0.9375rem] leading-relaxed text-muted-foreground">{item.body}</p>
               </li>
             ))}
           </ol>
@@ -192,50 +192,60 @@ export function ZylmeroLanding() {
 
       <motion.section
         id="chatbots"
-        className="scroll-mt-28 border-b border-border/30 py-16 md:py-20 dark:border-white/[0.06]"
+        className="scroll-mt-28 border-b border-border/30 py-20 md:py-24 dark:border-white/[0.06]"
         {...fadeUp}
       >
         <div className="mx-auto max-w-[1180px] px-4 md:px-8">
           <div className="mx-auto max-w-2xl text-center">
-            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">Chatbots bouwen</p>
-            <h2 className="mt-3 text-balance text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
-              Chatbots voor bedrijven — én voor jezelf
+            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">Website</p>
+            <h2 className="mt-4 text-balance text-2xl font-semibold tracking-tight text-foreground md:text-4xl">
+              Zet een chatbot op je website in 5 minuten
             </h2>
-            <p className="mt-5 text-base leading-[1.65] text-muted-foreground md:text-lg">
-              Met {BRAND_NAME} zet je een chatbot op die in de taal van de branche praat: afspraken, prijsindicaties,
-              veelgestelde vragen. Ideaal om voor klanten te leveren, en net zo handig om voor je eigen zaak (of je eigen
-              side-project) snel live te zetten zonder eerst een heel bouwproject te hoeven starten.
+            <p className="mt-6 text-base leading-relaxed text-muted-foreground md:text-lg">
+              Bezoekers stellen vragen — jouw chatbot reageert meteen. Zelfs als jij aan het werk bent of offline.
             </p>
           </div>
 
-          <div className="mt-12 grid gap-5 md:grid-cols-2 md:gap-6">
-            <div className="cf-landing-pro-card p-6 md:p-8">
+          <ul className="mx-auto mt-12 grid max-w-3xl gap-3 text-left sm:mx-auto">
+            {[
+              "Beantwoord vragen automatisch",
+              "Laat klanten afspraken aanvragen",
+              "Werkt 24/7",
+            ].map((label) => (
+              <li
+                key={label}
+                className="flex items-center gap-3 rounded-xl border border-border/45 bg-muted/25 px-5 py-4 text-[0.9375rem] font-medium text-foreground dark:border-white/[0.08] dark:bg-white/[0.04]"
+              >
+                <Check className="size-5 shrink-0 text-primary" aria-hidden strokeWidth={2.25} />
+                {label}
+              </li>
+            ))}
+          </ul>
+
+          <p className="mx-auto mt-12 max-w-2xl text-center text-sm leading-relaxed text-muted-foreground md:text-[0.9375rem]">
+            In je account bouw je de bot in het dashboard onder <strong className="text-foreground">Website-chat</strong>. Plak één regel code op je site — actief met een geldige proef of betaald abonnement.
+          </p>
+
+          <div className="mt-10 grid gap-5 md:grid-cols-2 md:gap-6">
+            <div className="cf-landing-pro-card p-8 md:p-9">
               <div className="flex size-11 items-center justify-center rounded-xl bg-primary/[0.1] text-primary ring-1 ring-primary/15">
                 <Bot className="size-5" strokeWidth={1.75} aria-hidden />
               </div>
-              <h3 className="mt-6 text-lg font-semibold text-foreground">Voor andere bedrijven</h3>
+              <h3 className="mt-6 text-lg font-semibold text-foreground">Voor klanten bouwen</h3>
               <p className="mt-3 text-[0.9375rem] leading-relaxed text-muted-foreground">
-                Bouw chatbots voor salons, garages, monteurs, praktijken — waar ook maar mensen via de site en WhatsApp
-                binnenstromen. Dezelfde bouwstenen, steeds passend bij de klant.
+                Dezelfde bouwstenen voor salons, garages, monteurs en praktijken — snel live, strak afgesteld.
               </p>
             </div>
-            <div className="cf-landing-pro-card p-6 md:p-8">
+            <div className="cf-landing-pro-card p-8 md:p-9">
               <div className="flex size-11 items-center justify-center rounded-xl bg-primary/[0.1] text-primary ring-1 ring-primary/15">
                 <Sparkles className="size-5" strokeWidth={1.75} aria-hidden />
               </div>
               <h3 className="mt-6 text-lg font-semibold text-foreground">Voor jezelf</h3>
               <p className="mt-3 text-[0.9375rem] leading-relaxed text-muted-foreground">
-                Test uit voor je eigen onderneming, zet een eerste versie live, en trek het bij als je meer wilt
-                automatiseren — zonder dat het een tweede baan wordt om bij te houden.
+                Begin klein, breid uit als het bevalt — geen tweede baan aan onderhoud.
               </p>
             </div>
           </div>
-
-          <p className="mx-auto mt-10 max-w-xl text-center text-sm leading-relaxed text-muted-foreground">
-            Hieronder kun je meteen een voorbeeld-chat uitproberen. Met een account stel je kennis en toon in, en plak je
-            onder <strong className="text-foreground">Instellingen → Widget</strong> de code op je site — actief zodra je
-            proef- of betaalabonnement loopt.
-          </p>
         </div>
       </motion.section>
 
@@ -243,56 +253,11 @@ export function ZylmeroLanding() {
         <LandingInteractiveChat />
       </div>
 
-      <motion.section className="border-b border-border/30 py-16 md:py-20 dark:border-white/[0.06]" {...fadeUp}>
-        <div className="mx-auto max-w-[1180px] px-4 md:px-8">
-          <h2 className="text-center text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
-            Wat andere ondernemers merken
-          </h2>
-          <p className="mx-auto mt-3 max-w-2xl text-center text-sm leading-relaxed text-muted-foreground">
-            Voorbeelden — geen echte klantquotes. Wel herkenbare situaties.
-          </p>
-          <div className="mt-12 grid gap-5 md:grid-cols-3 md:gap-6">
-            {[
-              {
-                name: "Rick de Vries",
-                role: "Garagehouder · Apeldoorn",
-                quote:
-                  "Ik zie eerder welke klant haast heeft. Minder gesprekken gemist tussen twee monteurs door.",
-              },
-              {
-                name: "Floor Martens",
-                role: "Fysiotherapiepraktijk · Amersfoort",
-                quote:
-                  "Patiënten mailen ook buiten receptietijden — nu leggen we niet meer onbedoeld een week stil.",
-              },
-              {
-                name: "Soufiane El Amrani",
-                role: "Installatie · Den Haag",
-                quote:
-                  "Spoed staat vooraan in het overzicht. Ik hoef niet meer vijf gesprekken terug te scrollen.",
-              },
-            ].map((t) => (
-              <blockquote key={t.name} className="cf-landing-pro-card flex h-full flex-col p-6 md:p-7">
-                <Quote className="size-5 text-primary/45" aria-hidden />
-                <p className="mt-4 flex-1 text-[0.9375rem] leading-relaxed text-foreground">&ldquo;{t.quote}&rdquo;</p>
-                <footer className="mt-6 flex items-center gap-3 border-t border-border/40 pt-5 dark:border-white/[0.07]">
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/[0.12] text-xs font-semibold text-primary ring-1 ring-primary/20">
-                    {testimonialInitials(t.name)}
-                  </span>
-                  <div className="min-w-0 text-sm">
-                    <p className="font-semibold text-foreground">{t.name}</p>
-                    <p className="mt-0.5 text-muted-foreground">{t.role}</p>
-                  </div>
-                </footer>
-              </blockquote>
-            ))}
-          </div>
-        </div>
-      </motion.section>
+      <LandingResultSection />
 
       <motion.section
         id="prijzen"
-        className="border-b border-border/30 py-16 md:py-20 dark:border-white/[0.06]"
+        className="border-b border-border/30 py-20 md:py-24 dark:border-white/[0.06]"
         {...fadeUp}
       >
         <div className="mx-auto max-w-[1200px] px-4 md:px-8">
@@ -300,18 +265,21 @@ export function ZylmeroLanding() {
             <LandingMissedRevenueEstimator className="mb-2" />
           </div>
 
-          <h2 className="mt-14 text-center text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
-            Prijzen
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl text-center text-base leading-[1.65] text-muted-foreground">
-            Start gratis. Daarna een vast bedrag per maand — klein beginnen kan, uitbreiden ook.
+          <p className="mx-auto mt-14 max-w-2xl text-center text-sm font-medium text-primary md:text-base">
+            Vaak al terugverdiend met 1 extra afspraak per maand
           </p>
-          <div className="mt-12 grid gap-6 lg:grid-cols-3 lg:items-stretch">
+          <h2 className="mt-4 text-center text-2xl font-semibold tracking-tight text-foreground md:text-4xl">
+            Kies wat bij je past
+          </h2>
+          <p className="mx-auto mt-5 max-w-xl text-center text-base leading-relaxed text-muted-foreground md:text-lg">
+            Start gratis. Daarna vast per maand — klein beginnen kan, uitbreiden ook.
+          </p>
+          <div className="mt-14 grid gap-6 lg:grid-cols-3 lg:items-stretch">
             {BILLING_PLANS.map((plan) => (
               <div
                 key={plan.id}
                 className={cn(
-                  "relative flex flex-col rounded-2xl border p-6 transition-[transform,box-shadow] duration-200 md:p-7",
+                  "relative flex flex-col rounded-2xl border p-7 transition-[transform,box-shadow] duration-200 md:p-8",
                   plan.popular
                     ? "z-[1] border-primary/40 bg-primary/[0.07] shadow-[0_24px_70px_-40px_hsl(var(--primary)/0.55)] ring-1 ring-primary/25 dark:bg-primary/[0.1] lg:scale-[1.02]"
                     : "border-border/40 bg-card/50 shadow-[0_18px_50px_-38px_rgb(0_0_0/0.45)] dark:border-white/[0.09] dark:bg-white/[0.03] dark:shadow-black/50",
@@ -323,14 +291,14 @@ export function ZylmeroLanding() {
                   </span>
                 ) : null}
                 <h3 className="text-lg font-semibold text-foreground">{plan.name}</h3>
-                <p className="mt-2 text-sm leading-snug text-foreground">{plan.description}</p>
-                <p className="mt-2 text-xs leading-snug text-muted-foreground">{plan.audience}</p>
-                <p className="mt-6">
+                <p className="mt-2 text-sm font-medium leading-snug text-foreground">{plan.description}</p>
+                <p className="mt-3 text-xs leading-snug text-muted-foreground">{plan.audience}</p>
+                <p className="mt-8">
                   <span className="text-4xl font-bold tabular-nums md:text-5xl">€{plan.priceEur}</span>
                   <span className="text-muted-foreground">/mnd</span>
                 </p>
                 <p className="mt-2 text-[0.7rem] text-muted-foreground">{plan.leadCapLabel}</p>
-                <ul className="mt-6 flex-1 space-y-3 text-sm text-foreground">
+                <ul className="mt-8 flex-1 space-y-3.5 text-sm text-foreground">
                   {plan.features.map((f) => (
                     <li key={f} className="flex gap-2">
                       <Check className="mt-0.5 size-4 shrink-0 text-primary" />
@@ -340,7 +308,7 @@ export function ZylmeroLanding() {
                 </ul>
                 <Button
                   asChild
-                  className={cn("mt-6 h-11 w-full rounded-xl text-sm font-semibold md:h-12 md:text-base")}
+                  className={cn("mt-8 h-12 w-full rounded-xl text-sm font-semibold md:h-12 md:text-base")}
                   variant={plan.popular ? "default" : "outline"}
                 >
                   <Link href="/signup">Start gratis</Link>
@@ -349,22 +317,24 @@ export function ZylmeroLanding() {
             ))}
           </div>
 
-          <p className="mx-auto mt-12 max-w-lg text-center text-sm leading-relaxed text-muted-foreground">
-            Start klein en breid uit wanneer het past.
+          <p className="mx-auto mt-14 max-w-lg text-center text-sm leading-relaxed text-muted-foreground">
+            Kleiner starten, later modules bijzetten — je betaalt niet voor wat je niet gebruikt.
           </p>
         </div>
       </motion.section>
 
+      <LandingModulesSection />
+
       <motion.section
         id="faq"
-        className="border-b border-border/30 py-16 md:py-20 dark:border-white/[0.06]"
+        className="border-b border-border/30 py-20 md:py-24 dark:border-white/[0.06]"
         {...fadeUp}
       >
         <div className="mx-auto max-w-3xl px-4 md:px-8">
           <div className="text-center">
             <h2 className="text-2xl font-semibold tracking-tight text-foreground md:text-3xl">Veelgestelde vragen</h2>
           </div>
-          <div className="mt-10 space-y-3">
+          <div className="mt-12 space-y-3">
             {FAQ_ITEMS.map((item) => (
               <details
                 key={item.q}
@@ -383,7 +353,9 @@ export function ZylmeroLanding() {
         </div>
       </motion.section>
 
-      <footer className="border-t border-border/40 py-10 dark:border-white/[0.06]">
+      <LandingFinalCtaSection />
+
+      <footer className="border-t border-border/40 py-12 dark:border-white/[0.06]">
         <div className="mx-auto flex max-w-[1200px] flex-col items-center gap-8 px-4 md:flex-row md:justify-between md:px-8">
           <div className="flex flex-col items-center gap-3 md:items-start">
             <div className="flex items-center gap-2.5">
@@ -392,7 +364,7 @@ export function ZylmeroLanding() {
               </div>
               <span className="font-semibold text-foreground">{BRAND_NAME}</span>
             </div>
-            <p className="text-xs text-muted-foreground">Minder klanten missen · meer uit je aanvragen</p>
+            <p className="text-xs text-muted-foreground">Minder omzet laten liggen · sneller voor je klanten klaarstaan</p>
           </div>
           <nav className="flex flex-wrap justify-center gap-x-8 gap-y-2 text-sm font-medium text-foreground">
             <Link href="/login" className="transition-colors hover:text-foreground">

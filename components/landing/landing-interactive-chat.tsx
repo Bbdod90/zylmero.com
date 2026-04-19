@@ -431,7 +431,7 @@ export function LandingInteractiveChat() {
       };
       setMessages((prev) => [...prev, bot]);
       setBusy(false);
-    }, 120);
+    }, 45);
   }
 
   return (
@@ -456,7 +456,7 @@ export function LandingInteractiveChat() {
           </p>
         </div>
 
-        <div className="relative mx-auto mt-12 max-w-2xl scroll-mt-24">
+        <div className="relative mx-auto mt-12 max-w-3xl scroll-mt-24">
           <div
             className="pointer-events-none absolute -inset-5 rounded-[1.65rem] bg-[radial-gradient(ellipse_at_45%_30%,hsl(var(--primary)/0.26),transparent_62%)] blur-2xl dark:bg-[radial-gradient(ellipse_at_45%_28%,hsl(var(--primary)/0.32),transparent_65%)]"
             aria-hidden
@@ -600,7 +600,7 @@ export function LandingInteractiveChat() {
                   maxLength={400}
                   disabled={busy}
                   className={cn(
-                    "h-12 min-h-[48px] flex-1 rounded-2xl text-sm focus-visible:ring-primary/40",
+                    "h-14 min-h-[56px] flex-1 rounded-2xl text-base focus-visible:ring-primary/40",
                     "border-border/80 bg-background text-foreground placeholder:text-muted-foreground",
                     "dark:border-white/10 dark:bg-zinc-900/80 dark:text-white dark:placeholder:text-white",
                   )}
@@ -610,7 +610,7 @@ export function LandingInteractiveChat() {
                 <Button
                   type="submit"
                   disabled={busy || !input.trim()}
-                  className="h-12 min-w-[52px] shrink-0 rounded-2xl px-4 font-bold shadow-lg shadow-primary/25"
+                  className="h-14 min-w-[56px] shrink-0 rounded-2xl px-5 font-bold shadow-lg shadow-primary/25"
                   aria-label="Verstuur bericht"
                 >
                   <Send className="size-5" />
