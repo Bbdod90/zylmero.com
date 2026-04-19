@@ -381,32 +381,6 @@ export function ZylmeroLanding() {
         </div>
       </motion.section>
 
-      <motion.section className="border-b border-border/30 py-16 md:py-20 dark:border-white/[0.06]" {...fadeUp}>
-        <div className="mx-auto max-w-xl px-4 text-center md:px-8">
-          <div className="cf-landing-pro-card px-6 py-10 md:px-10 md:py-12">
-            <h2 className="text-2xl font-semibold tracking-tight text-foreground md:text-3xl">Zelf proberen</h2>
-            <p className="mt-4 text-base leading-[1.65] text-muted-foreground">
-              Probeer de chat hierboven — zo voelt snelle opvolging voor je klant.
-            </p>
-            <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center">
-              <Button asChild size="lg" className="h-12 rounded-xl px-7 text-base font-semibold sm:h-14">
-                <Link href="/signup">Start gratis</Link>
-              </Button>
-              <AnonymousDemoForm>
-                <Button
-                  type="submit"
-                  size="lg"
-                  variant="demo"
-                  className="h-12 w-full rounded-xl px-7 text-base font-semibold sm:h-14 sm:w-auto"
-                >
-                  Bekijk demo
-                </Button>
-              </AnonymousDemoForm>
-            </div>
-          </div>
-        </div>
-      </motion.section>
-
       <footer className="border-t border-border/40 py-10 dark:border-white/[0.06]">
         <div className="mx-auto flex max-w-[1200px] flex-col items-center gap-8 px-4 md:flex-row md:justify-between md:px-8">
           <div className="flex flex-col items-center gap-3 md:items-start">
