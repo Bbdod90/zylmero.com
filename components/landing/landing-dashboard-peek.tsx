@@ -48,15 +48,16 @@ export function LandingDashboardPeek({ className }: { className?: string }) {
       )}
     >
       <div
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-primary/[0.04] via-muted/20 to-background dark:from-primary/[0.06] dark:via-transparent dark:to-transparent"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-primary/[0.06] via-muted/25 to-background dark:from-primary/[0.08] dark:via-[hsl(228_28%_7%/0.5)] dark:to-transparent"
         aria-hidden
       />
+      <div className="cf-landing-grain pointer-events-none absolute inset-0 opacity-50" aria-hidden />
       <div className="relative mx-auto max-w-[1100px] px-4 md:px-8">
         <motion.div className="mx-auto max-w-2xl text-center" {...fade}>
           <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">
             Na inloggen
           </p>
-          <h2 className="mt-3 text-balance text-2xl font-bold tracking-tight text-foreground md:text-3xl">
+          <h2 className="mt-3 text-balance text-2xl font-extrabold tracking-tight text-foreground md:text-[2rem]">
             Wat je ziet zodra je inlogt
           </h2>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground md:text-lg">
@@ -71,8 +72,8 @@ export function LandingDashboardPeek({ className }: { className?: string }) {
         >
           <div
             className={cn(
-              "relative overflow-hidden rounded-[1.25rem] border border-border/55 bg-card/60 shadow-[0_28px_70px_-44px_hsl(var(--primary)/0.35)] backdrop-blur-[2px]",
-              "dark:border-white/[0.1] dark:bg-[linear-gradient(165deg,hsl(228_26%_10%/0.72),hsl(228_28%_6%/0.88))]",
+              "relative overflow-hidden rounded-[1.25rem] border border-border/55 bg-card/65 shadow-[0_32px_72px_-44px_hsl(var(--primary)/0.38)] backdrop-blur-md",
+              "dark:border-white/[0.11] dark:bg-[linear-gradient(165deg,hsl(228_26%_11%/0.82),hsl(228_28%_6%/0.92))] dark:shadow-[0_36px_80px_-48px_rgba(0,0,0,0.55)]",
             )}
           >
             <div className="flex items-center gap-3 border-b border-border/50 px-4 py-3 dark:border-white/[0.07]">

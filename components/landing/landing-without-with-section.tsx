@@ -8,7 +8,7 @@ const ZONDER = [
   "Antwoord blijft uren of dagen liggen",
   "Klant belt al door naar de volgende op Google",
   "Je weet niet welke aanvraag het dringendst is",
-  "Alles staakjes verspreid — geen rust in je hoofd",
+  "Alles in losse stukjes verspreid — geen rust in je hoofd",
   "Opvolgen schiet erbij in als je druk bent",
 ] as const;
 
@@ -37,9 +37,10 @@ export function LandingWithoutWithSection({ className }: { className?: string })
       )}
     >
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,hsl(var(--primary)/0.06),transparent_55%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_45%_at_50%_-5%,hsl(var(--primary)/0.11),transparent_58%),radial-gradient(ellipse_50%_40%_at_100%_80%,hsl(262_45%_50%/0.06),transparent_50%)]"
         aria-hidden
       />
+      <div className="cf-landing-grain pointer-events-none absolute inset-0" aria-hidden />
       <div className="relative mx-auto max-w-[1100px] px-4 md:px-8">
         <motion.div className="mx-auto max-w-2xl text-center" {...fade}>
           <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">
@@ -58,7 +59,7 @@ export function LandingWithoutWithSection({ className }: { className?: string })
             className="pointer-events-none absolute left-1/2 top-12 hidden -translate-x-1/2 lg:block"
             aria-hidden
           >
-            <div className="flex size-14 items-center justify-center rounded-full border border-primary/35 bg-background text-xs font-black uppercase tracking-wider text-primary shadow-[0_0_40px_-12px_hsl(var(--primary)/0.65)] ring-4 ring-background dark:bg-[hsl(228_28%_8%/0.95)] dark:ring-[hsl(228_28%_5%/0.98)]">
+            <div className="flex size-[3.25rem] items-center justify-center rounded-full border border-primary/40 bg-gradient-to-b from-primary/15 to-background text-[0.7rem] font-black uppercase tracking-[0.12em] text-primary shadow-[0_0_48px_-10px_hsl(var(--primary)/0.85),inset_0_1px_0_0_hsl(0_0%_100%/0.08)] ring-[5px] ring-background dark:from-primary/25 dark:to-[hsl(228_28%_8%/0.98)] dark:ring-[hsl(228_28%_5%/0.98)]">
               vs
             </div>
           </div>

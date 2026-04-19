@@ -52,6 +52,7 @@ export function LandingPainCostSection({ className }: { className?: string }) {
         className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,hsl(var(--muted)/0.35)_0%,transparent_42%),radial-gradient(ellipse_55%_45%_at_100%_30%,hsl(var(--destructive)/0.06),transparent_55%),radial-gradient(ellipse_50%_40%_at_0%_70%,hsl(var(--primary)/0.06),transparent_52%)] dark:bg-[linear-gradient(180deg,hsl(228_28%_7%/0.85)_0%,transparent_45%),radial-gradient(ellipse_55%_45%_at_100%_25%,hsl(var(--destructive)/0.08),transparent_55%)]"
         aria-hidden
       />
+      <div className="cf-landing-grain pointer-events-none absolute inset-0 opacity-50" aria-hidden />
       <div className="relative mx-auto max-w-[1100px] px-4 md:px-8">
         <motion.div className="mx-auto max-w-2xl text-center" {...fade}>
           <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">

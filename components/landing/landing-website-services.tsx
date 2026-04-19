@@ -85,17 +85,19 @@ export function LandingWebsiteServices({ className }: { className?: string }) {
     <motion.section
       id="diensten-website"
       className={cn(
-        "scroll-mt-28 border-b border-border/40 py-14 md:py-20 dark:border-white/[0.06]",
+        "relative scroll-mt-28 overflow-hidden border-b border-border/40 py-14 md:py-20 dark:border-white/[0.06]",
         className,
       )}
       {...fade}
     >
-      <div className="mx-auto max-w-[1200px] px-4 md:px-8">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_65%_50%_at_50%_-10%,hsl(var(--primary)/0.1),transparent_58%),radial-gradient(ellipse_45%_40%_at_100%_80%,hsl(262_45%_48%/0.06),transparent_50%)]" aria-hidden />
+      <div className="cf-landing-grain pointer-events-none absolute inset-0 opacity-60" aria-hidden />
+      <div className="relative mx-auto max-w-[1200px] px-4 md:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">
             Waar we mee beginnen
           </p>
-          <h2 className="mt-2 text-2xl font-bold tracking-tight text-foreground md:text-3xl">
+          <h2 className="mt-2 text-balance text-2xl font-extrabold tracking-tight text-foreground md:text-[2rem]">
             Chatbots voor websites — en wat je er nog meer bij kunt doen
           </h2>
           <p className="mt-4 text-sm leading-relaxed text-muted-foreground md:text-base">
@@ -111,8 +113,8 @@ export function LandingWebsiteServices({ className }: { className?: string }) {
             <li
               key={title}
               className={cn(
-                "group relative overflow-hidden rounded-2xl border bg-card/60 p-5 shadow-sm transition duration-300",
-                "hover:-translate-y-0.5 hover:shadow-md",
+                "group relative overflow-hidden rounded-2xl border bg-card/55 p-5 shadow-[0_12px_40px_-28px_rgba(0,0,0,0.35)] backdrop-blur-md transition duration-300",
+                "hover:-translate-y-1 hover:shadow-[0_20px_48px_-32px_hsl(var(--primary)/0.22)]",
                 emphasis
                   ? "border-primary/35 bg-gradient-to-b from-primary/[0.09] to-transparent ring-1 ring-primary/15 dark:from-primary/[0.12]"
                   : "border-border/45 hover:border-primary/28 dark:border-white/[0.08] dark:bg-[hsl(228_26%_9%/0.55)]",
