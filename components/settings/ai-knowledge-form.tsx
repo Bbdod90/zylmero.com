@@ -86,7 +86,7 @@ export function AiKnowledgeForm({
               id="ai_knowledge_website"
               name="ai_knowledge_website"
               type="url"
-              placeholder="http://localhost:3000"
+              placeholder="https://jouwbedrijf.nl"
               defaultValue={initialWebsite}
               disabled={demoMode}
               className="h-11 rounded-xl border-border/60 bg-background/80 text-base shadow-sm dark:border-white/[0.1] dark:bg-[hsl(228_24%_8%)]"

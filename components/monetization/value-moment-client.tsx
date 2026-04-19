@@ -98,6 +98,9 @@ export function ValueMomentClient() {
         <form action={completeValueMomentAction}>
           <Submit />
         </form>
+        <Button variant="secondary" asChild className="h-12 w-full rounded-xl text-base font-semibold">
+          <Link href="/dashboard/chatbots/create">Website-chat instellen</Link>
+        </Button>
         <Button variant="outline" asChild className="h-12 w-full rounded-xl border-2 border-primary/30 text-base font-bold">
           <Link href="/dashboard/upgrade">Upgrade — blijf verzilveren</Link>
         </Button>

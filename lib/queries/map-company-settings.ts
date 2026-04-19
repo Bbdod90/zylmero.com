@@ -3,6 +3,7 @@ import type {
   KnowledgeSnippet,
   WhatsAppChannelSettings,
 } from "@/lib/types";
+import { isNonPublicKnowledgeHost } from "@/lib/url/public-site-url";
 
 export function mapCompanySettingsRow(
   data: Record<string, unknown> | null,
@@ -59,11 +60,12 @@ export function mapCompanySettingsRow(
           (x) => x && typeof x.title === "string" && typeof x.body === "string",
         )
       : [],
-    ai_knowledge_website:
-      typeof prefs.ai_knowledge_website === "string" &&
-      prefs.ai_knowledge_website.trim()
-        ? prefs.ai_knowledge_website.trim()
-        : null,
+    ai_knowledge_website: (() => {
+      const w =
+        typeof prefs.ai_knowledge_website === "string" ? prefs.ai_knowledge_website.trim() : "";
+      if (!w) return null;
+      return isNonPublicKnowledgeHost(w) ? null : w;
+    })(),
     ai_knowledge_document:
       typeof prefs.ai_knowledge_document === "string" &&
       prefs.ai_knowledge_document.trim()

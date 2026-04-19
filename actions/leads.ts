@@ -300,7 +300,15 @@ export async function createLead(input: {
     .select("id")
     .single();
   if (le || !lead) {
-    return { ok: false, error: le?.message || "Lead kon niet worden aangemaakt." };
+    const raw = le?.message || "";
+    if (raw.includes("full_name") || raw.includes("schema cache")) {
+      return {
+        ok: false,
+        error:
+          "Database mist nog een kolom (full_name op leads). Voer in Supabase de nieuwste SQL-migraties uit, of neem contact op met support.",
+      };
+    }
+    return { ok: false, error: raw || "Lead kon niet worden aangemaakt." };
   }
 
   const { error: ce } = await supabase.from("conversations").insert({
