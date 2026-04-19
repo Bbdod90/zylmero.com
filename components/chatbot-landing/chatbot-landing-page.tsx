@@ -206,7 +206,7 @@ export function ChatbotLandingPage() {
               {
                 step: "3",
                 title: "Plaats hem op je site",
-                body: "Één embed — klaar. Werkt bij vrijwel elke websitebouwer.",
+                body: "In je account kopieer je één regel code vóór </body>. Live verkeer gaat als je proef- of betaalabonnement loopt — dan worden berichten ook echt verwerkt.",
               },
             ].map((item) => (
               <li key={item.step} className="cf-landing-pro-card p-6 md:p-7">
@@ -218,6 +218,11 @@ export function ChatbotLandingPage() {
               </li>
             ))}
           </ol>
+          <p className="mx-auto mt-10 max-w-2xl text-center text-sm leading-relaxed text-muted-foreground">
+            Na aanmelden: je vindt de embed onder{" "}
+            <strong className="text-foreground">Instellingen → Widget</strong> en je verfijnt antwoorden onder{" "}
+            <strong className="text-foreground">Bedrijf</strong> en <strong className="text-foreground">Kennis</strong>.
+          </p>
         </div>
       </motion.section>
 
@@ -278,7 +283,8 @@ export function ChatbotLandingPage() {
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-2xl font-semibold tracking-tight text-foreground md:text-3xl">Prijzen · chatbot</h2>
             <p className="mt-4 text-base leading-[1.65] text-muted-foreground">
-              Kies wat bij je past. Start gratis, upgrade wanneer je klaar bent voor meer automatisering.
+              Kies wat bij je past. Start gratis — met een actieve proef of betaald plan kun je de widget op je site zetten
+              en berichten laten binnenstromen.
             </p>
           </div>
           <ChatbotPricing />

@@ -232,7 +232,9 @@ export function ZylmeroLanding() {
           </div>
 
           <p className="mx-auto mt-10 max-w-xl text-center text-sm leading-relaxed text-muted-foreground">
-            Hieronder kun je meteen een voorbeeld-chat uitproberen (branche kiezen en een klantbericht typen).
+            Hieronder kun je meteen een voorbeeld-chat uitproberen. Met een account stel je kennis en toon in, en plak je
+            onder <strong className="text-foreground">Instellingen → Widget</strong> de code op je site — actief zodra je
+            proef- of betaalabonnement loopt.
           </p>
         </div>
       </motion.section>

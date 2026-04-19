@@ -3,7 +3,6 @@
 import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CopyButton } from "@/components/growth/copy-button";
-import { BRAND_NAME } from "@/lib/brand";
 
 export function WidgetSettings({
   siteOrigin,
@@ -24,8 +23,10 @@ export function WidgetSettings({
       <CardHeader>
         <CardTitle className="text-base font-semibold">Website-widget</CardTitle>
         <p className="text-sm text-muted-foreground">
-          Plak dit vóór <code className="rounded bg-muted px-1">&lt;/body&gt;</code>. Bezoekers
-          kunnen een bericht sturen — leads komen binnen in {BRAND_NAME}.
+          Dit is jouw website-chat: bezoekers stappen binnen bij jouw leads. Antwoorden en tone volgen uit{" "}
+          <strong className="text-foreground">Bedrijf</strong> en <strong className="text-foreground">Kennis</strong>.
+          Plak dit vóór <code className="rounded bg-muted px-1">&lt;/body&gt;</code>. Zolang je abonnement actief is,
+          worden berichten verwerkt.
         </p>
       </CardHeader>
       <CardContent className="space-y-4">

@@ -17,6 +17,7 @@ import { WhatsAppSettingsForm } from "@/components/settings/whatsapp-settings-fo
 import { EmailChannelSettingsForm } from "@/components/settings/email-channel-settings-form";
 import { BillingSettings } from "@/components/settings/billing-settings";
 import { WidgetSettings } from "@/components/settings/widget-settings";
+import { WidgetSubscriptionGate } from "@/components/settings/widget-subscription-gate";
 import type { Company, WhatsAppChannelSettings } from "@/lib/types";
 
 function Submit({ label }: { label: string }) {
@@ -48,10 +49,13 @@ export function SettingsTabs({
   leadCap,
   siteOrigin,
   widgetEmbedToken,
+  websiteWidgetActive,
   defaultTab = "business",
 }: {
   company: Company;
   widgetEmbedToken: string | null;
+  /** Proef- of betaalabonnement: widget mag leads aannemen */
+  websiteWidgetActive: boolean;
   settings: {
     niche: string | null;
     services: string[];
@@ -94,6 +98,11 @@ export function SettingsTabs({
 
   const tab =
     defaultTab && VALID_TABS.has(defaultTab) ? defaultTab : "business";
+  /** Client-safe: niet trial.ts importeren (trekt server-only demo-map mee). */
+  const trialExpiredHint =
+    company.plan === "trial" &&
+    company.trial_ends_at != null &&
+    new Date(company.trial_ends_at).getTime() < Date.now();
 
   return (
     <Tabs defaultValue={tab} className="w-full">
@@ -386,12 +395,14 @@ export function SettingsTabs({
         />
       </TabsContent>
       <TabsContent value="widget" className="mt-6">
-        {widgetEmbedToken ? (
+        {!websiteWidgetActive ? (
+          <WidgetSubscriptionGate trialExpiredHint={trialExpiredHint} />
+        ) : widgetEmbedToken ? (
           <WidgetSettings siteOrigin={siteOrigin} embedToken={widgetEmbedToken} />
         ) : (
           <div className="cf-dashboard-panel rounded-2xl p-8 text-center">
             <p className="text-sm leading-relaxed text-muted-foreground">
-              Widget-token ontbreekt. Voer de database-migratie uit en herlaad deze pagina.
+              Widget-token ontbreekt. Neem contact op met support of herlaad later.
             </p>
           </div>
         )}

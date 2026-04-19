@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { mapCompanyRow } from "@/lib/auth/map-company";
+import { hasSubscriptionAccess } from "@/lib/billing/trial";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 const cors = {
@@ -34,16 +36,28 @@ export async function POST(request: Request) {
     }
 
     const admin = createAdminClient();
-    const { data: company, error: cErr } = await admin
+    const { data: row, error: cErr } = await admin
       .from("companies")
-      .select("id")
+      .select("*")
       .eq("widget_embed_token", token)
       .maybeSingle();
 
-    if (cErr || !company?.id) {
+    if (cErr || !row?.id) {
       return NextResponse.json(
         { ok: false, error: "ongeldige widget" },
         { status: 404, headers: cors },
+      );
+    }
+
+    const company = mapCompanyRow(row as Record<string, unknown>);
+    if (!hasSubscriptionAccess(company)) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error:
+            "Chat tijdelijk niet beschikbaar — het abonnement van dit bedrijf is niet actief. Probeer het later opnieuw of neem rechtstreeks contact op.",
+        },
+        { status: 403, headers: cors },
       );
     }
 

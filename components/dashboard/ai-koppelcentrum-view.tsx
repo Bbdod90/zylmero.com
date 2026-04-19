@@ -58,6 +58,8 @@ export type AiKoppelcentrumProps = {
   whatsappProvider: string;
   /** Widget op eigen site */
   hasWidgetToken: boolean;
+  /** Live leads via widget alleen bij actief abonnement / proef */
+  websiteWidgetActive: boolean;
   /** Contactmail bij bedrijf */
   hasContactEmail: boolean;
   /** E-mail inbound-webhook aan in automation_preferences */
@@ -74,6 +76,7 @@ export function AiKoppelcentrumView({
   whatsappAutoReply,
   whatsappProvider,
   hasWidgetToken,
+  websiteWidgetActive,
   hasContactEmail,
   emailInboundEnabled,
 }: AiKoppelcentrumProps) {
@@ -89,7 +92,13 @@ export function AiKoppelcentrumView({
         ? "partial"
         : "todo";
 
-  const widgetStatus: StepStatus = demoMode ? "demo" : hasWidgetToken ? "ok" : "todo";
+  const widgetStatus: StepStatus = demoMode
+    ? "demo"
+    : !websiteWidgetActive
+      ? "partial"
+      : hasWidgetToken
+        ? "ok"
+        : "todo";
 
   const mailStatus: StepStatus = demoMode
     ? "demo"
@@ -261,16 +270,34 @@ export function AiKoppelcentrumView({
               </div>
               <StatusBadge
                 status={widgetStatus}
-                label={hasWidgetToken || demoMode ? "Embed beschikbaar" : "Token nodig"}
+                label={
+                  demoMode
+                    ? "Demo"
+                    : !websiteWidgetActive
+                      ? "Abonnement nodig"
+                      : hasWidgetToken
+                        ? "Embed beschikbaar"
+                        : "Token nodig"
+                }
               />
             </div>
             <CardDescription className="text-sm leading-relaxed">
               Plak het script op je eigen site zodat bezoekers een bericht sturen — alles komt binnen
               bij <strong className="font-medium text-foreground">Berichten</strong> en kan met AI
-              worden opgepakt.
+              worden opgepakt. Werkt alleen als je proef- of betaalabonnement actief is.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-3">
+            {!demoMode && !websiteWidgetActive ? (
+              <p className="rounded-xl border border-amber-500/25 bg-amber-500/[0.06] px-4 py-3 text-sm text-amber-950 dark:text-amber-100">
+                <strong className="font-semibold">Website-chat staat uit</strong> zolang er geen actief
+                abonnement is — bezoekers zien het formulier niet verwerkt. Activeer onder{" "}
+                <Link href="/dashboard/upgrade" className="font-semibold underline underline-offset-2">
+                  Plannen
+                </Link>
+                .
+              </p>
+            ) : null}
             <Button asChild size="sm" className="rounded-xl">
               <Link href="/dashboard/settings?tab=widget">
                 Widget-code & instructies
