@@ -5,11 +5,15 @@ import type { EmbeddedChatTone } from "@/lib/embedded-chat/types";
 import { tryResolveSiteUrl } from "@/lib/site-url";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { EmbeddedChatbotEditor } from "@/components/embedded-chat/embedded-chatbot-editor";
+import { WizardCompletionBanner } from "@/components/embedded-chat/wizard-completion-banner";
 import { PageFrame } from "@/components/layout/page-frame";
+
 export default async function EmbeddedChatbotDetailPage({
   params,
+  searchParams,
 }: {
   params: { id: string };
+  searchParams?: { wizard?: string; note?: string };
 }) {
   const { company } = await requireCompany();
 
@@ -45,6 +49,9 @@ export default async function EmbeddedChatbotDetailPage({
     (process.env.NODE_ENV === "development" ? "http://localhost:3000" : BRAND_DEFAULT_SITE_URL);
   const widgetScriptUrl = `${baseUrl.replace(/\/$/, "")}/widget.js`;
 
+  const showWizardBanner = searchParams?.wizard === "1";
+  const wizardBannerVariant = searchParams?.note === "url" ? "urlNote" : "success";
+
   return (
     <PageFrame
       title={bot.name}
@@ -52,6 +59,7 @@ export default async function EmbeddedChatbotDetailPage({
       dismissHref="/dashboard/chatbots"
       dismissLabel="Alle chatbots"
     >
+      {showWizardBanner ? <WizardCompletionBanner variant={wizardBannerVariant} /> : null}
       <EmbeddedChatbotEditor
         chatbot={{
           id: bot.id,

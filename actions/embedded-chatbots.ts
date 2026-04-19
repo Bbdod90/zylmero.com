@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { requireCompany } from "@/lib/auth";
 import { maxEmbeddedChatbotsForPlan } from "@/lib/billing/embedded-chat-limits";
 import type { EmbeddedChatTone, EmbeddedChatbotSourceType } from "@/lib/embedded-chat/types";
+import type { WizardGoalId } from "@/lib/embedded-chat/wizard-presets";
+import { WIZARD_GOAL_PRESETS } from "@/lib/embedded-chat/wizard-presets";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 
 function needSupabase() {
@@ -46,6 +48,79 @@ export async function createEmbeddedChatbot() {
   }
   revalidatePath("/dashboard/chatbots");
   return { ok: true as const, id: data.id };
+}
+
+export async function createEmbeddedChatbotFromWizard(form: {
+  goal: WizardGoalId;
+  websiteUrl?: string | null;
+}) {
+  needSupabase();
+  const { company } = await requireCompany();
+  const supabase = await createClient();
+  const max = maxEmbeddedChatbotsForPlan(company.plan);
+  const { count } = await supabase
+    .from("embedded_chatbots")
+    .select("id", { count: "exact", head: true })
+    .eq("company_id", company.id);
+
+  if (count != null && count >= max) {
+    return {
+      ok: false as const,
+      error: `Je huidige pakket staat maximaal ${max} website-chatbot(s) toe. Upgrade om meer toe te voegen.`,
+    };
+  }
+
+  const rawUrl = form.websiteUrl?.trim();
+  let normalizedUrl: string | null = null;
+  if (rawUrl) {
+    let n = rawUrl;
+    if (!/^https?:\/\//i.test(n)) {
+      n = `https://${n}`;
+    }
+    try {
+      // eslint-disable-next-line no-new -- validate URL shape
+      new URL(n);
+    } catch {
+      return {
+        ok: false as const,
+        error: "Die URL lijkt ongeldig. Gebruik bijvoorbeeld https://jouwdomein.nl",
+      };
+    }
+    normalizedUrl = n;
+  }
+
+  const preset = WIZARD_GOAL_PRESETS[form.goal];
+  const { data, error } = await supabase
+    .from("embedded_chatbots")
+    .insert({
+      company_id: company.id,
+      name: preset.name,
+      tone: preset.tone,
+      instructions: preset.instructions,
+    })
+    .select("id")
+    .single();
+
+  if (error || !data?.id) {
+    return { ok: false as const, error: "Aanmaken mislukt. Probeer het opnieuw." };
+  }
+
+  let urlWarning: string | undefined;
+  if (normalizedUrl) {
+    const { error: srcErr } = await supabase.from("embedded_chatbot_sources").insert({
+      chatbot_id: data.id,
+      type: "url",
+      content: normalizedUrl,
+    });
+    if (srcErr) {
+      urlWarning =
+        "De website-URL kon niet worden opgeslagen. Voeg hem handmatig toe bij Kennis op de volgende pagina.";
+    }
+  }
+
+  revalidatePath("/dashboard/chatbots");
+  revalidatePath(`/dashboard/chatbots/${data.id}`);
+  return { ok: true as const, id: data.id, warning: urlWarning };
 }
 
 export async function updateEmbeddedChatbot(form: {

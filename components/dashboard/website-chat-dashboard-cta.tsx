@@ -10,7 +10,7 @@ export function WebsiteChatDashboardCta({
   hasEmbeddedBot: boolean;
   firstChatbotId?: string;
 }) {
-  const detailHref = firstChatbotId ? `/dashboard/chatbots/${firstChatbotId}` : "/dashboard/chatbots";
+  const detailHref = firstChatbotId ? `/dashboard/chatbots/${firstChatbotId}` : "/dashboard/chatbots/create";
 
   return (
     <Card className="overflow-hidden border-primary/22 bg-gradient-to-r from-primary/[0.09] via-card to-card dark:from-primary/[0.14] dark:via-card dark:to-card">
@@ -55,7 +55,7 @@ export function WebsiteChatDashboardCta({
           </Button>
           {!hasEmbeddedBot ? (
             <Button asChild variant="outline" className="rounded-xl border-primary/25 bg-background/70">
-              <Link href="/dashboard/chatbots">Meer over Website-chat</Link>
+              <Link href="/dashboard/chatbots">Overzicht Website-chat</Link>
             </Button>
           ) : null}
         </div>

@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Sparkles } from "lucide-react";
 import { requireCompany } from "@/lib/auth";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { PageFrame } from "@/components/layout/page-frame";
 import { NewEmbeddedChatbotButton } from "@/components/embedded-chat/new-embedded-chatbot-button";
 import { WebsiteChatSetupGuide } from "@/components/embedded-chat/website-chat-setup-guide";
+import { Button } from "@/components/ui/button";
 import { maxEmbeddedChatbotsForPlan } from "@/lib/billing/embedded-chat-limits";
 
 export default async function EmbeddedChatbotsPage() {
@@ -34,11 +35,19 @@ export default async function EmbeddedChatbotsPage() {
     <PageFrame title="Website-chat" subtitle="Bouw, test en embed een assistent op je site — binnen je actieve abonnement.">
       <div className="space-y-6">
         <WebsiteChatSetupGuide variant="compact" />
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-muted-foreground">
-            Eén regel JavaScript op je site — geen framework nodig. Meerdere bots alleen als je pakket dat toelaat.
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <p className="max-w-xl text-sm text-muted-foreground">
+            Eén regel JavaScript op je site — geen framework nodig. Start met de wizard (aanbevolen) of maak direct een bot zonder stappen.
           </p>
-          <NewEmbeddedChatbotButton />
+          <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:flex-wrap">
+            <Button asChild size="lg" className="rounded-xl shadow-sm">
+              <Link href="/dashboard/chatbots/create">
+                <Sparkles className="mr-2 size-4" aria-hidden />
+                Begeleide opstart
+              </Link>
+            </Button>
+            <NewEmbeddedChatbotButton variant="outline" />
+          </div>
         </div>
       </div>
 
@@ -77,8 +86,14 @@ export default async function EmbeddedChatbotsPage() {
           <p className="max-w-md text-sm text-muted-foreground">
             Nog geen chatbot. Maak er een aan — daarna embed je één regel code op je site.
           </p>
-          <div className="mt-6">
-            <NewEmbeddedChatbotButton />
+          <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row">
+            <Button asChild size="lg" className="rounded-xl shadow-sm">
+              <Link href="/dashboard/chatbots/create">
+                <Sparkles className="mr-2 size-4" aria-hidden />
+                Begeleide opstart
+              </Link>
+            </Button>
+            <NewEmbeddedChatbotButton variant="outline" />
           </div>
         </div>
       )}
