@@ -196,9 +196,18 @@ export async function POST(request: Request) {
       messages: chatMessages,
     });
     replyText = completion.choices[0]?.message?.content?.trim() || "";
-  } catch {
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    const missingKey =
+      msg.includes("OPENAI_API_KEY") ||
+      msg.includes("api key") ||
+      msg.includes("Incorrect API key");
     return NextResponse.json(
-      { error: "AI-antwoord niet beschikbaar. Probeer het zo opnieuw." },
+      {
+        error: missingKey
+          ? "AI is op deze omgeving nog niet gekoppeld (OPENAI_API_KEY). Voeg de sleutel toe bij je hosting — daarna werkt Live test en de widget."
+          : "AI-antwoord tijdelijk niet beschikbaar. Probeer het zo opnieuw.",
+      },
       { status: 503, headers: cors },
     );
   }

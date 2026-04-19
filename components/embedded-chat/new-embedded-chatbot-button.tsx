@@ -31,7 +31,7 @@ export function NewEmbeddedChatbotButton() {
         }}
       >
         {pending ? <Loader2 className="mr-2 size-4 animate-spin" /> : <Plus className="mr-2 size-4" />}
-        Nieuwe chatbot
+        Nieuwe website-chat
       </Button>
       {error ? <p className="max-w-xs text-right text-xs text-destructive">{error}</p> : null}
     </div>

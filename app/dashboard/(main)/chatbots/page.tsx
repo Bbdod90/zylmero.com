@@ -4,6 +4,7 @@ import { requireCompany } from "@/lib/auth";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { PageFrame } from "@/components/layout/page-frame";
 import { NewEmbeddedChatbotButton } from "@/components/embedded-chat/new-embedded-chatbot-button";
+import { WebsiteChatSetupGuide } from "@/components/embedded-chat/website-chat-setup-guide";
 import { maxEmbeddedChatbotsForPlan } from "@/lib/billing/embedded-chat-limits";
 
 export default async function EmbeddedChatbotsPage() {
@@ -31,9 +32,16 @@ export default async function EmbeddedChatbotsPage() {
 
   return (
     <PageFrame title="Website-chat" subtitle="Bouw, test en embed een assistent op je site — binnen je actieve abonnement.">
-      <div className="flex justify-end">
-        <NewEmbeddedChatbotButton />
+      <div className="space-y-6">
+        <WebsiteChatSetupGuide variant="compact" />
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-muted-foreground">
+            Eén regel JavaScript op je site — geen framework nodig. Meerdere bots alleen als je pakket dat toelaat.
+          </p>
+          <NewEmbeddedChatbotButton />
+        </div>
       </div>
+
       <p className="text-sm text-muted-foreground">
         Je pakket staat tot <strong className="font-medium text-foreground">{max}</strong> bot(s) toe. Grotere limiet via upgrade.
       </p>

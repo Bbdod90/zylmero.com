@@ -96,6 +96,7 @@ const ANONYMOUS_PREVIEW_GROUPS: { title: string; items: NavItem[] }[] = [
     title: "AI voor klanten",
     items: [
       { href: "/dashboard/ai-koppelingen", label: "AI & koppelingen", icon: Brain },
+      { href: "/dashboard/chatbots", label: "Website-chat", icon: Bot },
       { href: "/dashboard/ai-knowledge", label: "AI-kennis (detail)", icon: Sparkles },
     ],
   },

@@ -9,6 +9,7 @@ import {
   deleteEmbeddedChatbotSource,
   updateEmbeddedChatbot,
 } from "@/actions/embedded-chatbots";
+import { WebsiteChatSetupGuide } from "@/components/embedded-chat/website-chat-setup-guide";
 import { ChatWidget } from "@/components/chat/ChatWidget";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -110,9 +111,14 @@ export function EmbeddedChatbotEditor({ chatbot, sources, widgetScriptUrl, compa
   };
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,420px)]">
+    <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,420px)] lg:gap-10">
       <div className="space-y-8">
-        <div className="rounded-xl border border-border/60 bg-card p-6 dark:border-white/[0.09] dark:bg-card/80">
+        <WebsiteChatSetupGuide />
+
+        <div
+          id="website-chat-instellingen"
+          className="scroll-mt-28 rounded-xl border border-border/60 bg-card p-6 dark:border-white/[0.09] dark:bg-card/80"
+        >
           <h2 className="text-lg font-semibold text-foreground">Instellingen</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Naam en gedrag voor bezoekers op je site — geen ingewikkelde flows.
@@ -160,7 +166,10 @@ export function EmbeddedChatbotEditor({ chatbot, sources, widgetScriptUrl, compa
           </div>
         </div>
 
-        <div className="rounded-xl border border-border/60 bg-card p-6 dark:border-white/[0.09] dark:bg-card/80">
+        <div
+          id="website-chat-kennis"
+          className="scroll-mt-28 rounded-xl border border-border/60 bg-card p-6 dark:border-white/[0.09] dark:bg-card/80"
+        >
           <h2 className="text-lg font-semibold text-foreground">Kennis</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Korte tekst of een URL naar je prijzenpagina — de assistent gebruikt dit in antwoorden.
@@ -224,13 +233,19 @@ export function EmbeddedChatbotEditor({ chatbot, sources, widgetScriptUrl, compa
           </ul>
         </div>
 
-        <div className="rounded-xl border border-border/60 bg-card p-6 dark:border-white/[0.09] dark:bg-card/80">
+        <div
+          id="website-chat-embed"
+          className="scroll-mt-28 rounded-xl border border-border/60 bg-card p-6 dark:border-white/[0.09] dark:bg-card/80"
+        >
           <h2 className="text-lg font-semibold text-foreground">Website embed</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Plak onderaan je site vóór <code className="rounded bg-muted px-1">&lt;/body&gt;</code>. Werkt op elke site zonder
             framework.
           </p>
-          <pre className="mt-4 overflow-x-auto rounded-lg border border-border/50 bg-muted/30 p-4 text-xs leading-relaxed dark:bg-black/30">
+          <pre
+            className="mt-4 max-h-40 overflow-y-auto whitespace-pre-wrap break-all rounded-xl border border-border/50 bg-muted/35 p-4 font-mono text-[0.7rem] leading-relaxed text-foreground ring-1 ring-black/[0.04] dark:bg-black/35 dark:ring-white/[0.06] sm:text-xs"
+            tabIndex={0}
+          >
             {embedCode}
           </pre>
           <Button type="button" variant="outline" className="mt-4 rounded-lg" onClick={copyEmbed}>
@@ -251,7 +266,7 @@ export function EmbeddedChatbotEditor({ chatbot, sources, widgetScriptUrl, compa
         {message ? <p className="text-sm text-muted-foreground">{message}</p> : null}
       </div>
 
-      <div className="lg:sticky lg:top-24 lg:self-start">
+      <div id="website-chat-live-test" className="scroll-mt-28 lg:sticky lg:top-24 lg:self-start">
         <ChatWidget
           chatbotId={chatbot.id}
           title="Live test"

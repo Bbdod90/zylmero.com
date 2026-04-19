@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { X } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { cn } from "@/lib/utils";
@@ -33,9 +33,9 @@ export function TopBar({
               aria-label={dismissLabel}
             >
               <span className="flex size-8 items-center justify-center rounded-lg bg-background/90 ring-1 ring-border/55 dark:bg-card/90 dark:ring-white/[0.08]">
-                <X className="size-[1.05rem] opacity-80 transition-transform group-hover:scale-105 group-hover:opacity-100" />
+                <ChevronLeft className="size-[1.05rem] opacity-80 transition-transform group-hover:-translate-x-0.5 group-hover:opacity-100" />
               </span>
-              <span className="hidden max-w-[11rem] truncate leading-tight sm:inline">
+              <span className="max-w-[14rem] truncate leading-tight">
                 {dismissLabel}
               </span>
             </Link>
