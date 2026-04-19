@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { getDemoCompany } from "@/lib/demo/company";
 import { isDemoMode } from "@/lib/env";
 import type { Company, CompanyRole } from "@/lib/types";
@@ -19,31 +19,43 @@ export type AuthState =
       companyRole: CompanyRole;
     };
 
+function readAnonDemoAuthFromCookies(): AuthState | null {
+  try {
+    if (
+      cookies().get(COOKIE_ANON_DEMO)?.value === "1" ||
+      cookies().get("cf_anon_demo")?.value === "1"
+    ) {
+      return {
+        user: {
+          id: ANONYMOUS_DEMO_USER_ID,
+          email: BRAND_DEMO_PREVIEW_EMAIL,
+        },
+        company: getDemoCompany(),
+        companyRole: "owner",
+      };
+    }
+  } catch {
+    /* cookies unavailable */
+  }
+  return null;
+}
+
 export const getAuth = cache(async (): Promise<AuthState> => {
+  /**
+   * Zonder Supabase-keys: marketing/demo lokaal laten werken (geen crash op `/`).
+   * Dashboard/login blijft falen bij echte DB-calls tot `.env.local` gevuld is.
+   */
+  if (!isSupabaseConfigured()) {
+    return readAnonDemoAuthFromCookies() ?? { user: null, company: null, companyRole: null };
+  }
+
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) {
-    try {
-      if (
-        cookies().get(COOKIE_ANON_DEMO)?.value === "1" ||
-        cookies().get("cf_anon_demo")?.value === "1"
-      ) {
-        return {
-          user: {
-            id: ANONYMOUS_DEMO_USER_ID,
-            email: BRAND_DEMO_PREVIEW_EMAIL,
-          },
-          company: getDemoCompany(),
-          companyRole: "owner",
-        };
-      }
-    } catch {
-      /* cookies unavailable */
-    }
-    return { user: null, company: null, companyRole: null };
+    return readAnonDemoAuthFromCookies() ?? { user: null, company: null, companyRole: null };
   }
 
   if (isDemoMode()) {
