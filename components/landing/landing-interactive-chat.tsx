@@ -437,41 +437,26 @@ export function LandingInteractiveChat() {
   return (
     <section
       className={cn(
-        "relative overflow-hidden border-b border-border/40 py-16 md:py-24 dark:border-white/[0.06]",
-        "bg-gradient-to-b from-primary/[0.06] via-muted/25 to-background",
-        "dark:from-primary/[0.07] dark:via-[hsl(228_28%_6%/0.9)] dark:to-background",
+        "border-b border-border/30 py-16 md:py-20 dark:border-white/[0.06]",
+        "bg-muted/20 dark:bg-transparent",
       )}
     >
-      <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_-10%,hsl(var(--primary)/0.16),transparent_58%),radial-gradient(ellipse_40%_35%_at_90%_30%,hsl(262_45%_50%/0.07),transparent_50%)]"
-        aria-hidden
-      />
-      <div className="cf-landing-grain pointer-events-none absolute inset-0 opacity-70" aria-hidden />
       <div className="relative mx-auto max-w-[1200px] px-4 md:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/[0.06] px-3.5 py-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary backdrop-blur-sm dark:border-primary/35 dark:bg-primary/[0.1]">
-            Live demo · geen account nodig
-          </p>
-          <h2 className="mt-5 text-balance text-3xl font-extrabold tracking-tight text-foreground md:text-4xl dark:bg-gradient-to-br dark:from-white dark:via-zinc-100 dark:to-zinc-400 dark:bg-clip-text dark:text-transparent">
+        <div className="mx-auto max-w-xl text-center">
+          <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">Live demo</p>
+          <h2 className="mt-3 text-balance text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
             {chatHints.sectionTitle}
           </h2>
-          <p className="mt-4 text-base leading-relaxed text-muted-foreground md:text-[1.0625rem]">
+          <p className="mt-4 text-base leading-[1.65] text-muted-foreground">
             {chatHints.sectionSub}
           </p>
         </div>
 
-        <div className="relative mx-auto mt-12 max-w-lg scroll-mt-24">
+        <div className="mx-auto mt-10 max-w-lg scroll-mt-24">
           <div
             className={cn(
-              "pointer-events-none absolute -inset-[1px] rounded-[1.4rem] bg-gradient-to-b from-primary/45 via-primary/15 to-transparent opacity-90 blur-[1px] dark:from-primary/55 dark:opacity-100",
-            )}
-            aria-hidden
-          />
-          <div
-            className={cn(
-              "relative overflow-hidden rounded-[1.35rem] shadow-2xl",
-              "border border-border/70 bg-card text-foreground shadow-[0_32px_72px_-36px_hsl(var(--primary)/0.4),0_24px_52px_-28px_hsl(222_48%_32%/0.14)]",
-              "dark:border-white/[0.12] dark:bg-[linear-gradient(185deg,hsl(228_26%_11%/0.97),hsl(228_28%_5%/0.96))] dark:text-white dark:shadow-[0_36px_80px_-40px_rgba(0,0,0,0.75)] dark:ring-1 dark:ring-white/[0.08]",
+              "overflow-hidden rounded-2xl border border-border/50 bg-card text-foreground shadow-md",
+              "dark:border-white/[0.1] dark:bg-card",
             )}
           >
             <div
