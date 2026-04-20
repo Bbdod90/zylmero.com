@@ -44,10 +44,10 @@ export function WebsiteChatSetupGuide({ variant = "full" }: { variant?: "full" |
   }
 
   return (
-    <Card className="border-primary/18 bg-gradient-to-br from-primary/[0.07] via-card to-card dark:from-primary/[0.12] dark:via-card dark:to-card">
-      <CardHeader className="pb-2 pt-6 sm:pt-7">
-        <CardTitle className="text-base sm:text-lg">Zo zet je je website-chat live</CardTitle>
-        <CardDescription className="text-sm leading-relaxed">
+    <Card className="border-border/70 bg-card shadow-sm ring-1 ring-black/[0.03] dark:border-white/[0.09] dark:bg-card/90 dark:ring-white/[0.04]">
+      <CardHeader className="border-b border-border/50 bg-gradient-to-br from-primary/[0.06] via-transparent to-teal-500/[0.04] pb-4 pt-6 dark:border-white/[0.07] dark:from-primary/[0.1] dark:to-transparent sm:pt-7">
+        <CardTitle className="text-base text-foreground sm:text-lg">Zo zet je je website-chat live</CardTitle>
+        <CardDescription className="text-sm leading-relaxed text-muted-foreground">
           Vier korte stappen — van teksten tot de regel code op je site. Alles staat op één pagina; scroll of tik op een stap.
         </CardDescription>
       </CardHeader>
