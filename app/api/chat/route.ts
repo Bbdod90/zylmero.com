@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { APIError, RateLimitError } from "openai";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import { mapCompanyRow } from "@/lib/auth/map-company";
 import { hasSubscriptionAccess } from "@/lib/billing/trial";
@@ -9,8 +10,10 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
 
-/** Ruimte voor system + geschiedenis; meerdere URL-bronnen kunnen groot zijn */
-const MAX_KNOWLEDGE_CHARS = 45_000;
+/** Ruimte voor system + geschiedenis; voorkomt context_length-fouten bij grote Shopify-pagina’s */
+const MAX_KNOWLEDGE_CHARS = 14_000;
+const MAX_SYSTEM_CHARS_RETRY = 10_000;
+const CHAT_HISTORY_LIMIT = 24;
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -41,6 +44,59 @@ function capKnowledgeLines(lines: string[]): string[] {
   return [
     `${joined.slice(0, MAX_KNOWLEDGE_CHARS - 160)}\n\n[… Kennis ingekort wegens maximale lengte — gebruik kortere tekst of minder URL-bronnen.]`,
   ];
+}
+
+function openaiErrMeta(err: unknown): { msg: string; lower: string; status?: number; bodyLower: string } {
+  let msg = err instanceof Error ? err.message : String(err);
+  let status: number | undefined;
+  let bodyLower = "";
+  if (err instanceof APIError) {
+    status = err.status;
+    try {
+      bodyLower =
+        typeof err.error === "object" && err.error !== null
+          ? JSON.stringify(err.error).toLowerCase()
+          : "";
+    } catch {
+      bodyLower = "";
+    }
+  }
+  const lower = msg.toLowerCase();
+  return { msg, lower, status, bodyLower };
+}
+
+function isContextLengthFailure(err: unknown, bodyLower: string, lower: string): boolean {
+  if (bodyLower.includes("context_length_exceeded")) return true;
+  return (
+    lower.includes("context_length") ||
+    lower.includes("maximum context") ||
+    lower.includes("too many tokens") ||
+    lower.includes("this model's maximum context")
+  );
+}
+
+function isBillingOrQuotaFailure(lower: string, bodyLower: string): boolean {
+  return (
+    bodyLower.includes("insufficient_quota") ||
+    lower.includes("insufficient_quota") ||
+    bodyLower.includes("billing_hard_limit") ||
+    lower.includes("billing_hard_limit") ||
+    lower.includes("exceeded your current quota")
+  );
+}
+
+async function runChatCompletion(
+  openai: ReturnType<typeof getOpenAI>,
+  messages: ChatCompletionMessageParam[],
+  maxTokens: number,
+): Promise<string> {
+  const completion = await openai.chat.completions.create({
+    model: OPENAI_MODEL,
+    temperature: 0.45,
+    max_tokens: maxTokens,
+    messages,
+  });
+  return completion.choices[0]?.message?.content?.trim() || "";
 }
 
 function buildSystemPrompt(opts: {
@@ -190,7 +246,7 @@ export async function POST(request: Request) {
     .select("role, content")
     .eq("session_id", sessionId)
     .order("created_at", { ascending: true })
-    .limit(40);
+    .limit(CHAT_HISTORY_LIMIT);
 
   const system = buildSystemPrompt({
     botName: bot.name || "Assistent",
@@ -207,37 +263,81 @@ export async function POST(request: Request) {
     })),
   ];
 
-  let replyText: string;
+  let replyText = "";
   try {
     const openai = getOpenAI();
-    const completion = await openai.chat.completions.create({
-      model: OPENAI_MODEL,
-      temperature: 0.45,
-      max_tokens: 720,
-      messages: chatMessages,
-    });
-    replyText = completion.choices[0]?.message?.content?.trim() || "";
+    try {
+      replyText = await runChatCompletion(openai, chatMessages, 720);
+    } catch (firstErr) {
+      const meta = openaiErrMeta(firstErr);
+      if (isContextLengthFailure(firstErr, meta.bodyLower, meta.lower)) {
+        const sys = chatMessages[0];
+        if (sys?.role === "system" && typeof sys.content === "string" && sys.content.length > MAX_SYSTEM_CHARS_RETRY) {
+          const shortened =
+            sys.content.slice(0, MAX_SYSTEM_CHARS_RETRY - 140) +
+            "\n\n[…] Kennis automatisch ingekort — opnieuw proberen.";
+          const retryMessages: ChatCompletionMessageParam[] = [
+            { role: "system", content: shortened },
+            ...chatMessages.slice(1),
+          ];
+          replyText = await runChatCompletion(openai, retryMessages, 640);
+        } else {
+          throw firstErr;
+        }
+      } else {
+        throw firstErr;
+      }
+    }
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    const lower = msg.toLowerCase();
+    const { lower, status, bodyLower } = openaiErrMeta(err);
     const missingKey =
       lower.includes("openai_api_key") ||
       lower.includes("api key") ||
       lower.includes("incorrect api key") ||
       lower.includes("invalid api key");
-    const quotaOrLimit =
-      lower.includes("insufficient_quota") ||
-      lower.includes("rate limit") ||
-      lower.includes("429") ||
-      lower.includes("billing_hard_limit");
+    if (missingKey) {
+      return NextResponse.json(
+        {
+          error:
+            "AI is op deze omgeving nog niet gekoppeld (OPENAI_API_KEY). Voeg de sleutel toe bij je hosting — daarna werkt Live test en de widget.",
+        },
+        { status: 503, headers: cors },
+      );
+    }
+    if (isBillingOrQuotaFailure(lower, bodyLower)) {
+      return NextResponse.json(
+        {
+          error:
+            "OpenAI-account: geen saldo of quota meer — ga naar platform.openai.com, open Billing, voeg tegoed toe of verhoog je limiet. Daarna werkt Live test weer.",
+        },
+        { status: 503, headers: cors },
+      );
+    }
+    const rateHit =
+      err instanceof RateLimitError ||
+      (status === 429 && !isBillingOrQuotaFailure(lower, bodyLower)) ||
+      lower.includes("rate_limit_exceeded") ||
+      (lower.includes("too many requests") && status === 429);
+    if (rateHit) {
+      return NextResponse.json(
+        {
+          error:
+            "Even geduld — OpenAI geeft een tijdelijke rate limit. Wacht een minuut en probeer opnieuw.",
+        },
+        { status: 503, headers: cors },
+      );
+    }
+    if (isContextLengthFailure(err, bodyLower, lower)) {
+      return NextResponse.json(
+        {
+          error:
+            "Er past te veel kennis en gesprek in één verzoek. Verwijder een bron, plak kortere tekst, of gebruik een compacte pagina-URL (bijv. alleen je shop-home).",
+        },
+        { status: 503, headers: cors },
+      );
+    }
     return NextResponse.json(
-      {
-        error: missingKey
-          ? "AI is op deze omgeving nog niet gekoppeld (OPENAI_API_KEY). Voeg de sleutel toe bij je hosting — daarna werkt Live test en de widget."
-          : quotaOrLimit
-            ? "AI-dienst geeft een limiet of facturatiemelding — wacht even en probeer opnieuw, of controleer je OpenAI-plan en gebruikslimiet."
-            : "AI-antwoord tijdelijk niet beschikbaar. Probeer het zo opnieuw.",
-      },
+      { error: "AI-antwoord tijdelijk niet beschikbaar. Probeer het zo opnieuw." },
       { status: 503, headers: cors },
     );
   }

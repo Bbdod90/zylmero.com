@@ -107,7 +107,8 @@ export async function fetchUrlPlainTextForChatKnowledge(rawUrl: string): Promise
       return null;
     }
 
-    const plain = htmlToPlainText(raw).slice(0, 16_000);
+    /* Klein genoeg voor model-context na system + geschiedenis; nav/producttekst blijft bruikbaar */
+    const plain = htmlToPlainText(raw).slice(0, 10_000);
     /* Shopify e.d.: na strip vaak nog veel menu-ruis, maar genoeg voor productnavigatie */
     result = plain.length > 220 ? plain : null;
     fetchCache.set(normalized, { at: Date.now(), text: result });

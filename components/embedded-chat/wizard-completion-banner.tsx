@@ -17,9 +17,11 @@ export function WizardCompletionBanner({ variant = "success" }: { variant?: Bann
       className={cn(
         "relative mb-8 overflow-hidden rounded-2xl border px-4 py-5 text-sm shadow-md sm:px-6",
         "ring-1 ring-inset",
+        /* `!` op licht modus: niets mag bodytekst naar muted trekken */
+        "!text-zinc-950",
         isUrlNote
-          ? "border-amber-300/80 bg-gradient-to-br from-amber-100 via-amber-50 to-amber-100/90 ring-amber-950/10 dark:border-amber-600/40 dark:from-amber-950 dark:via-amber-950/95 dark:to-amber-950 dark:ring-amber-200/10"
-          : "border-emerald-300/80 bg-gradient-to-br from-emerald-100 via-emerald-50 to-teal-50/90 ring-emerald-950/10 dark:border-emerald-700/40 dark:from-emerald-950 dark:via-emerald-950/95 dark:to-emerald-950 dark:ring-emerald-200/10",
+          ? "border-amber-300/80 bg-gradient-to-br from-amber-100 via-amber-50 to-amber-100/90 ring-amber-950/10 dark:border-amber-600/40 dark:from-amber-950 dark:via-amber-950/95 dark:to-amber-950 dark:!text-amber-50 dark:ring-amber-200/10"
+          : "border-emerald-300/80 bg-gradient-to-br from-emerald-100 via-emerald-50 to-teal-50/90 ring-emerald-950/10 dark:border-emerald-700/40 dark:from-emerald-950 dark:via-emerald-950/95 dark:to-emerald-950 dark:!text-emerald-50 dark:ring-emerald-200/10",
       )}
       role="status"
     >
@@ -61,18 +63,18 @@ export function WizardCompletionBanner({ variant = "success" }: { variant?: Bann
         <div className="min-w-0 space-y-2 pt-0.5">
           <p
             className={cn(
-              "text-base font-semibold leading-snug tracking-tight text-zinc-950",
-              "dark:text-emerald-50",
-              isUrlNote && "dark:text-amber-50",
+              "text-base font-semibold leading-snug tracking-tight !text-zinc-950",
+              "dark:!text-emerald-50",
+              isUrlNote && "dark:!text-amber-50",
             )}
           >
             {isUrlNote ? "Website-URL handmatig toevoegen" : "Setup voltooid"}
           </p>
           <p
             className={cn(
-              "text-[0.9375rem] leading-relaxed text-zinc-900",
-              "dark:text-emerald-100/95",
-              isUrlNote && "dark:text-amber-100/95",
+              "text-[0.9375rem] leading-relaxed !text-zinc-900",
+              "dark:!text-emerald-100",
+              isUrlNote && "dark:!text-amber-100",
             )}
           >
             {isUrlNote ? (
