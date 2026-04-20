@@ -15,6 +15,7 @@ import {
   type AgendaPeekRow,
 } from "@/components/dashboard/dashboard-agenda-peek";
 import { DashboardQuotesPeek } from "@/components/dashboard/dashboard-quotes-peek";
+import { DashboardAiHub } from "@/components/dashboard/dashboard-ai-hub";
 import { WebsiteChatDashboardCta } from "@/components/dashboard/website-chat-dashboard-cta";
 import { LEAD_STATUSES } from "@/components/leads/status-badge";
 import type { LeadStatus } from "@/lib/types";
@@ -117,6 +118,12 @@ export default async function DashboardPage() {
     { label: "Offertes open", value: String(openQuotes) },
   ];
 
+  const priorityLeadId = topThree[0]?.id ?? bundle.leads[0]?.id ?? null;
+  const websiteChatHref =
+    websiteChatState.hasBot && websiteChatState.firstId
+      ? `/dashboard/chatbots/${websiteChatState.firstId}`
+      : "/dashboard/chatbots";
+
   return (
     <PageFrame
       title="Dashboard"
@@ -127,6 +134,12 @@ export default async function DashboardPage() {
       }
     >
       <div className="mx-auto w-full max-w-[1200px] space-y-8 lg:space-y-10">
+        <DashboardAiHub
+          demoMode={demo}
+          priorityLeadId={priorityLeadId}
+          websiteChatHref={websiteChatHref}
+        />
+
         {!demo ? (
           <WebsiteChatDashboardCta
             hasEmbeddedBot={websiteChatState.hasBot}
