@@ -146,15 +146,29 @@ export function AutomationRulesPanel({
 
   if (schemaError) {
     return (
-      <p className="text-sm text-muted-foreground">
-        Regels zijn nog niet beschikbaar: {schemaError}
-      </p>
+      <div className="cf-dashboard-panel border-amber-500/30 bg-amber-500/[0.06] p-6 sm:p-7 dark:bg-amber-500/[0.05]">
+        <p className="font-semibold text-foreground">Regels (als → dan) zijn nog niet beschikbaar</p>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          De database mist de tabel <code className="rounded bg-muted px-1.5 py-0.5 text-xs">automation_rules</code> of PostgREST heeft de schema-cache nog niet ververst.
+        </p>
+        <p className="mt-3 text-sm text-muted-foreground">
+          <span className="font-medium text-foreground">Oplossing:</span> draai de migratie{" "}
+          <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
+            20260415120000_enterprise_team_pipeline.sql
+          </code>{" "}
+          op je Supabase-project. Daarna in de SQL Editor:{" "}
+          <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
+            {`NOTIFY pgrst, 'reload schema';`}
+          </code>
+        </p>
+        <p className="mt-3 text-2xs text-muted-foreground/90">Technisch: {schemaError}</p>
+      </div>
     );
   }
 
   return (
     <div className="space-y-8">
-      <Card className="rounded-2xl border-border/50">
+      <Card className="cf-dashboard-panel overflow-hidden border-0 shadow-none">
         <CardHeader>
           <CardTitle className="text-base">Nieuwe regel</CardTitle>
           <p className="text-sm text-muted-foreground">
@@ -176,7 +190,7 @@ export function AutomationRulesPanel({
         {items.map((r) => (
           <div
             key={r.id}
-            className="flex flex-col gap-3 rounded-2xl border border-border/50 bg-card/50 p-4 sm:flex-row sm:items-center sm:justify-between"
+            className="cf-dashboard-panel flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
           >
             <div className="min-w-0 space-y-1">
               <p className="font-medium leading-tight">{r.name}</p>

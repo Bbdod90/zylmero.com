@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 function Submit() {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" disabled={pending} className="rounded-xl">
+    <Button type="submit" disabled={pending} className="rounded-lg px-6 font-semibold shadow-sm">
       {pending ? "Opslaan…" : "AI-instellingen opslaan"}
     </Button>
   );
@@ -34,7 +34,7 @@ export function AiPanel({
   return (
     <form
       action={action}
-      className="cf-dashboard-panel max-w-2xl space-y-6 p-6 sm:p-8"
+      className="cf-dashboard-panel mx-auto max-w-2xl space-y-6 p-6 sm:p-8"
     >
       <header className="space-y-1 border-b border-border/40 pb-5 dark:border-white/[0.06]">
         <p className="cf-eyebrow text-[0.625rem]">AI-closer</p>
@@ -46,39 +46,42 @@ export function AiPanel({
         </p>
       </header>
       <div className="space-y-2">
-        <Label htmlFor="tone">Toon</Label>
+        <Label htmlFor="tone" className="text-sm font-medium">
+          Toon
+        </Label>
         <Textarea
           id="tone"
           name="tone"
           defaultValue={tone || ""}
-          className="min-h-[90px] resize-none rounded-xl"
+          className="min-h-[90px] resize-y rounded-lg"
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="reply_style">Antwoordstijl</Label>
+        <Label htmlFor="reply_style" className="text-sm font-medium">
+          Antwoordstijl
+        </Label>
         <Textarea
           id="reply_style"
           name="reply_style"
           defaultValue={reply_style || ""}
-          className="min-h-[90px] rounded-xl"
+          className="min-h-[90px] resize-y rounded-lg"
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="language">Taal</Label>
-        <Input
-          id="language"
-          name="language"
-          defaultValue={language}
-          className="rounded-xl"
-        />
+        <Label htmlFor="language" className="text-sm font-medium">
+          Taal
+        </Label>
+        <Input id="language" name="language" defaultValue={language} className="rounded-lg" />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="automation_preferences">Notities automatisering</Label>
+        <Label htmlFor="automation_preferences" className="text-sm font-medium">
+          Notities automatisering
+        </Label>
         <Textarea
           id="automation_preferences"
           name="automation_preferences"
           defaultValue={automationNote}
-          className="min-h-[140px] resize-none rounded-xl"
+          className="min-h-[140px] resize-y rounded-lg"
           placeholder="Beschrijf hoe assertief opvolging moet zijn…"
         />
       </div>

@@ -37,7 +37,7 @@ function Row({
   const triggerLabel = triggerNl[a.trigger_type] ?? a.trigger_type;
 
   return (
-    <Card className="rounded-2xl border-border/70">
+    <Card className="cf-dashboard-panel overflow-hidden border-0 shadow-none">
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
         <div>
           <CardTitle className="text-base">{a.name}</CardTitle>
@@ -165,7 +165,7 @@ export function AutomationList({
       <Button
         type="button"
         variant="secondary"
-        className="rounded-xl"
+        className="rounded-lg"
         disabled={pending || !canUseAutomations}
         onClick={() => {
           start(async () => {

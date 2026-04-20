@@ -80,7 +80,7 @@ export function EmailChannelSettingsForm({
       </header>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-lg border border-border/60 bg-muted/[0.12] p-4 dark:border-white/[0.08]">
+        <div className="rounded-xl border border-border/55 bg-gradient-to-b from-card to-muted/15 p-4 shadow-sm dark:border-white/[0.08] dark:from-card/80 dark:to-card/40">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Stap 1</p>
           <p className="mt-2 text-sm font-medium text-foreground">Bedrijfsmail</p>
           <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
@@ -95,14 +95,14 @@ export function EmailChannelSettingsForm({
             {hasContactEmail ? "Contactmail is ingevuld." : "Vul eerst je contactmail in bij Bedrijf."}
           </p>
         </div>
-        <div className="rounded-lg border border-border/60 bg-muted/[0.12] p-4 dark:border-white/[0.08]">
+        <div className="rounded-xl border border-border/55 bg-gradient-to-b from-card to-muted/15 p-4 shadow-sm dark:border-white/[0.08] dark:from-card/80 dark:to-card/40">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Stap 2</p>
           <p className="mt-2 text-sm font-medium text-foreground">Webhook aanzetten</p>
           <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
             Zonder schakelaar wijzen we POST&apos;s op je endpoint af.
           </p>
         </div>
-        <div className="rounded-lg border border-border/60 bg-muted/[0.12] p-4 dark:border-white/[0.08]">
+        <div className="rounded-xl border border-border/55 bg-gradient-to-b from-card to-muted/15 p-4 shadow-sm dark:border-white/[0.08] dark:from-card/80 dark:to-card/40">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Stap 3</p>
           <p className="mt-2 text-sm font-medium text-foreground">Provider configureren</p>
           <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
@@ -111,7 +111,7 @@ export function EmailChannelSettingsForm({
         </div>
       </div>
 
-      <div className="flex flex-col gap-4 rounded-lg border border-primary/20 bg-primary/[0.04] p-5 sm:flex-row sm:items-center sm:justify-between dark:border-primary/25">
+      <div className="flex flex-col gap-4 rounded-xl border border-primary/22 bg-gradient-to-br from-primary/[0.06] to-muted/10 p-5 sm:flex-row sm:items-center sm:justify-between dark:border-primary/30 dark:from-primary/[0.08] dark:to-card/30">
         <div className="min-w-0 space-y-1">
           <p className="text-sm font-semibold text-foreground">Inbound via webhook</p>
           <p className="text-xs leading-relaxed text-muted-foreground">

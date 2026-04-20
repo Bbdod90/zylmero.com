@@ -110,7 +110,7 @@ export function WhatsAppSettingsForm({
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 rounded-lg border border-primary/20 bg-primary/[0.04] p-5 sm:flex-row sm:items-center sm:justify-between dark:border-primary/25">
+        <div className="flex flex-col gap-4 rounded-lg border border-border/60 bg-muted/[0.12] p-5 sm:flex-row sm:items-center sm:justify-between dark:border-white/[0.08]">
           <div className="min-w-0 space-y-1">
             <p className="text-sm font-semibold text-foreground">AI auto-antwoord</p>
             <p className="text-xs leading-relaxed text-muted-foreground">

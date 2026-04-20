@@ -1,6 +1,7 @@
 import { getAuth } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { AiWebsiteChatCallout } from "@/components/dashboard/ai-website-chat-callout";
+import { DashboardWorkSurface } from "@/components/layout/dashboard-work-surface";
 import { PageFrame } from "@/components/layout/page-frame";
 import { AiPanel } from "@/components/settings/ai-panel";
 
@@ -32,13 +33,15 @@ export default async function AiSettingsPage() {
       dismissHref="/dashboard/ai-koppelingen"
       dismissLabel="AI & koppelingen"
     >
-      <AiWebsiteChatCallout />
-      <AiPanel
-        tone={s?.tone ?? null}
-        reply_style={s?.reply_style ?? null}
-        language={s?.language || "nl"}
-        automationNote={automationNote}
-      />
+      <DashboardWorkSurface>
+        <AiWebsiteChatCallout />
+        <AiPanel
+          tone={s?.tone ?? null}
+          reply_style={s?.reply_style ?? null}
+          language={s?.language || "nl"}
+          automationNote={automationNote}
+        />
+      </DashboardWorkSurface>
     </PageFrame>
   );
 }

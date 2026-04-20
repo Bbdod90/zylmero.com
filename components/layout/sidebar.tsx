@@ -270,26 +270,6 @@ export function AppSidebar({
             />
             Upgrade
           </Link>
-          <Link
-            href="/dashboard/settings"
-            onClick={() => onNavLinkClick?.()}
-            className={cn(
-              "group flex min-h-11 touch-manipulation items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all duration-200",
-              pathname === "/dashboard/settings" || pathname.startsWith("/dashboard/settings")
-                ? "bg-primary/12 text-foreground dark:bg-white/[0.08]"
-                : "text-muted-foreground hover:bg-muted/70 hover:text-foreground dark:hover:bg-white/[0.04]",
-            )}
-          >
-            <Settings2
-              className={cn(
-                "size-[1.125rem] shrink-0",
-                pathname.startsWith("/dashboard/settings")
-                  ? "text-primary"
-                  : "text-muted-foreground group-hover:text-foreground",
-              )}
-            />
-            Instellingen
-          </Link>
         </div>
       </nav>
       {!isAnonymousPreview ? (

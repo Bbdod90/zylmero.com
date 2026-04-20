@@ -1,4 +1,5 @@
 import type { LucideIcon } from "lucide-react";
+import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 export function EmptyState({
@@ -6,16 +7,19 @@ export function EmptyState({
   title,
   description,
   className,
+  actions,
 }: {
   icon: LucideIcon;
   title: string;
   description: string;
   className?: string;
+  /** Optionele knoppen of links onder de tekst */
+  actions?: ReactNode;
 }) {
   return (
     <div
       className={cn(
-        "flex flex-col items-center rounded-2xl border border-dashed border-white/[0.1] bg-muted/10 px-8 py-14 text-center",
+        "cf-dashboard-panel flex flex-col items-center border-dashed border-border/55 bg-gradient-to-b from-card to-muted/15 px-8 py-14 text-center dark:border-white/[0.12] dark:to-card/40",
         className,
       )}
     >
@@ -26,6 +30,7 @@ export function EmptyState({
       <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
         {description}
       </p>
+      {actions ? <div className="mt-8 flex flex-wrap items-center justify-center gap-3">{actions}</div> : null}
     </div>
   );
 }

@@ -16,7 +16,7 @@ export function QuoteNewForm({ leads }: { leads: LeadOption[] }) {
 
   return (
     <form
-      className="max-w-lg space-y-6 rounded-3xl border border-border bg-card/50 p-6 shadow-premium dark:border-white/[0.06]"
+      className="cf-dashboard-panel mx-auto max-w-xl space-y-6 p-6 sm:p-8"
       onSubmit={(e) => {
         e.preventDefault();
         const fd = new FormData(e.currentTarget);
@@ -38,7 +38,7 @@ export function QuoteNewForm({ leads }: { leads: LeadOption[] }) {
         <select
           id="lead_id"
           name="lead_id"
-          className="h-11 w-full rounded-xl border border-border bg-background px-3 text-sm shadow-sm dark:border-white/[0.1] dark:bg-background/60"
+          className="h-11 w-full rounded-lg border border-border/60 bg-background px-3 text-sm shadow-sm dark:border-white/[0.1] dark:bg-background/60"
           defaultValue=""
         >
           <option value="">— Geen lead —</option>
@@ -53,10 +53,10 @@ export function QuoteNewForm({ leads }: { leads: LeadOption[] }) {
         </p>
       </div>
       <div className="flex flex-wrap gap-3">
-        <Button type="submit" className="rounded-xl" disabled={pending}>
+        <Button type="submit" className="rounded-lg" disabled={pending}>
           {pending ? "Aanmaken…" : "Concept aanmaken"}
         </Button>
-        <Button type="button" variant="secondary" className="rounded-xl" asChild>
+        <Button type="button" variant="secondary" className="rounded-lg" asChild>
           <Link href="/dashboard/quotes">Annuleren</Link>
         </Button>
       </div>

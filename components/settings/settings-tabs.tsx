@@ -48,7 +48,7 @@ const VALID_TABS = new Set([
 ]);
 
 const tabTriggerClass =
-  "relative shrink-0 whitespace-nowrap rounded-none border-b-2 border-transparent bg-transparent px-3 py-3 text-sm font-medium text-muted-foreground shadow-none ring-offset-background transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none sm:px-4";
+  "relative shrink-0 whitespace-nowrap rounded-none border-b-2 border-transparent bg-transparent px-2.5 py-2.5 text-[0.8125rem] font-medium text-muted-foreground shadow-none ring-offset-background transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none sm:px-4 sm:py-3 sm:text-sm";
 
 function FormShell({ className, ...props }: ComponentProps<"div">) {
   return (
@@ -140,10 +140,11 @@ export function SettingsTabs({
       : "#e2e8f0";
 
   return (
-    <div className="mx-auto w-full max-w-3xl">
+    <div className="mx-auto w-full max-w-4xl">
       <Tabs defaultValue={tab} className="w-full">
-        <div className="sticky top-0 z-10 -mx-1 mb-2 bg-background/80 pb-1 pt-0.5 backdrop-blur-md dark:bg-background/70">
-          <TabsList className="flex h-auto w-full min-h-0 flex-wrap items-stretch justify-start gap-0 overflow-x-auto rounded-none border-0 border-b border-border/70 bg-transparent p-0">
+        <div className="sticky top-0 z-10 -mx-1 mb-4 border-b border-border/60 bg-background/90 pb-0 pt-0.5 backdrop-blur-md dark:bg-background/80">
+          <div className="overflow-x-auto overflow-y-hidden [-webkit-overflow-scrolling:touch] [scrollbar-width:thin]">
+            <TabsList className="inline-flex h-11 min-h-[2.75rem] w-max max-w-none flex-nowrap items-stretch justify-start gap-0 rounded-none border-0 bg-transparent p-0 pr-1">
             <TabsTrigger value="business" className={tabTriggerClass}>
               Bedrijf
             </TabsTrigger>
@@ -168,7 +169,8 @@ export function SettingsTabs({
             <TabsTrigger value="widget" className={tabTriggerClass}>
               Widget
             </TabsTrigger>
-          </TabsList>
+            </TabsList>
+          </div>
         </div>
 
         <TabsContent value="business" className="mt-8 outline-none">
@@ -477,7 +479,7 @@ export function SettingsTabs({
             auto_reply_enabled={settings.auto_reply_enabled}
             auto_reply_delay_seconds={settings.auto_reply_delay_seconds}
           />
-          <div className="rounded-lg border border-border/60 bg-muted/20 p-5 text-xs leading-relaxed text-muted-foreground dark:border-white/[0.08]">
+          <div className="cf-dashboard-panel p-5 text-xs leading-relaxed text-muted-foreground sm:p-6">
             <p className="text-sm font-semibold text-foreground">Webhook-endpoint</p>
             <Separator className="my-3 bg-border/60" />
             <p className="break-all font-mono text-[0.8125rem] text-foreground/90">
@@ -538,18 +540,28 @@ export function SettingsTabs({
           ) : (
             <div className="cf-dashboard-panel p-8 sm:p-10">
               <div className="flex flex-col items-center gap-5 text-center sm:flex-row sm:items-start sm:text-left">
-                <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground ring-1 ring-border/60 dark:ring-white/[0.08]">
+                <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
                   <Puzzle className="size-6" aria-hidden />
                 </div>
                 <div className="min-w-0 space-y-3">
-                  <h3 className="text-lg font-semibold tracking-tight text-foreground">Widget-token ontbreekt</h3>
+                  <h3 className="text-lg font-semibold tracking-tight text-foreground">
+                    Website-widget is bijna klaar
+                  </h3>
                   <p className="text-sm leading-relaxed text-muted-foreground">
-                    Je account heeft nog geen unieke embed-token in de database. Dat lost je normaal gesproken op met
-                    de nieuwste Supabase-migraties (kolom <code className="rounded bg-muted px-1 font-mono text-xs">widget_embed_token</code>
-                    ). Herlaad daarna deze pagina.
+                    Er ontbreekt nog een technische embed-sleutel voor je account. Na een database-update verschijnt die
+                    automatisch — herlaad deze pagina. Tot die tijd kun je de rest van je instellingen gewoon gebruiken.
+                  </p>
+                  <p className="rounded-lg border border-border/50 bg-muted/30 px-3 py-2 text-2xs leading-relaxed text-muted-foreground dark:border-white/[0.08]">
+                    Voor je ontwikkelaar: kolom{" "}
+                    <code className="rounded bg-muted px-1 font-mono text-[0.65rem]">widget_embed_token</code> op{" "}
+                    <code className="font-mono text-[0.65rem]">companies</code> — migraties uit deze codebase op Supabase
+                    toepassen, daarna{" "}
+                    <code className="rounded bg-muted px-1 font-mono text-[0.65rem]">
+                      {`NOTIFY pgrst, 'reload schema';`}
+                    </code>
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Blijft dit zo? Neem even contact op met support met je bedrijfs-ID:{" "}
+                    Support: vermeld je bedrijfs-ID{" "}
                     <span className="font-mono text-foreground/90">{company.id}</span>
                   </p>
                 </div>

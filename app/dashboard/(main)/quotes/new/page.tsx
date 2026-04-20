@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getAuth } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { DashboardWorkSurface } from "@/components/layout/dashboard-work-surface";
 import { PageFrame } from "@/components/layout/page-frame";
 import { isDemoMode } from "@/lib/env";
 import { getDemoDashboardBundle } from "@/lib/demo/dashboard-data";
@@ -27,27 +28,29 @@ export default async function NewQuotePage() {
         title="Nieuwe offerte"
         subtitle="In de demo gebruik je vaste voorbeelddata."
       >
-        <Card className="max-w-xl rounded-3xl border-border dark:border-white/[0.06]">
-          <CardHeader>
-            <CardTitle>Demo</CardTitle>
-            <CardDescription>
-              Er wordt geen nieuwe offerte in de database aangemaakt. Open een
-              voorbeeld en bewerk regels en BTW — dat werkt lokaal op die pagina.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-wrap gap-3">
-            {sampleId ? (
-              <Button asChild className="rounded-xl">
-                <Link href={`/dashboard/quotes/${sampleId}`}>
-                  Voorbeeld offerte openen
-                </Link>
+        <DashboardWorkSurface>
+          <Card className="cf-dashboard-panel mx-auto max-w-xl border-0 shadow-none">
+            <CardHeader>
+              <CardTitle>Demo</CardTitle>
+              <CardDescription>
+                Er wordt geen nieuwe offerte in de database aangemaakt. Open een
+                voorbeeld en bewerk regels en BTW — dat werkt lokaal op die pagina.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-wrap gap-3">
+              {sampleId ? (
+                <Button asChild className="rounded-lg">
+                  <Link href={`/dashboard/quotes/${sampleId}`}>
+                    Voorbeeld offerte openen
+                  </Link>
+                </Button>
+              ) : null}
+              <Button variant="secondary" asChild className="rounded-lg">
+                <Link href="/dashboard/leads">Naar leads</Link>
               </Button>
-            ) : null}
-            <Button variant="secondary" asChild className="rounded-xl">
-              <Link href="/dashboard/leads">Naar leads</Link>
-            </Button>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </DashboardWorkSurface>
       </PageFrame>
     );
   }
@@ -69,7 +72,9 @@ export default async function NewQuotePage() {
       title="Nieuwe offerte"
       subtitle="Start met een leeg concept. Koppel optioneel meteen een lead."
     >
-      <QuoteNewForm leads={leads} />
+      <DashboardWorkSurface>
+        <QuoteNewForm leads={leads} />
+      </DashboardWorkSurface>
     </PageFrame>
   );
 }

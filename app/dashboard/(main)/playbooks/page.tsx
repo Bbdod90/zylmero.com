@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BookOpen, Lightbulb, Sparkles, Target } from "lucide-react";
+import { DashboardWorkSurface } from "@/components/layout/dashboard-work-surface";
 import { PageFrame } from "@/components/layout/page-frame";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -28,11 +29,15 @@ export default function PlaybooksPage() {
       title="Playbooks"
       subtitle="Korte werkwijzen — geen theorie, wel wat werkt in de praktijk."
     >
+      <DashboardWorkSurface>
       <div className="grid gap-5 md:grid-cols-3">
         {PLAYBOOKS.map((p) => {
           const Icon = p.icon;
           return (
-            <Card key={p.title} className="rounded-2xl border-white/[0.06]">
+            <Card
+              key={p.title}
+              className="cf-dashboard-panel overflow-hidden border-0 shadow-none"
+            >
               <CardHeader>
                 <Icon className="size-8 text-primary" />
                 <CardTitle className="text-base font-semibold leading-snug">{p.title}</CardTitle>
@@ -45,7 +50,7 @@ export default function PlaybooksPage() {
         })}
       </div>
 
-      <Card className="mt-10 rounded-2xl border-primary/20 bg-primary/[0.04]">
+      <Card className="cf-dashboard-panel mt-10 overflow-hidden border-primary/25 bg-gradient-to-br from-primary/[0.06] via-card to-card shadow-none dark:from-primary/[0.09]">
         <CardHeader className="flex flex-row items-center gap-2">
           <BookOpen className="size-5 text-primary" />
           <CardTitle className="text-base font-semibold">Roadmap</CardTitle>
@@ -59,11 +64,12 @@ export default function PlaybooksPage() {
             <strong className="text-foreground">Bronnen-attributie</strong> — zie welk
             kanaal (widget, WhatsApp, handmatig) de meeste waarde levert.
           </p>
-          <Button variant="outline" className="rounded-xl" asChild>
+          <Button variant="outline" className="rounded-lg" asChild>
             <Link href="/dashboard/growth">Naar groei &amp; referrals</Link>
           </Button>
         </CardContent>
       </Card>
+      </DashboardWorkSurface>
     </PageFrame>
   );
 }

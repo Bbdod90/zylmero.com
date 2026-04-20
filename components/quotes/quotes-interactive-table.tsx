@@ -35,7 +35,7 @@ export function QuotesInteractiveTable({
   const router = useRouter();
 
   return (
-    <div className="overflow-hidden rounded-3xl border border-white/[0.06] bg-card/50 shadow-premium">
+    <div className="cf-dashboard-panel overflow-hidden">
       <Table>
         <TableHeader>
           <TableRow>

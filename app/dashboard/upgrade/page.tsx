@@ -63,17 +63,17 @@ export default async function UpgradePage() {
           </p>
         </div>
         <div className="mx-auto mt-12 max-w-5xl px-4">
-          <div className="mb-6 rounded-2xl border border-border/60 bg-muted/20 px-4 py-3 text-center text-sm text-muted-foreground">
+          <div className="cf-dashboard-panel mb-6 px-4 py-3 text-center text-sm text-muted-foreground">
             Prijzen zijn indicatief — na registratie kies je je plan in het scherm hieronder.
           </div>
           <div className="grid gap-6 lg:grid-cols-3">
             {BILLING_PLANS.map((plan) => (
               <div
                 key={plan.id}
-                className={`relative flex flex-col rounded-2xl border p-6 ${
+                className={`relative flex flex-col p-6 sm:p-7 ${
                   plan.popular
-                    ? "border-primary/50 bg-primary/5 shadow-lg"
-                    : "border-border/70 bg-card/40"
+                    ? "cf-dashboard-panel border-primary/35 bg-gradient-to-b from-primary/[0.06] via-card to-card ring-1 ring-primary/15 dark:from-primary/[0.09]"
+                    : "cf-dashboard-panel"
                 }`}
               >
                 {plan.popular ? (
@@ -127,11 +127,11 @@ export default async function UpgradePage() {
       </div>
 
       <div id="plans" className="mx-auto mt-10 max-w-5xl scroll-mt-24">
-        <div className="mb-6 rounded-2xl border border-border/60 bg-muted/20 px-4 py-3 text-center text-sm text-muted-foreground">
+        <div className="cf-dashboard-panel mb-6 px-4 py-3.5 text-center text-sm leading-relaxed text-muted-foreground">
           Gebruikt door servicebedrijven · snellere reactie levert vaker een geboekte klant
         </div>
 
-        <div className="mb-8 rounded-2xl border border-destructive/20 bg-destructive/5 p-4 text-sm text-muted-foreground">
+        <div className="cf-dashboard-panel mb-8 border-destructive/25 bg-destructive/[0.04] p-5 text-sm text-muted-foreground sm:p-6">
           <p className="font-medium text-foreground">Wat je verliest als je stopt</p>
           <ul className="mt-2 grid gap-1 sm:grid-cols-2">
             {[
@@ -152,14 +152,14 @@ export default async function UpgradePage() {
           {BILLING_PLANS.map((plan) => (
             <div
               key={plan.id}
-              className={`relative flex flex-col rounded-2xl border p-6 ${
+              className={`relative flex flex-col p-6 sm:p-7 ${
                 plan.popular
-                  ? "border-primary/50 bg-primary/5 shadow-lg"
-                  : "border-border/70 bg-card/40"
+                  ? "cf-dashboard-panel border-primary/35 bg-gradient-to-b from-primary/[0.06] via-card to-card ring-1 ring-primary/15 dark:from-primary/[0.09]"
+                  : "cf-dashboard-panel"
               }`}
             >
               {plan.popular ? (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-3 py-0.5 text-xs font-semibold text-primary-foreground">
+                <span className="absolute -top-3 left-1/2 z-10 -translate-x-1/2 rounded-full bg-primary px-3 py-0.5 text-xs font-semibold text-primary-foreground shadow-sm">
                   Meest gekozen
                 </span>
               ) : null}
@@ -195,15 +195,15 @@ export default async function UpgradePage() {
 
         <div className="mt-10 flex flex-wrap justify-center gap-4">
           {!expired ? (
-            <Button variant="outline" asChild className="rounded-xl">
+            <Button variant="outline" asChild className="rounded-lg">
               <Link href="/dashboard">Terug naar dashboard</Link>
             </Button>
           ) : (
-            <Button variant="outline" asChild className="rounded-xl">
+            <Button variant="outline" asChild className="rounded-lg">
               <Link href="/">Terug naar home</Link>
             </Button>
           )}
-          <Button variant="ghost" asChild className="rounded-xl">
+          <Button variant="ghost" asChild className="rounded-lg">
             <a href={`mailto:${BRAND_CONTACT_EMAIL}`}>Contact verkoop</a>
           </Button>
         </div>

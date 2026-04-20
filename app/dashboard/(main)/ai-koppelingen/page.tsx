@@ -4,6 +4,7 @@ import { isDemoMode } from "@/lib/env";
 import { hasSubscriptionAccess, isDemoCompanyId } from "@/lib/billing/trial";
 import { mapCompanySettingsRow } from "@/lib/queries/map-company-settings";
 import { resolveSiteUrl } from "@/lib/site-url";
+import { DashboardWorkSurface } from "@/components/layout/dashboard-work-surface";
 import { PageFrame } from "@/components/layout/page-frame";
 import {
   AiKoppelcentrumView,
@@ -56,20 +57,22 @@ export default async function AiKoppelcentrumPage() {
       title="AI & koppelingen"
       subtitle="Train je AI, sluit WhatsApp, e-mail (webhook) en je website-widget aan — alles landt in Berichten, met dezelfde AI-antwoordoptie waar je die aanzet."
     >
-      <AiKoppelcentrumView
-        demoMode={demoMode}
-        siteOrigin={resolveSiteUrl()}
-        needsAiSetup={needsAiSetup}
-        knowledgeStatus={knowledgeStatus}
-        knowledgeSummary={knowledgeSummary}
-        whatsappConnected={Boolean(ch?.connected)}
-        whatsappAutoReply={Boolean(mapped?.auto_reply_enabled)}
-        whatsappProvider={whatsappProvider}
-        hasWidgetToken={Boolean(auth.company.widget_embed_token)}
-        websiteWidgetActive={hasSubscriptionAccess(auth.company)}
-        hasContactEmail={Boolean(auth.company.contact_email?.trim())}
-        emailInboundEnabled={Boolean(mapped?.email_inbound_enabled)}
-      />
+      <DashboardWorkSurface>
+        <AiKoppelcentrumView
+          demoMode={demoMode}
+          siteOrigin={resolveSiteUrl()}
+          needsAiSetup={needsAiSetup}
+          knowledgeStatus={knowledgeStatus}
+          knowledgeSummary={knowledgeSummary}
+          whatsappConnected={Boolean(ch?.connected)}
+          whatsappAutoReply={Boolean(mapped?.auto_reply_enabled)}
+          whatsappProvider={whatsappProvider}
+          hasWidgetToken={Boolean(auth.company.widget_embed_token)}
+          websiteWidgetActive={hasSubscriptionAccess(auth.company)}
+          hasContactEmail={Boolean(auth.company.contact_email?.trim())}
+          emailInboundEnabled={Boolean(mapped?.email_inbound_enabled)}
+        />
+      </DashboardWorkSurface>
     </PageFrame>
   );
 }

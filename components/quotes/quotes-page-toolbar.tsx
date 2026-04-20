@@ -12,15 +12,15 @@ export function QuotesPageToolbar({
 }) {
   if (demo) {
     return (
-      <div className="mb-6 flex flex-wrap items-center justify-end gap-3">
+      <div className="mb-2 flex flex-wrap items-center justify-end gap-3">
         {demoSampleQuoteId ? (
-          <Button asChild className="rounded-xl">
+          <Button asChild className="rounded-lg">
             <Link href={`/dashboard/quotes/${demoSampleQuoteId}`}>
               Voorbeeld bewerken
             </Link>
           </Button>
         ) : null}
-        <Button variant="secondary" asChild className="rounded-xl">
+        <Button variant="secondary" asChild className="rounded-lg">
           <Link href="/dashboard/leads">Nieuwe offerte via lead</Link>
         </Button>
       </div>
@@ -28,8 +28,8 @@ export function QuotesPageToolbar({
   }
 
   return (
-    <div className="mb-6 flex flex-wrap items-center justify-end gap-3">
-      <Button asChild className="rounded-xl">
+    <div className="mb-2 flex flex-wrap items-center justify-end gap-3">
+      <Button asChild className="rounded-lg">
         <Link href="/dashboard/quotes/new">Nieuwe offerte</Link>
       </Button>
     </div>

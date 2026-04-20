@@ -28,7 +28,7 @@ export function BillingUpgradeClient({
       </p>
       <Button
         type="button"
-        className="w-full rounded-xl py-6 text-base font-semibold"
+        className="w-full rounded-lg py-6 text-base font-semibold shadow-sm"
         disabled={pending}
         onClick={() => {
           setPending(true);

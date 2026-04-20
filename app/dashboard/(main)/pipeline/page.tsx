@@ -1,5 +1,6 @@
 import { getAuth } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { DashboardWorkSurface } from "@/components/layout/dashboard-work-surface";
 import { PageFrame } from "@/components/layout/page-frame";
 import { PipelineBoard } from "@/components/pipeline/pipeline-board";
 import { fetchLeadRow } from "@/lib/queries/mappers";
@@ -31,17 +32,15 @@ export default async function PipelinePage() {
       title="Pipeline"
       subtitle="Sleep leads tussen fases — visueel overzicht, direct gekoppeld aan inbox, offertes en rapportage."
     >
-      <div className="relative overflow-hidden rounded-3xl border border-border/50 bg-gradient-to-b from-card/60 to-transparent p-4 dark:border-white/[0.09] dark:from-white/[0.03] sm:p-6 lg:p-8">
-        <div
-          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"
-          aria-hidden
-        />
-        <PipelineBoard
-          initialLeads={leads}
-          companyId={auth.company.id}
-          demoMode={demo}
-        />
-      </div>
+      <DashboardWorkSurface>
+        <div className="cf-dashboard-panel relative p-4 sm:p-6 lg:p-8">
+          <PipelineBoard
+            initialLeads={leads}
+            companyId={auth.company.id}
+            demoMode={demo}
+          />
+        </div>
+      </DashboardWorkSurface>
     </PageFrame>
   );
 }

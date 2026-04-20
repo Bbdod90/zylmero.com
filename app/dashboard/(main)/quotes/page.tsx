@@ -4,7 +4,10 @@ import { createClient } from "@/lib/supabase/server";
 import { fetchQuotesForCompany } from "@/lib/queries/quotes-list";
 import { getDemoDashboardBundle } from "@/lib/demo/dashboard-data";
 import { isDemoMode } from "@/lib/env";
+import { DashboardWorkSurface } from "@/components/layout/dashboard-work-surface";
 import { PageFrame } from "@/components/layout/page-frame";
+import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import {
   QuotesInteractiveTable,
   type QuoteRowModel,
@@ -70,39 +73,31 @@ export default async function QuotesPage() {
       title="Offertes"
       subtitle="Van vraag naar prijs — volg status, BTW en totaal in één overzicht."
     >
-      <QuotesPageToolbar demo={demo} demoSampleQuoteId={demoSampleQuoteId} />
-      {quotes.length === 0 ? (
-        <div className="flex flex-col items-center rounded-3xl border border-dashed border-white/[0.1] bg-muted/10 px-8 py-20 text-center">
-          <div className="mb-5 flex size-16 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-inner-soft">
-            <FileText className="size-8" />
-          </div>
-          <p className="text-lg font-semibold tracking-tight text-foreground">
-            Nog geen offertes
-          </p>
-          <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
-            Maak een offerte vanuit een lead: open de lead en kies een offerte-actie
-            of laat AI een concept genereren.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-            {!demo ? (
-              <Link
-                href="/dashboard/quotes/new"
-                className="text-sm font-semibold text-primary hover:underline"
-              >
-                Nieuwe offerte →
-              </Link>
-            ) : null}
-            <Link
-              href="/dashboard/leads"
-              className="text-sm font-semibold text-primary hover:underline"
-            >
-              Naar leads →
-            </Link>
-          </div>
-        </div>
-      ) : (
-        <QuotesInteractiveTable rows={rows} demoMode={demo} />
-      )}
+      <DashboardWorkSurface>
+        <QuotesPageToolbar demo={demo} demoSampleQuoteId={demoSampleQuoteId} />
+        {quotes.length === 0 ? (
+          <EmptyState
+            icon={FileText}
+            title="Nog geen offertes"
+            description="Maak een offerte vanuit een lead: open de lead en kies een offerte-actie of laat AI een concept genereren."
+            className="py-16 sm:py-20"
+            actions={
+              <>
+                {!demo ? (
+                  <Button asChild className="rounded-lg">
+                    <Link href="/dashboard/quotes/new">Nieuwe offerte</Link>
+                  </Button>
+                ) : null}
+                <Button variant="outline" asChild className="rounded-lg">
+                  <Link href="/dashboard/leads">Naar leads</Link>
+                </Button>
+              </>
+            }
+          />
+        ) : (
+          <QuotesInteractiveTable rows={rows} demoMode={demo} />
+        )}
+      </DashboardWorkSurface>
     </PageFrame>
   );
 }

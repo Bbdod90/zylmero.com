@@ -1,5 +1,6 @@
 import { getAuth } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { DashboardWorkSurface } from "@/components/layout/dashboard-work-surface";
 import { PageFrame } from "@/components/layout/page-frame";
 import { LeadsExplorer } from "@/components/leads/leads-explorer";
 import { LeadImport } from "@/components/leads/lead-import";
@@ -23,17 +24,19 @@ export default async function LeadsPage() {
       title="Leads"
       subtitle="Prioriteit, status en waarde — werk eerst aan wat het meest oplevert."
     >
-      {!demo ? (
-        <div className="mb-10 max-w-2xl">
-          <LeadImport disabled={false} />
-        </div>
-      ) : null}
-      <LeadsExplorer
-        leads={bundle.leads}
-        staleReplyLeadIds={Array.from(sla.staleReplyLeadIds)}
-        demoMode={demo}
-        demoSampleLeadId={bundle.leads[0]?.id ?? null}
-      />
+      <DashboardWorkSurface>
+        {!demo ? (
+          <div className="max-w-2xl">
+            <LeadImport disabled={false} />
+          </div>
+        ) : null}
+        <LeadsExplorer
+          leads={bundle.leads}
+          staleReplyLeadIds={Array.from(sla.staleReplyLeadIds)}
+          demoMode={demo}
+          demoSampleLeadId={bundle.leads[0]?.id ?? null}
+        />
+      </DashboardWorkSurface>
     </PageFrame>
   );
 }

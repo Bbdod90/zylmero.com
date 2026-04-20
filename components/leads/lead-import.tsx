@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Upload } from "lucide-react";
 
 export function LeadImport({ disabled }: { disabled: boolean }) {
@@ -14,29 +13,39 @@ export function LeadImport({ disabled }: { disabled: boolean }) {
   const [file, setFile] = useState<File | null>(null);
 
   return (
-    <Card className="rounded-2xl border-border/50">
-      <CardHeader>
-        <CardTitle className="text-base">Import (CSV / Excel)</CardTitle>
-        <p className="text-sm text-muted-foreground">
+    <div className="cf-dashboard-panel">
+      <div className="border-b border-border/40 px-6 py-5 dark:border-white/[0.06] sm:px-7 sm:py-6">
+        <h3 className="text-base font-semibold tracking-tight text-foreground">
+          Import (CSV / Excel)
+        </h3>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
           Kolommen: naam (of name), email, telefoon, notities. Minimaal e-mail of
           telefoon per rij.
         </p>
-      </CardHeader>
-      <CardContent className="space-y-4">
+      </div>
+      <div className="space-y-4 p-6 sm:p-7">
         <div className="space-y-2">
           <Label htmlFor="import-file">Bestand</Label>
-          <input
-            id="import-file"
-            type="file"
-            accept=".csv,.xlsx,.xls"
-            disabled={disabled || pending}
-            className="block w-full text-sm"
-            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-          />
+          <div className="relative overflow-hidden rounded-lg border border-dashed border-border/60 bg-muted/20 transition-colors hover:border-primary/35 hover:bg-muted/30 dark:border-white/[0.1]">
+            <input
+              id="import-file"
+              type="file"
+              accept=".csv,.xlsx,.xls"
+              disabled={disabled || pending}
+              className="absolute inset-0 z-10 h-full min-h-[5.5rem] w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
+              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            />
+            <div className="pointer-events-none flex min-h-[5.5rem] flex-col items-center justify-center gap-1 px-4 py-6 text-center">
+              <span className="text-sm font-medium text-foreground">
+                {file ? file.name : "Sleep een bestand hierheen of klik om te kiezen"}
+              </span>
+              <span className="text-2xs text-muted-foreground">.csv, .xlsx of .xls</span>
+            </div>
+          </div>
         </div>
         <Button
           type="button"
-          className="rounded-xl"
+          className="rounded-lg"
           disabled={disabled || pending || !file}
           onClick={() => {
             if (!file) return;
@@ -76,7 +85,7 @@ export function LeadImport({ disabled }: { disabled: boolean }) {
           )}
           Importeren
         </Button>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
