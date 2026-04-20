@@ -408,22 +408,36 @@ export function QuoteDetailClient({
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="overflow-x-auto rounded-xl border border-white/[0.06]">
+          <div
+            className={cn(
+              "overflow-x-auto rounded-xl border border-border/65 bg-card",
+              "shadow-[0_1px_0_0_hsl(220_13%_70%/0.45)] ring-1 ring-black/[0.03]",
+              "dark:border-white/[0.09] dark:bg-card/70 dark:shadow-[0_1px_0_0_hsl(220_16%_22%/0.5)] dark:ring-white/[0.05]",
+            )}
+          >
             <table className="w-full min-w-[640px] text-sm">
               <thead>
-                <tr className="border-b border-white/[0.06] text-left text-2xs uppercase tracking-wide text-muted-foreground">
-                  <th className="px-3 py-2">Omschrijving</th>
-                  <th className="w-24 px-3 py-2 text-right">Aantal</th>
-                  <th className="w-36 px-3 py-2 text-right">
+                <tr
+                  className={cn(
+                    "border-b border-border/70 bg-gradient-to-b from-muted/55 to-muted/35 text-left text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-muted-foreground",
+                    "dark:border-white/[0.08] dark:from-white/[0.06] dark:to-white/[0.02]",
+                  )}
+                >
+                  <th className="px-4 py-3 first:pl-5">Omschrijving</th>
+                  <th className="w-24 px-4 py-3 text-right">Aantal</th>
+                  <th className="w-36 px-4 py-3 text-right">
                     {linePricesInclTax ? "Prijs (incl.)" : "Prijs (ex.)"}
                   </th>
-                  <th className="w-32 px-3 py-2 text-right">Totaal</th>
-                  <th className="w-12 px-1 py-2" />
+                  <th className="w-32 px-4 py-3 text-right">Totaal</th>
+                  <th className="w-12 px-2 py-3" />
                 </tr>
               </thead>
               <tbody>
                 {draft.lines.map((li, i) => (
-                  <tr key={li.id} className="border-b border-white/[0.04]">
+                  <tr
+                    key={li.id}
+                    className="border-b border-border/55 transition-colors hover:bg-muted/35 dark:border-white/[0.06] dark:hover:bg-white/[0.045]"
+                  >
                     <td className="px-3 py-2 align-top">
                       <Input
                         value={li.description}

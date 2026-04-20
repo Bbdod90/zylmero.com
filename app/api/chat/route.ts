@@ -47,7 +47,7 @@ function capKnowledgeLines(lines: string[]): string[] {
 }
 
 function openaiErrMeta(err: unknown): { msg: string; lower: string; status?: number; bodyLower: string } {
-  let msg = err instanceof Error ? err.message : String(err);
+  const msg = err instanceof Error ? err.message : String(err);
   let status: number | undefined;
   let bodyLower = "";
   if (err instanceof APIError) {
