@@ -5,6 +5,7 @@ import { hasSubscriptionAccess } from "@/lib/billing/trial";
 import { mapCompanyRow } from "@/lib/auth/map-company";
 import { sendAutoReplyIfEnabled } from "@/lib/whatsapp/auto-reply";
 import { getCompanySettings } from "@/lib/company-settings";
+import { leadInsertJsonDefaults } from "@/lib/leads/insert-defaults";
 
 export type InboundWebhookPayload = {
   company_id: string;
@@ -78,6 +79,7 @@ export async function processInboundWhatsApp(
         phone: from,
         source: "whatsapp",
         status: "new",
+        ...leadInsertJsonDefaults,
       })
       .select("id")
       .single();

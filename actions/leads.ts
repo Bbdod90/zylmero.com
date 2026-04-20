@@ -10,6 +10,7 @@ import type { ActionResult } from "@/actions/ai";
 import type { LeadStatus } from "@/lib/types";
 import type { LeadTemperature } from "@/lib/sales/scoring";
 import { logTeamActivity } from "@/lib/team-activity";
+import { leadInsertJsonDefaults } from "@/lib/leads/insert-defaults";
 
 const LEAD_STATUSES: LeadStatus[] = [
   "new",
@@ -296,6 +297,7 @@ export async function createLead(input: {
       phone: input.phone?.trim() || null,
       source: input.source?.trim() || null,
       status: "new",
+      ...leadInsertJsonDefaults,
     })
     .select("id")
     .single();

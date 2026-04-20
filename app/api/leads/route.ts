@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { leadInsertJsonDefaults } from "@/lib/leads/insert-defaults";
 
 function randomValue() {
   return Math.round(120 + Math.random() * 480);
@@ -69,6 +70,7 @@ export async function POST(req: Request) {
       intent: message || null,
       status: "new",
       estimated_value,
+      ...leadInsertJsonDefaults,
     })
     .select("id")
     .single();

@@ -83,7 +83,13 @@ export function NewLeadDialog({
                 source: source || null,
               });
               if (!res.ok) {
-                toast.error(res.error);
+                toast.error(res.error, {
+                  duration: 14_000,
+                  description:
+                    /full_name|migrat|schema cache|database/i.test(res.error) ?
+                      "Voer in Supabase SQL Editor de migraties uit (map supabase/migrations), daarna Settings → API → Reload schema."
+                    : undefined,
+                });
                 return;
               }
               toast.success("Lead aangemaakt");

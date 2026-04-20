@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { insertNotificationIfNew } from "@/lib/notifications/create";
+import { leadInsertJsonDefaults } from "@/lib/leads/insert-defaults";
 import { isLeadCapReached } from "@/lib/billing/entitlements";
 import { hasSubscriptionAccess } from "@/lib/billing/trial";
 import { mapCompanyRow } from "@/lib/auth/map-company";
@@ -90,6 +91,7 @@ export async function processInboundEmail(
         source: "email",
         intent: subject || null,
         status: "new",
+        ...leadInsertJsonDefaults,
       })
       .select("id")
       .single();

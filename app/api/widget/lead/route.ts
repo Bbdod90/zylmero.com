@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { mapCompanyRow } from "@/lib/auth/map-company";
 import { hasSubscriptionAccess } from "@/lib/billing/trial";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { leadInsertJsonDefaults } from "@/lib/leads/insert-defaults";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -73,11 +74,19 @@ export async function POST(request: Request) {
       source: "website_widget",
       status: "new",
       summary: summaryParts || null,
+      ...leadInsertJsonDefaults,
     });
 
     if (lErr) {
+      if (process.env.NODE_ENV === "development") {
+        console.error("[widget/lead] insert:", lErr.message);
+      }
       return NextResponse.json(
-        { ok: false, error: "lead opslaan mislukt" },
+        {
+          ok: false,
+          error: "lead opslaan mislukt",
+          detail: lErr.message,
+        },
         { status: 500, headers: cors },
       );
     }

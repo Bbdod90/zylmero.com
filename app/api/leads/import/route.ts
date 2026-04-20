@@ -3,6 +3,7 @@ import * as XLSX from "xlsx";
 import Papa from "papaparse";
 import { getAuth } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { leadInsertJsonDefaults } from "@/lib/leads/insert-defaults";
 import { hasSubscriptionAccess } from "@/lib/billing/trial";
 import { PAYWALL_AI_LEADS } from "@/lib/billing/paywall";
 
@@ -106,6 +107,7 @@ export async function POST(request: Request) {
         source: "import",
         status: "new",
         notes: n.notes,
+        ...leadInsertJsonDefaults,
       })
       .select("id")
       .single();
