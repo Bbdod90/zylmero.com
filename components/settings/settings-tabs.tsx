@@ -1,5 +1,6 @@
 "use client";
 
+import type { ComponentProps } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import {
   updateBusinessProfileAction,
@@ -13,17 +14,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
 import { WhatsAppSettingsForm } from "@/components/settings/whatsapp-settings-form";
 import { EmailChannelSettingsForm } from "@/components/settings/email-channel-settings-form";
 import { BillingSettings } from "@/components/settings/billing-settings";
 import { WidgetSettings } from "@/components/settings/widget-settings";
 import { WidgetSubscriptionGate } from "@/components/settings/widget-subscription-gate";
+import { FormBooleanSwitch } from "@/components/settings/form-boolean-switch";
+import { cn } from "@/lib/utils";
 import type { Company, WhatsAppChannelSettings } from "@/lib/types";
+import { Puzzle } from "lucide-react";
 
 function Submit({ label }: { label: string }) {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" disabled={pending} className="rounded-xl">
+    <Button type="submit" disabled={pending} className="rounded-lg px-6 font-semibold shadow-sm">
       {pending ? "Opslaan…" : label}
     </Button>
   );
@@ -41,6 +46,30 @@ const VALID_TABS = new Set([
   "widget",
   "quotes",
 ]);
+
+const tabTriggerClass =
+  "relative shrink-0 whitespace-nowrap rounded-none border-b-2 border-transparent bg-transparent px-3 py-3 text-sm font-medium text-muted-foreground shadow-none ring-offset-background transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none sm:px-4";
+
+function FormShell({ className, ...props }: ComponentProps<"div">) {
+  return (
+    <div
+      className={cn(
+        "cf-dashboard-panel space-y-8 p-6 sm:p-8 lg:p-9",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+function FormIntro({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <header className="space-y-1.5 border-b border-border/50 pb-6">
+      <h2 className="text-lg font-semibold tracking-tight text-foreground">{title}</h2>
+      <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">{children}</p>
+    </header>
+  );
+}
 
 export function SettingsTabs({
   company,
@@ -104,309 +133,431 @@ export function SettingsTabs({
     company.trial_ends_at != null &&
     new Date(company.trial_ends_at).getTime() < Date.now();
 
+  const primaryPreview =
+    settings.white_label_primary?.trim() &&
+    /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(settings.white_label_primary.trim())
+      ? settings.white_label_primary.trim()
+      : "#e2e8f0";
+
   return (
-    <Tabs defaultValue={tab} className="w-full">
-      <TabsList className="flex h-auto w-full flex-wrap gap-1 rounded-2xl border border-border/50 bg-muted/35 p-1.5 shadow-inner-soft dark:border-white/[0.08] dark:bg-white/[0.04]">
-        <TabsTrigger
-          value="business"
-          className="rounded-xl px-4 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-primary/20 dark:data-[state=active]:bg-card dark:data-[state=active]:ring-primary/25"
-        >
-          Bedrijf
-        </TabsTrigger>
-        <TabsTrigger
-          value="knowledge"
-          className="rounded-xl px-4 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-primary/20 dark:data-[state=active]:bg-card dark:data-[state=active]:ring-primary/25"
-        >
-          Kennis
-        </TabsTrigger>
-        <TabsTrigger
-          value="quotes"
-          className="rounded-xl px-4 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-primary/20 dark:data-[state=active]:bg-card dark:data-[state=active]:ring-primary/25"
-        >
-          Offertes
-        </TabsTrigger>
-        <TabsTrigger
-          value="branding"
-          className="rounded-xl px-4 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-primary/20 dark:data-[state=active]:bg-card dark:data-[state=active]:ring-primary/25"
-        >
-          Huisstijl
-        </TabsTrigger>
-        <TabsTrigger
-          value="whatsapp"
-          className="rounded-xl px-4 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-primary/20 dark:data-[state=active]:bg-card dark:data-[state=active]:ring-primary/25"
-        >
-          WhatsApp
-        </TabsTrigger>
-        <TabsTrigger
-          value="email"
-          className="rounded-xl px-4 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-primary/20 dark:data-[state=active]:bg-card dark:data-[state=active]:ring-primary/25"
-        >
-          E-mail
-        </TabsTrigger>
-        <TabsTrigger
-          value="billing"
-          className="rounded-xl px-4 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-primary/20 dark:data-[state=active]:bg-card dark:data-[state=active]:ring-primary/25"
-        >
-          Facturatie
-        </TabsTrigger>
-        <TabsTrigger
-          value="widget"
-          className="rounded-xl px-4 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-primary/20 dark:data-[state=active]:bg-card dark:data-[state=active]:ring-primary/25"
-        >
-          Widget
-        </TabsTrigger>
-      </TabsList>
-      <TabsContent value="business" className="mt-6 space-y-6">
-        <form action={a1} className="cf-dashboard-panel space-y-5 p-6 sm:p-8">
-          <div className="space-y-2">
-            <Label htmlFor="company_name">Bedrijfsnaam</Label>
-            <Input
-              id="company_name"
-              name="company_name"
-              defaultValue={company.name}
-              required
-            />
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="contact_email">Contact e-mail</Label>
-              <Input
-                id="contact_email"
-                name="contact_email"
-                type="email"
-                defaultValue={company.contact_email || ""}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="contact_phone">Contacttelefoon</Label>
-              <Input
-                id="contact_phone"
-                name="contact_phone"
-                defaultValue={company.contact_phone || ""}
-              />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="niche">Niche / specialisme</Label>
-            <Input id="niche" name="niche" defaultValue={settings.niche || ""} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="services">Diensten (één per regel)</Label>
-            <Textarea
-              id="services"
-              name="services"
-              className="min-h-[120px] rounded-xl"
-              defaultValue={settings.services?.join("\n") || ""}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="booking_link">Boekingslink</Label>
-            <Input
-              id="booking_link"
-              name="booking_link"
-              type="url"
-              defaultValue={settings.booking_link || ""}
-            />
-          </div>
-          {s1.error ? (
-            <p className="text-sm text-destructive">{s1.error}</p>
-          ) : null}
-          {s1.ok ? <p className="text-sm text-primary">Opgeslagen.</p> : null}
-          <Submit label="Profiel opslaan" />
-        </form>
-      </TabsContent>
-      <TabsContent value="knowledge" className="mt-6">
-        <form action={a2} className="cf-dashboard-panel space-y-5 p-6 sm:p-8">
-          <div className="space-y-2">
-            <Label htmlFor="pricing_hints">Prijshints</Label>
-            <Textarea
-              id="pricing_hints"
-              name="pricing_hints"
-              className="min-h-[100px] rounded-xl"
-              defaultValue={settings.pricing_hints || ""}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="faq">FAQ (V || A-blokken, lege regel ertussen)</Label>
-            <Textarea
-              id="faq"
-              name="faq"
-              className="min-h-[140px] rounded-xl"
-              defaultValue={faqText}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="business_hours">Openingstijden</Label>
-            <Textarea
-              id="business_hours"
-              name="business_hours"
-              className="min-h-[80px] rounded-xl"
-              defaultValue={hoursText}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="knowledge_snippets">
-              Extra kennis voor AI (titel || tekst, lege regel tussen items)
-            </Label>
-            <Textarea
-              id="knowledge_snippets"
-              name="knowledge_snippets"
-              className="min-h-[120px] rounded-xl"
-              defaultValue={snippetsText}
-              placeholder={`Levertijden || 2–3 werkdagen\n\nGarantie || 12 maanden op montage`}
-            />
-          </div>
-          {s2.error ? (
-            <p className="text-sm text-destructive">{s2.error}</p>
-          ) : null}
-          {s2.ok ? <p className="text-sm text-primary">Opgeslagen.</p> : null}
-          <Submit label="Kennis opslaan" />
-        </form>
-      </TabsContent>
-      <TabsContent value="quotes" className="mt-6">
-        <form action={a5} className="cf-dashboard-panel space-y-5 p-6 sm:p-8">
-          <div className="space-y-2">
-            <Label htmlFor="quote_intro">Vaste intro (bovenaan PDF)</Label>
-            <Textarea
-              id="quote_intro"
-              name="quote_intro"
-              className="min-h-[100px] rounded-xl"
-              defaultValue={settings.quote_intro || ""}
-              placeholder="Bedankt voor uw aanvraag. Onderstaande offerte is vrijblijvend…"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="quote_footer">
-              Voorwaarden, betalingstermijn, garantie (onderaan PDF)
-            </Label>
-            <Textarea
-              id="quote_footer"
-              name="quote_footer"
-              className="min-h-[140px] rounded-xl"
-              defaultValue={settings.quote_footer || ""}
-              placeholder="Betaling binnen 14 dagen. Werkzaamheden volgens afspraak…"
-            />
-          </div>
-          <div className="flex flex-col gap-3 rounded-xl border border-border/50 bg-muted/20 p-4 dark:border-white/[0.08]">
-            <label className="flex cursor-pointer items-start gap-3 text-sm">
-              <input
-                type="checkbox"
-                name="quote_include_pricing_hints"
-                defaultChecked={settings.quote_include_pricing_hints}
-                className="mt-1 size-4 rounded border-border"
-              />
-              <span>
-                <span className="font-medium text-foreground">
-                  Prijshints uit Kennis meenemen
-                </span>
-                <span className="mt-0.5 block text-muted-foreground">
-                  Voegt het veld &quot;Prijshints&quot; uit het tabblad Kennis toe op de PDF
-                  (richtlijnen en tarieven).
-                </span>
-              </span>
-            </label>
-            <label className="flex cursor-pointer items-start gap-3 text-sm">
-              <input
-                type="checkbox"
-                name="quote_include_zylmero_notice"
-                defaultChecked={settings.quote_include_zylmero_notice}
-                className="mt-1 size-4 rounded border-border"
-              />
-              <span>
-                <span className="font-medium text-foreground">
-                  Zylmero-platformvermelding
-                </span>
-                <span className="mt-0.5 block text-muted-foreground">
-                  Korte standaardtekst dat de offerte via Zylmero loopt (aanbevolen voor
-                  transparantie).
-                </span>
-              </span>
-            </label>
-          </div>
-          {s5.error ? (
-            <p className="text-sm text-destructive">{s5.error}</p>
-          ) : null}
-          {s5.ok ? <p className="text-sm text-primary">Opgeslagen.</p> : null}
-          <Submit label="Offerte-template opslaan" />
-        </form>
-      </TabsContent>
-      <TabsContent value="branding" className="mt-6">
-        <form action={a4} className="cf-dashboard-panel space-y-5 p-6 sm:p-8">
-          <div className="space-y-2">
-            <Label htmlFor="white_label_logo_url">Logo-URL (https)</Label>
-            <Input
-              id="white_label_logo_url"
-              name="white_label_logo_url"
-              type="url"
-              placeholder="https://…"
-              defaultValue={settings.white_label_logo_url || ""}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="white_label_primary">Primaire kleur (hex)</Label>
-            <Input
-              id="white_label_primary"
-              name="white_label_primary"
-              placeholder="#2563eb"
-              defaultValue={settings.white_label_primary || ""}
-            />
-          </div>
-          {s4.error ? (
-            <p className="text-sm text-destructive">{s4.error}</p>
-          ) : null}
-          {s4.ok ? <p className="text-sm text-primary">Opgeslagen.</p> : null}
-          <Submit label="Huisstijl opslaan" />
-        </form>
-      </TabsContent>
-      <TabsContent value="whatsapp" className="mt-6 space-y-4">
-        <WhatsAppSettingsForm
-          channel={settings.whatsapp_channel}
-          auto_reply_enabled={settings.auto_reply_enabled}
-          auto_reply_delay_seconds={settings.auto_reply_delay_seconds}
-        />
-        <div className="glass-bubble rounded-2xl border border-dashed border-border/70 p-5 text-xs text-muted-foreground dark:border-white/[0.1]">
-          <p className="font-semibold text-foreground">Webhook-endpoint</p>
-          <p className="mt-1 break-all">
-            POST {siteOrigin}/api/webhooks/whatsapp
-          </p>
-          <p className="mt-2">
-            Stuur header <code className="rounded bg-muted px-1">x-whatsapp-signature</code>{" "}
-            of <code className="rounded bg-muted px-1">Authorization: Bearer</code> met{" "}
-            <code className="rounded bg-muted px-1">WHATSAPP_WEBHOOK_SECRET</code>. JSON-body:{" "}
-            <code className="rounded bg-muted px-1">company_id</code>,{" "}
-            <code className="rounded bg-muted px-1">from</code>,{" "}
-            <code className="rounded bg-muted px-1">body</code>.
-          </p>
+    <div className="mx-auto w-full max-w-3xl">
+      <Tabs defaultValue={tab} className="w-full">
+        <div className="sticky top-0 z-10 -mx-1 mb-2 bg-background/80 pb-1 pt-0.5 backdrop-blur-md dark:bg-background/70">
+          <TabsList className="flex h-auto w-full min-h-0 flex-wrap items-stretch justify-start gap-0 overflow-x-auto rounded-none border-0 border-b border-border/70 bg-transparent p-0">
+            <TabsTrigger value="business" className={tabTriggerClass}>
+              Bedrijf
+            </TabsTrigger>
+            <TabsTrigger value="knowledge" className={tabTriggerClass}>
+              Kennis
+            </TabsTrigger>
+            <TabsTrigger value="quotes" className={tabTriggerClass}>
+              Offertes
+            </TabsTrigger>
+            <TabsTrigger value="branding" className={tabTriggerClass}>
+              Huisstijl
+            </TabsTrigger>
+            <TabsTrigger value="whatsapp" className={tabTriggerClass}>
+              WhatsApp
+            </TabsTrigger>
+            <TabsTrigger value="email" className={tabTriggerClass}>
+              E-mail
+            </TabsTrigger>
+            <TabsTrigger value="billing" className={tabTriggerClass}>
+              Facturatie
+            </TabsTrigger>
+            <TabsTrigger value="widget" className={tabTriggerClass}>
+              Widget
+            </TabsTrigger>
+          </TabsList>
         </div>
-      </TabsContent>
-      <TabsContent value="email" className="mt-6">
-        <EmailChannelSettingsForm
-          companyId={company.id}
-          emailInboundEnabled={settings.email_inbound_enabled}
-          hasContactEmail={Boolean(company.contact_email?.trim())}
-          siteOrigin={siteOrigin}
-        />
-      </TabsContent>
-      <TabsContent value="billing" className="mt-6">
-        <BillingSettings
-          company={company}
-          leadsThisMonth={leadsThisMonth}
-          leadCap={leadCap}
-        />
-      </TabsContent>
-      <TabsContent value="widget" className="mt-6">
-        {!websiteWidgetActive ? (
-          <WidgetSubscriptionGate trialExpiredHint={trialExpiredHint} />
-        ) : widgetEmbedToken ? (
-          <WidgetSettings siteOrigin={siteOrigin} embedToken={widgetEmbedToken} />
-        ) : (
-          <div className="cf-dashboard-panel rounded-2xl p-8 text-center">
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              Widget-token ontbreekt. Neem contact op met support of herlaad later.
+
+        <TabsContent value="business" className="mt-8 outline-none">
+          <form action={a1} className="space-y-8">
+            <FormShell className="space-y-8">
+              <FormIntro title="Bedrijf & contact">
+                Gegevens voor antwoorden, offertes en je publieke profiel. Houd dit actueel — de AI gebruikt dit
+                dagelijks.
+              </FormIntro>
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="company_name" className="text-sm font-medium">
+                    Bedrijfsnaam
+                  </Label>
+                  <Input
+                    id="company_name"
+                    name="company_name"
+                    defaultValue={company.name}
+                    required
+                    className="rounded-lg"
+                  />
+                </div>
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="contact_email" className="text-sm font-medium">
+                      Contact e-mail
+                    </Label>
+                    <Input
+                      id="contact_email"
+                      name="contact_email"
+                      type="email"
+                      defaultValue={company.contact_email || ""}
+                      className="rounded-lg"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="contact_phone" className="text-sm font-medium">
+                      Contacttelefoon
+                    </Label>
+                    <Input
+                      id="contact_phone"
+                      name="contact_phone"
+                      defaultValue={company.contact_phone || ""}
+                      className="rounded-lg"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="niche" className="text-sm font-medium">
+                    Niche / specialisme
+                  </Label>
+                  <Input
+                    id="niche"
+                    name="niche"
+                    defaultValue={settings.niche || ""}
+                    className="rounded-lg"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="services" className="text-sm font-medium">
+                    Diensten
+                  </Label>
+                  <p className="text-xs text-muted-foreground">Één dienst per regel.</p>
+                  <Textarea
+                    id="services"
+                    name="services"
+                    className="min-h-[120px] rounded-lg"
+                    defaultValue={settings.services?.join("\n") || ""}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="booking_link" className="text-sm font-medium">
+                    Boekingslink
+                  </Label>
+                  <p className="text-xs text-muted-foreground">Agenda of Calendly-URL voor afspraken.</p>
+                  <Input
+                    id="booking_link"
+                    name="booking_link"
+                    type="url"
+                    defaultValue={settings.booking_link || ""}
+                    className="rounded-lg"
+                  />
+                </div>
+              </div>
+              {s1.error ? (
+                <p className="text-sm font-medium text-destructive">{s1.error}</p>
+              ) : null}
+              {s1.ok ? (
+                <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">Opgeslagen.</p>
+              ) : null}
+              <div className="flex flex-wrap items-center gap-4 border-t border-border/40 pt-6">
+                <Submit label="Profiel opslaan" />
+              </div>
+            </FormShell>
+          </form>
+        </TabsContent>
+
+        <TabsContent value="knowledge" className="mt-8 outline-none">
+          <form action={a2}>
+            <FormShell className="space-y-8">
+              <FormIntro title="Kennis voor AI">
+                Richtlijnen en snippets die antwoorden scherper maken. FAQ en extra kennis gebruiken het formaat{" "}
+                <code className="rounded bg-muted px-1 py-0.5 text-xs">vraag || antwoord</code> met een lege regel
+                tussen items.
+              </FormIntro>
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="pricing_hints" className="text-sm font-medium">
+                    Prijshints
+                  </Label>
+                  <p className="text-xs text-muted-foreground">Richtprijzen of uurtarieven (intern, niet juridisch bindend).</p>
+                  <Textarea
+                    id="pricing_hints"
+                    name="pricing_hints"
+                    className="min-h-[100px] rounded-lg"
+                    defaultValue={settings.pricing_hints || ""}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="faq" className="text-sm font-medium">
+                    FAQ
+                  </Label>
+                  <p className="text-xs text-muted-foreground">Blokken: vraag || antwoord. Lege regel tussen blokken.</p>
+                  <Textarea
+                    id="faq"
+                    name="faq"
+                    className="min-h-[140px] rounded-lg"
+                    defaultValue={faqText}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="business_hours" className="text-sm font-medium">
+                    Openingstijden
+                  </Label>
+                  <p className="text-xs text-muted-foreground">Vrije tekst of gestructureerde JSON — wat je team gewend is.</p>
+                  <Textarea
+                    id="business_hours"
+                    name="business_hours"
+                    className="min-h-[88px] rounded-lg font-mono text-xs leading-relaxed"
+                    defaultValue={hoursText}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="knowledge_snippets" className="text-sm font-medium">
+                    Extra kennis
+                  </Label>
+                  <p className="text-xs text-muted-foreground">Titel || tekst per item, lege regel ertussen.</p>
+                  <Textarea
+                    id="knowledge_snippets"
+                    name="knowledge_snippets"
+                    className="min-h-[120px] rounded-lg"
+                    defaultValue={snippetsText}
+                    placeholder={`Levertijden || 2–3 werkdagen\n\nGarantie || 12 maanden op montage`}
+                  />
+                </div>
+              </div>
+              {s2.error ? (
+                <p className="text-sm font-medium text-destructive">{s2.error}</p>
+              ) : null}
+              {s2.ok ? (
+                <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">Opgeslagen.</p>
+              ) : null}
+              <div className="flex flex-wrap items-center gap-4 border-t border-border/40 pt-6">
+                <Submit label="Kennis opslaan" />
+              </div>
+            </FormShell>
+          </form>
+        </TabsContent>
+
+        <TabsContent value="quotes" className="mt-8 outline-none">
+          <form action={a5}>
+            <FormShell className="space-y-8">
+              <FormIntro title="Offerte-PDF">
+                Vaste boven- en ondertekst voor elke PDF. Optioneel prijshints uit het tabblad Kennis en een korte
+                platformvermelding.
+              </FormIntro>
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="quote_intro" className="text-sm font-medium">
+                    Vaste intro
+                  </Label>
+                  <p className="text-xs text-muted-foreground">Bovenaan de PDF, vóór de regels.</p>
+                  <Textarea
+                    id="quote_intro"
+                    name="quote_intro"
+                    className="min-h-[100px] rounded-lg"
+                    defaultValue={settings.quote_intro || ""}
+                    placeholder="Bedankt voor uw aanvraag. Onderstaande offerte is vrijblijvend…"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="quote_footer" className="text-sm font-medium">
+                    Voorwaarden & afsluiting
+                  </Label>
+                  <p className="text-xs text-muted-foreground">Onderaan de PDF: betaling, garantie, voorwaarden.</p>
+                  <Textarea
+                    id="quote_footer"
+                    name="quote_footer"
+                    className="min-h-[140px] rounded-lg"
+                    defaultValue={settings.quote_footer || ""}
+                    placeholder="Betaling binnen 14 dagen. Werkzaamheden volgens afspraak…"
+                  />
+                </div>
+              </div>
+              <div className="space-y-3">
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Opties</p>
+                <div className="grid gap-3">
+                  <div className="flex flex-col gap-4 rounded-lg border border-border/60 bg-muted/[0.12] p-4 sm:flex-row sm:items-center sm:justify-between dark:border-white/[0.08]">
+                    <div className="min-w-0 space-y-1">
+                      <p className="text-sm font-medium text-foreground">Prijshints uit Kennis</p>
+                      <p className="text-xs leading-relaxed text-muted-foreground">
+                        Voegt het veld Prijshints (tabblad Kennis) toe op de PDF als richtlijn.
+                      </p>
+                    </div>
+                    <FormBooleanSwitch
+                      name="quote_include_pricing_hints"
+                      defaultChecked={settings.quote_include_pricing_hints}
+                      switchAriaLabel="Prijshints op PDF"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-4 rounded-lg border border-border/60 bg-muted/[0.12] p-4 sm:flex-row sm:items-center sm:justify-between dark:border-white/[0.08]">
+                    <div className="min-w-0 space-y-1">
+                      <p className="text-sm font-medium text-foreground">Zylmero-vermelding</p>
+                      <p className="text-xs leading-relaxed text-muted-foreground">
+                        Korte standaardtekst dat de offerte via Zylmero loopt (aanbevolen).
+                      </p>
+                    </div>
+                    <FormBooleanSwitch
+                      name="quote_include_zylmero_notice"
+                      defaultChecked={settings.quote_include_zylmero_notice}
+                      switchAriaLabel="Zylmero-vermelding op PDF"
+                    />
+                  </div>
+                </div>
+              </div>
+              {s5.error ? (
+                <p className="text-sm font-medium text-destructive">{s5.error}</p>
+              ) : null}
+              {s5.ok ? (
+                <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">Opgeslagen.</p>
+              ) : null}
+              <div className="flex flex-wrap items-center gap-4 border-t border-border/40 pt-6">
+                <Submit label="Offerte-template opslaan" />
+              </div>
+            </FormShell>
+          </form>
+        </TabsContent>
+
+        <TabsContent value="branding" className="mt-8 outline-none">
+          <form action={a4}>
+            <FormShell className="space-y-8">
+              <FormIntro title="Huisstijl">Logo en primaire kleur voor offertes en klantgerichte uitstraling.</FormIntro>
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="white_label_logo_url" className="text-sm font-medium">
+                    Logo-URL
+                  </Label>
+                  <p className="text-xs text-muted-foreground">Publieke HTTPS-URL naar je logo (PNG of SVG).</p>
+                  <Input
+                    id="white_label_logo_url"
+                    name="white_label_logo_url"
+                    type="url"
+                    placeholder="https://…"
+                    defaultValue={settings.white_label_logo_url || ""}
+                    className="rounded-lg"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="white_label_primary" className="text-sm font-medium">
+                    Primaire kleur
+                  </Label>
+                  <p className="text-xs text-muted-foreground">Hex-kleur, bijvoorbeeld #2563eb.</p>
+                  <div className="flex flex-wrap items-stretch gap-3">
+                    <Input
+                      id="white_label_primary"
+                      name="white_label_primary"
+                      placeholder="#2563eb"
+                      defaultValue={settings.white_label_primary || ""}
+                      className="max-w-xs flex-1 rounded-lg font-mono text-sm"
+                    />
+                    <div
+                      className="size-11 shrink-0 rounded-lg border border-border/60 shadow-inner-soft dark:border-white/[0.12]"
+                      style={{ backgroundColor: primaryPreview }}
+                      title="Voorbeeldkleur"
+                      aria-hidden
+                    />
+                  </div>
+                </div>
+              </div>
+              {s4.error ? (
+                <p className="text-sm font-medium text-destructive">{s4.error}</p>
+              ) : null}
+              {s4.ok ? (
+                <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">Opgeslagen.</p>
+              ) : null}
+              <div className="flex flex-wrap items-center gap-4 border-t border-border/40 pt-6">
+                <Submit label="Huisstijl opslaan" />
+              </div>
+            </FormShell>
+          </form>
+        </TabsContent>
+
+        <TabsContent value="whatsapp" className="mt-8 space-y-5 outline-none">
+          <WhatsAppSettingsForm
+            channel={settings.whatsapp_channel}
+            auto_reply_enabled={settings.auto_reply_enabled}
+            auto_reply_delay_seconds={settings.auto_reply_delay_seconds}
+          />
+          <div className="rounded-lg border border-border/60 bg-muted/20 p-5 text-xs leading-relaxed text-muted-foreground dark:border-white/[0.08]">
+            <p className="text-sm font-semibold text-foreground">Webhook-endpoint</p>
+            <Separator className="my-3 bg-border/60" />
+            <p className="break-all font-mono text-[0.8125rem] text-foreground/90">
+              POST {siteOrigin.replace(/\/$/, "")}/api/webhooks/whatsapp
+            </p>
+            <p className="mt-3">
+              Header{" "}
+              <code className="rounded-md bg-background/80 px-1.5 py-0.5 font-mono text-[0.7rem] ring-1 ring-border/50">
+                x-whatsapp-signature
+              </code>{" "}
+              of{" "}
+              <code className="rounded-md bg-background/80 px-1.5 py-0.5 font-mono text-[0.7rem] ring-1 ring-border/50">
+                Authorization: Bearer …
+              </code>{" "}
+              met{" "}
+              <code className="rounded-md bg-background/80 px-1.5 py-0.5 font-mono text-[0.7rem] ring-1 ring-border/50">
+                WHATSAPP_WEBHOOK_SECRET
+              </code>
+              . JSON:{" "}
+              <code className="rounded-md bg-background/80 px-1.5 py-0.5 font-mono text-[0.7rem] ring-1 ring-border/50">
+                company_id
+              </code>
+              ,{" "}
+              <code className="rounded-md bg-background/80 px-1.5 py-0.5 font-mono text-[0.7rem] ring-1 ring-border/50">
+                from
+              </code>
+              ,{" "}
+              <code className="rounded-md bg-background/80 px-1.5 py-0.5 font-mono text-[0.7rem] ring-1 ring-border/50">
+                body
+              </code>
+              .
             </p>
           </div>
-        )}
-      </TabsContent>
-    </Tabs>
+        </TabsContent>
+
+        <TabsContent value="email" className="mt-8 outline-none">
+          <EmailChannelSettingsForm
+            companyId={company.id}
+            emailInboundEnabled={settings.email_inbound_enabled}
+            hasContactEmail={Boolean(company.contact_email?.trim())}
+            siteOrigin={siteOrigin}
+          />
+        </TabsContent>
+
+        <TabsContent value="billing" className="mt-8 outline-none">
+          <BillingSettings
+            company={company}
+            leadsThisMonth={leadsThisMonth}
+            leadCap={leadCap}
+          />
+        </TabsContent>
+
+        <TabsContent value="widget" className="mt-8 outline-none">
+          {!websiteWidgetActive ? (
+            <WidgetSubscriptionGate trialExpiredHint={trialExpiredHint} />
+          ) : widgetEmbedToken ? (
+            <WidgetSettings siteOrigin={siteOrigin} embedToken={widgetEmbedToken} />
+          ) : (
+            <div className="cf-dashboard-panel p-8 sm:p-10">
+              <div className="flex flex-col items-center gap-5 text-center sm:flex-row sm:items-start sm:text-left">
+                <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground ring-1 ring-border/60 dark:ring-white/[0.08]">
+                  <Puzzle className="size-6" aria-hidden />
+                </div>
+                <div className="min-w-0 space-y-3">
+                  <h3 className="text-lg font-semibold tracking-tight text-foreground">Widget-token ontbreekt</h3>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    Je account heeft nog geen unieke embed-token in de database. Dat lost je normaal gesproken op met
+                    de nieuwste Supabase-migraties (kolom <code className="rounded bg-muted px-1 font-mono text-xs">widget_embed_token</code>
+                    ). Herlaad daarna deze pagina.
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Blijft dit zo? Neem even contact op met support met je bedrijfs-ID:{" "}
+                    <span className="font-mono text-foreground/90">{company.id}</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 }

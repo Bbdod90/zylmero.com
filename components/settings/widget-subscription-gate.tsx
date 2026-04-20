@@ -14,9 +14,9 @@ export function WidgetSubscriptionGate({
   trialExpiredHint?: boolean;
 }) {
   return (
-    <div className="cf-dashboard-panel rounded-2xl p-6 sm:p-8">
+    <div className="cf-dashboard-panel p-6 sm:p-8 lg:p-9">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-        <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/[0.1] text-primary ring-1 ring-primary/15">
+        <div className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-primary/[0.1] text-primary ring-1 ring-primary/15">
           <CreditCard className="size-5" aria-hidden />
         </div>
         <div className="min-w-0 flex-1 space-y-3">
@@ -35,10 +35,10 @@ export function WidgetSubscriptionGate({
             ) : null}
           </div>
           <div className="flex flex-wrap gap-3 pt-2">
-            <Button asChild className="rounded-xl font-semibold">
+            <Button asChild className="rounded-lg px-6 font-semibold shadow-sm">
               <Link href="/dashboard/upgrade">Plannen bekijken & activeren</Link>
             </Button>
-            <Button asChild variant="outline" className="rounded-xl">
+            <Button asChild variant="outline" className="rounded-lg">
               <Link href="/dashboard/settings?tab=billing">Facturatie</Link>
             </Button>
           </div>
