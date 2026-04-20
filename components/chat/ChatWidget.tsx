@@ -183,10 +183,11 @@ export function ChatWidget({
         {error ? (
           <div className="space-y-2 rounded-xl border border-destructive/25 bg-destructive/[0.06] px-3 py-2.5">
             <p className="text-sm leading-relaxed text-destructive">{error}</p>
-            {/OPENAI_API_KEY|niet gekoppeld|op de server/i.test(error) ? (
+            {/OPENAI_API_KEY|niet gekoppeld|op de server|OpenAI-plan|facturatie/i.test(error) ? (
               <p className="text-2xs leading-relaxed text-muted-foreground">
                 Voor beheerders: zet <code className="rounded bg-muted px-1 py-0.5 font-mono text-[0.65rem]">OPENAI_API_KEY</code> in
-                je productie-omgeving (bijv. Vercel) en deploy opnieuw.
+                je productie-omgeving (bijv. Vercel) en deploy opnieuw. Controleer ook{" "}
+                <code className="rounded bg-muted px-1 py-0.5 font-mono text-[0.65rem]">/api/health</code> (OpenAI + uitgaand HTTPS).
               </p>
             ) : null}
           </div>

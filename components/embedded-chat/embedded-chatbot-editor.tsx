@@ -172,7 +172,8 @@ export function EmbeddedChatbotEditor({ chatbot, sources, widgetScriptUrl, compa
         >
           <h2 className="text-lg font-semibold text-foreground">Kennis</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Korte tekst of een URL naar je prijzenpagina — de assistent gebruikt dit in antwoorden.
+            Korte tekst of een URL (ook alleen <span className="font-medium text-foreground">domein.nl</span>) — we halen waar mogelijk de
+            paginatekst op zodat de assistent producten en prijzen kan noemen die op je site staan.
           </p>
           <div className="mt-6 space-y-3">
             <div className="flex flex-wrap gap-2">
@@ -194,7 +195,7 @@ export function EmbeddedChatbotEditor({ chatbot, sources, widgetScriptUrl, compa
               className="min-h-[88px] resize-y rounded-lg text-sm"
               placeholder={
                 sourceType === "url"
-                  ? "https://…"
+                  ? "https://jouwsite.nl of jouwsite.nl"
                   : "Openingstijden, tarieven vanaf, gebiedswerk…"
               }
             />
@@ -270,7 +271,7 @@ export function EmbeddedChatbotEditor({ chatbot, sources, widgetScriptUrl, compa
         <ChatWidget
           chatbotId={chatbot.id}
           title="Live test"
-          subtitle="Zo zien bezoekers het — zonder je site te publiceren."
+          subtitle="Zo zien bezoekers het — zonder je site te publiceren. Werkt het niet? Open /api/health (zelfde domein) voor env- en netwerkcheck."
           placeholder="Typ wat een klant zou sturen…"
           className="min-h-[28rem] shadow-lg"
         />

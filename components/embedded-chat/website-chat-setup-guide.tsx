@@ -12,7 +12,7 @@ const STEPS = [
   {
     icon: Bot,
     title: "Kennis (optioneel)",
-    body: "Voeg korte tekst of een URL toe met prijzen, openingstijden of werkgebied — betere antwoorden.",
+    body: "Tekst of een URL (ook domein.nl): de server haalt waar mogelijk paginatekst op — zo kan de bot producten en prijzen noemen die op je site staan.",
     anchor: "#website-chat-kennis",
   },
   {

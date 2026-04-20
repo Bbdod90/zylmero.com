@@ -7,6 +7,7 @@ import type { EmbeddedChatTone, EmbeddedChatbotSourceType } from "@/lib/embedded
 import type { WizardGoalId } from "@/lib/embedded-chat/wizard-presets";
 import { WIZARD_GOAL_PRESETS } from "@/lib/embedded-chat/wizard-presets";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { isNonPublicKnowledgeHost, normalizeKnowledgeWebsiteUrl } from "@/lib/url/public-site-url";
 
 function needSupabase() {
   if (!isSupabaseConfigured()) {
@@ -173,12 +174,21 @@ export async function addEmbeddedChatbotSource(form: {
   needSupabase();
   await requireCompany();
   const supabase = await createClient();
-  const content = form.content.trim();
+  let content = form.content.trim();
   if (!content) {
     return { ok: false as const, error: "Vul tekst of een URL in." };
   }
-  if (form.type === "url" && !/^https?:\/\//i.test(content)) {
-    return { ok: false as const, error: "URL moet beginnen met http:// of https://" };
+  if (form.type === "url") {
+    content = normalizeKnowledgeWebsiteUrl(content);
+    if (!/^https?:\/\//i.test(content)) {
+      return { ok: false as const, error: "Vul een geldige website in (bijv. jouwbedrijf.nl)." };
+    }
+    if (isNonPublicKnowledgeHost(content)) {
+      return {
+        ok: false as const,
+        error: "Gebruik je publieke website (geen localhost).",
+      };
+    }
   }
   const { error } = await supabase.from("embedded_chatbot_sources").insert({
     chatbot_id: form.chatbotId,

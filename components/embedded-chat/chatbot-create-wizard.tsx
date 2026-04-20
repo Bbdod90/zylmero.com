@@ -168,7 +168,7 @@ export function ChatbotCreateWizard() {
                 <span className="min-w-0 flex-1">
                   <span className="flex flex-wrap items-center gap-2">
                     <span className="font-semibold text-white">Begeleide opstart</span>
-                    <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-2xs font-semibold uppercase tracking-wide text-emerald-400">
+                    <span className="rounded-full border border-emerald-500/40 bg-emerald-400 px-2 py-0.5 text-2xs font-semibold uppercase tracking-wide text-emerald-950 shadow-sm">
                       Aanbevolen
                     </span>
                   </span>

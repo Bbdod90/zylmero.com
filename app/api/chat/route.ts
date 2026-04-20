@@ -3,10 +3,14 @@ import type { ChatCompletionMessageParam } from "openai/resources/chat/completio
 import { mapCompanyRow } from "@/lib/auth/map-company";
 import { hasSubscriptionAccess } from "@/lib/billing/trial";
 import type { EmbeddedChatTone } from "@/lib/embedded-chat/types";
+import { fetchUrlPlainTextForChatKnowledge } from "@/lib/embedded-chat/url-page-context";
 import { getOpenAI, OPENAI_MODEL } from "@/lib/openai/client";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
+
+/** Ruimte voor system + geschiedenis; meerdere URL-bronnen kunnen groot zijn */
+const MAX_KNOWLEDGE_CHARS = 45_000;
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -31,6 +35,14 @@ function toneDirective(tone: string): string {
   }
 }
 
+function capKnowledgeLines(lines: string[]): string[] {
+  const joined = lines.join("\n\n");
+  if (joined.length <= MAX_KNOWLEDGE_CHARS) return lines;
+  return [
+    `${joined.slice(0, MAX_KNOWLEDGE_CHARS - 160)}\n\n[… Kennis ingekort wegens maximale lengte — gebruik kortere tekst of minder URL-bronnen.]`,
+  ];
+}
+
 function buildSystemPrompt(opts: {
   botName: string;
   tone: string;
@@ -39,7 +51,7 @@ function buildSystemPrompt(opts: {
 }): string {
   const knowledge =
     opts.knowledgeLines.length > 0
-      ? `\n\nKennis van dit bedrijf (gebruik dit waar het klopt; verzin geen prijzen of garanties die hier niet staan):\n${opts.knowledgeLines.join("\n\n")}`
+      ? `\n\nKennis van dit bedrijf (inclusief tekst van gekoppelde pagina’s waar aanwezig). Gebruik dit als feitenbron: noem alleen producten, prijzen en details die hier letterlijk of duidelijk in staan. Staat iets er niet (bijv. een specifiek model), zeg dat eerlijk en bied contact of de site aan — verzin niets.\n${opts.knowledgeLines.join("\n\n")}`
       : "";
 
   return `Je bent de websitechat van "${opts.botName}" — een klein bedrijf in Nederland.
@@ -124,13 +136,22 @@ export async function POST(request: Request) {
     .select("type, content")
     .eq("chatbot_id", chatbotId);
 
-  const knowledgeLines =
-    sources?.map((s) => {
-      if (s.type === "url") {
-        return `Website-URL (context): ${s.content}`;
-      }
-      return `Tekstkennis:\n${s.content}`;
-    }) ?? [];
+  const knowledgeLinesRaw: string[] = sources?.length
+    ? await Promise.all(
+        sources.map(async (s) => {
+          if (s.type === "url") {
+            const url = String(s.content || "").trim();
+            const fetched = await fetchUrlPlainTextForChatKnowledge(url);
+            if (fetched) {
+              return `Website “${url}” — platte tekst van de pagina (kan onvolledig zijn door lay-out; gebruik dit voor producten/voorraad):\n${fetched}`;
+            }
+            return `Website-URL (inhoud kon niet worden ingelezen; gebruik de link alleen als hint, geen productlijst verzinnen): ${url}`;
+          }
+          return `Tekstkennis:\n${s.content}`;
+        }),
+      )
+    : [];
+  const knowledgeLines = capKnowledgeLines(knowledgeLinesRaw);
 
   if (sessionId) {
     const { data: sess } = await admin
@@ -192,21 +213,30 @@ export async function POST(request: Request) {
     const completion = await openai.chat.completions.create({
       model: OPENAI_MODEL,
       temperature: 0.45,
-      max_tokens: 420,
+      max_tokens: 720,
       messages: chatMessages,
     });
     replyText = completion.choices[0]?.message?.content?.trim() || "";
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
+    const lower = msg.toLowerCase();
     const missingKey =
-      msg.includes("OPENAI_API_KEY") ||
-      msg.includes("api key") ||
-      msg.includes("Incorrect API key");
+      lower.includes("openai_api_key") ||
+      lower.includes("api key") ||
+      lower.includes("incorrect api key") ||
+      lower.includes("invalid api key");
+    const quotaOrLimit =
+      lower.includes("insufficient_quota") ||
+      lower.includes("rate limit") ||
+      lower.includes("429") ||
+      lower.includes("billing_hard_limit");
     return NextResponse.json(
       {
         error: missingKey
           ? "AI is op deze omgeving nog niet gekoppeld (OPENAI_API_KEY). Voeg de sleutel toe bij je hosting — daarna werkt Live test en de widget."
-          : "AI-antwoord tijdelijk niet beschikbaar. Probeer het zo opnieuw.",
+          : quotaOrLimit
+            ? "AI-dienst geeft een limiet of facturatiemelding — wacht even en probeer opnieuw, of controleer je OpenAI-plan en gebruikslimiet."
+            : "AI-antwoord tijdelijk niet beschikbaar. Probeer het zo opnieuw.",
       },
       { status: 503, headers: cors },
     );
