@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { normalizeKnowledgeWebsiteUrl } from "@/lib/url/public-site-url";
 import { cn } from "@/lib/utils";
 import { FileText, Globe, Sparkles, Upload } from "lucide-react";
 
@@ -85,16 +86,25 @@ export function AiKnowledgeForm({
             <Input
               id="ai_knowledge_website"
               name="ai_knowledge_website"
-              type="url"
-              placeholder="https://jouwbedrijf.nl"
+              type="text"
+              inputMode="url"
+              autoCapitalize="none"
+              spellCheck={false}
+              placeholder="https://jouwbedrijf.nl of jouwbedrijf.nl"
               defaultValue={initialWebsite}
               disabled={demoMode}
               className="h-11 rounded-xl border-border/60 bg-background/80 text-base shadow-sm dark:border-white/[0.1] dark:bg-[hsl(228_24%_8%)]"
-              autoComplete="off"
+              autoComplete="url"
+              onBlur={(e) => {
+                const el = e.currentTarget;
+                const next = normalizeKnowledgeWebsiteUrl(el.value);
+                if (next && next !== el.value) el.value = next;
+              }}
             />
             <p className="text-xs leading-relaxed text-muted-foreground">
-              Dient als vaste referentie bij antwoorden — geen volledige live crawl. Vul tekst hieronder
-              aan waar nodig.
+              Je mag een domein zonder <code className="rounded bg-muted px-1 font-mono text-[0.65rem]">https://</code>{" "}
+              — dat wordt automatisch aangevuld bij opslaan. Dient als vaste referentie bij antwoorden — geen volledige
+              live crawl. Vul tekst hieronder aan waar nodig.
             </p>
           </section>
 

@@ -4,7 +4,10 @@ import { revalidatePath } from "next/cache";
 import { getAuth } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { mapCompanySettingsRow } from "@/lib/queries/map-company-settings";
-import { isNonPublicKnowledgeHost } from "@/lib/url/public-site-url";
+import {
+  isNonPublicKnowledgeHost,
+  normalizeKnowledgeWebsiteUrl,
+} from "@/lib/url/public-site-url";
 import { isDemoMode } from "@/lib/env";
 import type { KnowledgeSnippet } from "@/lib/types";
 
@@ -444,7 +447,9 @@ export async function updateAiKnowledgeAction(
     return { error: "Niet ingelogd." };
   }
 
-  const website = String(formData.get("ai_knowledge_website") || "").trim();
+  const website = normalizeKnowledgeWebsiteUrl(
+    String(formData.get("ai_knowledge_website") || ""),
+  );
   const document = String(formData.get("ai_knowledge_document") || "").trim();
   if (document.length > 48_000) {
     return { error: "Tekst is te lang (max. 48.000 tekens)." };
