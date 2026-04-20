@@ -18,8 +18,8 @@ export function DashboardRevenueHero({
   return (
     <section
       className={cn(
-        "relative overflow-hidden rounded-3xl border border-border/60 shadow-[0_28px_100px_-52px_rgb(0_0_0/0.55)] dark:border-white/[0.1] dark:shadow-[0_32px_110px_-56px_rgb(0_0_0/0.72)]",
-        "bg-gradient-to-br from-card via-card to-muted/30 dark:from-white/[0.06] dark:via-[hsl(222_28%_6%)] dark:to-black/50",
+        "cf-dashboard-panel relative overflow-hidden rounded-2xl border border-border/60 shadow-[0_24px_70px_-44px_rgb(15_23_42/0.22)] dark:border-white/[0.1] dark:shadow-[0_28px_80px_-48px_rgb(0_0_0/0.65)]",
+        "bg-gradient-to-br from-card via-card to-muted/25 dark:from-white/[0.05] dark:via-[hsl(222_28%_6%)] dark:to-black/45",
       )}
       aria-labelledby="dashboard-revenue-heading"
     >
@@ -40,14 +40,9 @@ export function DashboardRevenueHero({
         className="pointer-events-none absolute -bottom-32 right-0 size-[20rem] rounded-full bg-violet-500/[0.06] blur-3xl dark:bg-violet-500/[0.1]"
         aria-hidden
       />
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent"
-        aria-hidden
-      />
-
-      <div className="relative px-6 py-8 sm:px-8 sm:py-10 md:px-10 md:py-11">
+      <div className="relative px-6 py-8 sm:px-8 sm:py-9 md:px-9 md:py-10">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/[0.1] px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-primary">
+          <span className="inline-flex items-center gap-1.5 rounded-lg border border-primary/25 bg-primary/[0.1] px-2.5 py-1 text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-primary">
             <Sparkles className="size-3" aria-hidden />
             {BRAND_NAME} workspace
           </span>
@@ -71,7 +66,7 @@ export function DashboardRevenueHero({
             {chipItems.map((c) => (
               <div
                 key={c.label}
-                className="rounded-full border border-border/60 bg-background/50 px-3 py-1.5 text-xs backdrop-blur-sm dark:border-white/[0.08] dark:bg-black/25"
+                className="rounded-lg border border-border/55 bg-background/60 px-2.5 py-1.5 text-xs shadow-sm backdrop-blur-sm dark:border-white/[0.08] dark:bg-black/20"
               >
                 <span className="text-muted-foreground">{c.label}</span>
                 <span className="ml-2 font-semibold tabular-nums text-foreground">
@@ -91,10 +86,10 @@ export function DashboardRevenueHero({
           {amountLabel}
         </p>
 
-        <div className="mt-8 flex flex-wrap gap-2.5 sm:mt-9 sm:gap-3">
+        <div className="mt-8 flex flex-wrap gap-2 sm:mt-9 sm:gap-2.5">
           <Button
             size="default"
-            className="h-11 rounded-full px-6 text-sm font-semibold shadow-lg shadow-primary/25"
+            className="h-11 rounded-lg px-5 text-sm font-semibold shadow-md shadow-primary/20"
             asChild
           >
             <Link href="/dashboard/appointments">
@@ -105,7 +100,7 @@ export function DashboardRevenueHero({
           <Button
             variant="outline"
             size="default"
-            className="h-11 rounded-full border-border/80 bg-background/50 px-6 text-sm font-semibold backdrop-blur-md dark:border-white/[0.12] dark:bg-white/[0.04]"
+            className="h-11 rounded-lg border-border/70 bg-background/70 px-5 text-sm font-semibold shadow-sm backdrop-blur-sm dark:border-white/[0.12] dark:bg-white/[0.04]"
             asChild
           >
             <Link href="/dashboard/inbox">Inbox</Link>
@@ -113,7 +108,7 @@ export function DashboardRevenueHero({
           <Button
             variant="outline"
             size="default"
-            className="h-11 rounded-full border-border/80 bg-background/50 px-6 text-sm font-semibold backdrop-blur-md dark:border-white/[0.12] dark:bg-white/[0.04]"
+            className="h-11 rounded-lg border-border/70 bg-background/70 px-5 text-sm font-semibold shadow-sm backdrop-blur-sm dark:border-white/[0.12] dark:bg-white/[0.04]"
             asChild
           >
             <Link href="/dashboard/pipeline">Pipeline</Link>
@@ -121,7 +116,7 @@ export function DashboardRevenueHero({
           <Button
             variant="outline"
             size="default"
-            className="h-11 rounded-full border-border/80 bg-background/50 px-6 text-sm font-semibold backdrop-blur-md dark:border-white/[0.12] dark:bg-white/[0.04]"
+            className="h-11 rounded-lg border-border/70 bg-background/70 px-5 text-sm font-semibold shadow-sm backdrop-blur-sm dark:border-white/[0.12] dark:bg-white/[0.04]"
             asChild
           >
             <Link href="/dashboard/leads">Alle leads</Link>

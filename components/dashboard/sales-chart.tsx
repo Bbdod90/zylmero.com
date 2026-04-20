@@ -24,11 +24,11 @@ export function SalesChart({
   title?: string;
 }) {
   return (
-    <div className="h-72 w-full rounded-[1.25rem] border border-white/[0.07] bg-gradient-to-b from-card/50 to-card/20 p-6 shadow-premium">
-      <p className="mb-5 text-sm font-medium tracking-tight text-muted-foreground">
-        {title}
-      </p>
-      <ResponsiveContainer width="100%" height="85%">
+    <div className="cf-dashboard-panel h-80 w-full rounded-2xl border border-border/60 p-5 sm:h-[22rem] sm:p-6 dark:border-white/[0.08]">
+      {title ? (
+        <p className="mb-4 text-sm font-medium tracking-tight text-muted-foreground">{title}</p>
+      ) : null}
+      <ResponsiveContainer width="100%" height={title ? "82%" : "88%"}>
         <AreaChart data={data}>
           <defs>
             <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">

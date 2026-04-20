@@ -46,18 +46,18 @@ export default async function GrowthPage() {
       dismissHref="/dashboard"
       dismissLabel="Terug naar dashboard"
     >
-      <div className="mb-10">
+      <div className="mx-auto w-full max-w-3xl space-y-12 lg:space-y-14">
         <ReferralInviteSection
           siteUrl={siteUrl}
           initialCode={referralCode}
           referralCount={referralCount}
           creditPerReferralEur={10}
         />
+        <GrowthDashboard
+          siteUrl={siteUrl}
+          salesModeInitial={isSalesMode()}
+        />
       </div>
-      <GrowthDashboard
-        siteUrl={siteUrl}
-        salesModeInitial={isSalesMode()}
-      />
     </PageFrame>
   );
 }

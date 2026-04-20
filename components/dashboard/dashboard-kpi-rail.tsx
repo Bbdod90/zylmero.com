@@ -23,7 +23,7 @@ function KpiTile({
   return (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-2xl border border-border/60 bg-gradient-to-br from-card via-card to-muted/30 p-4 shadow-[0_8px_30px_-18px_rgb(15_23_42/0.12)] transition-all duration-200",
+        "group relative overflow-hidden rounded-xl border border-border/60 bg-gradient-to-br from-card via-card to-muted/25 p-3.5 shadow-[0_6px_24px_-14px_rgb(15_23_42/0.12)] transition-all duration-200 sm:p-4",
         "hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-[0_14px_40px_-20px_rgb(15_23_42/0.18)]",
         "dark:border-white/[0.08] dark:from-card dark:via-card/90 dark:to-white/[0.02] dark:shadow-[0_12px_40px_-24px_rgb(0_0_0/0.45)] dark:hover:border-primary/30",
       )}

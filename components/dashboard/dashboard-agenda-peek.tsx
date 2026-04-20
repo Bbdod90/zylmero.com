@@ -26,9 +26,15 @@ export function DashboardAgendaPeek({ items }: { items: AgendaPeekRow[] }) {
       }
     >
       {items.length === 0 ? (
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          Geen geplande afspraken vooruit. Plan er een via een lead of de agenda.
-        </p>
+        <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border/50 bg-muted/[0.08] px-4 py-8 text-center dark:border-white/[0.08]">
+          <CalendarClock className="size-8 text-muted-foreground/70" aria-hidden />
+          <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
+            Geen afspraken vooruit. Plan vanuit een lead of open je agenda om ruimte te blokken.
+          </p>
+          <Button variant="secondary" size="sm" className="rounded-lg" asChild>
+            <Link href="/dashboard/appointments">Naar agenda</Link>
+          </Button>
+        </div>
       ) : (
         <ul className="space-y-2">
           {items.map((a) => {

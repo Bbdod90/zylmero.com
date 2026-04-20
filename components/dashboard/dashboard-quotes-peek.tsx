@@ -18,9 +18,15 @@ export function DashboardQuotesPeek({ quotes }: { quotes: Quote[] }) {
       }
     >
       {quotes.length === 0 ? (
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          Nog geen offertes. Genereer er een vanuit een lead met AI-acties.
-        </p>
+        <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border/50 bg-muted/[0.08] px-4 py-8 text-center dark:border-white/[0.08]">
+          <FileText className="size-8 text-muted-foreground/70" aria-hidden />
+          <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
+            Nog geen offertes. Maak er een vanuit een lead — met AI-acties gaat dat in minuten.
+          </p>
+          <Button variant="secondary" size="sm" className="rounded-lg" asChild>
+            <Link href="/dashboard/quotes/new">Nieuwe offerte</Link>
+          </Button>
+        </div>
       ) : (
         <ul className="space-y-2">
           {quotes.map((q) => (

@@ -13,7 +13,7 @@ export function WebsiteChatDashboardCta({
   const detailHref = firstChatbotId ? `/dashboard/chatbots/${firstChatbotId}` : "/dashboard/chatbots/create";
 
   return (
-    <Card className="overflow-hidden border-primary/22 bg-gradient-to-r from-primary/[0.09] via-card to-card dark:from-primary/[0.14] dark:via-card dark:to-card">
+    <Card className="cf-dashboard-panel overflow-hidden rounded-2xl border-primary/20 bg-gradient-to-r from-primary/[0.07] via-card to-card dark:from-primary/[0.12] dark:via-card dark:to-card">
       <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:p-6">
         <div className="flex min-w-0 gap-3.5">
           <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary shadow-inner-soft ring-1 ring-primary/15">
@@ -38,7 +38,7 @@ export function WebsiteChatDashboardCta({
           </div>
         </div>
         <div className="flex shrink-0 flex-wrap gap-2 sm:flex-col sm:items-end lg:flex-row">
-          <Button asChild className="rounded-xl shadow-sm">
+          <Button asChild className="rounded-lg px-5 font-semibold shadow-sm">
             <Link href={detailHref}>
               {hasEmbeddedBot ? (
                 <>
@@ -54,7 +54,7 @@ export function WebsiteChatDashboardCta({
             </Link>
           </Button>
           {!hasEmbeddedBot ? (
-            <Button asChild variant="outline" className="rounded-xl border-primary/25 bg-background/70">
+            <Button asChild variant="outline" className="rounded-lg border-primary/25 bg-background/70">
               <Link href="/dashboard/chatbots">Overzicht Website-chat</Link>
             </Button>
           ) : null}

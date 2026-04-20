@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { formatDateTime } from "@/lib/utils";
-import { Sparkles } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { MessageSquare, Sparkles } from "lucide-react";
 
 type Item = {
   id: string;
@@ -36,10 +38,16 @@ export function RecentMessagesFeed({ messages }: { messages: Item[] }) {
 
   if (messages.length === 0) {
     return (
-      <p className="text-muted-foreground">
-        Je AI staat klaar om nieuwe klanten op te vangen. Zodra er berichten
-        binnenkomen, zie je ze hier in realtime.
-      </p>
+      <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border/50 bg-muted/[0.08] px-4 py-8 text-center dark:border-white/[0.08]">
+        <MessageSquare className="size-8 text-muted-foreground/70" aria-hidden />
+        <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
+          Nog geen recente berichten. Zodra klanten reageren, verschijnen ze hier — stel je widget en AI in onder
+          Instellingen.
+        </p>
+        <Button variant="secondary" size="sm" className="rounded-lg" asChild>
+          <Link href="/dashboard/inbox">Naar inbox</Link>
+        </Button>
+      </div>
     );
   }
 

@@ -1,3 +1,4 @@
+import type { ComponentType, ReactNode } from "react";
 import Link from "next/link";
 import { BarChart3, Clock, MessageSquareWarning, TrendingUp } from "lucide-react";
 import { getAuth } from "@/lib/auth";
@@ -13,10 +14,51 @@ import {
 import { isDemoMode } from "@/lib/env";
 import { computeSalesMetrics } from "@/lib/sales/metrics";
 import { PageFrame } from "@/components/layout/page-frame";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SalesChart } from "@/components/dashboard/sales-chart";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+
+function KpiPanel({
+  icon: Icon,
+  title,
+  value,
+  hint,
+  foot,
+  iconClass,
+}: {
+  icon: ComponentType<{ className?: string }>;
+  title: string;
+  value: ReactNode;
+  hint: string;
+  foot?: ReactNode;
+  iconClass?: string;
+}) {
+  return (
+    <div className="cf-dashboard-panel flex flex-col rounded-2xl p-5 sm:p-6">
+      <div className="flex items-start gap-3">
+        <div
+          className={cn(
+            "flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary ring-1 ring-primary/12",
+            iconClass,
+          )}
+        >
+          <Icon className="size-[1.15rem]" aria-hidden />
+        </div>
+        <div className="min-w-0 flex-1 space-y-1">
+          <p className="text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+            {title}
+          </p>
+          <p className="text-2xl font-bold tabular-nums tracking-tight text-foreground sm:text-3xl">
+            {value}
+          </p>
+          <p className="text-xs leading-relaxed text-muted-foreground">{hint}</p>
+          {foot ? <div className="pt-1">{foot}</div> : null}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default async function InsightsPage() {
   const auth = await getAuth();
@@ -38,103 +80,90 @@ export default async function InsightsPage() {
   });
 
   const avg =
-    sla.avgResponseHours != null
-      ? `${sla.avgResponseHours} u`
-      : "—";
+    sla.avgResponseHours != null ? `${sla.avgResponseHours} u` : "—";
   const staleN = stale.size;
 
   return (
     <PageFrame
       title="Prestaties"
-      subtitle="Responstijden, omzet en pijplijn — hetzelfde datapunt als je dashboard, hier gefocust op inzicht."
+      subtitle="Reactiesnelheid, pijplijn en omzet — dezelfde data als op je dashboard, hier gericht op inzicht en actie."
     >
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Card className="rounded-2xl border-white/[0.06]">
-          <CardHeader className="flex flex-row items-center gap-2">
-            <Clock className="size-4 text-primary" />
-            <CardTitle className="text-sm font-semibold">Gem. reactietijd</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold tabular-nums text-foreground">{avg}</p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Na eerste klantbericht tot staff-antwoord (geschat).
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="rounded-2xl border-white/[0.06]">
-          <CardHeader className="flex flex-row items-center gap-2">
-            <MessageSquareWarning className="size-4 text-amber-500/90" />
-            <CardTitle className="text-sm font-semibold">Wacht op antwoord</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold tabular-nums text-foreground">{staleN}</p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Leads met openstaand klantbericht (&gt;4 u).
-            </p>
-            {staleN > 0 ? (
-              <Button variant="link" className="mt-2 h-auto px-0 text-xs" asChild>
-                <Link href="/dashboard/inbox">Naar berichten</Link>
-              </Button>
-            ) : null}
-          </CardContent>
-        </Card>
-        <Card className="rounded-2xl border-white/[0.06]">
-          <CardHeader className="flex flex-row items-center gap-2">
-            <TrendingUp className="size-4 text-primary" />
-            <CardTitle className="text-sm font-semibold">Gewonnen omzet</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold tabular-nums text-foreground">
-              {formatCurrency(revenue.wonRevenueEur)}
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {revenue.acceptedQuotes}{" "}
-              {revenue.acceptedQuotes === 1
-                ? "geaccepteerde offerte"
-                : "geaccepteerde offertes"}
-              .
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="rounded-2xl border-white/[0.06]">
-          <CardHeader className="flex flex-row items-center gap-2">
-            <BarChart3 className="size-4 text-primary" />
-            <CardTitle className="text-sm font-semibold">Conversie</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold tabular-nums text-foreground">
-              {Math.round(sales.conversionRate * 100)}%
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Lead → gewonnen (ruwe schatting op basis van status).
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="mt-10 grid gap-8 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <SalesChart title="Trend (indicatie)" />
+      <div className="mx-auto w-full max-w-[1100px] space-y-10">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <KpiPanel
+            icon={Clock}
+            title="Gem. reactietijd"
+            value={avg}
+            hint="Van eerste klantbericht tot eerste teamantwoord (geschat)."
+          />
+          <KpiPanel
+            icon={MessageSquareWarning}
+            title="Wacht op antwoord"
+            value={staleN}
+            hint="Leads met open klantbericht langer dan ~4 uur."
+            iconClass="bg-amber-500/12 text-amber-700 ring-amber-500/20 dark:text-amber-400"
+            foot={
+              staleN > 0 ? (
+                <Button variant="link" className="h-auto p-0 text-xs font-semibold" asChild>
+                  <Link href="/dashboard/inbox">Naar berichten →</Link>
+                </Button>
+              ) : null
+            }
+          />
+          <KpiPanel
+            icon={TrendingUp}
+            title="Gewonnen omzet"
+            value={formatCurrency(revenue.wonRevenueEur)}
+            hint={`${revenue.acceptedQuotes} ${
+              revenue.acceptedQuotes === 1 ? "geaccepteerde offerte" : "geaccepteerde offertes"
+            }.`}
+          />
+          <KpiPanel
+            icon={BarChart3}
+            title="Conversie"
+            value={`${Math.round(sales.conversionRate * 100)}%`}
+            hint="Lead → gewonnen (ruwe schatting op basis van status)."
+          />
         </div>
-        <Card className="rounded-2xl border-white/[0.06] lg:col-span-1">
-          <CardHeader>
-            <CardTitle className="text-base font-semibold">Snelle acties</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm text-muted-foreground">
-            <p>
-              Omzetrisico door trage reactie:{" "}
-              <span className="font-semibold text-foreground">
+
+        <div className="grid gap-8 lg:grid-cols-3">
+          <div className="min-w-0 space-y-3 lg:col-span-2">
+            <div className="flex items-end justify-between gap-3 px-0.5">
+              <div>
+                <p className="text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                  Trend
+                </p>
+                <h2 className="text-base font-semibold tracking-tight text-foreground">
+                  Pijplijn vs. gewonnen (indicatie)
+                </h2>
+              </div>
+            </div>
+            <SalesChart title="" />
+          </div>
+
+          <div className="cf-dashboard-panel flex flex-col rounded-2xl p-6 lg:col-span-1">
+            <p className="text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+              Actie
+            </p>
+            <h2 className="mt-1 text-lg font-semibold tracking-tight text-foreground">
+              Snelle vervolgstappen
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              Geschat omzetrisico door trage of gemiste reacties:{" "}
+              <span className="font-semibold tabular-nums text-foreground">
                 {formatCurrency(sales.missedReplyRevenueEstimate + sales.lostRevenueEstimate)}
               </span>
             </p>
-            <Button className="w-full rounded-xl" asChild>
-              <Link href="/dashboard">Volledig dashboard</Link>
-            </Button>
-            <Button variant="outline" className="w-full rounded-xl" asChild>
-              <Link href="/dashboard/growth">Groei &amp; referrals</Link>
-            </Button>
-          </CardContent>
-        </Card>
+            <div className="mt-6 flex flex-col gap-2.5 border-t border-border/40 pt-6 dark:border-white/[0.06]">
+              <Button className="h-11 w-full rounded-lg font-semibold shadow-sm" asChild>
+                <Link href="/dashboard">Volledig dashboard</Link>
+              </Button>
+              <Button variant="outline" className="h-11 w-full rounded-lg font-semibold" asChild>
+                <Link href="/dashboard/growth">Groei &amp; referrals</Link>
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
     </PageFrame>
   );

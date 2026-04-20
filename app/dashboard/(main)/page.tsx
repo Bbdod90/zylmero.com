@@ -126,7 +126,7 @@ export default async function DashboardPage() {
           : "Waardevolle eerste indruk: omzetpotentie, verdeling en laatste activiteit."
       }
     >
-      <div className="space-y-8 lg:space-y-10">
+      <div className="mx-auto w-full max-w-[1200px] space-y-8 lg:space-y-10">
         {!demo ? (
           <WebsiteChatDashboardCta
             hasEmbeddedBot={websiteChatState.hasBot}

@@ -12,7 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Sparkles, Users } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { LeadStatusMenu } from "@/components/leads/lead-status-menu";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,14 +36,10 @@ export function DashboardTopLeadsTable({
 
   return (
     <section
-      className="relative overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-b from-card/95 to-muted/20 shadow-[0_20px_70px_-44px_rgb(0_0_0/0.4)] dark:border-white/[0.09] dark:from-white/[0.04] dark:to-black/25 dark:shadow-[0_24px_80px_-48px_rgb(0_0_0/0.6)]"
+      className="cf-dashboard-panel relative overflow-hidden rounded-2xl"
       aria-labelledby="dashboard-top-leads-heading"
     >
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/25 to-transparent"
-        aria-hidden
-      />
-      <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0 px-6 pb-3 pt-6 sm:px-8 sm:pt-7">
+      <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0 border-b border-border/40 px-6 pb-4 pt-6 sm:px-8 dark:border-white/[0.06]">
         <CardTitle
           id="dashboard-top-leads-heading"
           className="text-lg font-semibold tracking-tight sm:text-xl"
@@ -62,11 +58,25 @@ export function DashboardTopLeadsTable({
           </Link>
         </Button>
       </CardHeader>
-      <CardContent className="border-t border-border/50 px-0 pb-6 pt-0 dark:border-white/[0.06]">
+      <CardContent className="px-0 pb-6 pt-0">
         {merged.length === 0 ? (
-          <p className="px-6 py-6 text-sm leading-relaxed text-muted-foreground sm:px-8">
-            Nog geen leads. Zodra er aanvragen binnenkomen, zie je hier waar de meeste waarde zit.
-          </p>
+          <div className="flex flex-col items-center gap-4 px-6 py-10 text-center sm:px-8">
+            <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
+              <Users className="size-6" aria-hidden />
+            </div>
+            <div className="max-w-sm space-y-2">
+              <p className="text-sm font-medium text-foreground">Nog geen leads in je top 3</p>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                Zodra aanvragen binnenkomen, tonen we hier automatisch waar de meeste geschatte waarde zit.
+              </p>
+            </div>
+            <Button asChild variant="outline" className="rounded-lg shadow-sm">
+              <Link href="/dashboard/growth">
+                <Sparkles className="mr-2 size-4" aria-hidden />
+                Klanten werven
+              </Link>
+            </Button>
+          </div>
         ) : (
           <Table>
             <TableHeader>
