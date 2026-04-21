@@ -5,18 +5,18 @@ import { Inbox, MessageSquare, Workflow } from "lucide-react";
 
 const MODULES = [
   {
-    title: "Website-widget (leads)",
-    body: "Bezoekers laten een aanvraag achter op je site — alles landt strak in je inbox.",
+    title: "Lead-widget op je site",
+    body: "Bezoekers laten een aanvraag achter — alles komt strak binnen bij je inbox, klaar voor opvolging.",
     Icon: MessageSquare,
   },
   {
-    title: "Inbox / mailbox cleaner",
-    body: "Orde in aanvragen zodat niemand tussen wal en schip valt.",
+    title: "Inbox met overzicht",
+    body: "Orde in berichten en aanvragen. Je ziet in één oogopslag wat aandacht vraagt.",
     Icon: Inbox,
   },
   {
     title: "Slimme opvolging",
-    body: "Automatisering die past bij zzp en kleine teams — uitbreidbaar als je groeit.",
+    body: "Automatisering die past bij kleine teams: herinneringen en ritmes zonder een tweede baan aan onderhoud.",
     Icon: Workflow,
   },
 ] as const;
@@ -32,18 +32,16 @@ export function LandingModulesSection() {
   return (
     <motion.section
       id="modules"
-      className="scroll-mt-28 border-b border-border/30 py-16 md:py-24 dark:border-white/[0.06]"
+      className="scroll-mt-28 border-b border-border/30 py-20 md:py-24 dark:border-white/[0.06]"
       {...fade}
     >
       <div className="mx-auto max-w-[1180px] px-4 md:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">Uitbreidbaar</p>
-          <h2 className="mt-3 text-balance text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
-            Extra modules — wanneer jij er klaar voor bent
-          </h2>
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="cf-landing-eyebrow">Uitbreiden</p>
+          <h2 className="cf-landing-h2 mt-4">Klein beginnen, uitbouwen als het loont</h2>
           <p className="mt-5 text-base leading-relaxed text-muted-foreground md:text-lg">
-            Gericht op zzp en heel kleine bedrijven: klein starten, later uitbreiden — zonder enterprise-contract of
-            ingewikkelde trajecten.
+            Je hoeft niet alles tegelijk te nemen. Start met overzicht en snelle reacties; breid uit wanneer je klaar
+            bent voor meer structuur op je site en in je opvolging.
           </p>
         </div>
         <ul className="mt-14 grid gap-5 md:grid-cols-3 md:gap-6">

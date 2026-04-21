@@ -272,8 +272,8 @@ export function getLandingChatHints(role: NicheId): {
   ] as const;
 
   return {
-    sectionTitle: "Probeer het zelf — binnen 10 seconden",
-    sectionSub: `Kies je branche (${short}), tik een voorbeeld aan of typ zelf. Je ziet direct hoe snel en duidelijk je reactie kan zijn.`,
+    sectionTitle: "Zo reageer je straks op echte klanten",
+    sectionSub: `Kies je branche (${short}), typ een korte vraag of gebruik een voorbeeld. Je ziet meteen hoe strak een eerste antwoord kan zijn — zonder dat jij overal achteraan hoeft.`,
     emptyExamples: EXAMPLES[role] ?? EXAMPLES_FALLBACK,
     inputPlaceholder: PLACEHOLDERS[role] ?? "Typ je vraag of afspraak…",
     quickPrompts: [...(QUICK_PROMPTS[role] ?? quickFallback)],

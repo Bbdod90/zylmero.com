@@ -1,0 +1,95 @@
+"use client";
+
+import { motion } from "framer-motion";
+import { Check } from "lucide-react";
+
+const fade = {
+  initial: { opacity: 0, y: 14 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: "-50px" },
+  transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] },
+};
+
+const STATS = [
+  {
+    label: "Gemiste kansen",
+    value: "€400 – €2.000+",
+    sub: "per week bij slechts twee gemiste aanvragen — afhankelijk van je orderwaarde",
+  },
+  {
+    label: "Effect van traagheid",
+    value: "10 – 30%",
+    sub: "minder kans op een afspraak dan bij een snelle, duidelijke reactie",
+  },
+  {
+    label: "Terugverdiend",
+    value: "1 extra klus",
+    sub: "betaalt je abonnement vaak al ruimschoots terug",
+  },
+] as const;
+
+const BENEFITS = [
+  "Minder klanten die stilletjes afhaken",
+  "Eerste reactie binnen seconden, ook als jij niet kunt",
+  "Rust in je inbox: wat spoed heeft, staat vooraan",
+  "Betere opvolging zonder extra uren te plannen",
+  "Meer omzet uit dezelfde stroom aanvragen",
+] as const;
+
+export function LandingOutcomesSection() {
+  return (
+    <motion.section
+      id="resultaat"
+      className="relative scroll-mt-28 border-b border-border/30 bg-gradient-to-b from-background via-muted/20 to-background py-20 md:py-28 dark:border-white/[0.06] dark:via-white/[0.02]"
+      {...fade}
+    >
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/25 to-transparent" aria-hidden />
+      <div className="relative mx-auto max-w-[1180px] px-4 md:px-8">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="cf-landing-eyebrow">Resultaat</p>
+          <h2 className="cf-landing-h2 mt-4">
+            Minder omzet laten liggen — meetbaar in je agenda
+          </h2>
+          <p className="mt-5 text-base leading-relaxed text-muted-foreground md:text-lg">
+            Het gaat niet om “meer tools”. Het gaat om sneller reageren, strakker opvolgen en serieuze aanvragen niet
+            verliezen aan een concurrent die wél op tijd antwoordt.
+          </p>
+        </div>
+
+        <div className="mx-auto mt-14 grid max-w-5xl gap-4 sm:grid-cols-3">
+          {STATS.map((card) => (
+            <div key={card.label} className="cf-landing-pro-card flex flex-col p-7 md:p-8">
+              <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                {card.label}
+              </p>
+              <p className="mt-4 font-mono text-xl font-bold tabular-nums tracking-tight text-foreground sm:text-2xl md:text-3xl">
+                {card.value}
+              </p>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{card.sub}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mx-auto mt-16 max-w-3xl">
+          <p className="text-center text-sm font-medium text-foreground">Concreet merk je</p>
+          <ul className="mt-6 grid gap-3 sm:grid-cols-2">
+            {BENEFITS.map((label) => (
+              <li
+                key={label}
+                className="flex items-start gap-3 rounded-xl border border-border/40 bg-card/60 px-4 py-3.5 text-left text-sm font-medium leading-snug text-foreground dark:border-white/[0.08] dark:bg-white/[0.03]"
+              >
+                <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/12 text-primary ring-1 ring-primary/20">
+                  <Check className="size-3.5" strokeWidth={2.5} aria-hidden />
+                </span>
+                {label}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-8 text-center text-xs leading-relaxed text-muted-foreground">
+            Indicaties op basis van gangbare conversie-inzichten; jouw situatie verschilt per branche en prijsniveau.
+          </p>
+        </div>
+      </div>
+    </motion.section>
+  );
+}

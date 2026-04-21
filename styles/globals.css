@@ -235,12 +235,20 @@
     @apply pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent;
   }
 
+  /** Landing — sectielabels en koppen (één ritme op de homepage) */
+  .cf-landing-eyebrow {
+    @apply text-[0.6875rem] font-semibold uppercase tracking-[0.22em] text-primary;
+  }
+  .cf-landing-h2 {
+    @apply text-balance text-[1.625rem] font-semibold tracking-tight text-foreground sm:text-3xl md:text-[2.25rem] md:leading-[1.15];
+  }
+
   /** Sticky CTA — zwevende dock (desktop) */
   .cf-sticky-dock {
     @apply fixed bottom-0 left-0 right-0 z-50 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 md:px-6 md:pb-5;
   }
   .cf-sticky-dock-inner {
-    @apply mx-3 flex max-w-[1180px] flex-col gap-3 rounded-2xl border border-border/35 bg-background/90 px-4 py-3 shadow-[0_24px_80px_-40px_rgb(0_0_0/0.45)] backdrop-blur-xl dark:border-white/[0.1] dark:bg-[hsl(228_32%_6%/0.82)] dark:shadow-black/60 sm:mx-auto sm:flex-row sm:items-center sm:justify-between sm:gap-6;
+    @apply mx-3 flex max-w-[1180px] flex-col gap-3 rounded-2xl border border-border/40 bg-background/[0.94] px-4 py-3.5 shadow-[0_28px_90px_-42px_rgb(0_0_0/0.42)] backdrop-blur-xl ring-1 ring-black/[0.04] dark:border-white/[0.1] dark:bg-[hsl(228_30%_5%/0.88)] dark:shadow-black/60 dark:ring-white/[0.05] sm:mx-auto sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-5;
   }
 }
 

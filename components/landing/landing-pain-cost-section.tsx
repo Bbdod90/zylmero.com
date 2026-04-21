@@ -1,29 +1,29 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Clock, Inbox, MessageSquareX, Zap } from "lucide-react";
+import { Clock, Inbox, MessageSquareX, UserX } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const ITEMS = [
   {
-    title: "Je reageert te laat",
-    body: "De klant is al weg voordat jij antwoord geeft.",
+    title: "Te laat reageren",
+    body: "De klant stapt al over naar iemand anders terwijl jij nog op de klus zit of onderweg bent.",
     Icon: Clock,
   },
   {
-    title: "Berichten staan overal",
-    body: "WhatsApp, mail, formulier — geen overzicht.",
+    title: "Chaos tussen kanalen",
+    body: "WhatsApp hier, mail daar, een formulier ergens anders — geen enkel overzicht van wat echt telt.",
     Icon: Inbox,
   },
   {
-    title: "Opvolging schiet erbij in",
-    body: "Druk → vergeten → gemiste omzet.",
+    title: "Opvolging die blijft liggen",
+    body: "Goede leads verdwijnen in de ruis. Geen tijd betekent geen reactie — en dat kost omzet.",
     Icon: MessageSquareX,
   },
   {
-    title: "Concurrent is sneller",
-    body: "Niet de goedkoopste wint — de snelste die serieus antwoord geeft.",
-    Icon: Zap,
+    title: "Altijd zelf beschikbaar moeten zijn",
+    body: "Je kunt niet 24/7 klaarstaan. Toch verwacht de markt een antwoord alsof je een callcenter hebt.",
+    Icon: UserX,
   },
 ] as const;
 
@@ -37,26 +37,25 @@ const fade = {
 export function LandingPainCostSection({ className }: { className?: string }) {
   return (
     <section
-      id="wat-het-kost"
+      id="probleem"
       className={cn(
-        "relative overflow-hidden border-b border-border/30 py-16 md:py-24 lg:py-28 dark:border-white/[0.06]",
+        "relative overflow-hidden border-b border-border/30 py-20 md:py-28 dark:border-white/[0.06]",
         className,
       )}
     >
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[min(380px,55%)] bg-[radial-gradient(ellipse_at_50%_0%,hsl(var(--primary)/0.06),transparent_70%)] dark:bg-[radial-gradient(ellipse_at_50%_0%,hsl(var(--primary)/0.1),transparent_72%)]" aria-hidden />
       <div className="relative mx-auto max-w-[1180px] px-4 md:px-8">
-        <motion.div className="mx-auto max-w-2xl text-center" {...fade}>
-          <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">Herkenning</p>
-          <h2 className="mt-3 text-balance text-2xl font-semibold tracking-tight text-foreground md:text-4xl">
-            Wat het je nu kost (zonder dat je het ziet)
-          </h2>
+        <motion.div className="mx-auto max-w-3xl text-center" {...fade}>
+          <p className="cf-landing-eyebrow">Het probleem</p>
+          <h2 className="cf-landing-h2 mt-4">Omzet die je niet ziet verdwijnen</h2>
           <p className="mt-5 text-base leading-relaxed text-muted-foreground md:text-lg">
-            Geen verwijt — wel harde economie: als jij de baas én de uitvoerder bent en niet op tijd reageert, wint
-            vaak degene die wél antwoord geeft.
+            Geen dramatiek — wel rekenwerk: als aanvragen blijven liggen of traag worden opgevolgd, laat je geld liggen.
+            Bij kleine bedrijven merk je dat direct in je agenda.
           </p>
         </motion.div>
 
         <motion.ul
-          className="mt-14 grid gap-4 md:grid-cols-2"
+          className="mt-14 grid gap-4 sm:grid-cols-2"
           {...fade}
           transition={{ ...fade.transition, delay: 0.06 }}
         >
