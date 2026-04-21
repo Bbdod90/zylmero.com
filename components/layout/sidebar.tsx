@@ -22,7 +22,6 @@ import {
   UsersRound,
   ClipboardList,
   Brain,
-  Bot,
 } from "lucide-react";
 import type { AppNotification } from "@/lib/types";
 import { BRAND_NAME } from "@/lib/brand";
@@ -56,7 +55,6 @@ const GROUPS: { title: string; items: NavItem[] }[] = [
     title: "AI & klanten",
     items: [
       { href: "/dashboard/ai-koppelingen", label: "AI & koppelingen", icon: Brain },
-      { href: "/dashboard/chatbots", label: "Website-chat", icon: Bot },
       { href: "/dashboard/playbooks", label: "Playbooks", icon: BookOpen },
     ],
   },
@@ -96,7 +94,6 @@ const ANONYMOUS_PREVIEW_GROUPS: { title: string; items: NavItem[] }[] = [
     title: "AI voor klanten",
     items: [
       { href: "/dashboard/ai-koppelingen", label: "AI & koppelingen", icon: Brain },
-      { href: "/dashboard/chatbots", label: "Website-chat", icon: Bot },
       { href: "/dashboard/ai-knowledge", label: "AI-kennis (detail)", icon: Sparkles },
     ],
   },

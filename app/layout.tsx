@@ -22,8 +22,8 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: `${BRAND_NAME} — AI-antwoorden die meer werk opleveren`,
-  description: `Verlies geen klanten door trage reacties. ${BRAND_NAME} zet WhatsApp- en inboxberichten om in afspraken, offertes en omzet.`,
+  title: `${BRAND_NAME} — inbox en AI voor zzp en kleine bedrijven`,
+  description: `Voor zzp'ers en heel kleine teams: minder gemiste aanvragen en sneller antwoord via WhatsApp, mail en site — zonder sales-afdeling of IT-project.`,
 };
 
 export const viewport: Viewport = {

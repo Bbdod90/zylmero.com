@@ -22,7 +22,8 @@ export function LandingFinalCtaSection() {
           Stop met klanten missen
         </h2>
         <p className="mx-auto mt-5 max-w-lg text-base leading-relaxed text-muted-foreground">
-          Start gratis en zie in je dashboard wat er binnenkomt — geen creditcard nodig om te beginnen.
+          Start gratis en zie in je dashboard wat er binnenkomt — gemaakt voor zzp en kleine teams, geen creditcard nodig
+          om te beginnen.
         </p>
         <div className="mt-10 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
           <Button asChild size="lg" className="h-12 rounded-xl px-8 text-base font-semibold sm:h-14">

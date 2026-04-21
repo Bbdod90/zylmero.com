@@ -39,7 +39,7 @@ export async function GET() {
     next_public_supabase_anon_key: hasSupabaseAnon,
     supabase_service_role_key: hasServiceRole,
     site_url: hasSiteUrl,
-    /** Server kan https:// bereiken (nodig om kennis-URL’s op te halen voor website-chat) */
+    /** Server kan https:// bereiken (nodig om kennis-URL’s op te halen voor AI-kennis) */
     outbound_https_head: outboundHttps,
   };
 
@@ -57,8 +57,8 @@ export async function GET() {
       hint: ok
         ? outboundHttps
           ? "Kern-env ziet er goed uit; uitgaand HTTPS werkt (URL-kennis kan worden opgehaald). Blijft iets kapot? Check Supabase SQL-migraties en deploy logs."
-          : "Kern-env is ok, maar uitgaand HTTPS lijkt geblokkeerd — website-chat kan URL-kennis niet ophalen. Check firewall/Vercel egress. Verder: migraties en deploy logs."
-        : "Vul ontbrekende variabelen in Vercel/hosting en deploy opnieuw. Zonder OPENAI_API_KEY werkt website-chat / Live test niet.",
+          : "Kern-env is ok, maar uitgaand HTTPS lijkt geblokkeerd — AI kan URL-kennis niet ophalen. Check firewall/Vercel egress. Verder: migraties en deploy logs."
+        : "Vul ontbrekende variabelen in Vercel/hosting en deploy opnieuw. Zonder OPENAI_API_KEY werken AI-antwoorden en slimme opvolging niet.",
     },
     { status: ok ? 200 : 503 },
   );

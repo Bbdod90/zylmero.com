@@ -6,12 +6,12 @@ const STEPS = [
   {
     icon: HeartHandshake,
     title: "Wie wij zijn",
-    body: "We bouwen software voor zelfstandigen en kleine teams die geen sales-afdeling hebben — maar wél elke aanvraag serieus nemen.",
+    body: "We bouwen voor zzp'ers en echt kleine bedrijven: geen sales-afdeling, geen IT-team — wél elke aanvraag serieus nemen.",
   },
   {
     icon: MessageCircle,
     title: "Het probleem",
-    body: "Berichten verdwijnen in apps, concurrenten antwoorden sneller, en jij bent op de werkvloer. Gemiste chats zijn geen pech — het zijn euro’s die je nooit terugziet.",
+    body: "Berichten verdwijnen in apps, concurrenten antwoorden sneller, en jij bent op de werkvloer. Als je klein bent, merk je dat direct in de agenda. Gemiste chats zijn euro’s die je nooit terugziet.",
   },
   {
     icon: Rocket,

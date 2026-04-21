@@ -1,13 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Bot, Inbox, Workflow } from "lucide-react";
+import { Inbox, MessageSquare, Workflow } from "lucide-react";
 
 const MODULES = [
   {
-    title: "Website-chatbot",
-    body: "Bezoekers krijgen direct antwoord — ook als jij offline bent.",
-    Icon: Bot,
+    title: "Website-widget (leads)",
+    body: "Bezoekers laten een aanvraag achter op je site — alles landt strak in je inbox.",
+    Icon: MessageSquare,
   },
   {
     title: "Inbox / mailbox cleaner",
@@ -42,7 +42,8 @@ export function LandingModulesSection() {
             Extra modules — wanneer jij er klaar voor bent
           </h2>
           <p className="mt-5 text-base leading-relaxed text-muted-foreground md:text-lg">
-            Klein starten, later uitbreiden. Je hoeft niet alles tegelijk te nemen — Zylmero groeit mee met je zaak.
+            Gericht op zzp en heel kleine bedrijven: klein starten, later uitbreiden — zonder enterprise-contract of
+            ingewikkelde trajecten.
           </p>
         </div>
         <ul className="mt-14 grid gap-5 md:grid-cols-3 md:gap-6">

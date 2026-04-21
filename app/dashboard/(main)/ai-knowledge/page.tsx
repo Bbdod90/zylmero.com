@@ -2,7 +2,6 @@ import { getAuth } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { isDemoMode } from "@/lib/env";
 import { mapCompanySettingsRow } from "@/lib/queries/map-company-settings";
-import { AiWebsiteChatCallout } from "@/components/dashboard/ai-website-chat-callout";
 import { PageFrame } from "@/components/layout/page-frame";
 import { AiKnowledgeForm } from "@/components/settings/ai-knowledge-form";
 
@@ -25,7 +24,6 @@ export default async function AiKnowledgePage() {
       dismissHref="/dashboard/ai-koppelingen"
       dismissLabel="AI & koppelingen"
     >
-      <AiWebsiteChatCallout />
       <AiKnowledgeForm
         demoMode={demo}
         initialWebsite={mapped?.ai_knowledge_website ?? ""}

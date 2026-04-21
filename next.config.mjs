@@ -13,6 +13,22 @@ const projectDir = path.dirname(fileURLToPath(import.meta.url));
 nextEnv.loadEnvConfig(projectDir);
 
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+  async redirects() {
+    return [
+      {
+        source: "/dashboard/chatbots",
+        destination: "/dashboard/settings?tab=widget",
+        permanent: true,
+      },
+      {
+        source: "/dashboard/chatbots/:path*",
+        destination: "/dashboard/settings?tab=widget",
+        permanent: true,
+      },
+      { source: "/chatbot", destination: "/", permanent: true },
+    ];
+  },
+};
 
 export default nextConfig;

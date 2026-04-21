@@ -1,7 +1,6 @@
 import Link from "next/link";
 import {
   ArrowUpRight,
-  Bot,
   Brain,
   ClipboardList,
   Inbox,
@@ -24,13 +23,10 @@ type HubLink = {
 export function DashboardAiHub({
   demoMode,
   priorityLeadId,
-  websiteChatHref,
 }: {
   demoMode: boolean;
   /** Beste lead voor “open in workspace” (AI-acties op de lead-pagina). */
   priorityLeadId: string | null;
-  /** Wizard of eerste bot. */
-  websiteChatHref: string;
 }) {
   const leadHref = priorityLeadId
     ? `/dashboard/leads/${priorityLeadId}`
@@ -73,12 +69,6 @@ export function DashboardAiHub({
       title: "Automatiseringen",
       description: "Opvolgingsritmes en regels, inclusief optie AI-antwoord.",
       icon: Zap,
-    },
-    {
-      href: websiteChatHref,
-      title: "Website-chat",
-      description: "Embeddable assistent met wizard en test.",
-      icon: Bot,
     },
     {
       href: "/dashboard/playbooks",

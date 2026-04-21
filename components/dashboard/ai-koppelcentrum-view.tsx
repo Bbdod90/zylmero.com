@@ -290,7 +290,7 @@ export function AiKoppelcentrumView({
           <CardContent className="space-y-3">
             {!demoMode && !websiteWidgetActive ? (
               <p className="rounded-xl border border-amber-500/25 bg-amber-500/[0.06] px-4 py-3 text-sm text-amber-950 dark:text-amber-100">
-                <strong className="font-semibold">Website-chat staat uit</strong> zolang er geen actief
+                <strong className="font-semibold">De website-widget staat uit</strong> zolang er geen actief
                 abonnement is — bezoekers zien het formulier niet verwerkt. Activeer onder{" "}
                 <Link href="/dashboard/upgrade" className="font-semibold underline underline-offset-2">
                   Plannen

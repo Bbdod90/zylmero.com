@@ -128,7 +128,7 @@ export default async function UpgradePage() {
 
       <div id="plans" className="mx-auto mt-10 max-w-5xl scroll-mt-24">
         <div className="cf-dashboard-panel mb-6 px-4 py-3.5 text-center text-sm leading-relaxed text-muted-foreground">
-          Gebruikt door servicebedrijven · snellere reactie levert vaker een geboekte klant
+          Voor zzp en kleine servicebedrijven · snellere reactie levert vaker een geboekte klant
         </div>
 
         <div className="cf-dashboard-panel mb-8 border-destructive/25 bg-destructive/[0.04] p-5 text-sm text-muted-foreground sm:p-6">

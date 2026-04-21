@@ -24,9 +24,9 @@ export function LandingImpactSection() {
             Dit gebeurt er elke maand
           </h2>
           <p className="mt-5 text-base leading-relaxed text-muted-foreground md:text-lg">
-            Een paar gemiste aanvragen lijkt weinig. Bij elkaar is het{" "}
+            Voor een kleine zaak telt elke gemiste lead dubbel. Bij elkaar is het al snel{" "}
             <strong className="font-semibold text-foreground">honderden tot duizenden euro&apos;s</strong> per maand — zonder dat
-            je het op je bankafschrift ziet staan.
+            je het als aparte post ziet.
           </p>
         </div>
 

@@ -16,7 +16,6 @@ import {
 } from "@/components/dashboard/dashboard-agenda-peek";
 import { DashboardQuotesPeek } from "@/components/dashboard/dashboard-quotes-peek";
 import { DashboardAiHub } from "@/components/dashboard/dashboard-ai-hub";
-import { WebsiteChatDashboardCta } from "@/components/dashboard/website-chat-dashboard-cta";
 import { LEAD_STATUSES } from "@/components/leads/status-badge";
 import type { LeadStatus } from "@/lib/types";
 
@@ -93,24 +92,6 @@ export default async function DashboardPage() {
 
   const recentQuotes = bundle.quotes.slice(0, 4);
 
-  let websiteChatState: { hasBot: boolean; firstId?: string } = { hasBot: false };
-  if (!demo) {
-    try {
-      const { data: botRows } = await supabase
-        .from("embedded_chatbots")
-        .select("id")
-        .eq("company_id", auth.company.id)
-        .order("updated_at", { ascending: false })
-        .limit(1);
-      websiteChatState = {
-        hasBot: Boolean(botRows?.length),
-        firstId: botRows?.[0]?.id,
-      };
-    } catch {
-      websiteChatState = { hasBot: false };
-    }
-  }
-
   const chipItems = [
     { label: "Leads", value: String(bundle.leads.length) },
     { label: "In pipeline", value: String(pipelineActive) },
@@ -119,10 +100,6 @@ export default async function DashboardPage() {
   ];
 
   const priorityLeadId = topThree[0]?.id ?? bundle.leads[0]?.id ?? null;
-  const websiteChatHref =
-    websiteChatState.hasBot && websiteChatState.firstId
-      ? `/dashboard/chatbots/${websiteChatState.firstId}`
-      : "/dashboard/chatbots";
 
   return (
     <PageFrame
@@ -134,18 +111,7 @@ export default async function DashboardPage() {
       }
     >
       <div className="mx-auto w-full max-w-[1200px] space-y-8 lg:space-y-10">
-        <DashboardAiHub
-          demoMode={demo}
-          priorityLeadId={priorityLeadId}
-          websiteChatHref={websiteChatHref}
-        />
-
-        {!demo ? (
-          <WebsiteChatDashboardCta
-            hasEmbeddedBot={websiteChatState.hasBot}
-            firstChatbotId={websiteChatState.firstId}
-          />
-        ) : null}
+        <DashboardAiHub demoMode={demo} priorityLeadId={priorityLeadId} />
 
         {/* Hero + KPI-rail */}
         <div className="grid gap-6 lg:grid-cols-12 lg:items-start lg:gap-8">

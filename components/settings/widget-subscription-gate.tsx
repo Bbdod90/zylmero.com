@@ -21,11 +21,11 @@ export function WidgetSubscriptionGate({
         </div>
         <div className="min-w-0 flex-1 space-y-3">
           <div>
-            <h3 className="text-lg font-semibold text-foreground">Website-chat live zetten</h3>
+            <h3 className="text-lg font-semibold text-foreground">Website-widget live zetten</h3>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Je chatbot vul je met kennis onder <strong className="text-foreground">Kennis</strong> en je profiel onder{" "}
-              <strong className="text-foreground">Bedrijf</strong>. Om het chatvenster op je eigen site te laten werken
-              (bezoekers bericht laten sturen naar jouw inbox), hoort een{" "}
+              Vul <strong className="text-foreground">Kennis</strong> en <strong className="text-foreground">Bedrijf</strong>{" "}
+              in de instellingen zodat antwoorden en intake kloppen. Om het embed-script op je eigen site leads te laten
+              doorsturen naar je inbox, hoort een{" "}
               <strong className="text-foreground">actieve proefperiode of betaald abonnement</strong>.
             </p>
             {trialExpiredHint ? (

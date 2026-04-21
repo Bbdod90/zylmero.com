@@ -50,7 +50,8 @@ export function LandingPainCostSection({ className }: { className?: string }) {
             Wat het je nu kost (zonder dat je het ziet)
           </h2>
           <p className="mt-5 text-base leading-relaxed text-muted-foreground md:text-lg">
-            Geen verwijt — wel harde economie: als je niet op tijd reageert, verlies je klanten aan iemand die dat wél doet.
+            Geen verwijt — wel harde economie: als jij de baas én de uitvoerder bent en niet op tijd reageert, wint
+            vaak degene die wél antwoord geeft.
           </p>
         </motion.div>
 

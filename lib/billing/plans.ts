@@ -18,14 +18,14 @@ export const BILLING_PLANS: PlanDefinition[] = [
   {
     id: "starter",
     name: "Starter",
-    description: "Voor overzicht en snelle reacties.",
-    audience: "Zzp en kleine zaak: vooral rust in de inbox en tempo naar de eerste reactie.",
+    description: "Voor zzp en micro-bedrijven: overzicht en snelle reacties.",
+    audience: "Echt klein: jij bent de inbox — hier krijg je rust en tempo naar de eerste reactie.",
     priceEur: 79,
     leadCapLabel: "Tot 100 leads / mnd",
     features: [
       "Eén plek voor aanvragen — minder zoeken, minder missers",
       "Sneller eerste antwoord zonder de hele dag online te zijn",
-      "Later uitbreiden met website-chat en automatisering",
+      "Later uitbreiden met website-widget en automatisering",
       "E-mailsupport",
     ],
     stripePriceId: process.env.STRIPE_PRICE_STARTER,
@@ -33,13 +33,13 @@ export const BILLING_PLANS: PlanDefinition[] = [
   {
     id: "growth",
     name: "Growth",
-    description: "Voor meer afspraken en automatisering.",
-    audience: "Teams met meer volume — salon, garage, monteur, praktijk.",
+    description: "Voor een klein team met meer aanvragen.",
+    audience: "2–10 mensen met groeiend volume — denk salon, garage, monteur, praktijk, ambacht.",
     priceEur: 149,
     leadCapLabel: "Tot 500 leads / mnd",
     features: [
       "Alles uit Starter — meer uit dezelfde stroom aanvragen",
-      "Ruimte voor website-chatbot en slimme opvolging",
+      "Ruimte voor website-widget en slimme opvolging",
       "Minder leads die stilletjes verdwijnen",
       "Snellere support bij groeiende drukte",
     ],
@@ -49,8 +49,8 @@ export const BILLING_PLANS: PlanDefinition[] = [
   {
     id: "pro",
     name: "Pro",
-    description: "Voor maximale controle en groei.",
-    audience: "Als aanvragen je hoofdzaak zijn en je grip én maatwerk wilt.",
+    description: "Maximale controle voor een klein bedrijf dat groot wil blijven voelen.",
+    audience: "Aanvragen zijn je hoofdzaak — je wilt grip en maatwerk zonder enterprise-gedoe.",
     priceEur: 299,
     leadCapLabel: "Onbeperkt leads",
     features: [

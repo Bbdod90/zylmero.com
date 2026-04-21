@@ -39,6 +39,9 @@ export function LandingSolutionSection() {
           <h2 className="text-balance text-2xl font-semibold tracking-tight text-foreground md:text-4xl">
             Dit verandert er als je Zylmero gebruikt
           </h2>
+          <p className="mt-5 text-base leading-relaxed text-muted-foreground md:text-lg">
+            Speciaal als je het zelf regelt of met een klein team werkt — geen aparte binnendienst of IT nodig.
+          </p>
         </div>
         <ul className="mt-14 grid gap-5 md:grid-cols-3 md:gap-6">
           {BLOCKS.map(({ title, body, Icon }) => (

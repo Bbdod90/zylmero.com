@@ -4,13 +4,11 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
-  Bot,
   CalendarCheck,
   Check,
   ChevronDown,
   Inbox,
   MessageCircle,
-  Sparkles,
 } from "lucide-react";
 import { AnonymousDemoForm } from "@/components/landing/demo-role-context";
 import { HeroInboxMock } from "@/components/landing/hero-inbox-mock";
@@ -32,22 +30,22 @@ import { cn } from "@/lib/utils";
 const HERO_H1 = "Elke gemiste aanvraag kost je geld — zonder dat je het doorhebt";
 
 const HERO_SUB =
-  "Zylmero reageert direct op je klanten, filtert serieuze aanvragen en helpt richting afspraak. Jij hoeft niet de hele dag online te zijn — maar mist geen klant meer onnodig.";
+  "Zylmero is gemaakt voor zzp'ers en echt kleine bedrijven: eerste antwoord binnen seconden, overzicht in de inbox en helpen richting afspraak. Jij staat op de klus — zonder de hele dag online te hoeven zijn.";
 
 const HERO_BULLETS = [
-  "Reageert binnen seconden",
-  "Meer afspraken zonder extra werk",
+  "Gebouwd voor wie het zelf doet (of met een klein team)",
+  "Meer afspraken uit dezelfde stroom berichten",
   "Werkt via je website, mail en WhatsApp",
 ] as const;
 
 const FAQ_ITEMS = [
   {
     q: "Is dit moeilijk om te gebruiken?",
-    a: "Nee. Je start binnen enkele minuten: overzicht, eerste antwoorden, en later optioneel een website-chat. Geen IT-project.",
+    a: "Nee. Je start binnen enkele minuten: overzicht, eerste antwoorden, en later optioneel een lead-widget op je site. Geen IT-project.",
   },
   {
     q: "Werkt dit voor mijn bedrijf?",
-    a: "Als je aanvragen krijgt — mail, WhatsApp of website — dan wel. Het gaat om snelheid en overzicht, niet om je sectorlabel.",
+    a: "Vooral als je klein bent: zzp, eenmanszaak of een paar collega's. Als aanvragen binnenkomen via mail, WhatsApp of je site, helpt Zylmero met snelheid en overzicht — sector maakt niet uit.",
   },
   {
     q: "Wat levert het echt op?",
@@ -190,85 +188,6 @@ export function ZylmeroLanding() {
         </div>
       </motion.section>
 
-      <motion.section
-        id="chatbots"
-        className="scroll-mt-28 border-b border-border/30 py-20 md:py-24 dark:border-white/[0.06]"
-        {...fadeUp}
-      >
-        <div className="mx-auto max-w-[1180px] px-4 md:px-8">
-          <div className="mx-auto max-w-2xl text-center">
-            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">Website</p>
-            <h2 className="mt-4 text-balance text-2xl font-semibold tracking-tight text-foreground md:text-4xl">
-              Zet een chatbot op je website in 5 minuten
-            </h2>
-            <p className="mt-6 text-base leading-relaxed text-muted-foreground md:text-lg">
-              Bezoekers stellen vragen — jouw chatbot reageert meteen. Zelfs als jij aan het werk bent of offline.
-            </p>
-          </div>
-
-          <ul className="mx-auto mt-12 grid max-w-3xl gap-3 text-left sm:mx-auto">
-            {[
-              "Beantwoord vragen automatisch",
-              "Laat klanten afspraken aanvragen",
-              "Werkt 24/7",
-            ].map((label) => (
-              <li
-                key={label}
-                className="flex items-center gap-3 rounded-xl border border-border/45 bg-muted/25 px-5 py-4 text-[0.9375rem] font-medium text-foreground dark:border-white/[0.08] dark:bg-white/[0.04]"
-              >
-                <Check className="size-5 shrink-0 text-primary" aria-hidden strokeWidth={2.25} />
-                {label}
-              </li>
-            ))}
-          </ul>
-
-          <div className="mx-auto mt-10 max-w-lg rounded-2xl border border-primary/35 bg-primary/[0.07] p-6 text-center shadow-[0_20px_60px_-40px_hsl(var(--primary)/0.45)] dark:border-primary/30 dark:bg-primary/[0.09]">
-            <p className="text-sm font-semibold text-foreground">Hier maak je je echte website-chatbot</p>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Niet op deze marketingpagina — in je <strong className="text-foreground">dashboard</strong> onder{" "}
-              <strong className="text-foreground">Website-chat</strong>. Geen account? Start gratis, daarna bot aanmaken en één regel code
-              plakken.
-            </p>
-            <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:justify-center">
-              <Button asChild className="h-11 rounded-xl px-6 font-semibold">
-                <Link href="/dashboard/chatbots">Ga naar Website-chat</Link>
-              </Button>
-              <Button asChild variant="outline" className="h-11 rounded-xl px-6 font-semibold">
-                <Link href="/signup">Account aanmaken</Link>
-              </Button>
-            </div>
-            <p className="mt-4 text-xs text-muted-foreground">
-              Niet ingelogd? Je wordt doorgestuurd naar inloggen — daarna direct bouwen.
-            </p>
-          </div>
-
-          <p className="mx-auto mt-12 max-w-2xl text-center text-sm leading-relaxed text-muted-foreground md:text-[0.9375rem]">
-            Plak één regel code op je site — actief met een geldige proef of betaald abonnement.
-          </p>
-
-          <div className="mt-10 grid gap-5 md:grid-cols-2 md:gap-6">
-            <div className="cf-landing-pro-card p-8 md:p-9">
-              <div className="flex size-11 items-center justify-center rounded-xl bg-primary/[0.1] text-primary ring-1 ring-primary/15">
-                <Bot className="size-5" strokeWidth={1.75} aria-hidden />
-              </div>
-              <h3 className="mt-6 text-lg font-semibold text-foreground">Voor klanten bouwen</h3>
-              <p className="mt-3 text-[0.9375rem] leading-relaxed text-muted-foreground">
-                Dezelfde bouwstenen voor salons, garages, monteurs en praktijken — snel live, strak afgesteld.
-              </p>
-            </div>
-            <div className="cf-landing-pro-card p-8 md:p-9">
-              <div className="flex size-11 items-center justify-center rounded-xl bg-primary/[0.1] text-primary ring-1 ring-primary/15">
-                <Sparkles className="size-5" strokeWidth={1.75} aria-hidden />
-              </div>
-              <h3 className="mt-6 text-lg font-semibold text-foreground">Voor jezelf</h3>
-              <p className="mt-3 text-[0.9375rem] leading-relaxed text-muted-foreground">
-                Begin klein, breid uit als het bevalt — geen tweede baan aan onderhoud.
-              </p>
-            </div>
-          </div>
-        </div>
-      </motion.section>
-
       <div id="demo">
         <LandingInteractiveChat />
       </div>
@@ -292,7 +211,7 @@ export function ZylmeroLanding() {
             Kies wat bij je past
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-center text-base leading-relaxed text-muted-foreground md:text-lg">
-            Start gratis. Daarna vast per maand — klein beginnen kan, uitbreiden ook.
+            Start gratis. Daarna vast per maand — geen enterprise-pakketten: prijzen die passen bij kleine ondernemers.
           </p>
           <div className="mt-14 grid gap-6 lg:grid-cols-3 lg:items-stretch">
             {BILLING_PLANS.map((plan) => (
@@ -384,7 +303,7 @@ export function ZylmeroLanding() {
               </div>
               <span className="font-semibold text-foreground">{BRAND_NAME}</span>
             </div>
-            <p className="text-xs text-muted-foreground">Minder omzet laten liggen · sneller voor je klanten klaarstaan</p>
+            <p className="text-xs text-muted-foreground">Voor zzp en kleine zaken · minder omzet laten liggen</p>
           </div>
           <nav className="flex flex-wrap justify-center gap-x-8 gap-y-2 text-sm font-medium text-foreground">
             <Link href="/login" className="transition-colors hover:text-foreground">

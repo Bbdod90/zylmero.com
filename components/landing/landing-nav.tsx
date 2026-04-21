@@ -12,11 +12,11 @@ import { cn } from "@/lib/utils";
 const LINKS = [
   { href: "#wat-het-kost", label: "Waarom" },
   { href: "#hoe-het-werkt", label: "Hoe" },
-  { href: "#chatbots", label: "Chatbots" },
+  { href: "#modules", label: "Modules" },
   { href: "#demo", label: "Demo" },
   { href: "#prijzen", label: "Prijzen" },
-  /** Eigen bot bouwen — zonder ingelogd: middleware → /login */
-  { href: "/dashboard/chatbots", label: "Website-chat" },
+  /** Lead-widget op je site — zonder ingelogd: middleware → /login */
+  { href: "/dashboard/settings?tab=widget", label: "Widget" },
 ] as const;
 
 export function LandingNav() {
