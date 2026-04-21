@@ -8,11 +8,11 @@ import { LandingComparisonSection } from "@/components/landing/landing-compariso
 import { LandingFaqSection } from "@/components/landing/landing-faq-section";
 import { LandingFinalCtaSection } from "@/components/landing/landing-final-cta-section";
 import { LandingHeroProductVisual } from "@/components/landing/landing-hero-product-visual";
-import { LandingInteractiveChat } from "@/components/landing/landing-interactive-chat";
 import { LandingNav } from "@/components/landing/landing-nav";
 import { LandingOutcomesSection } from "@/components/landing/landing-outcomes-section";
 import { LandingPainCostSection } from "@/components/landing/landing-pain-cost-section";
 import { LandingPlatformBento } from "@/components/landing/landing-platform-bento";
+import { LandingProductTour } from "@/components/landing/landing-product-tour";
 import { LandingSolutionSection } from "@/components/landing/landing-solution-section";
 import { LandingStatsStrip } from "@/components/landing/landing-stats-strip";
 import { LandingUseCasesSection } from "@/components/landing/landing-use-cases-section";
@@ -143,23 +143,7 @@ export function ZylmeroLanding() {
 
         <LandingOutcomesSection />
 
-        <div id="demo" className="scroll-mt-28 border-t border-border/45 dark:border-white/[0.08]">
-          <div className={cn(LANDING_MAX, "pt-24 md:pt-32")}>
-            <p className="text-center font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">Live preview</p>
-            <h2 className="mx-auto mt-4 max-w-3xl text-balance text-center text-3xl font-semibold tracking-[-0.03em] text-foreground md:text-5xl md:leading-[1.06]">
-              Van bericht tot afspraak
-            </h2>
-            <p className="mx-auto mt-5 max-w-xl text-center font-mono text-[13px] leading-relaxed text-muted-foreground md:text-sm">
-              Klant stuurt · AI antwoordt · Afspraak staat · Lead zichtbaar
-            </p>
-          </div>
-          <LandingInteractiveChat
-            showMarketingHeader={false}
-            hideBottomCtas
-            premiumEmbed
-            hideQuickPrompts
-          />
-        </div>
+        <LandingProductTour />
 
         <LandingUseCasesSection />
 
