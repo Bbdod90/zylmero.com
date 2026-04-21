@@ -19,7 +19,7 @@ export function LandingNav() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
+    const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -28,38 +28,38 @@ export function LandingNav() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 border-b transition-[background-color,box-shadow] duration-200",
+        "sticky top-0 z-50 border-b transition-[background-color,box-shadow,backdrop-filter] duration-300",
         scrolled
-          ? "border-border/60 bg-background/95 shadow-sm backdrop-blur-md dark:border-white/[0.08] dark:bg-background/95"
-          : "border-transparent bg-background/80 backdrop-blur-sm dark:bg-background/80",
+          ? "border-border/55 bg-background/[0.82] shadow-[0_1px_0_0_hsl(var(--border)/0.5)] backdrop-blur-2xl dark:border-white/[0.08] dark:bg-[hsl(228_32%_4%/0.78)]"
+          : "border-transparent bg-background/70 backdrop-blur-md dark:bg-background/60",
       )}
     >
-      <div className="mx-auto flex h-16 max-w-[1120px] items-center justify-between gap-3 px-4 md:px-8">
+      <div className="mx-auto flex h-[3.65rem] max-w-[1180px] items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex min-w-0 shrink-0 items-center gap-2.5 text-foreground">
-          <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground">
+          <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary text-[11px] font-bold text-primary-foreground shadow-sm ring-1 ring-black/5 dark:ring-white/10">
             {BRAND_LOGO_MONOGRAM}
           </div>
-          <span className="truncate text-[15px] font-semibold tracking-tight">{BRAND_NAME}</span>
+          <span className="truncate text-[15px] font-semibold tracking-[-0.02em]">{BRAND_NAME}</span>
         </Link>
-        <nav className="hidden items-center gap-0.5 md:flex">
+        <nav className="hidden items-center gap-1 md:flex">
           {LINKS.map((l) => (
             <a
               key={l.href}
               href={l.href}
-              className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className="rounded-full px-3.5 py-2 text-[13px] font-medium text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
             >
               {l.label}
             </a>
           ))}
         </nav>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 items-center gap-1.5">
           <ThemeToggle />
           <AnonymousDemoForm>
-            <Button type="submit" size="sm" variant="ghost" className="hidden font-medium sm:inline-flex">
+            <Button type="submit" size="sm" variant="ghost" className="hidden rounded-full font-medium sm:inline-flex">
               Demo
             </Button>
           </AnonymousDemoForm>
-          <Button size="sm" className="h-9 rounded-lg px-4 text-sm font-semibold" asChild>
+          <Button size="sm" className="h-9 rounded-full px-4 text-[13px] font-semibold shadow-sm" asChild>
             <Link href="/signup">Start gratis</Link>
           </Button>
         </div>

@@ -8,7 +8,7 @@
 @layer base {
   :root {
     /* Iets koeler dan wit — minder fel, beter bij cards en demo-blokken. */
-    --background: 220 24% 97%;
+    --background: 220 22% 98%;
     /* Body- en UI-tekst: puur zwart (geen grijs via muted). */
     --foreground: 0 0% 0%;
     --card: 0 0% 100%;
@@ -160,6 +160,36 @@
         transparent 45%
       );
   }
+  /** Marketing — subtiel raster (viewport-fixed, blijft rustig bij scroll) */
+  .zm-landing-dots {
+    background-image: radial-gradient(
+      circle at center,
+      hsl(222 25% 42% / 0.07) 1.25px,
+      transparent 1.25px
+    );
+    background-size: 36px 36px;
+  }
+  .dark .zm-landing-dots {
+    background-image: radial-gradient(
+      circle at center,
+      rgb(255 255 255 / 0.055) 1.25px,
+      transparent 1.25px
+    );
+  }
+  .zm-landing-radial-fade {
+    background: radial-gradient(
+      ellipse 80% 50% at 50% -20%,
+      hsl(var(--primary) / 0.06),
+      transparent 70%
+    );
+  }
+  .dark .zm-landing-radial-fade {
+    background: radial-gradient(
+      ellipse 75% 45% at 50% -15%,
+      hsl(var(--primary) / 0.12),
+      transparent 72%
+    );
+  }
   .glass {
     @apply border border-border/60 bg-card/60 shadow-[var(--shadow-md)] backdrop-blur-2xl dark:border-white/[0.07] dark:bg-card/45 dark:shadow-[var(--shadow-md)];
   }
@@ -248,7 +278,7 @@
     @apply fixed bottom-0 left-0 right-0 z-50 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 md:px-6 md:pb-5;
   }
   .cf-sticky-dock-inner {
-    @apply mx-3 flex max-w-[1180px] flex-col gap-3 rounded-2xl border border-border/40 bg-background/[0.94] px-4 py-3.5 shadow-[0_28px_90px_-42px_rgb(0_0_0/0.42)] backdrop-blur-xl ring-1 ring-black/[0.04] dark:border-white/[0.1] dark:bg-[hsl(228_30%_5%/0.88)] dark:shadow-black/60 dark:ring-white/[0.05] sm:mx-auto sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-5;
+    @apply mx-3 flex max-w-[1180px] flex-col gap-3 rounded-2xl border border-border/50 bg-background/[0.92] px-4 py-3.5 shadow-[0_32px_100px_-48px_rgb(0_0_0/0.45)] backdrop-blur-2xl ring-1 ring-black/[0.04] dark:border-white/[0.12] dark:bg-[hsl(228_28%_6%/0.92)] dark:shadow-[0_40px_120px_-50px_rgb(0_0_0/0.65)] dark:ring-white/[0.06] sm:mx-auto sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-6 sm:py-4;
   }
 }
 

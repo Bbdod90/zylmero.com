@@ -9,28 +9,28 @@ const BLOCKS = [
 ] as const;
 
 const fade = {
-  initial: { opacity: 0, y: 12 },
+  initial: { opacity: 0, y: 14 },
   whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: "-40px" },
-  transition: { duration: 0.24, ease: [0.22, 1, 0.36, 1] },
+  viewport: { once: true, margin: "-48px" },
+  transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] },
 };
 
 export function LandingSolutionSection() {
   return (
     <motion.section
       id="oplossing"
-      className="scroll-mt-28 border-t border-border/40 py-24 md:py-32 dark:border-white/[0.06]"
+      className="scroll-mt-28 border-t border-border/40 py-28 md:py-36 dark:border-white/[0.06]"
       {...fade}
     >
-      <div className="mx-auto max-w-[720px] px-4 md:px-8">
-        <h2 className="text-center text-balance text-3xl font-semibold tracking-tight text-foreground md:text-5xl md:leading-[1.1]">
+      <div className="mx-auto max-w-[1180px] px-4 sm:px-6 lg:px-8">
+        <h2 className="mx-auto max-w-[880px] text-center text-balance text-3xl font-semibold tracking-[-0.02em] text-foreground md:text-5xl md:leading-[1.08]">
           Zylmero pakt dit volledig voor je op
         </h2>
-        <ul className="mt-14 space-y-4">
+        <ul className="mx-auto mt-16 grid max-w-[960px] gap-4 md:grid-cols-3 md:gap-5">
           {BLOCKS.map((line) => (
             <li
               key={line}
-              className="rounded-2xl border border-border/50 bg-muted/20 px-6 py-5 text-lg font-semibold text-foreground dark:border-white/[0.08] md:text-xl"
+              className="cf-landing-pro-card flex min-h-[6.5rem] items-center px-6 py-6 text-[15px] font-semibold leading-snug tracking-tight text-foreground transition-transform duration-300 hover:-translate-y-0.5 md:min-h-[7rem] md:text-lg"
             >
               {line}
             </li>

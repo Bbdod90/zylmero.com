@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import dynamic from "next/dynamic";
-import { JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import { BRAND_NAME } from "@/lib/brand";
 import "@/styles/globals.css";
 
@@ -9,7 +9,7 @@ const Providers = dynamic(() => import("@/components/layout/providers"), {
 });
 
 /* Variabel font: geen vaste weight-array — voorkomt webpack/Safari issues met font-loader. */
-const sans = Plus_Jakarta_Sans({
+const sans = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
   display: "swap",
@@ -45,7 +45,7 @@ export default function RootLayout({
   return (
     <html lang="nl" className="scroll-smooth" suppressHydrationWarning>
       <body
-        className={`${sans.variable} ${mono.variable} zm-app-mesh min-h-dvh bg-background font-sans text-[15px] antialiased transition-colors duration-300 sm:text-[15.5px]`}
+        className={`${sans.variable} ${mono.variable} zm-app-mesh min-h-dvh bg-background font-sans text-[15px] antialiased transition-colors duration-300 sm:text-[15px]`}
       >
         <Providers>{children}</Providers>
       </body>

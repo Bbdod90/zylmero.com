@@ -10,32 +10,40 @@ const LINES = [
 ] as const;
 
 const fade = {
-  initial: { opacity: 0, y: 12 },
+  initial: { opacity: 0, y: 14 },
   whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: "-40px" },
-  transition: { duration: 0.24, ease: [0.22, 1, 0.36, 1] },
+  viewport: { once: true, margin: "-48px" },
+  transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] },
 };
 
 export function LandingOutcomesSection() {
   return (
     <motion.section
       id="resultaten"
-      className="scroll-mt-28 border-t border-border/40 py-24 md:py-32 dark:border-white/[0.06]"
+      className="scroll-mt-28 border-t border-border/40 py-28 md:py-36 dark:border-white/[0.06]"
       {...fade}
     >
-      <div className="mx-auto max-w-[720px] px-4 md:px-8">
-        <h2 className="text-center text-balance text-3xl font-semibold tracking-tight text-foreground md:text-5xl md:leading-[1.1]">
+      <div className="mx-auto max-w-[1180px] px-4 sm:px-6 lg:px-8">
+        <h2 className="text-center text-balance text-3xl font-semibold tracking-[-0.02em] text-foreground md:text-5xl md:leading-[1.08]">
           Wat dit je oplevert
         </h2>
-        <ul className="mt-14 space-y-3 text-center text-xl font-semibold text-foreground md:text-2xl">
+        <div className="mx-auto mt-16 grid max-w-[900px] gap-4 sm:grid-cols-2 sm:gap-5">
           {LINES.map((line) => (
-            <li key={line} className="border-b border-border/40 pb-3 last:border-0 dark:border-white/[0.08]">
+            <div
+              key={line}
+              className="cf-landing-pro-card flex items-center px-6 py-5 text-[15px] font-semibold text-foreground md:text-lg"
+            >
               {line}
-            </li>
+            </div>
           ))}
-        </ul>
-        <p className="mt-10 text-center text-2xl font-semibold tabular-nums text-primary md:text-3xl">+32% meer conversie</p>
-        <p className="mt-2 text-center text-sm text-muted-foreground">Indicatief — resultaat verschilt per branche.</p>
+        </div>
+        <div className="mx-auto mt-8 max-w-[900px]">
+          <div className="cf-landing-pro-card relative overflow-hidden px-8 py-10 text-center md:px-12 md:py-12">
+            <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">Indicatief</p>
+            <p className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-foreground md:text-4xl">+32% meer conversie</p>
+            <p className="mt-3 text-sm text-muted-foreground">Resultaat verschilt per branche en aanbod.</p>
+          </div>
+        </div>
       </div>
     </motion.section>
   );

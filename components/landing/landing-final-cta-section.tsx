@@ -5,23 +5,35 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 
 const fade = {
-  initial: { opacity: 0, y: 12 },
+  initial: { opacity: 0, y: 14 },
   whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: "-40px" },
-  transition: { duration: 0.24, ease: [0.22, 1, 0.36, 1] },
+  viewport: { once: true, margin: "-48px" },
+  transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] },
 };
 
 export function LandingFinalCtaSection() {
   return (
-    <motion.section className="border-t border-border/40 py-28 md:py-36 dark:border-white/[0.06]" {...fade} id="start">
-      <div className="mx-auto max-w-[640px] px-4 text-center md:px-8">
-        <h2 className="text-balance text-3xl font-semibold tracking-tight text-foreground md:text-5xl md:leading-[1.1]">
+    <motion.section
+      className="relative border-t border-border/40 py-32 md:py-40 dark:border-white/[0.06]"
+      {...fade}
+      id="start"
+    >
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_100%,hsl(var(--primary)/0.08),transparent_65%)] dark:bg-[radial-gradient(ellipse_65%_55%_at_50%_100%,hsl(var(--primary)/0.14),transparent_68%)]"
+        aria-hidden
+      />
+      <div className="relative mx-auto max-w-[640px] px-4 text-center sm:px-6">
+        <h2 className="text-balance text-3xl font-semibold tracking-[-0.02em] text-foreground md:text-5xl md:leading-[1.08]">
           Stop met klanten missen
         </h2>
-        <Button asChild size="lg" className="mt-10 h-14 rounded-xl px-10 text-base font-semibold md:h-16 md:text-lg">
+        <Button
+          asChild
+          size="lg"
+          className="mt-12 h-[3.25rem] rounded-full px-12 text-[15px] font-semibold shadow-md md:h-14 md:px-14 md:text-base"
+        >
           <Link href="/signup">Start gratis</Link>
         </Button>
-        <p className="mt-6 text-base font-medium text-muted-foreground md:text-lg">Binnen 5 minuten actief</p>
+        <p className="mt-7 font-mono text-sm font-medium text-muted-foreground md:text-[15px]">Binnen 5 minuten actief</p>
       </div>
     </motion.section>
   );

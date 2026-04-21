@@ -453,7 +453,7 @@ export function LandingInteractiveChat({
       className={cn(
         "relative overflow-hidden",
         premiumEmbed
-          ? "border-t border-border/40 bg-background py-12 md:py-16 dark:border-white/[0.06]"
+          ? "border-t border-border/40 bg-background py-16 md:py-24 dark:border-white/[0.06]"
           : cn(
               "border-b border-border/30 dark:border-white/[0.06]",
               showMarketingHeader ? "py-16 md:py-24" : "py-6 md:py-8",
@@ -467,7 +467,7 @@ export function LandingInteractiveChat({
           aria-hidden
         />
       ) : null}
-      <div className="relative mx-auto max-w-[1200px] px-4 md:px-8">
+      <div className={cn("relative mx-auto max-w-[1200px] px-4 md:px-8", premiumEmbed && "sm:px-6 lg:px-8")}>
         {showMarketingHeader ? (
           <div className="mx-auto max-w-2xl text-center">
             <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">Live demo</p>
@@ -489,16 +489,19 @@ export function LandingInteractiveChat({
           ) : null}
           <div
             className={cn(
-              "relative overflow-hidden rounded-2xl border bg-card text-foreground",
+              "relative overflow-hidden border bg-card text-foreground",
               premiumEmbed
-                ? "border-border/60 shadow-sm dark:border-white/[0.1]"
+                ? "cf-landing-pro-card rounded-[1.35rem] shadow-[var(--shadow-lg)] dark:shadow-[var(--shadow-lg)]"
                 : "rounded-[1.35rem] border-border/55 shadow-[0_34px_100px_-44px_rgb(0_0_0/0.72)] ring-1 ring-black/[0.05] dark:border-white/[0.11] dark:bg-[hsl(228_26%_8%/0.96)] dark:shadow-black/60 dark:ring-white/[0.06]",
             )}
           >
             <div
               className={cn(
-                "flex items-center gap-2 border-b px-3 py-3 sm:gap-3 sm:px-4",
-                "border-border/60 bg-muted/30 dark:border-white/[0.08] dark:bg-white/[0.03]",
+                "flex items-center gap-2 border-b px-3 py-3.5 sm:gap-3 sm:px-5",
+                "border-border/55 dark:border-white/[0.08]",
+                premiumEmbed
+                  ? "bg-muted/25 dark:bg-white/[0.03]"
+                  : "border-border/60 bg-muted/30 dark:bg-white/[0.03]",
                 !premiumEmbed && "bg-gradient-to-b from-muted/50 to-muted/15 dark:from-white/[0.06] dark:to-transparent",
               )}
             >
