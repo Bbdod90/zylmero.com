@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Building2, Car, Hammer, Scissors, Stethoscope, Wrench } from "lucide-react";
+import { Building2, Car, Hammer, MapPin, Scissors, Stethoscope, Wrench } from "lucide-react";
 
 const fade = {
   initial: { opacity: 0, y: 14 },
@@ -12,19 +12,19 @@ const fade = {
 
 const SEGMENTS = [
   {
-    title: "Zzp en eenmanszaak",
-    body: "Jij bent verkoper, planner én uitvoerder. Zylmero vangt aanvragen op en helpt de eerste reactie strak te houden.",
+    title: "Zzp’ers",
+    body: "Jij bent alles: vakman, planner, verkoper. Zylmero vangt aanvragen op zodat de eerste reactie niet afhangt van of je net onder de auto ligt.",
     Icon: Hammer,
   },
   {
-    title: "Klein team (2–8 mensen)",
-    body: "Geen aparte binnendienst nodig: één overzicht, duidelijke prioriteit, minder ruis tussen collega’s.",
+    title: "Kleine bedrijven",
+    body: "Te weinig handen voor te veel kanalen. Eén overzicht, duidelijke prioriteit — zonder extra persoon op de loonlijst.",
     Icon: Building2,
   },
   {
-    title: "Lokale dienstverlening",
-    body: "Van loodgieter tot salon: als aanvragen binnenrollen via mail, WhatsApp of je site — past het.",
-    Icon: Wrench,
+    title: "Lokale dienstverleners",
+    body: "Klanten in de buurt, korte lijnen, harde verwachting op snelheid. Als het via mail, WhatsApp of je site binnenkomt: dit past.",
+    Icon: MapPin,
   },
 ] as const;
 
@@ -45,9 +45,10 @@ export function LandingAudienceSection() {
       <div className="mx-auto max-w-[1180px] px-4 md:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <p className="cf-landing-eyebrow">Voor wie</p>
-          <h2 className="cf-landing-h2 mt-4">Gebouwd voor ondernemers die het zelf druk hebben</h2>
+          <h2 className="cf-landing-h2 mt-4">Voor wie dit bedoeld is</h2>
           <p className="mt-5 text-base leading-relaxed text-muted-foreground md:text-lg">
-            Geen enterprise-software. Wel grip op klanten die vandaag nog een antwoord verwachten.
+            Geen software voor multinationals. Wel voor ondernemers die aanvragen niet kunnen laten liggen — maar ook
+            niet 24/7 achter een scherm kunnen zitten.
           </p>
         </div>
 
@@ -65,7 +66,7 @@ export function LandingAudienceSection() {
 
         <div className="mx-auto mt-12 max-w-3xl rounded-2xl border border-border/40 bg-muted/15 px-6 py-6 dark:border-white/[0.08] dark:bg-white/[0.03] md:px-8 md:py-7">
           <p className="text-center text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-            Voorbeelden van branches
+            Branches waar dit vaak past
           </p>
           <ul className="mt-5 flex flex-wrap justify-center gap-2.5">
             {EXAMPLES.map(({ label, Icon }) => (
@@ -79,8 +80,7 @@ export function LandingAudienceSection() {
             ))}
           </ul>
           <p className="mt-5 text-center text-xs leading-relaxed text-muted-foreground">
-            Ook hoveniers, schoonmaak, schilders en andere lokale vakbedrijven — het gaat om aanvragen en snelheid, niet
-            om je sectorlabel.
+            Hoveniers, schoonmaak, schilders — overal waar snel antwoord geld oplevert.
           </p>
         </div>
       </div>

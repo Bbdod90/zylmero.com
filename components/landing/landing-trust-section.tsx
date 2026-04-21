@@ -13,19 +13,19 @@ const fade = {
 const PLACEHOLDERS = [
   {
     quote:
-      "Voorheen bleven WhatsApp en mail liggen als ik op locatie was. Nu krijgt de klant meteen een helder antwoord en zie ik zelf wat ik nog moet afmaken.",
+      "Ik sta de hele dag op locatie. Vroeger bleven mail en WhatsApp liggen. Nu ziet de klant meteen iets degelijks en ik zie zelf wat nog openstaat.",
     name: "R. de Vries",
-    role: "Installatiebedrijf · regio Utrecht",
+    role: "Installatie · Midden-Nederland",
   },
   {
     quote:
-      "Het gaat bij ons om volume en snelheid. Als we een uur later reageren, is de klant al verder. Dit houdt de druk eraf zonder extra mensen aan te nemen.",
+      "Bij ons telt elk uur. Te laat = weg. Dit haalt de druk van ‘nu meteen reageren’ zonder dat we iemand extra aannemen.",
     name: "M. Jansen",
     role: "Garage · Randstad",
   },
   {
     quote:
-      "Ik wil geen ingewikkeld systeem. Wel overzicht en rust in mijn inbox. Dat is precies wat we nu hebben.",
+      "Ik wil geen ingewikkeld systeem. Wel overzicht. Dit is rust in mijn inbox — dat was het doel.",
     name: "S. Öztürk",
     role: "Salon · Zuid-Nederland",
   },
@@ -40,10 +40,10 @@ export function LandingTrustSection() {
     >
       <div className="mx-auto max-w-[1180px] px-4 md:px-8">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="cf-landing-eyebrow">Ervaring</p>
-          <h2 className="cf-landing-h2 mt-4">Wat ondernemers zoeken: rust, snelheid, resultaat</h2>
+          <p className="cf-landing-eyebrow">Social proof</p>
+          <h2 className="cf-landing-h2 mt-4">Wat je straks van klanten hoort</h2>
           <p className="mt-5 text-base leading-relaxed text-muted-foreground md:text-lg">
-            Voorbeelden ter illustratie — straks vul je hier echte reviews of cases van klanten in.
+            Voorbeeldteksten — vervang ze door echte reviews zodra je die hebt.
           </p>
         </div>
 
@@ -64,8 +64,8 @@ export function LandingTrustSection() {
 
         <div className="mx-auto mt-12 flex max-w-2xl flex-wrap items-center justify-center gap-6 rounded-2xl border border-dashed border-border/50 px-6 py-5 text-center dark:border-white/[0.12]">
           <div>
-            <p className="text-2xl font-semibold tabular-nums text-foreground md:text-3xl">24/7</p>
-            <p className="mt-1 text-xs text-muted-foreground">Bereikbaar voor eerste antwoord</p>
+            <p className="text-2xl font-semibold tabular-nums text-foreground md:text-3xl">Direct</p>
+            <p className="mt-1 text-xs text-muted-foreground">Eerste reactie op aanvragen</p>
           </div>
           <div className="hidden h-10 w-px bg-border/60 sm:block dark:bg-white/[0.1]" aria-hidden />
           <div>
@@ -75,7 +75,7 @@ export function LandingTrustSection() {
           <div className="hidden h-10 w-px bg-border/60 sm:block dark:bg-white/[0.1]" aria-hidden />
           <div>
             <p className="text-2xl font-semibold tabular-nums text-foreground md:text-3xl">0</p>
-            <p className="mt-1 text-xs text-muted-foreground">Extra IT-beheer nodig</p>
+            <p className="mt-1 text-xs text-muted-foreground">Extra mensen op payroll</p>
           </div>
         </div>
       </div>

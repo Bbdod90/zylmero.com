@@ -29,49 +29,45 @@ import { BILLING_PLANS } from "@/lib/billing/plans";
 import { BRAND_CONTACT_EMAIL, BRAND_LOGO_MONOGRAM, BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
-const HERO_H1 = "Minder omzet verliezen aan trage reacties op klanten";
+const HERO_H1 = "Gemiste aanvragen kosten omzet";
 
 const HERO_SUB =
-  "Zylmero is je AI-assistent voor zzp en kleine bedrijven: hij reageert direct op aanvragen, vangt serieuze leads op en helpt je opvolgen — zodat jij meer haalt uit de klanten die je al binnenkrijgt via mail, WhatsApp en je website.";
+  "Zylmero reageert als eerste op mail, WhatsApp en aanvragen via je site. Serieuze leads blijven in beeld. Opvolging loopt door. Jij pakt af wat telt — zonder extra iemand op kantoor.";
 
 const HERO_BULLETS = [
-  "Eerste antwoord binnen seconden, in jouw toon",
-  "Eén overzicht: minder chaos tussen kanalen",
+  "Eerste reactie binnen seconden, in jouw woorden",
+  "Eén plek: geen zoekwerk meer tussen apps en inbox",
   "Meer afspraken uit dezelfde stroom aanvragen",
 ] as const;
 
 const FAQ_ITEMS = [
   {
     q: "Wat doet Zylmero precies?",
-    a: "Zylmero helpt je sneller en consistenter reageren op klantaanvragen, overzicht te houden in je inbox en opvolging strak te trekken. Het doel is simpel: minder gemiste kansen en meer concrete afspraken uit wat er al binnenkomt.",
+    a: "Het vangt klantaanvragen op en zorgt voor een snelle eerste reactie. Alles staat op één plek. Opvolging blijft lopen. Jij ziet wat spoed heeft en wat wacht — en pakt de verkoop zelf af.",
   },
   {
-    q: "Is dit voor mijn type bedrijf?",
-    a: "Vooral als je zzp bent, eenmanszaak voert of een klein team hebt — en aanvragen binnenkomen via mail, WhatsApp of je site. Denk aan lokale dienstverlening: techniek, mobiliteit, zorg, beauty, hoveniers, schoonmaak en vergelijkbare vakbedrijven.",
+    q: "Is dit geschikt voor mijn bedrijf?",
+    a: "Als je zzp bent, eenmanszaak voert of een klein team hebt en aanvragen binnenkomt via mail, WhatsApp of je site: ja. Lokale dienstverlening — techniek, garage, zorg, beauty, hoveniers, schoonmaak — past hier het best bij.",
+  },
+  {
+    q: "Reageert het automatisch?",
+    a: "Ja, op de manier die jij instelt: eerste antwoord en opvolging binnen jouw grenzen. Jij bepaalt toon en inhoud. Geen bericht zonder dat jij weet hoe het werkt.",
   },
   {
     q: "Moet ik technisch zijn?",
-    a: "Nee. Je start met een duidelijk stappenplan in je dashboard. Geen IT-project: vul je bedrijfsgegevens en kennis in, koppel je kanalen waar van toepassing, en je ziet meteen wat er speelt.",
-  },
-  {
-    q: "Reageert het automatisch op klanten?",
-    a: "Zylmero kan automatisch een eerste antwoord geven en opvolging ondersteunen — binnen de kaders die jij instelt. Jij blijft eigenaar: wat eruit gaat, past bij jouw zaak en grenzen.",
-  },
-  {
-    q: "Kan ik zelf bepalen hoe het werkt?",
-    a: "Ja. Toon, taal, kennis en automatisering stel je in. Zylmero voert uit wat jij wilt laten lopen; jij houdt controle op de inhoud en het moment waarop jij persoonlijk overneemt.",
+    a: "Nee. Je vult je zaak in, koppelt waar nodig, en je ziet je aanvragen. Geen IT-traject.",
   },
   {
     q: "Bespaart dit echt tijd?",
-    a: "Je hoeft niet meer overal tegelijk te kijken of hetzelfde te typen. Wat je wint, is snelheid en rust: minder zoekwerk, minder vergeten berichten, minder klanten die wegzakken omdat niemand op tijd antwoordde.",
+    a: "Ja. Minder app-wisselen, minder dubbel typen, minder dingen die blijven liggen. Dat is tijd die je nu kwijt bent aan ruis rond klanten.",
   },
   {
-    q: "Waarom zou ik dit nemen als ik zelf ook kan reageren?",
-    a: "Omdat jij niet overal tegelijk kunt zijn — en klanten niet wachten. Zylmero vangt piekmomenten op: avonden, weekenden, drukke dagen op locatie. Jij reageert zelf wanneer het kan; de rest loopt niet vast.",
+    q: "Waarom zou ik dit gebruiken in plaats van zelf te reageren?",
+    a: "Omdat jij niet overal tegelijk kunt zijn. Klanten wachten niet tot je klaar bent op de klus. Zylmero vult de gaten: avond, weekend, drukte op locatie. Jij blijft baas; het systeem vangt de piek op.",
   },
   {
-    q: "Kan ik maandelijks stoppen?",
-    a: "Ja. Betaalde plannen zijn maandelijks opzegbaar. Controleer bij start wel je bevestiging en voorwaarden van je hostingpartij — dat hoort netjes in je mailbox.",
+    q: "Kan ik stoppen?",
+    a: "Ja. Betaalde plannen zijn maandelijks opzegbaar. Check je bevestigingsmail bij start.",
   },
 ] as const;
 
@@ -85,26 +81,26 @@ const fadeUp = {
 const HOW_STEPS = [
   {
     step: "1",
-    title: "Aanvraag komt binnen",
-    body: "Via je website, e-mail of WhatsApp — alles landt waar jij het verwacht.",
+    title: "Klant stuurt een aanvraag",
+    body: "Mail, WhatsApp of je site — het komt bij jou binnen.",
     Icon: Inbox,
   },
   {
     step: "2",
-    title: "Meteen een strak eerste antwoord",
-    body: "Duidelijk en professioneel — ook als jij op de klus staat of onderweg bent.",
+    title: "Zylmero reageert direct",
+    body: "Strak, duidelijk, in jouw stijl. Ook als jij niet bij de telefoon zit.",
     Icon: MessageCircle,
   },
   {
     step: "3",
-    title: "Opvolging die blijft lopen",
-    body: "Serieuze leads verdwijnen niet in een mapje. Jij ziet wat wacht en wat spoed heeft.",
+    title: "De lead wordt opgevolgd",
+    body: "Wat serieus is, blijft in beeld. Niets verdwijnt tussen de ruis.",
     Icon: ListChecks,
   },
   {
     step: "4",
-    title: "Jij sluit de deal",
-    body: "Naar offerte of afspraak: jij pakt het persoonlijk op waar het telt.",
+    title: "Jij krijgt serieuze klanten",
+    body: "Offerte of afspraak: jij sluit af waar het geld wordt verdiend.",
     Icon: CalendarCheck,
   },
 ] as const;
@@ -131,7 +127,7 @@ export function ZylmeroLanding() {
           <motion.div {...fadeUp}>
             <div className="inline-flex items-center gap-2 rounded-full border border-border/50 bg-muted/30 px-3 py-1.5 text-[0.6875rem] font-medium tracking-tight text-foreground dark:border-white/[0.1] dark:bg-white/[0.04]">
               <span className="size-1.5 rounded-full bg-primary shadow-[0_0_0_3px_hsl(var(--primary)/0.25)]" aria-hidden />
-              Voor zzp en kleine bedrijven
+              Zzp en kleine bedrijven
             </div>
             <h1 className="mt-7 text-balance text-[2rem] font-semibold leading-[1.08] tracking-tight text-foreground sm:text-4xl md:text-5xl lg:text-[3.25rem] lg:leading-[1.05] dark:bg-gradient-to-b dark:from-white dark:to-zinc-400 dark:bg-clip-text dark:text-transparent">
               {HERO_H1}
@@ -173,7 +169,7 @@ export function ZylmeroLanding() {
               </AnonymousDemoForm>
             </div>
             <p className="mt-8 max-w-md text-sm leading-relaxed text-muted-foreground">
-              Geen creditcard om te beginnen · maandelijks opzegbaar · binnen enkele minuten inzicht in je aanvragen
+              Geen creditcard om te starten · opzeggen wanneer je wilt · binnen minuten aan de slag
             </p>
           </motion.div>
           <div className="relative mt-16 lg:mt-0">
@@ -185,7 +181,7 @@ export function ZylmeroLanding() {
               <HeroInboxMock />
             </div>
             <p className="mt-4 text-center text-xs text-muted-foreground lg:text-left">
-              Voorbeeld van je inbox — straks met jouw echte aanvragen en jouw huisstijl.
+              Voorbeeld — straks met jouw echte aanvragen.
             </p>
           </div>
         </div>
@@ -222,10 +218,9 @@ export function ZylmeroLanding() {
         <div className="mx-auto max-w-[1180px] px-4 md:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <p className="cf-landing-eyebrow">Hoe het werkt</p>
-            <h2 className="cf-landing-h2 mt-4">Vier stappen. Geen handleiding van dertig pagina’s.</h2>
+            <h2 className="cf-landing-h2 mt-4">Zo loopt het bij jou</h2>
             <p className="mt-5 text-base leading-relaxed text-muted-foreground md:text-lg">
-              Geen technisch verhaal: dit is het pad van aanvraag tot afspraak — zoals je het zelf ook zou uitleggen aan
-              een collega.
+              Van binnenkomst tot afspraak. Korte zinnen. Geen gedoe.
             </p>
           </div>
 
@@ -270,10 +265,9 @@ export function ZylmeroLanding() {
 
           <div className="mx-auto mt-16 max-w-3xl text-center">
             <p className="cf-landing-eyebrow">Tarieven</p>
-            <h2 className="cf-landing-h2 mt-4">Heldere prijzen voor kleine bedrijven</h2>
+            <h2 className="cf-landing-h2 mt-4">Wat het kost</h2>
             <p className="mt-5 text-base leading-relaxed text-muted-foreground md:text-lg">
-              Start gratis. Als het bevalt, kies je een vast maandbedrag — zonder verborgen kosten en zonder
-              enterprise-contracten.
+              Start gratis. Werkt het? Dan kies je een vast bedrag per maand. Geen verborgen kosten.
             </p>
           </div>
 
@@ -321,7 +315,7 @@ export function ZylmeroLanding() {
           </div>
 
           <p className="mx-auto mt-14 max-w-lg text-center text-sm leading-relaxed text-muted-foreground">
-            Liever eerst proberen? Start gratis — upgrade pas als je merkt dat het je tijd en omzet oplevert.
+            Eerst proberen, daarna beslissen. Geen dwang.
           </p>
         </div>
       </motion.section>
@@ -336,10 +330,10 @@ export function ZylmeroLanding() {
       >
         <div className="mx-auto max-w-3xl px-4 md:px-8">
           <div className="text-center">
-            <p className="cf-landing-eyebrow">Veelgestelde vragen</p>
-            <h2 className="cf-landing-h2 mt-4">Antwoorden vóór je ze hoeft te mailen</h2>
+            <p className="cf-landing-eyebrow">Praktisch</p>
+            <h2 className="cf-landing-h2 mt-4">Veelgestelde vragen</h2>
             <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-muted-foreground">
-              Geen verkooppraatje — gewoon helderheid over wat je koopt en wat je ermee kunt.
+              Kort antwoord. Geen omweg.
             </p>
           </div>
           <div className="mt-12 space-y-3">
@@ -373,7 +367,7 @@ export function ZylmeroLanding() {
               <span className="font-semibold text-foreground">{BRAND_NAME}</span>
             </div>
             <p className="max-w-xs text-center text-xs leading-relaxed text-muted-foreground md:text-left">
-              AI-assistent voor zzp en kleine bedrijven — sneller op aanvragen, minder omzet laten liggen.
+              Sneller op aanvragen. Minder klanten missen. Voor zzp en kleine bedrijven.
             </p>
           </div>
           <nav className="flex flex-wrap justify-center gap-x-8 gap-y-2 text-sm font-medium text-foreground">

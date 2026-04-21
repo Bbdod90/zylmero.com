@@ -11,7 +11,7 @@ export function StickyConversionBar() {
       <div className="cf-sticky-dock">
         <div className="cf-sticky-dock-inner">
           <p className="text-center text-sm leading-snug text-muted-foreground sm:max-w-md sm:text-left">
-            Sneller op aanvragen, minder omzet laten liggen — start gratis of bekijk eerst hoe het werkt.
+            Minder gemiste aanvragen. Start gratis of bekijk eerst hoe het werkt.
           </p>
           <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:justify-end">
             <Button size="lg" className="h-11 w-full rounded-xl text-sm font-semibold sm:min-w-[168px]" asChild>

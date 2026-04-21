@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CalendarClock, Inbox, MessageCircle, Route } from "lucide-react";
+import { CalendarClock, Filter, Inbox, MessageCircle } from "lucide-react";
 
 const fade = {
   initial: { opacity: 0, y: 14 },
@@ -12,23 +12,23 @@ const fade = {
 
 const BLOCKS = [
   {
-    title: "Meteen een goed eerste antwoord",
-    body: "Klanten horen snel iets degelijks — ook als jij op locatie bent of je telefoon niet ziet.",
+    title: "Reageert direct",
+    body: "Eerste antwoord gaat eruit zodra de aanvraag binnenkomt. Strak. Professioneel. In jouw woorden.",
     Icon: MessageCircle,
   },
   {
-    title: "Alles op één rustige plek",
-    body: "Mail, WhatsApp en je site: je ziet wat binnenkomt, wat wacht en wat spoed heeft.",
+    title: "Vangt aanvragen op",
+    body: "Mail, WhatsApp, site: alles op één plek. Geen gezoek meer tussen apps.",
     Icon: Inbox,
   },
   {
-    title: "Opvolging die niet stilvalt",
-    body: "Serieuze leads blijven in beeld. Jij bepaalt waar het naartoe gaat — richting offerte of afspraak.",
-    Icon: Route,
+    title: "Houdt serieuze klanten vast",
+    body: "Wat telt, blijft bovenaan. De rest verdwijnt niet in een mapje ergens onderaan.",
+    Icon: Filter,
   },
   {
-    title: "Meer uit dezelfde aanvragen",
-    body: "Minder zoeken, minder vergeten, minder gemiste kansen. Dat vertaalt zich in concrete afspraken.",
+    title: "Helpt opvolgen",
+    body: "Niets blijft stilletjes liggen. Jij ziet wat wacht — en pakt verkopen af waar het moet.",
     Icon: CalendarClock,
   },
 ] as const;
@@ -42,12 +42,11 @@ export function LandingSolutionSection() {
     >
       <div className="mx-auto max-w-[1180px] px-4 md:px-8">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="cf-landing-eyebrow">De aanpak</p>
-          <h2 className="cf-landing-h2 mt-4">Zylmero vangt aanvragen op en houdt ze in beweging</h2>
+          <p className="cf-landing-eyebrow">De oplossing</p>
+          <h2 className="cf-landing-h2 mt-4">Zylmero lost dat op</h2>
           <p className="mt-5 text-base leading-relaxed text-muted-foreground md:text-lg">
-            Een AI-assistent voor zzp en kleine bedrijven: hij reageert direct op klantaanvragen, helpt serieuze leads
-            opvolgen en haalt meer uit de aanvragen die je al binnenkrijgt — zonder dat jij overal achteraan hoeft te
-            zitten.
+            Minder gemiste aanvragen. Sneller contact. Betere opvolging. Meer omzet uit wat er al binnenkomt — zonder
+            dat jij er een nachtbaan bij neemt.
           </p>
         </div>
         <ul className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
@@ -62,8 +61,7 @@ export function LandingSolutionSection() {
           ))}
         </ul>
         <p className="mx-auto mt-10 max-w-2xl text-center text-xs leading-relaxed text-muted-foreground">
-          Jij houdt de regie: toon, kennis en grenzen stel je zelf in. Zylmero voert het eerste contact strak uit zodat
-          jij kunt focussen op het werk dat je factureert.
+          Jij stelt grenzen en toon in. Zylmero voert uit wat jij wilt laten lopen.
         </p>
       </div>
     </motion.section>

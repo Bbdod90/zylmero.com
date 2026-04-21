@@ -1,28 +1,33 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Clock, Inbox, MessageSquareX, UserX } from "lucide-react";
+import { Clock, Inbox, MessageSquareX, Split, UserX } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const ITEMS = [
   {
-    title: "Te laat reageren",
-    body: "De klant stapt al over naar iemand anders terwijl jij nog op de klus zit of onderweg bent.",
+    title: "Je reageert te laat",
+    body: "De klant is al verder terwijl jij nog op de klus staat of rijdt.",
     Icon: Clock,
   },
   {
-    title: "Chaos tussen kanalen",
-    body: "WhatsApp hier, mail daar, een formulier ergens anders — geen enkel overzicht van wat echt telt.",
-    Icon: Inbox,
-  },
-  {
-    title: "Opvolging die blijft liggen",
-    body: "Goede leads verdwijnen in de ruis. Geen tijd betekent geen reactie — en dat kost omzet.",
+    title: "Je vergeet opvolging",
+    body: "Vandaag druk, morgen weer vol. Ondertussen stopt de klant met wachten.",
     Icon: MessageSquareX,
   },
   {
-    title: "Altijd zelf beschikbaar moeten zijn",
-    body: "Je kunt niet 24/7 klaarstaan. Toch verwacht de markt een antwoord alsof je een callcenter hebt.",
+    title: "Aanvragen verdwijnen tussen WhatsApp en mail",
+    body: "Alles op losse plekken. Geen overzicht. Geen prioriteit.",
+    Icon: Split,
+  },
+  {
+    title: "Niets voelt urgent — tot het te laat is",
+    body: "Wat geld had opgeleverd, zakt weg zonder dat je het op de bank ziet.",
+    Icon: Inbox,
+  },
+  {
+    title: "Jij moet overal tegelijk zijn",
+    body: "Er is geen tweede persoon die meeleest. Toch verwacht de klant een snel antwoord.",
     Icon: UserX,
   },
 ] as const;
@@ -47,15 +52,15 @@ export function LandingPainCostSection({ className }: { className?: string }) {
       <div className="relative mx-auto max-w-[1180px] px-4 md:px-8">
         <motion.div className="mx-auto max-w-3xl text-center" {...fade}>
           <p className="cf-landing-eyebrow">Het probleem</p>
-          <h2 className="cf-landing-h2 mt-4">Omzet die je niet ziet verdwijnen</h2>
+          <h2 className="cf-landing-h2 mt-4">Zo verlies je klanten zonder het te merken</h2>
           <p className="mt-5 text-base leading-relaxed text-muted-foreground md:text-lg">
-            Geen dramatiek — wel rekenwerk: als aanvragen blijven liggen of traag worden opgevolgd, laat je geld liggen.
-            Bij kleine bedrijven merk je dat direct in je agenda.
+            Geen moraalpredikant: dit is hoe het bij veel zzp’ers en kleine bedrijven misgaat. Herken je dit, dan lekt
+            er omzet.
           </p>
         </motion.div>
 
         <motion.ul
-          className="mt-14 grid gap-4 sm:grid-cols-2"
+          className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
           {...fade}
           transition={{ ...fade.transition, delay: 0.06 }}
         >

@@ -22,8 +22,8 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: `${BRAND_NAME} — sneller op klantaanvragen, minder omzet laten liggen`,
-  description: `AI-assistent voor zzp en kleine bedrijven: direct reageren op aanvragen, leads opvolgen en meer halen uit mail, WhatsApp en je website — zonder extra personeel.`,
+  title: `${BRAND_NAME} — gemiste aanvragen kosten omzet`,
+  description: `Voor zzp en kleine bedrijven: snel reageren op mail, WhatsApp en site-aanvragen, serieuze leads vasthouden en opvolgen — zonder extra personeel op kantoor.`,
 };
 
 export const viewport: Viewport = {

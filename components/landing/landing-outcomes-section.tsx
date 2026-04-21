@@ -12,28 +12,29 @@ const fade = {
 
 const STATS = [
   {
-    label: "Gemiste kansen",
+    label: "Kosten van gemiste kansen",
     value: "€400 – €2.000+",
-    sub: "per week bij slechts twee gemiste aanvragen — afhankelijk van je orderwaarde",
+    sub: "per week bij een paar gemiste aanvragen — afhankelijk van je orderwaarde",
   },
   {
-    label: "Effect van traagheid",
+    label: "Prijs van traagheid",
     value: "10 – 30%",
-    sub: "minder kans op een afspraak dan bij een snelle, duidelijke reactie",
+    sub: "minder kans op een afspraak dan bij een snelle reactie",
   },
   {
     label: "Terugverdiend",
     value: "1 extra klus",
-    sub: "betaalt je abonnement vaak al ruimschoots terug",
+    sub: "betaalt je tooling vaak al terug",
   },
 ] as const;
 
 const BENEFITS = [
-  "Minder klanten die stilletjes afhaken",
-  "Eerste reactie binnen seconden, ook als jij niet kunt",
-  "Rust in je inbox: wat spoed heeft, staat vooraan",
-  "Betere opvolging zonder extra uren te plannen",
-  "Meer omzet uit dezelfde stroom aanvragen",
+  "Minder gemiste klanten",
+  "Sneller contact met elke aanvraag",
+  "Minder stress in je hoofd",
+  "Meer overzicht in je inbox",
+  "Betere opvolging zonder extra uren",
+  "Meer omzet uit bestaande aanvragen",
 ] as const;
 
 export function LandingOutcomesSection() {
@@ -47,12 +48,10 @@ export function LandingOutcomesSection() {
       <div className="relative mx-auto max-w-[1180px] px-4 md:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <p className="cf-landing-eyebrow">Resultaat</p>
-          <h2 className="cf-landing-h2 mt-4">
-            Minder omzet laten liggen — meetbaar in je agenda
-          </h2>
+          <h2 className="cf-landing-h2 mt-4">Wat je er concreet voor terugkrijgt</h2>
           <p className="mt-5 text-base leading-relaxed text-muted-foreground md:text-lg">
-            Het gaat niet om “meer tools”. Het gaat om sneller reageren, strakker opvolgen en serieuze aanvragen niet
-            verliezen aan een concurrent die wél op tijd antwoordt.
+            Geen beloftes van “groei hacks”. Wel minder lekken aan de voorkant van je zaak — waar klanten beslissen of ze
+            bij jou blijven.
           </p>
         </div>
 
@@ -71,7 +70,7 @@ export function LandingOutcomesSection() {
         </div>
 
         <div className="mx-auto mt-16 max-w-3xl">
-          <p className="text-center text-sm font-medium text-foreground">Concreet merk je</p>
+          <p className="text-center text-sm font-medium text-foreground">Hard voordeel</p>
           <ul className="mt-6 grid gap-3 sm:grid-cols-2">
             {BENEFITS.map((label) => (
               <li
@@ -86,7 +85,7 @@ export function LandingOutcomesSection() {
             ))}
           </ul>
           <p className="mt-8 text-center text-xs leading-relaxed text-muted-foreground">
-            Indicaties op basis van gangbare conversie-inzichten; jouw situatie verschilt per branche en prijsniveau.
+            Indicaties; jouw cijfers verschillen per branche en prijs.
           </p>
         </div>
       </div>

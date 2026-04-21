@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { AnonymousDemoForm } from "@/components/landing/demo-role-context";
 import { Button } from "@/components/ui/button";
-import { BRAND_NAME } from "@/lib/brand";
 
 const fade = {
   initial: { opacity: 0, y: 14 },
@@ -22,11 +21,11 @@ export function LandingFinalCtaSection() {
         aria-hidden
       />
       <div className="relative mx-auto max-w-[720px] px-4 text-center md:px-8">
-        <p className="cf-landing-eyebrow">Volgende stap</p>
-        <h2 className="cf-landing-h2 mt-4">Klaar om minder aanvragen te laten liggen?</h2>
+        <p className="cf-landing-eyebrow">Start</p>
+        <h2 className="cf-landing-h2 mt-4">Stop met klanten verliezen aan stilte</h2>
         <p className="mx-auto mt-6 max-w-lg text-base leading-relaxed text-muted-foreground">
-          {BRAND_NAME} is er voor zzp en kleine bedrijven die sneller willen reageren zonder extra personeel. Start gratis,
-          bekijk je dashboard — pas daarna beslis je of je wilt uitbreiden.
+          Sneller reageren. Strakker opvolgen. Meer uit elke aanvraag. Start gratis — geen creditcard. Zie binnen minuten
+          hoe het voelt.
         </p>
         <div className="mt-10 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
           <Button asChild size="lg" className="h-12 rounded-xl px-8 text-base font-semibold sm:h-14">
@@ -45,7 +44,7 @@ export function LandingFinalCtaSection() {
           </AnonymousDemoForm>
         </div>
         <p className="mx-auto mt-8 max-w-md text-xs leading-relaxed text-muted-foreground">
-          Geen creditcard verplicht om te beginnen · op elk moment opzegbaar · support in begrijpelijke taal
+          Opzeggen wanneer je wilt · geen kleine-letter circus · gewoon werken
         </p>
       </div>
     </motion.section>
