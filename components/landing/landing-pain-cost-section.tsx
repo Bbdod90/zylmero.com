@@ -1,78 +1,50 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Clock, Inbox, MessageSquareX, Split, UserX } from "lucide-react";
+import { Inbox, MessageSquareX, Timer, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const ITEMS = [
-  {
-    title: "Je reageert te laat",
-    body: "De klant is al verder terwijl jij nog op de klus staat of rijdt.",
-    Icon: Clock,
-  },
-  {
-    title: "Je vergeet opvolging",
-    body: "Vandaag druk, morgen weer vol. Ondertussen stopt de klant met wachten.",
-    Icon: MessageSquareX,
-  },
-  {
-    title: "Aanvragen verdwijnen tussen WhatsApp en mail",
-    body: "Alles op losse plekken. Geen overzicht. Geen prioriteit.",
-    Icon: Split,
-  },
-  {
-    title: "Niets voelt urgent — tot het te laat is",
-    body: "Wat geld had opgeleverd, zakt weg zonder dat je het op de bank ziet.",
-    Icon: Inbox,
-  },
-  {
-    title: "Jij moet overal tegelijk zijn",
-    body: "Er is geen tweede persoon die meeleest. Toch verwacht de klant een snel antwoord.",
-    Icon: UserX,
-  },
+  { title: "Te laat reageren", body: "Klant weg.", Icon: Timer },
+  { title: "Geen opvolging", body: "Klant weg.", Icon: MessageSquareX },
+  { title: "Alles verspreid", body: "Chaos.", Icon: Inbox },
+  { title: "Jij doet alles zelf", body: "Geen buffer.", Icon: User },
 ] as const;
 
 const fade = {
-  initial: { opacity: 0, y: 16 },
+  initial: { opacity: 0, y: 12 },
   whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: "-60px" },
-  transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] },
+  viewport: { once: true, margin: "-40px" },
+  transition: { duration: 0.24, ease: [0.22, 1, 0.36, 1] },
 };
 
 export function LandingPainCostSection({ className }: { className?: string }) {
   return (
     <section
       id="probleem"
-      className={cn(
-        "relative overflow-hidden border-b border-border/30 py-20 md:py-28 dark:border-white/[0.06]",
-        className,
-      )}
+      className={cn("border-b border-border/30 py-20 md:py-28 dark:border-white/[0.06]", className)}
     >
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[min(380px,55%)] bg-[radial-gradient(ellipse_at_50%_0%,hsl(var(--primary)/0.06),transparent_70%)] dark:bg-[radial-gradient(ellipse_at_50%_0%,hsl(var(--primary)/0.1),transparent_72%)]" aria-hidden />
-      <div className="relative mx-auto max-w-[1180px] px-4 md:px-8">
-        <motion.div className="mx-auto max-w-3xl text-center" {...fade}>
-          <p className="cf-landing-eyebrow">Het probleem</p>
-          <h2 className="cf-landing-h2 mt-4">Zo verlies je klanten zonder het te merken</h2>
-          <p className="mt-5 text-base leading-relaxed text-muted-foreground md:text-lg">
-            Geen moraalpredikant: dit is hoe het bij veel zzp’ers en kleine bedrijven misgaat. Herken je dit, dan lekt
-            er omzet.
-          </p>
+      <div className="mx-auto max-w-[900px] px-4 md:px-8">
+        <motion.div className="text-center" {...fade}>
+          <h2 className="text-balance text-3xl font-semibold tracking-tight text-foreground md:text-5xl md:leading-tight">
+            Hier verlies je geld
+          </h2>
         </motion.div>
-
         <motion.ul
-          className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          className="mx-auto mt-14 grid max-w-3xl gap-4 sm:grid-cols-2"
           {...fade}
-          transition={{ ...fade.transition, delay: 0.06 }}
+          transition={{ ...fade.transition, delay: 0.04 }}
         >
           {ITEMS.map(({ title, body, Icon }) => (
-            <li key={title} className="cf-landing-pro-card flex gap-4 p-7 md:gap-5 md:p-8">
-              <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/[0.1] text-primary ring-1 ring-primary/15">
-                <Icon className="size-5" strokeWidth={1.75} aria-hidden />
+            <li
+              key={title}
+              className="flex items-center justify-between gap-4 rounded-2xl border border-border/40 bg-card/50 px-5 py-5 dark:border-white/[0.08]"
+            >
+              <div className="flex min-w-0 items-center gap-3">
+                <Icon className="size-5 shrink-0 text-primary" strokeWidth={1.75} aria-hidden />
+                <span className="text-base font-semibold text-foreground md:text-lg">{title}</span>
               </div>
-              <div className="min-w-0">
-                <h3 className="text-lg font-semibold leading-snug text-foreground">{title}</h3>
-                <p className="mt-2 text-[0.9375rem] leading-relaxed text-muted-foreground">{body}</p>
-              </div>
+              <span className="shrink-0 text-sm font-medium text-muted-foreground">{body}</span>
             </li>
           ))}
         </motion.ul>

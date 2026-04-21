@@ -1,37 +1,21 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CalendarClock, Filter, Inbox, MessageCircle } from "lucide-react";
+import { Check } from "lucide-react";
+
+const BULLETS = [
+  "Reageert direct",
+  "Houdt gesprekken gaande",
+  "Filtert serieuze klanten",
+  "Jij pakt alleen de deals",
+] as const;
 
 const fade = {
-  initial: { opacity: 0, y: 14 },
+  initial: { opacity: 0, y: 12 },
   whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: "-50px" },
-  transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] },
+  viewport: { once: true, margin: "-40px" },
+  transition: { duration: 0.24, ease: [0.22, 1, 0.36, 1] },
 };
-
-const BLOCKS = [
-  {
-    title: "Reageert direct",
-    body: "Eerste antwoord gaat eruit zodra de aanvraag binnenkomt. Strak. Professioneel. In jouw woorden.",
-    Icon: MessageCircle,
-  },
-  {
-    title: "Vangt aanvragen op",
-    body: "Mail, WhatsApp, site: alles op één plek. Geen gezoek meer tussen apps.",
-    Icon: Inbox,
-  },
-  {
-    title: "Houdt serieuze klanten vast",
-    body: "Wat telt, blijft bovenaan. De rest verdwijnt niet in een mapje ergens onderaan.",
-    Icon: Filter,
-  },
-  {
-    title: "Helpt opvolgen",
-    body: "Niets blijft stilletjes liggen. Jij ziet wat wacht — en pakt verkopen af waar het moet.",
-    Icon: CalendarClock,
-  },
-] as const;
 
 export function LandingSolutionSection() {
   return (
@@ -40,29 +24,23 @@ export function LandingSolutionSection() {
       className="scroll-mt-28 border-b border-border/30 py-20 md:py-28 dark:border-white/[0.06]"
       {...fade}
     >
-      <div className="mx-auto max-w-[1180px] px-4 md:px-8">
-        <div className="mx-auto max-w-3xl text-center">
-          <p className="cf-landing-eyebrow">De oplossing</p>
-          <h2 className="cf-landing-h2 mt-4">Zylmero lost dat op</h2>
-          <p className="mt-5 text-base leading-relaxed text-muted-foreground md:text-lg">
-            Minder gemiste aanvragen. Sneller contact. Betere opvolging. Meer omzet uit wat er al binnenkomt — zonder
-            dat jij er een nachtbaan bij neemt.
-          </p>
-        </div>
-        <ul className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
-          {BLOCKS.map(({ title, body, Icon }) => (
-            <li key={title} className="cf-landing-pro-card p-7 md:p-8">
-              <div className="flex size-11 items-center justify-center rounded-xl bg-primary/[0.1] text-primary ring-1 ring-primary/15">
-                <Icon className="size-5" strokeWidth={1.75} aria-hidden />
-              </div>
-              <h3 className="mt-6 text-base font-semibold leading-snug text-foreground md:text-lg">{title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground md:text-[0.9375rem]">{body}</p>
+      <div className="mx-auto max-w-[640px] px-4 md:px-8">
+        <h2 className="text-center text-balance text-3xl font-semibold tracking-tight text-foreground md:text-5xl md:leading-tight">
+          Dit pakt Zylmero voor je op
+        </h2>
+        <ul className="mt-14 space-y-4">
+          {BULLETS.map((line) => (
+            <li
+              key={line}
+              className="flex items-center gap-4 rounded-2xl border border-border/40 bg-muted/20 px-5 py-4 text-lg font-semibold text-foreground dark:border-white/[0.08] md:text-xl"
+            >
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                <Check className="size-4" strokeWidth={2.5} aria-hidden />
+              </span>
+              {line}
             </li>
           ))}
         </ul>
-        <p className="mx-auto mt-10 max-w-2xl text-center text-xs leading-relaxed text-muted-foreground">
-          Jij stelt grenzen en toon in. Zylmero voert uit wat jij wilt laten lopen.
-        </p>
       </div>
     </motion.section>
   );

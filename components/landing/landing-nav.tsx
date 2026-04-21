@@ -9,11 +9,8 @@ import { BRAND_LOGO_MONOGRAM, BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
-  { href: "#probleem", label: "Probleem" },
-  { href: "#oplossing", label: "Oplossing" },
-  { href: "#hoe-het-werkt", label: "Hoe" },
-  { href: "#resultaat", label: "Resultaat" },
   { href: "#demo", label: "Demo" },
+  { href: "#probleem", label: "Probleem" },
   { href: "#prijzen", label: "Prijzen" },
   { href: "#faq", label: "FAQ" },
 ] as const;
@@ -33,45 +30,37 @@ export function LandingNav() {
       className={cn(
         "sticky top-0 z-50 border-b transition-[background-color,box-shadow,backdrop-filter] duration-300",
         scrolled
-          ? "border-border/50 bg-background/[0.96] shadow-[0_1px_0_0_hsl(var(--border)/0.5)] backdrop-blur-xl dark:border-white/[0.08] dark:bg-[hsl(228_32%_4%/0.94)]"
-          : "border-transparent bg-background/85 backdrop-blur-md dark:bg-background/[0.82]",
+          ? "border-border/50 bg-background/[0.96] shadow-sm backdrop-blur-xl dark:border-white/[0.08] dark:bg-[hsl(228_32%_4%/0.94)]"
+          : "border-transparent bg-background/90 backdrop-blur-md dark:bg-background/[0.85]",
       )}
     >
-      <div className="mx-auto flex h-14 max-w-[1200px] items-center justify-between gap-2 px-4 md:h-[3.75rem] md:gap-4 md:px-8">
-        <Link href="/" className="flex min-w-0 shrink-0 items-center gap-2.5 text-foreground">
-          <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-xs font-semibold text-foreground ring-1 ring-primary/20">
+      <div className="mx-auto flex h-14 max-w-[1200px] items-center justify-between gap-2 px-4 md:h-16 md:px-8">
+        <Link href="/" className="flex min-w-0 shrink-0 items-center gap-2 text-foreground">
+          <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-xs font-semibold ring-1 ring-primary/20">
             {BRAND_LOGO_MONOGRAM}
           </div>
-          <span className="truncate text-[0.9375rem] font-semibold tracking-tight">{BRAND_NAME}</span>
+          <span className="truncate font-semibold tracking-tight">{BRAND_NAME}</span>
         </Link>
-        <nav className="hidden items-center gap-0.5 xl:flex">
+        <nav className="hidden items-center gap-1 md:flex">
           {LINKS.map((l) => (
             <a
               key={l.href}
               href={l.href}
-              className="rounded-lg px-2.5 py-2 text-[0.8125rem] font-medium tracking-tight text-foreground transition-colors hover:bg-muted/70 hover:text-foreground lg:px-3"
+              className="rounded-lg px-3 py-2 text-sm font-medium text-foreground hover:bg-muted/60"
             >
               {l.label}
             </a>
           ))}
         </nav>
-        <div className="flex min-w-0 shrink-0 items-center justify-end gap-1 sm:gap-1.5 md:gap-2">
+        <div className="flex shrink-0 items-center gap-1.5">
           <ThemeToggle />
           <AnonymousDemoForm>
-            <Button type="submit" size="sm" variant="outline" className="hidden rounded-lg px-2.5 text-[0.7rem] sm:inline-flex sm:text-[0.8125rem]">
-              Hoe het werkt
+            <Button type="submit" size="sm" variant="outline" className="rounded-lg text-xs font-semibold sm:text-sm">
+              Demo
             </Button>
           </AnonymousDemoForm>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="hidden rounded-lg px-3 text-[0.8125rem] font-medium text-foreground hover:bg-muted/70 hover:text-foreground md:inline-flex"
-            asChild
-          >
-            <Link href="/login">Inloggen</Link>
-          </Button>
-          <Button size="sm" className="rounded-lg px-3 text-[0.75rem] font-semibold shadow-sm sm:px-4 sm:text-[0.8125rem]" asChild>
-            <Link href="/signup">Gratis starten</Link>
+          <Button size="sm" className="rounded-lg px-3 text-xs font-semibold sm:text-sm" asChild>
+            <Link href="/signup">Start gratis</Link>
           </Button>
         </div>
       </div>

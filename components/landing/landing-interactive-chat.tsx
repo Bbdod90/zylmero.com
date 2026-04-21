@@ -266,7 +266,12 @@ function nid() {
   return `m-${idSeq}`;
 }
 
-export function LandingInteractiveChat() {
+export function LandingInteractiveChat({
+  showMarketingHeader = true,
+}: {
+  /** Op de homepage staat de kop al buiten dit blok. */
+  showMarketingHeader?: boolean;
+}) {
   const { demoRole } = useDemoRole();
   const chatHints = getLandingChatHints(demoRole);
   const [input, setInput] = useState("");
@@ -437,7 +442,8 @@ export function LandingInteractiveChat() {
   return (
     <section
       className={cn(
-        "relative overflow-hidden border-b border-border/30 py-16 md:py-24 dark:border-white/[0.06]",
+        "relative overflow-hidden border-b border-border/30 dark:border-white/[0.06]",
+        showMarketingHeader ? "py-16 md:py-24" : "py-6 md:py-8",
         "bg-gradient-to-b from-muted/25 via-muted/10 to-transparent dark:from-white/[0.035] dark:via-transparent dark:to-transparent",
       )}
     >
@@ -446,17 +452,19 @@ export function LandingInteractiveChat() {
         aria-hidden
       />
       <div className="relative mx-auto max-w-[1200px] px-4 md:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">Live demo</p>
-          <h2 className="mt-3 text-balance text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
-            {chatHints.sectionTitle}
-          </h2>
-          <p className="mt-4 text-base leading-[1.65] text-muted-foreground md:text-lg">
-            {chatHints.sectionSub}
-          </p>
-        </div>
+        {showMarketingHeader ? (
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">Live demo</p>
+            <h2 className="mt-3 text-balance text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
+              {chatHints.sectionTitle}
+            </h2>
+            <p className="mt-4 text-base leading-[1.65] text-muted-foreground md:text-lg">
+              {chatHints.sectionSub}
+            </p>
+          </div>
+        ) : null}
 
-        <div className="relative mx-auto mt-12 max-w-3xl scroll-mt-24">
+        <div className={cn("relative mx-auto max-w-3xl scroll-mt-24", showMarketingHeader ? "mt-12" : "mt-0")}>
           <div
             className="pointer-events-none absolute -inset-5 rounded-[1.65rem] bg-[radial-gradient(ellipse_at_45%_30%,hsl(var(--primary)/0.26),transparent_62%)] blur-2xl dark:bg-[radial-gradient(ellipse_at_45%_28%,hsl(var(--primary)/0.32),transparent_65%)]"
             aria-hidden
