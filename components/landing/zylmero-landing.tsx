@@ -3,11 +3,10 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Check } from "lucide-react";
-import { AnonymousDemoForm } from "@/components/landing/demo-role-context";
 import { LandingComparisonSection } from "@/components/landing/landing-comparison-section";
 import { LandingFaqSection } from "@/components/landing/landing-faq-section";
 import { LandingFinalCtaSection } from "@/components/landing/landing-final-cta-section";
-import { LandingHeroProductVisual } from "@/components/landing/landing-hero-product-visual";
+import { LandingHeroDashboardPreview } from "@/components/landing/landing-hero-dashboard-preview";
 import { LandingNav } from "@/components/landing/landing-nav";
 import { LandingOutcomesSection } from "@/components/landing/landing-outcomes-section";
 import { LandingPainCostSection } from "@/components/landing/landing-pain-cost-section";
@@ -85,21 +84,21 @@ export function ZylmeroLanding() {
                 >
                   <Link href="/signup">Start gratis</Link>
                 </Button>
-                <AnonymousDemoForm className="w-full sm:w-auto">
-                  <Button
-                    type="submit"
-                    size="lg"
-                    variant="outline"
-                    className="h-[3.25rem] w-full rounded-full border-border/65 bg-background/70 px-10 text-[15px] font-semibold backdrop-blur-md sm:h-14 sm:w-auto dark:border-white/[0.16] dark:bg-white/[0.04]"
-                  >
-                    Bekijk demo
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="h-[3.25rem] w-full rounded-full border-border/65 bg-background/70 px-10 text-[15px] font-semibold backdrop-blur-md sm:h-14 sm:w-auto dark:border-white/[0.16] dark:bg-white/[0.04]"
+                >
+                  <Link href="#demo">
+                    Product tour
                     <ArrowRight className="ml-2 size-4 opacity-80" aria-hidden />
-                  </Button>
-                </AnonymousDemoForm>
+                  </Link>
+                </Button>
               </div>
             </motion.div>
             <motion.div {...fadeUp} transition={{ ...fadeUp.transition, delay: 0.08 }}>
-              <LandingHeroProductVisual />
+              <LandingHeroDashboardPreview />
             </motion.div>
           </div>
         </section>

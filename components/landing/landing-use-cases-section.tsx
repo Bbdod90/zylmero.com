@@ -1,41 +1,66 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Briefcase } from "lucide-react";
+import { Brush, Briefcase, CarFront, Wrench } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
-const INDUSTRIES = ["Schilders", "Loodgieters", "Garages", "Monteurs"] as const;
+const CASES: Array<{ label: string; line: string; Icon: LucideIcon }> = [
+  {
+    label: "Schilders",
+    line: "Offerte-aanvragen die nooit meer blijven hangen.",
+    Icon: Brush,
+  },
+  {
+    label: "Loodgieters",
+    line: "Spoed en planning — zonder dat jij elk nummer hoeft af te pakken.",
+    Icon: Wrench,
+  },
+  {
+    label: "Garages",
+    line: "Kentekens, werkplaats-capaciteit — context meteen bij de eerste reactie.",
+    Icon: CarFront,
+  },
+  {
+    label: "Monteurs",
+    line: "Routes en urgente klussen — gefilterd voordat jij belt.",
+    Icon: Briefcase,
+  },
+];
 
 const fade = {
-  initial: { opacity: 0, y: 14 },
+  initial: { opacity: 0, y: 16 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true, margin: "-48px" },
-  transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] },
+  transition: { duration: 0.34, ease: [0.22, 1, 0.36, 1] },
 };
 
 export function LandingUseCasesSection() {
   return (
-    <motion.section
-      id="voor-wie"
-      className="scroll-mt-28 border-t border-border/40 py-28 md:py-36 dark:border-white/[0.08]"
-      {...fade}
-    >
+    <motion.section id="voor-wie" className="scroll-mt-28 border-t border-border/45 bg-muted/[0.2] py-28 md:py-36 dark:border-white/[0.08] dark:bg-white/[0.02]" {...fade}>
       <div className="mx-auto max-w-[1180px] px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto mb-14 flex justify-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-border/55 bg-card/90 px-4 py-2 text-[13px] font-medium text-muted-foreground shadow-sm backdrop-blur-sm dark:border-white/[0.1] dark:bg-white/[0.04]">
-            <Briefcase className="size-4 text-primary" strokeWidth={1.75} aria-hidden />
-            Voor wie
-          </span>
-        </div>
-        <h2 className="mx-auto max-w-[920px] text-balance text-center text-3xl font-semibold tracking-[-0.03em] text-foreground md:text-5xl md:leading-[1.06]">
-          Bedrijven die afhankelijk zijn van aanvragen
+        <p className="text-center font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">Segmenten</p>
+        <h2 className="mx-auto mt-5 max-w-[920px] text-balance text-center text-3xl font-semibold tracking-[-0.038em] text-foreground md:text-[2.65rem] md:leading-[1.08]">
+          Voor bedrijven waar aanvragen omzet zijn
         </h2>
-        <ul className="mx-auto mt-14 flex max-w-[760px] flex-wrap justify-center gap-3 md:gap-4">
-          {INDUSTRIES.map((label) => (
+        <p className="mx-auto mt-5 max-w-2xl text-center text-lg text-muted-foreground">
+          Zelfde platform — verschillende werkdagen. Kies waar jij staat.
+        </p>
+
+        <ul className="mx-auto mt-14 grid gap-5 sm:grid-cols-2 lg:gap-6">
+          {CASES.map(({ label, line, Icon }) => (
             <li
               key={label}
-              className="rounded-full border border-border/55 bg-gradient-to-b from-card/95 to-card/80 px-7 py-3 text-[15px] font-semibold tracking-tight text-foreground shadow-[0_8px_30px_-18px_rgb(0_0_0/0.35)] ring-1 ring-black/[0.03] backdrop-blur-sm dark:border-white/[0.12] dark:from-white/[0.06] dark:to-white/[0.02] dark:ring-white/[0.05]"
+              className="group relative overflow-hidden rounded-2xl border border-border/50 bg-card/80 p-7 shadow-[0_20px_60px_-44px_rgb(15_23_42/0.35)] transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-[0_28px_70px_-40px_hsl(var(--primary)/0.22)] dark:border-white/[0.09] dark:bg-[hsl(222_30%_9%/0.85)] dark:hover:border-primary/30"
             >
-              {label}
+              <div className="flex items-start gap-5">
+                <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary/12 text-primary ring-1 ring-primary/20 transition-colors group-hover:bg-primary/18 dark:bg-primary/15">
+                  <Icon className="size-6" strokeWidth={1.5} aria-hidden />
+                </span>
+                <div>
+                  <h3 className="text-lg font-semibold tracking-tight text-foreground md:text-xl">{label}</h3>
+                  <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">{line}</p>
+                </div>
+              </div>
             </li>
           ))}
         </ul>

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Minus, Plus } from "lucide-react";
+import { Check, Minus, Plus, X } from "lucide-react";
 import { BRAND_NAME } from "@/lib/brand";
 
 const ROWS = [
@@ -32,13 +32,13 @@ export function LandingComparisonSection() {
         </h2>
         <div className="mt-14 overflow-hidden rounded-2xl border border-border/50 bg-card/40 shadow-[var(--shadow-md)] backdrop-blur-sm dark:border-white/[0.1] dark:bg-[hsl(222_30%_8%/0.5)]">
           <div className="grid grid-cols-2 border-b border-border/45 text-center dark:border-white/[0.08]">
-            <div className="border-r border-border/45 py-4 dark:border-white/[0.08]">
+            <div className="border-r border-border/45 bg-red-500/[0.06] py-4 dark:border-white/[0.08] dark:bg-red-500/[0.08]">
               <span className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                 <Minus className="size-3.5" aria-hidden />
                 Zo nu
               </span>
             </div>
-            <div className="py-4">
+            <div className="bg-emerald-500/[0.06] py-4 dark:bg-emerald-500/[0.09]">
               <span className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">
                 <Plus className="size-3.5" aria-hidden />
                 Met Zylmero
@@ -48,10 +48,18 @@ export function LandingComparisonSection() {
           <div className="divide-y divide-border/40 dark:divide-white/[0.06]">
             {ROWS.map((row) => (
               <div key={row.without} className="grid grid-cols-2">
-                <p className="border-r border-border/45 p-5 text-[14px] leading-snug text-muted-foreground md:p-6 md:text-[15px] dark:border-white/[0.06]">
-                  {row.without}
-                </p>
-                <p className="p-5 text-[14px] font-medium leading-snug text-foreground md:p-6 md:text-[15px]">{row.with}</p>
+                <div className="flex gap-3 border-r border-border/45 bg-red-500/[0.04] p-5 md:p-6 dark:border-white/[0.06] dark:bg-red-500/[0.05]">
+                  <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-red-500/15 text-red-600 dark:text-red-400">
+                    <X className="size-3.5" strokeWidth={2.25} aria-hidden />
+                  </span>
+                  <p className="text-[14px] leading-snug text-muted-foreground md:text-[15px]">{row.without}</p>
+                </div>
+                <div className="flex gap-3 bg-emerald-500/[0.04] p-5 md:p-6 dark:bg-emerald-500/[0.06]">
+                  <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-700 dark:text-emerald-400">
+                    <Check className="size-3.5" strokeWidth={2.25} aria-hidden />
+                  </span>
+                  <p className="text-[14px] font-medium leading-snug text-foreground md:text-[15px]">{row.with}</p>
+                </div>
               </div>
             ))}
           </div>

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { AnonymousDemoForm } from "@/components/landing/demo-role-context";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -37,20 +37,16 @@ export function StickyConversionBar() {
           <p className="text-center text-sm font-medium text-muted-foreground sm:text-left">
             Elke gemiste aanvraag kost geld.
           </p>
-          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:justify-end">
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:justify-end sm:gap-3">
             <Button size="lg" className="h-11 w-full rounded-full text-sm font-semibold sm:min-w-[148px]" asChild>
               <Link href="/signup">Start gratis</Link>
             </Button>
-            <AnonymousDemoForm className="w-full sm:w-auto">
-              <Button
-                type="submit"
-                variant="outline"
-                size="lg"
-                className="h-11 w-full rounded-full border-border/60 text-sm font-semibold sm:min-w-[148px] dark:border-white/[0.14]"
-              >
-                Demo
-              </Button>
-            </AnonymousDemoForm>
+            <Link
+              href="#demo"
+              className="inline-flex h-11 w-full items-center justify-center gap-1.5 rounded-full border border-border/60 bg-background/90 px-5 text-sm font-semibold text-foreground backdrop-blur-sm transition-colors hover:bg-muted/80 dark:border-white/[0.14] dark:bg-white/[0.05] dark:hover:bg-white/[0.09] sm:w-auto sm:min-w-[148px]"
+            >
+              Tour <ArrowRight className="size-4 opacity-80" aria-hidden />
+            </Link>
           </div>
         </div>
       </div>
