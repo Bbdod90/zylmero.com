@@ -53,8 +53,8 @@ export function TopBar({
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <Badge
-            variant="muted"
-            className="hidden rounded-full border-primary/20 bg-primary/[0.07] px-2.5 py-0.5 text-2xs font-semibold uppercase tracking-[0.16em] text-primary shadow-sm dark:border-primary/25 dark:bg-primary/[0.1] dark:text-primary sm:inline-flex"
+            variant="outline"
+            className="hidden rounded-full border-emerald-400/50 bg-emerald-50 px-2.5 py-0.5 text-2xs font-semibold uppercase tracking-[0.16em] text-emerald-950 shadow-sm dark:border-emerald-600/50 dark:bg-emerald-950/55 dark:text-emerald-50 sm:inline-flex"
           >
             Live
           </Badge>
