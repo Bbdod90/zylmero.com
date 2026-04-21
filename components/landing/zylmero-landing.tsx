@@ -3,46 +3,42 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Check } from "lucide-react";
-import { LandingComparisonSection } from "@/components/landing/landing-comparison-section";
 import { LandingFaqSection } from "@/components/landing/landing-faq-section";
 import { LandingFinalCtaSection } from "@/components/landing/landing-final-cta-section";
-import { LandingHeroDashboardPreview } from "@/components/landing/landing-hero-dashboard-preview";
+import { LandingHeroConversation } from "@/components/landing/landing-hero-conversation";
 import { LandingNav } from "@/components/landing/landing-nav";
 import { LandingOutcomesSection } from "@/components/landing/landing-outcomes-section";
 import { LandingPainCostSection } from "@/components/landing/landing-pain-cost-section";
 import { LandingPlatformBento } from "@/components/landing/landing-platform-bento";
 import { LandingProductTour } from "@/components/landing/landing-product-tour";
-import { LandingSolutionSection } from "@/components/landing/landing-solution-section";
-import { LandingStatsStrip } from "@/components/landing/landing-stats-strip";
-import { LandingUseCasesSection } from "@/components/landing/landing-use-cases-section";
 import { StickyConversionBar } from "@/components/landing/sticky-conversion-bar";
 import { Button } from "@/components/ui/button";
 import { BILLING_PLANS } from "@/lib/billing/plans";
 import { BRAND_CONTACT_EMAIL, BRAND_LOGO_MONOGRAM, BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
-const POSITIONING = "Automatisch reageren op elke aanvraag — meer klanten binnenhalen zonder extra werk.";
+const POSITIONING = "Aanvragen opvangen, direct antwoord, serieuze leads naar afspraak.";
 
 const HOW_STEPS = [
-  "Sluit je kanalen aan (WhatsApp, site, e-mail)",
-  "AI reageert direct op klanten",
-  "Jij focust alleen op serieuze aanvragen",
+  "Koppel WhatsApp, site en mail",
+  "AI reageert meteen met context",
+  "Jij pakt alleen deals die tellen",
 ] as const;
 
 const CHANNEL_BADGES = ["WhatsApp", "Website", "E-mail"] as const;
 
 const fadeUp = {
-  initial: { opacity: 0, y: 16 },
+  initial: { opacity: 0, y: 12 },
   whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: "-56px" },
-  transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] },
+  viewport: { once: true, margin: "-40px" },
+  transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] },
 };
 
 const LANDING_MAX = "mx-auto w-full max-w-[1180px] px-4 sm:px-6 lg:px-8";
 
 export function ZylmeroLanding() {
   return (
-    <div className="relative min-h-dvh zm-landing-atmosphere overflow-x-hidden pb-36 text-foreground md:pb-32">
+    <div className="relative min-h-dvh zm-landing-atmosphere overflow-x-hidden pb-28 text-foreground md:pb-24">
       <div className="pointer-events-none fixed inset-0 z-0" aria-hidden>
         <div className="absolute inset-0 zm-landing-spotlight opacity-90 dark:opacity-100" />
         <div className="absolute inset-0 zm-landing-edge-glow opacity-70 dark:opacity-90" />
@@ -55,32 +51,36 @@ export function ZylmeroLanding() {
 
         {/* Hero */}
         <section className="border-b border-border/50 dark:border-white/[0.09]">
-          <div className={cn(LANDING_MAX, "grid gap-16 py-24 md:gap-24 md:py-36 lg:grid-cols-[1.06fr_0.94fr] lg:items-center lg:gap-14")}>
+          <div
+            className={cn(
+              LANDING_MAX,
+              "grid gap-10 py-14 md:gap-12 md:py-16 lg:grid-cols-[1.02fr_0.98fr] lg:items-center lg:gap-10",
+            )}
+          >
             <motion.div {...fadeUp}>
-              <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">{POSITIONING}</p>
-              <h1 className="mt-6 text-balance text-4xl font-semibold leading-[1.06] tracking-[-0.038em] sm:text-5xl md:text-[3.25rem] lg:text-[3.95rem]">
+              <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">{POSITIONING}</p>
+              <h1 className="mt-4 text-balance text-[2.15rem] font-semibold leading-[1.08] tracking-[-0.035em] sm:text-4xl md:text-[2.75rem] lg:text-[3.15rem]">
                 <span className="zm-text-gradient block">Elke gemiste aanvraag</span>
-                <span className="mt-2 block text-foreground">kost je geld</span>
+                <span className="mt-1 block text-foreground">kost je geld</span>
               </h1>
-              <p className="mt-8 max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl md:leading-relaxed">
-                {BRAND_NAME} vangt elke klantvraag op, beantwoordt meteen met context, en zet serieuze leads om in concrete
-                afspraken — zonder dat jij 24/7 bereikbaar hoeft te zijn.
+              <p className="mt-5 max-w-xl text-pretty text-base leading-relaxed text-muted-foreground md:text-[17px]">
+                {BRAND_NAME} bundelt mail, WhatsApp en site, antwoordt direct met context en zet warme leads om in afspraken.
               </p>
-              <div className="mt-7 flex flex-wrap gap-2">
+              <div className="mt-5 flex flex-wrap gap-2">
                 {CHANNEL_BADGES.map((c) => (
                   <span
                     key={c}
-                    className="rounded-full border border-border/55 bg-card/70 px-3 py-1.5 font-mono text-[11px] font-medium uppercase tracking-wider text-muted-foreground backdrop-blur-sm dark:border-white/[0.12] dark:bg-white/[0.05]"
+                    className="rounded-full border border-border/55 bg-card/70 px-2.5 py-1 font-mono text-[10px] font-medium uppercase tracking-wider text-muted-foreground backdrop-blur-sm dark:border-white/[0.12] dark:bg-white/[0.05]"
                   >
                     {c}
                   </span>
                 ))}
               </div>
-              <div className="mt-11 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="mt-8 flex flex-col gap-2.5 sm:flex-row sm:items-center">
                 <Button
                   asChild
                   size="lg"
-                  className="h-[3.25rem] rounded-full px-10 text-[15px] font-semibold shadow-[0_2px_24px_-8px_hsl(var(--primary)/0.55)] sm:h-14 sm:px-11"
+                  className="h-12 rounded-full px-8 text-[14px] font-semibold shadow-[0_2px_20px_-6px_hsl(var(--primary)/0.55)] sm:h-[3rem] sm:px-10"
                 >
                   <Link href="/signup">Start gratis</Link>
                 </Button>
@@ -88,7 +88,7 @@ export function ZylmeroLanding() {
                   asChild
                   size="lg"
                   variant="outline"
-                  className="h-[3.25rem] w-full rounded-full border-border/65 bg-background/70 px-10 text-[15px] font-semibold backdrop-blur-md sm:h-14 sm:w-auto dark:border-white/[0.16] dark:bg-white/[0.04]"
+                  className="h-12 w-full rounded-full border-border/65 bg-background/70 px-8 text-[14px] font-semibold backdrop-blur-md sm:h-[3rem] sm:w-auto dark:border-white/[0.16] dark:bg-white/[0.04]"
                 >
                   <Link href="#demo">
                     Product tour
@@ -97,43 +97,37 @@ export function ZylmeroLanding() {
                 </Button>
               </div>
             </motion.div>
-            <motion.div {...fadeUp} transition={{ ...fadeUp.transition, delay: 0.08 }}>
-              <LandingHeroDashboardPreview />
+            <motion.div {...fadeUp} transition={{ ...fadeUp.transition, delay: 0.06 }}>
+              <LandingHeroConversation />
             </motion.div>
           </div>
         </section>
 
-        <LandingStatsStrip />
-
-        <div className="border-b border-border/45 bg-muted/25 dark:border-white/[0.07] dark:bg-white/[0.03]">
-          <LandingPainCostSection className="border-t-0" />
-        </div>
-
-        <LandingSolutionSection />
+        <LandingPainCostSection />
 
         <LandingPlatformBento />
 
         <motion.section
           id="hoe-het-werkt"
-          className="scroll-mt-28 border-t border-border/45 bg-muted/15 py-28 md:py-36 dark:border-white/[0.08] dark:bg-white/[0.02]"
+          className="scroll-mt-24 border-t border-border/45 bg-muted/12 py-12 md:py-14 dark:border-white/[0.08] dark:bg-white/[0.02]"
           {...fadeUp}
         >
-          <div className={cn(LANDING_MAX, "max-w-[720px]")}>
-            <p className="text-center font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">Proces</p>
-            <h2 className="mt-4 text-center text-balance text-3xl font-semibold tracking-[-0.03em] text-foreground md:text-5xl md:leading-[1.06]">
-              Hoe het werkt
-            </h2>
-            <ol className="relative mt-16">
-              <div
-                className="pointer-events-none absolute left-[19px] top-8 bottom-8 w-px bg-gradient-to-b from-primary/50 via-primary/20 to-transparent md:left-[21px]"
-                aria-hidden
-              />
+          <div className={LANDING_MAX}>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">Proces</p>
+                <h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-foreground md:text-3xl">Zo werkt het</h2>
+              </div>
+              <p className="max-w-md text-sm text-muted-foreground">Drie stappen — daarna draait het zonder dat jij 24/7 bereikbaar hoeft te zijn.</p>
+            </div>
+            <ol className="mt-8 grid gap-4 md:grid-cols-3 md:gap-5">
               {HOW_STEPS.map((line, i) => (
-                <li key={line} className="relative flex gap-5 pb-12 last:pb-0 md:gap-7 md:pb-14">
-                  <span className="relative z-[1] flex size-10 shrink-0 items-center justify-center rounded-full border border-primary/25 bg-background font-mono text-sm font-semibold tabular-nums text-primary shadow-[0_0_20px_-8px_hsl(var(--primary)/0.5)] dark:border-primary/35 dark:bg-[hsl(222_35%_9%)] dark:text-primary">
-                    {i + 1}
-                  </span>
-                  <span className="pt-1.5 text-lg font-medium leading-snug text-foreground md:text-xl">{line}</span>
+                <li
+                  key={line}
+                  className="relative rounded-2xl border border-border/45 bg-card/50 p-5 dark:border-white/[0.08] dark:bg-white/[0.03]"
+                >
+                  <span className="font-mono text-[11px] font-bold tabular-nums text-primary">{String(i + 1).padStart(2, "0")}</span>
+                  <p className="mt-2 text-[15px] font-medium leading-snug text-foreground">{line}</p>
                 </li>
               ))}
             </ol>
@@ -144,48 +138,44 @@ export function ZylmeroLanding() {
 
         <LandingProductTour />
 
-        <LandingUseCasesSection />
-
-        <LandingComparisonSection />
-
         <motion.section
           id="prijzen"
-          className="scroll-mt-28 border-t border-border/45 bg-muted/20 py-28 md:py-36 dark:border-white/[0.08] dark:bg-white/[0.03]"
+          className="scroll-mt-24 border-t border-border/45 bg-muted/15 py-12 md:py-16 dark:border-white/[0.08] dark:bg-white/[0.03]"
           {...fadeUp}
         >
           <div className={LANDING_MAX}>
-            <p className="text-center font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">Abonnementen</p>
-            <h2 className="mt-4 text-center text-3xl font-semibold tracking-[-0.03em] text-foreground md:text-5xl">Prijzen</h2>
-            <p className="mx-auto mt-5 max-w-lg text-center text-lg text-muted-foreground">Start klein, schaal wanneer nodig.</p>
-            <div className="mx-auto mt-16 grid max-w-[1040px] gap-5 md:grid-cols-3 md:gap-6">
+            <p className="text-center font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">Abonnementen</p>
+            <h2 className="mt-2 text-center text-2xl font-semibold tracking-[-0.03em] text-foreground md:text-4xl">Prijzen</h2>
+            <p className="mx-auto mt-2 max-w-lg text-center text-sm text-muted-foreground md:text-base">Start klein, schaal mee.</p>
+            <div className="mx-auto mt-8 grid max-w-[1040px] gap-4 md:grid-cols-3 md:gap-5">
               {BILLING_PLANS.map((plan) => (
                 <div
                   key={plan.id}
                   className={cn(
-                    "cf-landing-pro-card flex flex-col p-8 transition-all duration-300 md:p-9",
-                    "hover:-translate-y-1",
-                    plan.popular && "cf-landing-feature-ring md:scale-[1.03]",
+                    "cf-landing-pro-card flex flex-col p-6 transition-all duration-300 md:p-7",
+                    "hover:-translate-y-0.5",
+                    plan.popular && "cf-landing-feature-ring md:scale-[1.02]",
                   )}
                 >
                   {plan.popular ? (
-                    <span className="mb-5 inline-flex w-fit rounded-full bg-primary px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-primary-foreground shadow-sm">
+                    <span className="mb-3 inline-flex w-fit rounded-full bg-primary px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary-foreground">
                       Populair
                     </span>
                   ) : (
-                    <span className="mb-5 block h-7" aria-hidden />
+                    <span className="mb-3 block h-6" aria-hidden />
                   )}
-                  <h3 className="text-lg font-semibold tracking-tight">{plan.name}</h3>
-                  <p className="mt-5 flex items-baseline gap-1">
-                    <span className="text-4xl font-semibold tracking-[-0.04em] tabular-nums text-foreground md:text-[2.75rem]">
+                  <h3 className="text-base font-semibold tracking-tight">{plan.name}</h3>
+                  <p className="mt-3 flex items-baseline gap-1">
+                    <span className="text-3xl font-semibold tracking-[-0.04em] tabular-nums text-foreground md:text-[2.25rem]">
                       €{plan.priceEur}
                     </span>
-                    <span className="text-sm font-medium text-muted-foreground">/mnd</span>
+                    <span className="text-xs font-medium text-muted-foreground">/mnd</span>
                   </p>
-                  <p className="mt-2 font-mono text-xs text-muted-foreground">{plan.leadCapLabel}</p>
-                  <ul className="mt-10 flex-1 space-y-3.5 text-[15px] leading-snug text-foreground">
+                  <p className="mt-1 font-mono text-[11px] text-muted-foreground">{plan.leadCapLabel}</p>
+                  <ul className="mt-6 flex-1 space-y-2.5 text-[14px] leading-snug text-foreground">
                     {plan.features.map((f) => (
-                      <li key={f} className="flex gap-3 text-[15px] text-foreground">
-                        <Check className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
+                      <li key={f} className="flex gap-2.5">
+                        <Check className="mt-0.5 size-3.5 shrink-0 text-primary" aria-hidden />
                         {f}
                       </li>
                     ))}
@@ -193,7 +183,7 @@ export function ZylmeroLanding() {
                   <Button
                     asChild
                     className={cn(
-                      "mt-10 h-12 w-full rounded-full text-[15px] font-semibold",
+                      "mt-8 h-11 w-full rounded-full text-[14px] font-semibold",
                       plan.popular ? "" : "border-border/65 dark:border-white/[0.14]",
                     )}
                     variant={plan.popular ? "default" : "outline"}
@@ -210,15 +200,15 @@ export function ZylmeroLanding() {
 
         <LandingFinalCtaSection />
 
-        <footer className="border-t border-border/50 bg-muted/10 py-16 dark:border-white/[0.1] dark:bg-transparent">
-          <div className={cn(LANDING_MAX, "flex flex-col items-center justify-between gap-10 md:flex-row")}>
+        <footer className="border-t border-border/50 bg-muted/10 py-10 dark:border-white/[0.1] dark:bg-transparent">
+          <div className={cn(LANDING_MAX, "flex flex-col items-center justify-between gap-6 md:flex-row")}>
             <div className="flex items-center gap-3">
-              <div className="flex size-10 items-center justify-center rounded-xl bg-primary text-xs font-bold text-primary-foreground shadow-md ring-1 ring-black/10 dark:ring-white/15">
+              <div className="flex size-9 items-center justify-center rounded-xl bg-primary text-[11px] font-bold text-primary-foreground shadow-md ring-1 ring-black/10 dark:ring-white/15">
                 {BRAND_LOGO_MONOGRAM}
               </div>
-              <span className="text-[15px] font-semibold tracking-tight text-foreground">{BRAND_NAME}</span>
+              <span className="text-sm font-semibold tracking-tight text-foreground">{BRAND_NAME}</span>
             </div>
-            <nav className="flex flex-wrap justify-center gap-x-10 gap-y-3 text-sm font-medium text-muted-foreground">
+            <nav className="flex flex-wrap justify-center gap-x-8 gap-y-2 text-sm font-medium text-muted-foreground">
               <Link href="/login" className="transition-colors hover:text-foreground">
                 Inloggen
               </Link>
