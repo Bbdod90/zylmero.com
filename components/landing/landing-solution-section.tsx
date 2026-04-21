@@ -1,11 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { CalendarClock, Filter, Zap } from "lucide-react";
 
 const BLOCKS = [
-  "Reageert direct op elke aanvraag",
-  "Filtert serieuze klanten",
-  "Plant afspraken automatisch",
+  { line: "Reageert direct op elke aanvraag", Icon: Zap },
+  { line: "Filtert serieuze klanten", Icon: Filter },
+  { line: "Plant afspraken automatisch", Icon: CalendarClock },
 ] as const;
 
 const fade = {
@@ -19,20 +20,24 @@ export function LandingSolutionSection() {
   return (
     <motion.section
       id="oplossing"
-      className="scroll-mt-28 border-t border-border/40 py-28 md:py-36 dark:border-white/[0.06]"
+      className="scroll-mt-28 border-t border-border/40 py-28 md:py-36 dark:border-white/[0.08]"
       {...fade}
     >
       <div className="mx-auto max-w-[1180px] px-4 sm:px-6 lg:px-8">
-        <h2 className="mx-auto max-w-[880px] text-center text-balance text-3xl font-semibold tracking-[-0.02em] text-foreground md:text-5xl md:leading-[1.08]">
+        <p className="text-center font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">De oplossing</p>
+        <h2 className="mx-auto mt-4 max-w-[880px] text-center text-balance text-3xl font-semibold tracking-[-0.03em] text-foreground md:text-5xl md:leading-[1.06]">
           Zylmero pakt dit volledig voor je op
         </h2>
-        <ul className="mx-auto mt-16 grid max-w-[960px] gap-4 md:grid-cols-3 md:gap-5">
-          {BLOCKS.map((line) => (
+        <ul className="mx-auto mt-14 grid max-w-[960px] gap-4 md:grid-cols-3 md:gap-5">
+          {BLOCKS.map(({ line, Icon }) => (
             <li
               key={line}
-              className="cf-landing-pro-card flex min-h-[6.5rem] items-center px-6 py-6 text-[15px] font-semibold leading-snug tracking-tight text-foreground transition-transform duration-300 hover:-translate-y-0.5 md:min-h-[7rem] md:text-lg"
+              className="cf-landing-pro-card group flex flex-col gap-5 p-6 transition-transform duration-300 hover:-translate-y-1 md:min-h-[10rem] md:p-7"
             >
-              {line}
+              <span className="flex size-11 items-center justify-center rounded-xl bg-primary/12 text-primary ring-1 ring-primary/20 transition-colors group-hover:bg-primary/18 dark:bg-primary/15 dark:ring-primary/25">
+                <Icon className="size-5" strokeWidth={1.75} aria-hidden />
+              </span>
+              <p className="text-[15px] font-semibold leading-snug tracking-tight text-foreground md:text-lg">{line}</p>
             </li>
           ))}
         </ul>

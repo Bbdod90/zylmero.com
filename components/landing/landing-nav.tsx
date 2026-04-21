@@ -28,7 +28,7 @@ export function LandingNav() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 border-b transition-[background-color,box-shadow,backdrop-filter] duration-300",
+        "sticky top-0 z-[60] border-b transition-[background-color,box-shadow,backdrop-filter] duration-300",
         scrolled
           ? "border-border/55 bg-background/[0.82] shadow-[0_1px_0_0_hsl(var(--border)/0.5)] backdrop-blur-2xl dark:border-white/[0.08] dark:bg-[hsl(228_32%_4%/0.78)]"
           : "border-transparent bg-background/70 backdrop-blur-md dark:bg-background/60",

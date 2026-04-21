@@ -46,25 +46,26 @@
   }
 
   .dark {
-    --background: 228 32% 4%;
-    --foreground: 0 0% 100%;
-    --card: 222 26% 7%;
-    --card-foreground: 0 0% 100%;
-    --popover: 222 26% 7.5%;
-    --popover-foreground: 0 0% 100%;
-    --primary: 220 42% 58%;
-    --primary-foreground: 210 40% 99%;
-    --secondary: 220 14% 12%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 220 14% 13%;
-    --muted-foreground: 0 0% 100%;
+    /* Geen pitch-black: lagen + leesbare hiërarchie (muted ≠ wit) */
+    --background: 222 44% 6%;
+    --foreground: 210 40% 98%;
+    --card: 222 32% 10%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 30% 9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 218 52% 62%;
+    --primary-foreground: 222 47% 8%;
+    --secondary: 220 16% 14%;
+    --secondary-foreground: 210 40% 96%;
+    --muted: 220 14% 15%;
+    --muted-foreground: 220 9% 58%;
     --accent: 262 58% 56%;
     --accent-foreground: 210 40% 99%;
     --destructive: 0 58% 46%;
     --destructive-foreground: 210 40% 98%;
-    --border: 220 14% 22%;
-    --input: 220 14% 22%;
-    --ring: 220 42% 58%;
+    --border: 220 12% 22%;
+    --input: 220 12% 24%;
+    --ring: 218 52% 62%;
     --chart-1: 220 42% 56%;
     --chart-2: 262 58% 56%;
     --chart-3: 142 56% 46%;
@@ -159,6 +160,32 @@
         var(--cf-mesh-c),
         transparent 45%
       );
+  }
+  /** Marketing — verticale diepte (light + dark) */
+  .zm-landing-atmosphere {
+    background: linear-gradient(
+      180deg,
+      hsl(220 26% 99%) 0%,
+      hsl(220 22% 98%) 45%,
+      hsl(220 20% 97%) 100%
+    );
+  }
+  .dark .zm-landing-atmosphere {
+    background: linear-gradient(180deg, hsl(222 44% 8%) 0%, hsl(222 44% 6%) 42%, hsl(225 38% 5%) 100%);
+  }
+  .zm-landing-spotlight {
+    background: radial-gradient(
+      ellipse 90% 55% at 50% -15%,
+      hsl(218 55% 42% / 0.14),
+      transparent 58%
+    );
+  }
+  .zm-landing-edge-glow {
+    background: radial-gradient(
+      ellipse 55% 40% at 100% 30%,
+      hsl(262 45% 48% / 0.07),
+      transparent 55%
+    );
   }
   /** Marketing — subtiel raster (viewport-fixed, blijft rustig bij scroll) */
   .zm-landing-dots {
@@ -258,11 +285,15 @@
 
   /** Landing — gepolijste kaarten (depth + top highlight, zonder drukte) */
   .cf-landing-pro-card {
-    @apply relative overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-b from-card/95 via-card/90 to-card/80 shadow-[0_22px_60px_-36px_rgb(15_23_42/0.55)] backdrop-blur-sm dark:border-white/[0.09] dark:from-[hsl(228_26%_12%/0.92)] dark:via-[hsl(228_28%_9%/0.94)] dark:to-[hsl(228_30%_6%/0.96)] dark:shadow-[0_28px_70px_-40px_rgb(0_0_0/0.75)];
+    @apply relative overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-b from-card via-card/95 to-card/85 shadow-[0_22px_60px_-36px_rgb(15_23_42/0.55)] backdrop-blur-sm dark:border-white/[0.1] dark:from-[hsl(222_30%_13%/0.97)] dark:via-[hsl(222_32%_10%/0.98)] dark:to-[hsl(222_38%_7%/0.99)] dark:shadow-[0_28px_70px_-36px_rgb(0_0_0/0.72),inset_0_1px_0_0_rgb(255_255_255/0.04)];
   }
   .cf-landing-pro-card::before {
     content: "";
-    @apply pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent;
+    @apply pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/35 to-transparent;
+  }
+  /** Featured pricing / highlights */
+  .cf-landing-feature-ring {
+    @apply ring-1 ring-primary/35 shadow-[0_0_0_1px_hsl(var(--primary)/0.15),0_24px_80px_-40px_hsl(var(--primary)/0.35)];
   }
 
   /** Landing — sectielabels en koppen (één ritme op de homepage) */

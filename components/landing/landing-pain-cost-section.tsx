@@ -1,12 +1,22 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { MessageSquareOff, Moon, Timer } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const BULLETS = [
-  "Je reageert te laat → klant is weg",
-  "Je mist berichten buiten werktijd",
-  "Je bent constant bezig met appen/mailen",
+const ITEMS = [
+  {
+    line: "Je reageert te laat → klant is weg",
+    Icon: Timer,
+  },
+  {
+    line: "Je mist berichten buiten werktijd",
+    Icon: Moon,
+  },
+  {
+    line: "Je bent constant bezig met appen/mailen",
+    Icon: MessageSquareOff,
+  },
 ] as const;
 
 const fade = {
@@ -18,24 +28,29 @@ const fade = {
 
 export function LandingPainCostSection({ className }: { className?: string }) {
   return (
-    <section id="probleem" className={cn("border-t border-border/40 py-24 md:py-32 dark:border-white/[0.06]", className)}>
+    <section id="probleem" className={cn("border-t border-border/40 py-24 md:py-32 dark:border-white/[0.08]", className)}>
       <div className="mx-auto max-w-[1180px] px-4 sm:px-6 lg:px-8">
         <motion.div {...fade}>
-          <h2 className="mx-auto max-w-[920px] text-balance text-center text-3xl font-semibold tracking-[-0.02em] text-foreground md:text-5xl md:leading-[1.08]">
+          <p className="text-center font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">Het probleem</p>
+          <h2 className="mx-auto mt-4 max-w-[920px] text-balance text-center text-3xl font-semibold tracking-[-0.03em] text-foreground md:text-5xl md:leading-[1.06]">
             Dit gebeurt nu waarschijnlijk in jouw bedrijf
           </h2>
-          <ul className="mx-auto mt-16 grid max-w-[960px] gap-4 md:grid-cols-3 md:gap-5">
-            {BULLETS.map((line) => (
+          <ul className="mx-auto mt-14 grid max-w-[960px] gap-4 md:grid-cols-3 md:gap-5">
+            {ITEMS.map(({ line, Icon }) => (
               <li
                 key={line}
-                className="cf-landing-pro-card flex min-h-[7.5rem] items-center justify-center px-5 py-6 text-center text-[15px] font-medium leading-snug text-foreground md:min-h-[8.25rem] md:px-6 md:text-base"
+                className="cf-landing-pro-card group flex flex-col gap-5 p-6 md:min-h-[11rem] md:p-7"
               >
-                {line}
+                <span className="flex size-11 items-center justify-center rounded-xl bg-primary/12 text-primary ring-1 ring-primary/20 transition-colors group-hover:bg-primary/18 dark:bg-primary/15 dark:ring-primary/25">
+                  <Icon className="size-5" strokeWidth={1.75} aria-hidden />
+                </span>
+                <p className="text-[15px] font-medium leading-snug tracking-tight text-foreground md:text-base">{line}</p>
               </li>
             ))}
           </ul>
-          <p className="mt-14 text-center text-xl font-semibold tracking-tight text-foreground md:text-2xl">
-            Dat kost je klanten. Elke dag opnieuw.
+          <p className="mx-auto mt-14 max-w-xl text-center text-lg font-semibold tracking-tight text-foreground md:text-xl">
+            Dat kost je klanten.{" "}
+            <span className="text-muted-foreground font-medium">Elke dag opnieuw.</span>
           </p>
         </motion.div>
       </div>

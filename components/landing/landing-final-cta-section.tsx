@@ -14,7 +14,7 @@ const fade = {
 export function LandingFinalCtaSection() {
   return (
     <motion.section
-      className="relative border-t border-border/40 py-32 md:py-40 dark:border-white/[0.06]"
+      className="relative border-t border-border/45 py-36 md:py-44 dark:border-white/[0.09]"
       {...fade}
       id="start"
     >
@@ -22,8 +22,9 @@ export function LandingFinalCtaSection() {
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_100%,hsl(var(--primary)/0.08),transparent_65%)] dark:bg-[radial-gradient(ellipse_65%_55%_at_50%_100%,hsl(var(--primary)/0.14),transparent_68%)]"
         aria-hidden
       />
-      <div className="relative mx-auto max-w-[640px] px-4 text-center sm:px-6">
-        <h2 className="text-balance text-3xl font-semibold tracking-[-0.02em] text-foreground md:text-5xl md:leading-[1.08]">
+      <div className="relative mx-auto max-w-[680px] px-4 text-center sm:px-6">
+        <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">Nu starten</p>
+        <h2 className="mt-5 text-balance text-3xl font-semibold tracking-[-0.035em] text-foreground md:text-5xl md:leading-[1.06]">
           Stop met klanten missen
         </h2>
         <Button
