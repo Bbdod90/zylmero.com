@@ -73,7 +73,8 @@ function rowWithoutAutomationPreferences(
     typeof prefs.niche_key === "string" ? prefs.niche_key : undefined;
   const onboardingFlow =
     prefs.onboarding_flow != null ? String(prefs.onboarding_flow) : undefined;
-  const { automation_preferences: _a, ...rest } = row;
+  const { automation_preferences, ...rest } = row;
+  void automation_preferences;
   return {
     ...rest,
     niche_intake: {
@@ -86,27 +87,33 @@ function rowWithoutAutomationPreferences(
 }
 
 function omitBookingLink(row: Record<string, unknown>): Record<string, unknown> {
-  const { booking_link: _b, ...rest } = row;
+  const { booking_link, ...rest } = row;
+  void booking_link;
   return rest;
 }
 
 function omitBusinessHours(row: Record<string, unknown>): Record<string, unknown> {
-  const { business_hours: _h, ...rest } = row;
+  const { business_hours, ...rest } = row;
+  void business_hours;
   return rest;
 }
 
 function omitNicheIntakeAndKnowledge(row: Record<string, unknown>): Record<string, unknown> {
-  const { niche_intake: _n, knowledge_snippets: _k, ...rest } = row;
+  const { niche_intake, knowledge_snippets, ...rest } = row;
+  void niche_intake;
+  void knowledge_snippets;
   return rest;
 }
 
 function omitLanguage(row: Record<string, unknown>): Record<string, unknown> {
-  const { language: _l, ...rest } = row;
+  const { language, ...rest } = row;
+  void language;
   return rest;
 }
 
 function omitNicheColumn(row: Record<string, unknown>): Record<string, unknown> {
-  const { niche: _n, ...rest } = row;
+  const { niche, ...rest } = row;
+  void niche;
   return rest;
 }
 

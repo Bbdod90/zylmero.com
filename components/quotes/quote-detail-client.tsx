@@ -81,6 +81,7 @@ export function QuoteDetailClient({
   useEffect(() => {
     setDraft(buildDraft(quote));
     setDemoStatus(quote.status);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reset draft bij server-refresh (id+updated_at), niet bij elke quote-referentie (voorkomt invoer verlies)
   }, [quote.id, quote.updated_at]);
 
   const previewTotals = useMemo(() => {

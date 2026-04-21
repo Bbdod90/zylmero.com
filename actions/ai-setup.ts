@@ -277,9 +277,11 @@ Taal: Nederlands. Toon: professioneel, verkopend, helder.`,
 }
 
 export async function runAiSetupAction(
-  _prev: AiSetupState,
-  _formData: FormData,
+  prev: AiSetupState,
+  formData: FormData,
 ): Promise<AiSetupState> {
+  void prev;
+  void formData;
   const auth = await getAuth();
   if (!auth.user || !auth.company) {
     return { error: "Je sessie is verlopen. Log opnieuw in." };

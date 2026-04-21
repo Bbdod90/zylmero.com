@@ -24,9 +24,9 @@ export function AppointmentsPageClient({
 }) {
   const [items, setItems] = useState<AgendaAppointment[]>(agendaItems);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- sync alleen wanneer server-revisie verandert (router.refresh)
   useEffect(() => {
     setItems(agendaItems);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- sync alleen bij agendaRevision (router.refresh), niet bij elke agendaItems-referentie
   }, [agendaRevision]);
 
   return (

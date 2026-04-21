@@ -150,7 +150,7 @@ export async function updateLeadProfile(
   if (!full_name) {
     return { ok: false, error: "Naam is verplicht." };
   }
-  let estimated: number | null | undefined = input.estimated_value;
+  const estimated: number | null | undefined = input.estimated_value;
   if (estimated !== undefined && estimated !== null) {
     if (Number.isNaN(estimated) || estimated < 0) {
       return { ok: false, error: "Ongeldige geschatte waarde." };

@@ -11,7 +11,8 @@ export function useBilling() {
   const [error, setError] = useState<string | null>(null);
 
   const startCheckout = useCallback(
-    async (_priceId: string) => {
+    async (priceId: string) => {
+      void priceId;
       setLoading(true);
       setError(null);
       try {
