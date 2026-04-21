@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "typecheck": "tsc --noEmit",
     "stripe:products": "tsx scripts/stripe-products.ts",
     "supabase:raise-rate-limits": "bash scripts/supabase-raise-auth-rate-limits.sh"
   },

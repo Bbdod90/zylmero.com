@@ -315,50 +315,64 @@ Als geen sector-hint past: blijf een warme, efficiënte lokale dienstverlener; �
   }
   userFacingMessages.push({ role: "user", content: message });
 
-  const completion = await openai.chat.completions.create({
-    model,
-    temperature: landingDemo && demoNiche ? 0.72 : 0.35,
-    max_tokens: landingDemo && demoNiche ? 900 : 380,
-    response_format: { type: "json_object" },
-    messages: [
-      {
-        role: "system",
-        content: `${
-          landingDemo && demoNiche
-            ? `${identityIntro} Antwoord natuurlijk en inhoudelijk sterk in het Nederlands — vergelijkbaar met ChatGPT in dit vak: bij een inhoudelijke vraag mag je gerust meerdere zinnen en nuttige nuance gebruiken (opties, veiligheid, planning); bij alleen "hoi" of een minimale begroeting blijf je kort. Geen marketingtaal. Varieer telkens formulering en structuur — geen vast sjabloon per bericht.`
-            : `${identityIntro} Schrijf zoals een ondernemer: kort, duidelijk, geen moeilijke woorden, geen marketingtaal.`
-        }${personaBlock}${landingRules}
+  try {
+    const completion = await openai.chat.completions.create({
+      model,
+      temperature: landingDemo && demoNiche ? 0.72 : 0.35,
+      max_tokens: landingDemo && demoNiche ? 900 : 380,
+      response_format: { type: "json_object" },
+      messages: [
+        {
+          role: "system",
+          content: `${
+            landingDemo && demoNiche
+              ? `${identityIntro} Antwoord natuurlijk en inhoudelijk sterk in het Nederlands — vergelijkbaar met ChatGPT in dit vak: bij een inhoudelijke vraag mag je gerust meerdere zinnen en nuttige nuance gebruiken (opties, veiligheid, planning); bij alleen "hoi" of een minimale begroeting blijf je kort. Geen marketingtaal. Varieer telkens formulering en structuur — geen vast sjabloon per bericht.`
+              : `${identityIntro} Schrijf zoals een ondernemer: kort, duidelijk, geen moeilijke woorden, geen marketingtaal.`
+          }${personaBlock}${landingRules}
 Als het laatste bericht alleen een begroeting is (bijv. "hoi", "hallo", "hey") zonder concrete vraag én er is geen eerdere context: groet vriendelijk en vraag één zin wat ze nodig hebben. Geen afspraaktijden, geen "morgen om …", geen prijs in reply. Zet resultTitle op "Intake" en valueLine op "—".
 Als wél een concrete vraag of klacht genoemd wordt: bij een inhoudelijke vervolgvraag eerst antwoord geven (ja/nee/uitleg), niet opnieuw hetzelfde intake-blok. Anders: hooguit één gerichte vervolgvraag als iets echt ontbreekt; zo niet, werk naar afspraak of tijdvoorstel. Herhaal nooit je vorige antwoord letterlijk.
 ${extraServicesRule}
 Zeg nooit dat je een AI of assistent bent. Typische prijsrange voor valueLine (alleen als het past bij de vraag): ${prijsrangeResolved}.
 Antwoord alleen met JSON met keys: reply (string), resultTitle (string), valueLine (string).`,
-      },
-      ...userFacingMessages,
-    ],
-  });
+        },
+        ...userFacingMessages,
+      ],
+    });
 
-  const raw = completion.choices[0]?.message?.content?.trim() || "";
-  try {
-    const parsed = JSON.parse(raw) as {
-      reply?: string;
-      resultTitle?: string;
-      valueLine?: string;
-    };
-    if (parsed.reply) {
-      return NextResponse.json({
-        reply: parsed.reply,
-        resultTitle: parsed.resultTitle || "Afspraak voorgesteld",
-        valueLine: parsed.valueLine || prijsrangeResolved,
-      });
+    const raw = completion.choices[0]?.message?.content?.trim() || "";
+    try {
+      const parsed = JSON.parse(raw) as {
+        reply?: string;
+        resultTitle?: string;
+        valueLine?: string;
+      };
+      if (parsed.reply) {
+        return NextResponse.json({
+          reply: parsed.reply,
+          resultTitle: parsed.resultTitle || "Afspraak voorgesteld",
+          valueLine: parsed.valueLine || prijsrangeResolved,
+        });
+      }
+    } catch {
+      /* parse text fallback */
     }
-  } catch {
-    /* parse text fallback */
-  }
 
-  return NextResponse.json({
-    reply: raw || "Dank je — wanneer komt het uit om langs te komen?",
-    resultTitle: "Afspraak voorgesteld",
-    valueLine: prijsrangeResolved,
-  });
+    return NextResponse.json({
+      reply: raw || "Dank je — wanneer komt het uit om langs te komen?",
+      resultTitle: "Afspraak voorgesteld",
+      valueLine: prijsrangeResolved,
+    });
+  } catch (e) {
+    console.error("[api/ai] OpenAI:", e);
+    return NextResponse.json(
+      {
+        reply: "",
+        resultTitle: "",
+        valueLine: "",
+        error: "AI tijdelijk niet beschikbaar",
+        hint: "Probeer het zo opnieuw. Blijft het fout? Controleer /api/health en je netwerk.",
+      },
+      { status: 503 },
+    );
+  }
 }
