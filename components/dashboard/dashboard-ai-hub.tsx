@@ -91,7 +91,7 @@ export function DashboardAiHub({
     >
       <div className="flex flex-col gap-4 border-b border-border/45 pb-5 sm:flex-row sm:items-start sm:justify-between dark:border-white/[0.06]">
         <div className="min-w-0 space-y-1.5">
-          <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">
+          <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-primary">
             AI-assistent
           </p>
           <h2
@@ -126,7 +126,7 @@ export function DashboardAiHub({
             <li key={item.href}>
               <Link
                 href={item.href}
-                className="group flex h-full flex-col gap-2 rounded-xl border border-border/50 bg-gradient-to-b from-card/80 to-muted/[0.08] p-4 transition-colors hover:border-primary/30 hover:from-primary/[0.04] hover:to-card dark:border-white/[0.06] dark:from-card/60 dark:to-card/20 dark:hover:border-primary/25"
+                className="group flex h-full flex-col gap-2 rounded-xl border border-border/50 bg-card/60 p-4 transition-all hover:border-primary/25 hover:shadow-[0_12px_40px_-28px_hsl(var(--primary)/0.25)] dark:border-white/[0.09] dark:bg-[hsl(222_28%_10%/0.5)] dark:hover:border-primary/35"
               >
                 <span className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary ring-1 ring-primary/12 transition-transform group-hover:scale-[1.02]">
                   <Icon className="size-4 shrink-0" aria-hidden />

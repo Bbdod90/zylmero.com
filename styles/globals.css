@@ -254,9 +254,9 @@
   .cf-heading-xl {
     @apply text-balance font-extrabold tracking-tight text-foreground;
   }
-  /** Dashboard — premium panelen (donker + licht) */
+  /** Dashboard kaarten — zelfde ritme als marketing (cf-landing-pro-card) */
   .cf-dashboard-panel {
-    @apply relative overflow-hidden rounded-2xl border border-border/70 bg-gradient-to-b from-card via-card/95 to-card/80 shadow-[0_1px_0_0_hsl(220_13%_70%/0.55),0_16px_40px_-20px_rgb(15_23_42/0.1)] dark:border-white/[0.1] dark:from-card dark:via-card/95 dark:to-[hsl(222_26%_5%)] dark:shadow-[0_1px_0_0_hsl(220_16%_22%/0.55),0_20px_50px_-24px_rgb(0_0_0/0.5)];
+    @apply relative overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-b from-card via-card/95 to-card/85 shadow-[0_22px_60px_-36px_rgb(15_23_42/0.55)] backdrop-blur-sm dark:border-white/[0.1] dark:from-[hsl(222_30%_13%/0.97)] dark:via-[hsl(222_32%_10%/0.98)] dark:to-[hsl(222_38%_7%/0.99)] dark:shadow-[0_28px_70px_-36px_rgb(0_0_0/0.72),inset_0_1px_0_0_rgb(255_255_255/0.04)];
   }
   .cf-dashboard-panel::before {
     content: "";

@@ -22,12 +22,12 @@ export function PageFrame({
         dismissHref={dismissHref}
         dismissLabel={dismissLabel}
       />
-      <div className="relative mx-auto w-full max-w-[1580px] flex-1 px-safe py-7 sm:px-7 sm:py-9 lg:px-12 lg:py-11">
+      <div className="relative mx-auto w-full max-w-[1200px] flex-1 px-safe py-5 sm:px-6 sm:py-7 lg:px-8 lg:py-8">
         <div
-          className="pointer-events-none absolute left-1/2 top-0 h-56 w-[min(100%,42rem)] -translate-x-1/2 rounded-full bg-primary/[0.06] blur-3xl dark:bg-primary/[0.09]"
+          className="pointer-events-none absolute left-1/2 top-0 h-40 w-[min(100%,36rem)] -translate-x-1/2 rounded-full bg-primary/[0.05] blur-3xl dark:bg-primary/[0.08]"
           aria-hidden
         />
-        <div className="relative space-y-8 sm:space-y-11">{children}</div>
+        <div className="relative space-y-6 sm:space-y-8 lg:space-y-9">{children}</div>
       </div>
     </>
   );

@@ -8,7 +8,6 @@ import {
   CalendarDays,
   Gauge,
   Inbox,
-  LayoutGrid,
   LogOut,
   Settings2,
   Sparkles,
@@ -24,7 +23,7 @@ import {
   Brain,
 } from "lucide-react";
 import type { AppNotification } from "@/lib/types";
-import { BRAND_NAME } from "@/lib/brand";
+import { BRAND_LOGO_MONOGRAM, BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 import { signOutAction } from "@/actions/auth";
 import { DemoModeToggle } from "@/components/sales/demo-mode-toggle";
@@ -197,10 +196,15 @@ export function AppSidebar({
       )}
     >
       <div className="flex min-h-[3.75rem] items-center gap-3 border-b border-border/55 px-3 py-3.5 sm:min-h-[4rem] sm:px-4 dark:border-white/[0.06]">
-        <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 via-primary/12 to-accent/10 shadow-[0_8px_24px_-12px_hsl(222_48%_32%/0.35)] ring-1 ring-border/55 dark:from-primary/30 dark:ring-white/[0.08]">
-          <LayoutGrid className="size-[1.125rem] text-primary" strokeWidth={2} />
-        </div>
-        <div className="min-w-0 flex-1">
+        <Link
+          href="/"
+          onClick={() => onNavLinkClick?.()}
+          className="group flex min-w-0 flex-1 items-center gap-3"
+        >
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-[11px] font-bold text-primary-foreground shadow-sm ring-1 ring-black/5 dark:ring-white/10">
+            {BRAND_LOGO_MONOGRAM}
+          </div>
+          <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold leading-tight tracking-tight text-foreground">
             {companyName}
           </p>
@@ -210,7 +214,8 @@ export function AppSidebar({
               Proefperiode · nog {trialDaysLeft} {trialDaysLeft === 1 ? "dag" : "dagen"}
             </p>
           ) : null}
-        </div>
+          </div>
+        </Link>
         {!isAnonymousPreview && !hideNotificationBell ? (
           <NotificationBell initial={notifications} />
         ) : null}

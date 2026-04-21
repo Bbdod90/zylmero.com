@@ -105,12 +105,10 @@ export default async function DashboardPage() {
     <PageFrame
       title="Dashboard"
       subtitle={
-        demo
-          ? "Demo — volledig overzicht: waarde, pipeline, inbox en planning."
-          : "Waardevolle eerste indruk: omzetpotentie, verdeling en laatste activiteit."
+        demo ? "Demo-data — workspace zoals klanten ’m zien." : "Pipeline-waarde, funnel en laatste activiteit."
       }
     >
-      <div className="mx-auto w-full max-w-[1200px] space-y-8 lg:space-y-10">
+      <div className="mx-auto w-full max-w-[1200px] space-y-6 lg:space-y-8">
         <DashboardAiHub demoMode={demo} priorityLeadId={priorityLeadId} />
 
         {/* Hero + KPI-rail */}

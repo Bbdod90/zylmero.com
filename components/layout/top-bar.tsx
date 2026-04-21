@@ -17,10 +17,10 @@ export function TopBar({
   dismissLabel?: string;
 }) {
   return (
-    <header className="sticky top-0 z-30 border-b border-border/50 bg-background/88 backdrop-blur-xl supports-[backdrop-filter]:bg-background/72 dark:border-white/[0.07] dark:bg-background/[0.78]">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-border/40 to-transparent dark:via-white/[0.04]" />
-      <div className="mx-auto flex min-h-[3.75rem] max-w-[1580px] items-center justify-between gap-3 px-safe py-2.5 sm:min-h-[4rem] sm:gap-4 sm:px-7 lg:px-12">
+    <header className="sticky top-0 z-30 border-b border-border/50 bg-background/82 backdrop-blur-xl supports-[backdrop-filter]:bg-background/68 dark:border-white/[0.08] dark:bg-[hsl(228_32%_4%/0.82)]">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/35 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-border/35 to-transparent dark:via-white/[0.06]" />
+      <div className="mx-auto flex min-h-[3.5rem] max-w-[1200px] items-center justify-between gap-3 px-safe py-2 sm:min-h-[3.65rem] sm:gap-4 sm:px-6 lg:px-8">
         <div className="flex min-w-0 flex-1 items-start gap-3 sm:gap-4">
           {dismissHref ? (
             <Link

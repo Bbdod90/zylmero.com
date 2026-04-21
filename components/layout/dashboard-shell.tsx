@@ -30,7 +30,15 @@ export function DashboardShell({
         {...sidebarProps}
         className="sticky top-0 z-20 hidden h-dvh max-h-dvh lg:flex"
       />
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+      <div className="relative zm-landing-atmosphere flex min-h-0 min-w-0 flex-1 flex-col">
+        <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
+          <div className="absolute inset-0 zm-landing-spotlight opacity-[0.55] dark:opacity-[0.75]" />
+          <div className="absolute inset-0 zm-landing-edge-glow opacity-45 dark:opacity-[0.65]" />
+          <div className="absolute inset-0 zm-landing-radial-fade opacity-50 dark:opacity-[0.6]" />
+          <div className="absolute inset-0 zm-landing-dots opacity-[0.35] dark:opacity-[0.28]" />
+          <div className="cf-landing-grain absolute inset-0" aria-hidden />
+        </div>
+        <div className="relative z-[1] flex min-h-0 min-w-0 flex-1 flex-col">
         <header
           className={cn(
             "sticky top-0 z-30 flex items-center gap-2 border-b border-border/55 bg-background/90 py-2.5 backdrop-blur-md supports-[backdrop-filter]:bg-background/75 dark:border-white/[0.06] lg:hidden",
@@ -59,6 +67,7 @@ export function DashboardShell({
           <ThemeToggle className="shrink-0" />
         </header>
         {children}
+        </div>
       </div>
 
       <Dialog open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
