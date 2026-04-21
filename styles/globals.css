@@ -296,6 +296,30 @@
     @apply ring-1 ring-primary/35 shadow-[0_0_0_1px_hsl(var(--primary)/0.15),0_24px_80px_-40px_hsl(var(--primary)/0.35)];
   }
 
+  /** Hero accent — enterprise headline highlight */
+  .zm-text-gradient {
+    background: linear-gradient(
+      120deg,
+      hsl(var(--foreground)) 0%,
+      hsl(var(--primary)) 55%,
+      hsl(262 58% 52%) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .dark .zm-text-gradient {
+    background: linear-gradient(
+      118deg,
+      hsl(210 40% 99%) 0%,
+      hsl(var(--primary)) 48%,
+      hsl(262 62% 62%) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
   /** Landing — sectielabels en koppen (één ritme op de homepage) */
   .cf-landing-eyebrow {
     @apply text-[0.6875rem] font-semibold uppercase tracking-[0.22em] text-primary;

@@ -4,13 +4,17 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Check } from "lucide-react";
 import { AnonymousDemoForm } from "@/components/landing/demo-role-context";
+import { LandingComparisonSection } from "@/components/landing/landing-comparison-section";
+import { LandingFaqSection } from "@/components/landing/landing-faq-section";
 import { LandingFinalCtaSection } from "@/components/landing/landing-final-cta-section";
 import { LandingHeroProductVisual } from "@/components/landing/landing-hero-product-visual";
 import { LandingInteractiveChat } from "@/components/landing/landing-interactive-chat";
 import { LandingNav } from "@/components/landing/landing-nav";
 import { LandingOutcomesSection } from "@/components/landing/landing-outcomes-section";
 import { LandingPainCostSection } from "@/components/landing/landing-pain-cost-section";
+import { LandingPlatformBento } from "@/components/landing/landing-platform-bento";
 import { LandingSolutionSection } from "@/components/landing/landing-solution-section";
+import { LandingStatsStrip } from "@/components/landing/landing-stats-strip";
 import { LandingUseCasesSection } from "@/components/landing/landing-use-cases-section";
 import { StickyConversionBar } from "@/components/landing/sticky-conversion-bar";
 import { Button } from "@/components/ui/button";
@@ -50,17 +54,18 @@ export function ZylmeroLanding() {
       <div className="relative z-10">
         <LandingNav />
 
-        {/* 1 — Hero */}
+        {/* Hero */}
         <section className="border-b border-border/50 dark:border-white/[0.09]">
           <div className={cn(LANDING_MAX, "grid gap-16 py-24 md:gap-24 md:py-36 lg:grid-cols-[1.06fr_0.94fr] lg:items-center lg:gap-14")}>
             <motion.div {...fadeUp}>
               <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">{POSITIONING}</p>
-              <h1 className="mt-6 text-balance text-4xl font-semibold leading-[1.03] tracking-[-0.035em] text-foreground sm:text-5xl md:text-[3.35rem] lg:text-[3.85rem]">
-                Elke gemiste aanvraag kost je geld
+              <h1 className="mt-6 text-balance text-4xl font-semibold leading-[1.06] tracking-[-0.038em] sm:text-5xl md:text-[3.25rem] lg:text-[3.95rem]">
+                <span className="zm-text-gradient block">Elke gemiste aanvraag</span>
+                <span className="mt-2 block text-foreground">kost je geld</span>
               </h1>
               <p className="mt-8 max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl md:leading-relaxed">
-                Zylmero reageert automatisch op elke klantvraag, filtert serieuze leads en plant afspraken in — zonder dat jij
-                continu online hoeft te zijn.
+                {BRAND_NAME} vangt elke klantvraag op, beantwoordt meteen met context, en zet serieuze leads om in concrete
+                afspraken — zonder dat jij 24/7 bereikbaar hoeft te zijn.
               </p>
               <div className="mt-7 flex flex-wrap gap-2">
                 {CHANNEL_BADGES.map((c) => (
@@ -99,11 +104,15 @@ export function ZylmeroLanding() {
           </div>
         </section>
 
+        <LandingStatsStrip />
+
         <div className="border-b border-border/45 bg-muted/25 dark:border-white/[0.07] dark:bg-white/[0.03]">
           <LandingPainCostSection className="border-t-0" />
         </div>
 
         <LandingSolutionSection />
+
+        <LandingPlatformBento />
 
         <motion.section
           id="hoe-het-werkt"
@@ -121,10 +130,7 @@ export function ZylmeroLanding() {
                 aria-hidden
               />
               {HOW_STEPS.map((line, i) => (
-                <li
-                  key={line}
-                  className="relative flex gap-5 pb-12 last:pb-0 md:gap-7 md:pb-14"
-                >
+                <li key={line} className="relative flex gap-5 pb-12 last:pb-0 md:gap-7 md:pb-14">
                   <span className="relative z-[1] flex size-10 shrink-0 items-center justify-center rounded-full border border-primary/25 bg-background font-mono text-sm font-semibold tabular-nums text-primary shadow-[0_0_20px_-8px_hsl(var(--primary)/0.5)] dark:border-primary/35 dark:bg-[hsl(222_35%_9%)] dark:text-primary">
                     {i + 1}
                   </span>
@@ -156,6 +162,8 @@ export function ZylmeroLanding() {
         </div>
 
         <LandingUseCasesSection />
+
+        <LandingComparisonSection />
 
         <motion.section
           id="prijzen"
@@ -215,6 +223,8 @@ export function ZylmeroLanding() {
           </div>
         </motion.section>
 
+        <LandingFaqSection />
+
         <LandingFinalCtaSection />
 
         <footer className="border-t border-border/50 bg-muted/10 py-16 dark:border-white/[0.1] dark:bg-transparent">
@@ -234,6 +244,9 @@ export function ZylmeroLanding() {
               </a>
               <a href="#prijzen" className="transition-colors hover:text-foreground">
                 Prijzen
+              </a>
+              <a href="#faq" className="transition-colors hover:text-foreground">
+                FAQ
               </a>
             </nav>
           </div>

@@ -9,10 +9,10 @@ import { BRAND_LOGO_MONOGRAM, BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
-  { href: "#probleem", label: "Probleem" },
-  { href: "#hoe-het-werkt", label: "Hoe het werkt" },
+  { href: "#platform", label: "Product" },
   { href: "#demo", label: "Demo" },
   { href: "#prijzen", label: "Prijzen" },
+  { href: "#faq", label: "FAQ" },
 ] as const;
 
 export function LandingNav() {
