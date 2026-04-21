@@ -2,87 +2,56 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, Check, ChevronDown } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import { AnonymousDemoForm } from "@/components/landing/demo-role-context";
-import { HeroInboxMock } from "@/components/landing/hero-inbox-mock";
 import { LandingFinalCtaSection } from "@/components/landing/landing-final-cta-section";
+import { LandingHeroProductVisual } from "@/components/landing/landing-hero-product-visual";
 import { LandingInteractiveChat } from "@/components/landing/landing-interactive-chat";
-import { LandingMissedRevenueEstimator } from "@/components/landing/landing-missed-revenue-estimator";
 import { LandingNav } from "@/components/landing/landing-nav";
 import { LandingOutcomesSection } from "@/components/landing/landing-outcomes-section";
 import { LandingPainCostSection } from "@/components/landing/landing-pain-cost-section";
 import { LandingSolutionSection } from "@/components/landing/landing-solution-section";
-import { LandingTrustSection } from "@/components/landing/landing-trust-section";
+import { LandingUseCasesSection } from "@/components/landing/landing-use-cases-section";
 import { StickyConversionBar } from "@/components/landing/sticky-conversion-bar";
 import { Button } from "@/components/ui/button";
 import { BILLING_PLANS } from "@/lib/billing/plans";
 import { BRAND_CONTACT_EMAIL, BRAND_LOGO_MONOGRAM, BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
-const HERO_H1 = "Je mist klanten. Elke dag.";
+const POSITIONING = "Automatisch reageren op elke aanvraag — meer klanten binnenhalen zonder extra werk.";
 
-const HERO_SUB = "Zylmero reageert direct en volgt aanvragen op terwijl jij werkt.";
-
-const DEMO_BELOW = [
-  "Reageert binnen seconden",
-  "Volgt automatisch op",
-  "Zet om in afspraken",
-] as const;
-
-const HOW_LINES = [
-  "Klant stuurt bericht",
-  "Zylmero reageert",
-  "Gesprek loopt door",
-  "Jij sluit de deal",
-] as const;
-
-const FAQ_ITEMS = [
-  {
-    q: "Wat doet het?",
-    a: "Reageert op aanvragen. Houdt overzicht. Volgt op. Jij sluit af.",
-  },
-  {
-    q: "Werkt het automatisch?",
-    a: "Ja — binnen wat jij instelt. Jij houdt de regels.",
-  },
-  {
-    q: "Voor wie is dit?",
-    a: "Zzp en kleine bedrijven met aanvragen via mail, WhatsApp of site.",
-  },
-  {
-    q: "Kan ik stoppen?",
-    a: "Ja. Maandelijks opzegbaar.",
-  },
+const HOW_STEPS = [
+  "Sluit je kanalen aan (WhatsApp, site, e-mail)",
+  "AI reageert direct op klanten",
+  "Jij focust alleen op serieuze aanvragen",
 ] as const;
 
 const fadeUp = {
-  initial: { opacity: 0, y: 10 },
+  initial: { opacity: 0, y: 14 },
   whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: "-40px" },
-  transition: { duration: 0.22, ease: [0.22, 1, 0.36, 1] },
+  viewport: { once: true, margin: "-48px" },
+  transition: { duration: 0.28, ease: [0.22, 1, 0.36, 1] },
 };
 
 export function ZylmeroLanding() {
   return (
-    <div className="relative min-h-dvh overflow-x-hidden bg-background pb-24 text-foreground md:pb-20">
-      <div
-        className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,hsl(var(--primary)/0.06),transparent_55%)] dark:opacity-90"
-        aria-hidden
-      />
+    <div className="relative min-h-dvh overflow-x-hidden bg-background pb-28 text-foreground md:pb-24">
       <LandingNav />
 
-      {/* Hero */}
-      <section className="border-b border-border/30 dark:border-white/[0.06]">
-        <div className="mx-auto grid max-w-[1200px] gap-12 px-4 py-16 md:gap-16 md:px-8 md:py-24 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+      {/* 1 — Hero */}
+      <section className="border-b border-border/40 dark:border-white/[0.06]">
+        <div className="mx-auto grid max-w-[1120px] gap-16 px-4 py-20 md:gap-20 md:px-8 md:py-28 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
           <motion.div {...fadeUp}>
-            <h1 className="text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-foreground sm:text-5xl md:text-6xl md:leading-[1.02]">
-              {HERO_H1}
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">{POSITIONING}</p>
+            <h1 className="mt-5 text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-[3.35rem] lg:leading-[1.02]">
+              Elke gemiste aanvraag kost je geld
             </h1>
-            <p className="mt-6 max-w-md text-lg font-medium leading-snug text-muted-foreground md:text-xl">
-              {HERO_SUB}
+            <p className="mt-6 max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl">
+              Zylmero reageert automatisch op elke klantvraag, filtert serieuze leads en plant afspraken in — zonder dat
+              jij continu online hoeft te zijn.
             </p>
             <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <Button asChild size="lg" className="h-14 rounded-xl px-8 text-base font-semibold sm:h-16 sm:text-lg">
+              <Button asChild size="lg" className="h-12 rounded-lg px-8 text-base font-semibold sm:h-14">
                 <Link href="/signup">Start gratis</Link>
               </Button>
               <AnonymousDemoForm className="w-full sm:w-auto">
@@ -90,106 +59,109 @@ export function ZylmeroLanding() {
                   type="submit"
                   size="lg"
                   variant="outline"
-                  className="h-14 w-full rounded-xl border-2 border-primary/30 px-8 text-base font-semibold sm:h-16 sm:w-auto sm:text-lg"
+                  className="h-12 w-full rounded-lg border-border/60 px-8 text-base font-semibold sm:h-14 sm:w-auto dark:border-white/[0.12]"
                 >
                   Bekijk demo
                   <ArrowRight className="ml-2 size-4" aria-hidden />
                 </Button>
               </AnonymousDemoForm>
             </div>
-            <p className="mt-8 text-sm text-muted-foreground">Geen creditcard · Binnen minuten actief</p>
           </motion.div>
-          <div className="relative lg:pl-4">
-            <div className="overflow-hidden rounded-2xl border border-border/50 shadow-xl dark:border-white/[0.1]">
-              <HeroInboxMock />
-            </div>
-          </div>
+          <motion.div {...fadeUp} transition={{ ...fadeUp.transition, delay: 0.06 }}>
+            <LandingHeroProductVisual />
+          </motion.div>
         </div>
       </section>
 
-      {/* Demo */}
-      <section id="demo" className="scroll-mt-24 border-b border-border/30 py-20 md:py-28 dark:border-white/[0.06]">
-        <div className="mx-auto max-w-[720px] px-4 text-center md:px-8">
-          <h2 className="text-balance text-3xl font-semibold tracking-tight text-foreground md:text-5xl">
-            Dit gebeurt terwijl jij bezig bent
-          </h2>
-        </div>
-        <LandingInteractiveChat showMarketingHeader={false} />
-        <div className="mx-auto mt-10 max-w-xl px-4 md:px-8">
-          <ul className="flex flex-col gap-2 text-center text-lg font-semibold text-foreground sm:flex-row sm:justify-center sm:gap-8 md:text-xl">
-            {DEMO_BELOW.map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
+      {/* 2 — Probleem */}
       <LandingPainCostSection />
+
+      {/* 3 — Oplossing */}
       <LandingSolutionSection />
 
-      {/* Hoe */}
+      {/* 4 — Hoe het werkt */}
       <motion.section
         id="hoe-het-werkt"
-        className="scroll-mt-24 border-b border-border/30 py-20 md:py-28 dark:border-white/[0.06]"
+        className="scroll-mt-28 border-t border-border/40 py-24 md:py-32 dark:border-white/[0.06]"
         {...fadeUp}
       >
-        <div className="mx-auto max-w-[720px] px-4 md:px-8">
-          <h2 className="text-center text-balance text-3xl font-semibold tracking-tight text-foreground md:text-5xl">
-            Zo simpel is het
+        <div className="mx-auto max-w-[640px] px-4 md:px-8">
+          <h2 className="text-center text-balance text-3xl font-semibold tracking-tight text-foreground md:text-5xl md:leading-[1.1]">
+            Hoe het werkt
           </h2>
-          <ol className="mt-14 space-y-5 text-center text-xl font-semibold text-foreground md:text-2xl">
-            {HOW_LINES.map((line, i) => (
-              <li key={line} className="flex flex-col items-center gap-1 sm:flex-row sm:justify-center sm:gap-4">
-                <span className="text-primary tabular-nums">{i + 1}.</span>
-                <span>{line}</span>
+          <ol className="mt-14 space-y-6">
+            {HOW_STEPS.map((line, i) => (
+              <li key={line} className="flex gap-5 text-lg font-semibold text-foreground md:text-xl">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-sm tabular-nums text-muted-foreground">
+                  {i + 1}
+                </span>
+                <span className="pt-1 leading-snug">{line}</span>
               </li>
             ))}
           </ol>
         </div>
       </motion.section>
 
+      {/* 5 — Resultaten */}
       <LandingOutcomesSection />
 
-      {/* Prijzen */}
-      <motion.section id="prijzen" className="scroll-mt-24 border-b border-border/30 py-20 md:py-28 dark:border-white/[0.06]" {...fadeUp}>
-        <div className="mx-auto max-w-[1200px] px-4 md:px-8">
-          <div id="indicatie" className="scroll-mt-24">
-            <LandingMissedRevenueEstimator className="mb-8" />
-          </div>
-          <p className="mb-10 text-center text-lg font-semibold text-foreground md:text-xl">
-            1 extra klant = vaak al terugverdiend
+      {/* 6 — Visuele demo */}
+      <div id="demo" className="scroll-mt-28">
+        <div className="mx-auto max-w-[1120px] px-4 pt-20 md:px-8 md:pt-28">
+          <h2 className="mx-auto max-w-3xl text-balance text-center text-3xl font-semibold tracking-tight text-foreground md:text-5xl md:leading-[1.1]">
+            Van bericht tot afspraak
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-center text-base text-muted-foreground md:text-lg">
+            Klant stuurt · AI antwoordt · Afspraak staat · Lead zichtbaar
           </p>
-          <div className="grid gap-6 lg:grid-cols-3 lg:items-stretch">
+        </div>
+        <LandingInteractiveChat
+          showMarketingHeader={false}
+          hideBottomCtas
+          premiumEmbed
+          hideQuickPrompts
+        />
+      </div>
+
+      {/* 7 — Use cases */}
+      <LandingUseCasesSection />
+
+      {/* 8 — Prijs */}
+      <motion.section id="prijzen" className="scroll-mt-28 border-t border-border/40 py-24 md:py-32 dark:border-white/[0.06]" {...fadeUp}>
+        <div className="mx-auto max-w-[1000px] px-4 md:px-8">
+          <h2 className="text-center text-3xl font-semibold tracking-tight text-foreground md:text-5xl">Prijzen</h2>
+          <p className="mx-auto mt-4 max-w-lg text-center text-lg text-muted-foreground">Start klein, schaal wanneer nodig.</p>
+          <div className="mx-auto mt-14 grid gap-6 md:grid-cols-3">
             {BILLING_PLANS.map((plan) => (
               <div
                 key={plan.id}
                 className={cn(
-                  "flex flex-col rounded-2xl border p-6 md:p-8",
+                  "flex flex-col rounded-2xl border p-8",
                   plan.popular
-                    ? "border-primary/45 bg-primary/[0.07] ring-1 ring-primary/20 dark:bg-primary/[0.09]"
-                    : "border-border/45 bg-card/50 dark:border-white/[0.08]",
+                    ? "border-foreground/15 bg-muted/30 dark:border-white/[0.12] dark:bg-white/[0.04]"
+                    : "border-border/50 bg-background dark:border-white/[0.08]",
                 )}
               >
                 {plan.popular ? (
-                  <span className="mb-3 inline-flex w-fit rounded-full bg-primary px-3 py-0.5 text-xs font-semibold text-primary-foreground">
-                    Populair
-                  </span>
-                ) : null}
-                <h3 className="text-xl font-semibold">{plan.name}</h3>
+                  <span className="mb-4 w-fit rounded-md bg-foreground px-2.5 py-1 text-xs font-semibold text-background">Populair</span>
+                ) : (
+                  <span className="mb-4 block h-7" aria-hidden />
+                )}
+                <h3 className="text-lg font-semibold">{plan.name}</h3>
                 <p className="mt-4">
-                  <span className="text-4xl font-bold tabular-nums">€{plan.priceEur}</span>
+                  <span className="text-4xl font-semibold tabular-nums tracking-tight">€{plan.priceEur}</span>
                   <span className="text-muted-foreground">/mnd</span>
                 </p>
-                <p className="mt-1 text-xs text-muted-foreground">{plan.leadCapLabel}</p>
-                <ul className="mt-6 flex-1 space-y-2 text-sm">
+                <p className="mt-1 text-sm text-muted-foreground">{plan.leadCapLabel}</p>
+                <ul className="mt-8 flex-1 space-y-3 text-sm text-foreground">
                   {plan.features.map((f) => (
                     <li key={f} className="flex gap-2">
-                      <Check className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
+                      <Check className="mt-0.5 size-4 shrink-0 text-foreground opacity-70" aria-hidden />
                       {f}
                     </li>
                   ))}
                 </ul>
-                <Button asChild className="mt-8 h-12 w-full rounded-xl font-semibold" variant={plan.popular ? "default" : "outline"}>
+                <Button asChild className="mt-10 h-11 w-full rounded-lg font-semibold" variant={plan.popular ? "default" : "outline"}>
                   <Link href="/signup">Start gratis</Link>
                 </Button>
               </div>
@@ -198,44 +170,27 @@ export function ZylmeroLanding() {
         </div>
       </motion.section>
 
-      <LandingTrustSection />
-
-      <motion.section id="faq" className="scroll-mt-24 border-b border-border/30 py-20 md:py-28 dark:border-white/[0.06]" {...fadeUp}>
-        <div className="mx-auto max-w-xl px-4 md:px-8">
-          <h2 className="text-center text-3xl font-semibold tracking-tight text-foreground md:text-4xl">FAQ</h2>
-          <div className="mt-10 space-y-2">
-            {FAQ_ITEMS.map((item) => (
-              <details
-                key={item.q}
-                className="group rounded-xl border border-border/40 bg-card/30 open:bg-card/50 dark:border-white/[0.08]"
-              >
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3.5 text-left font-semibold text-foreground">
-                  {item.q}
-                  <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" />
-                </summary>
-                <p className="border-t border-border/30 px-4 pb-3.5 pt-2 text-sm text-muted-foreground dark:border-white/[0.06]">
-                  {item.a}
-                </p>
-              </details>
-            ))}
-          </div>
-        </div>
-      </motion.section>
-
+      {/* 9 — Final CTA */}
       <LandingFinalCtaSection />
 
-      <footer className="border-t border-border/40 py-10 dark:border-white/[0.06]">
-        <div className="mx-auto flex max-w-[1200px] flex-col items-center justify-between gap-6 px-4 md:flex-row md:px-8">
-          <div className="flex items-center gap-2">
-            <div className="flex size-8 items-center justify-center rounded-lg bg-primary/15 text-xs font-semibold">
+      <footer className="border-t border-border/40 py-12 dark:border-white/[0.06]">
+        <div className="mx-auto flex max-w-[1120px] flex-col items-center justify-between gap-8 px-4 md:flex-row md:px-8">
+          <div className="flex items-center gap-2.5">
+            <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground">
               {BRAND_LOGO_MONOGRAM}
             </div>
             <span className="font-semibold">{BRAND_NAME}</span>
           </div>
-          <nav className="flex flex-wrap justify-center gap-6 text-sm font-medium">
-            <Link href="/login">Inloggen</Link>
-            <a href={`mailto:${BRAND_CONTACT_EMAIL}`}>Contact</a>
-            <a href="#prijzen">Prijzen</a>
+          <nav className="flex flex-wrap justify-center gap-8 text-sm font-medium text-muted-foreground">
+            <Link href="/login" className="hover:text-foreground">
+              Inloggen
+            </Link>
+            <a href={`mailto:${BRAND_CONTACT_EMAIL}`} className="hover:text-foreground">
+              Contact
+            </a>
+            <a href="#prijzen" className="hover:text-foreground">
+              Prijzen
+            </a>
           </nav>
         </div>
       </footer>

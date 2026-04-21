@@ -64,11 +64,11 @@ export async function isLeadCapReached(
 export function entitlementUpgradeMessage(feature: "quotes" | "automations" | "full_ai" | "leads"): string {
   switch (feature) {
     case "quotes":
-      return "Offertes zitten in Growth en Pro. Upgrade om offertekladen te ontgrendelen.";
+      return "Offertes zitten in Pro en Business. Upgrade om offertekladen te ontgrendelen.";
     case "automations":
-      return "Automatiseringen zitten in Growth en Pro. Upgrade om opvolgingsflows te ontgrendelen.";
+      return "Automatiseringen zitten in Pro en Business. Upgrade om opvolgingsflows te ontgrendelen.";
     case "full_ai":
-      return "De volledige AI-closer is een Pro-functie. Upgrade voor slimme vervolgstappen en opvolging.";
+      return "Volledige AI-closer zit in Business. Upgrade voor slimme vervolgstappen en opvolging.";
     case "leads":
       return "Je hebt je maandelijkse leadlimiet bereikt. Upgrade voor meer capaciteit.";
     default:

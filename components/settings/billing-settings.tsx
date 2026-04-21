@@ -7,8 +7,8 @@ import { CreditCard, Gauge } from "lucide-react";
 const planLabel: Record<string, string> = {
   trial: "Proefperiode",
   starter: "Starter",
-  growth: "Growth",
-  pro: "Pro",
+  growth: "Pro",
+  pro: "Business",
 };
 
 export function BillingSettings({

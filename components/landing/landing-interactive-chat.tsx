@@ -268,9 +268,18 @@ function nid() {
 
 export function LandingInteractiveChat({
   showMarketingHeader = true,
+  hideBottomCtas = false,
+  premiumEmbed = false,
+  hideQuickPrompts = false,
 }: {
   /** Op de homepage staat de kop al buiten dit blok. */
   showMarketingHeader?: boolean;
+  /** Geen dubbele knoppen onderaan als de pagina al CTAs heeft. */
+  hideBottomCtas?: boolean;
+  /** Rustige sectie: minder gradient/glow, strakkere chrome. */
+  premiumEmbed?: boolean;
+  /** Minder ruis in de demo — geen quick-reply chips. */
+  hideQuickPrompts?: boolean;
 }) {
   const { demoRole } = useDemoRole();
   const chatHints = getLandingChatHints(demoRole);
@@ -442,15 +451,22 @@ export function LandingInteractiveChat({
   return (
     <section
       className={cn(
-        "relative overflow-hidden border-b border-border/30 dark:border-white/[0.06]",
-        showMarketingHeader ? "py-16 md:py-24" : "py-6 md:py-8",
-        "bg-gradient-to-b from-muted/25 via-muted/10 to-transparent dark:from-white/[0.035] dark:via-transparent dark:to-transparent",
+        "relative overflow-hidden",
+        premiumEmbed
+          ? "border-t border-border/40 bg-background py-12 md:py-16 dark:border-white/[0.06]"
+          : cn(
+              "border-b border-border/30 dark:border-white/[0.06]",
+              showMarketingHeader ? "py-16 md:py-24" : "py-6 md:py-8",
+              "bg-gradient-to-b from-muted/25 via-muted/10 to-transparent dark:from-white/[0.035] dark:via-transparent dark:to-transparent",
+            ),
       )}
     >
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-[min(520px,70%)] bg-[radial-gradient(ellipse_at_50%_0%,hsl(var(--primary)/0.14),transparent_62%)] dark:bg-[radial-gradient(ellipse_at_50%_0%,hsl(var(--primary)/0.18),transparent_65%)]"
-        aria-hidden
-      />
+      {!premiumEmbed ? (
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-[min(520px,70%)] bg-[radial-gradient(ellipse_at_50%_0%,hsl(var(--primary)/0.14),transparent_62%)] dark:bg-[radial-gradient(ellipse_at_50%_0%,hsl(var(--primary)/0.18),transparent_65%)]"
+          aria-hidden
+        />
+      ) : null}
       <div className="relative mx-auto max-w-[1200px] px-4 md:px-8">
         {showMarketingHeader ? (
           <div className="mx-auto max-w-2xl text-center">
@@ -465,21 +481,25 @@ export function LandingInteractiveChat({
         ) : null}
 
         <div className={cn("relative mx-auto max-w-3xl scroll-mt-24", showMarketingHeader ? "mt-12" : "mt-0")}>
-          <div
-            className="pointer-events-none absolute -inset-5 rounded-[1.65rem] bg-[radial-gradient(ellipse_at_45%_30%,hsl(var(--primary)/0.26),transparent_62%)] blur-2xl dark:bg-[radial-gradient(ellipse_at_45%_28%,hsl(var(--primary)/0.32),transparent_65%)]"
-            aria-hidden
-          />
+          {!premiumEmbed ? (
+            <div
+              className="pointer-events-none absolute -inset-5 rounded-[1.65rem] bg-[radial-gradient(ellipse_at_45%_30%,hsl(var(--primary)/0.26),transparent_62%)] blur-2xl dark:bg-[radial-gradient(ellipse_at_45%_28%,hsl(var(--primary)/0.32),transparent_65%)]"
+              aria-hidden
+            />
+          ) : null}
           <div
             className={cn(
-              "relative overflow-hidden rounded-[1.35rem] border border-border/55 bg-card text-foreground shadow-[0_34px_100px_-44px_rgb(0_0_0/0.72)] ring-1 ring-black/[0.05]",
-              "dark:border-white/[0.11] dark:bg-[hsl(228_26%_8%/0.96)] dark:shadow-black/60 dark:ring-white/[0.06]",
+              "relative overflow-hidden rounded-2xl border bg-card text-foreground",
+              premiumEmbed
+                ? "border-border/60 shadow-sm dark:border-white/[0.1]"
+                : "rounded-[1.35rem] border-border/55 shadow-[0_34px_100px_-44px_rgb(0_0_0/0.72)] ring-1 ring-black/[0.05] dark:border-white/[0.11] dark:bg-[hsl(228_26%_8%/0.96)] dark:shadow-black/60 dark:ring-white/[0.06]",
             )}
           >
             <div
               className={cn(
                 "flex items-center gap-2 border-b px-3 py-3 sm:gap-3 sm:px-4",
-                "border-border/60 bg-gradient-to-b from-muted/50 to-muted/15",
-                "dark:border-white/[0.08] dark:from-white/[0.06] dark:to-transparent",
+                "border-border/60 bg-muted/30 dark:border-white/[0.08] dark:bg-white/[0.03]",
+                !premiumEmbed && "bg-gradient-to-b from-muted/50 to-muted/15 dark:from-white/[0.06] dark:to-transparent",
               )}
             >
               <div className="flex gap-1.5 pl-0.5 opacity-70">
@@ -495,7 +515,7 @@ export function LandingInteractiveChat({
                   {BRAND_NAME} · demo
                 </p>
                 <p className="text-xs text-muted-foreground dark:text-white/65">
-                  Interactieve preview — geen account nodig
+                  {premiumEmbed ? "Typ een bericht — zie de flow." : "Interactieve preview — geen account nodig"}
                 </p>
               </div>
               <div className="flex shrink-0 flex-col items-end gap-1">
@@ -510,7 +530,7 @@ export function LandingInteractiveChat({
               ref={messagesContainerRef}
               className={cn(
                 "max-h-[min(420px,55vh)] space-y-3 overflow-y-auto overflow-x-hidden px-3 py-4 [overflow-anchor:none] sm:px-4",
-                "bg-muted/10 dark:bg-transparent",
+                premiumEmbed ? "bg-background dark:bg-transparent" : "bg-muted/10 dark:bg-transparent",
               )}
               role="log"
               aria-live="polite"
@@ -582,24 +602,26 @@ export function LandingInteractiveChat({
                 "dark:border-white/[0.08] dark:bg-black/25",
               )}
             >
-              <div className="mb-3 flex flex-wrap gap-2">
-                {chatHints.quickPrompts.map((prompt) => (
-                  <button
-                    key={prompt}
-                    type="button"
-                    disabled={busy}
-                    onClick={() => setInput(prompt)}
-                    className={cn(
-                      "rounded-full border border-border/60 bg-background/80 px-3 py-1.5 text-left text-[0.8125rem] leading-snug text-foreground transition-colors",
-                      "hover:border-primary/35 hover:bg-primary/[0.06]",
-                      "disabled:pointer-events-none disabled:opacity-50",
-                      "dark:border-white/[0.1] dark:bg-white/[0.04] dark:text-white dark:hover:border-primary/40",
-                    )}
-                  >
-                    {prompt}
-                  </button>
-                ))}
-              </div>
+              {!hideQuickPrompts ? (
+                <div className="mb-3 flex flex-wrap gap-2">
+                  {chatHints.quickPrompts.map((prompt) => (
+                    <button
+                      key={prompt}
+                      type="button"
+                      disabled={busy}
+                      onClick={() => setInput(prompt)}
+                      className={cn(
+                        "rounded-full border border-border/60 bg-background/80 px-3 py-1.5 text-left text-[0.8125rem] leading-snug text-foreground transition-colors",
+                        "hover:border-primary/35 hover:bg-primary/[0.06]",
+                        "disabled:pointer-events-none disabled:opacity-50",
+                        "dark:border-white/[0.1] dark:bg-white/[0.04] dark:text-white dark:hover:border-primary/40",
+                      )}
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
               <div className="flex gap-2">
                 <Input
                   value={input}
@@ -628,16 +650,18 @@ export function LandingInteractiveChat({
           </div>
         </div>
 
-        <div className="relative mx-auto mt-12 flex max-w-lg flex-col items-stretch gap-3 sm:flex-row sm:justify-center">
-          <Button asChild size="lg" className="h-12 rounded-xl px-8 text-base font-semibold sm:flex-1">
-            <Link href="/signup">Start gratis</Link>
-          </Button>
-          <AnonymousDemoForm className="sm:flex-1">
-            <Button type="submit" variant="demo" size="lg" className="h-12 w-full rounded-xl px-8 text-base font-semibold">
-              Bekijk demo
+        {!hideBottomCtas ? (
+          <div className="relative mx-auto mt-12 flex max-w-lg flex-col items-stretch gap-3 sm:flex-row sm:justify-center">
+            <Button asChild size="lg" className="h-12 rounded-xl px-8 text-base font-semibold sm:flex-1">
+              <Link href="/signup">Start gratis</Link>
             </Button>
-          </AnonymousDemoForm>
-        </div>
+            <AnonymousDemoForm className="sm:flex-1">
+              <Button type="submit" variant="demo" size="lg" className="h-12 w-full rounded-xl px-8 text-base font-semibold">
+                Bekijk demo
+              </Button>
+            </AnonymousDemoForm>
+          </div>
+        ) : null}
       </div>
     </section>
   );

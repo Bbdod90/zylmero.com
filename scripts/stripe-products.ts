@@ -14,9 +14,9 @@ async function main() {
   const stripe = new Stripe(key, { typescript: true });
 
   const plans = [
-    { id: "starter", name: "Zylmero Starter", amount: 7900 },
-    { id: "growth", name: "Zylmero Growth", amount: 14900 },
-    { id: "pro", name: "Zylmero Pro", amount: 29900 },
+    { id: "starter", name: "Zylmero Starter", amount: 2900 },
+    { id: "growth", name: "Zylmero Pro", amount: 4900 },
+    { id: "pro", name: "Zylmero Business", amount: 7900 },
   ] as const;
 
   for (const p of plans) {

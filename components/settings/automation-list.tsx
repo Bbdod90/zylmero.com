@@ -153,7 +153,7 @@ export function AutomationList({
       ) : null}
       {!canUseAutomations ? (
         <div className="rounded-xl border border-primary/25 bg-primary/5 p-4 text-sm">
-          <p className="font-medium">Automatiseringen zitten in Growth en Pro</p>
+          <p className="font-medium">Automatiseringen zitten in Pro en Business</p>
           <p className="mt-1 text-muted-foreground">
             Upgrade om opvolgingsritmes en sjablonen te gebruiken.
           </p>
