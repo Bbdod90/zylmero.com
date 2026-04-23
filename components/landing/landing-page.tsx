@@ -1,5 +1,5 @@
-import { ZylmeroLanding } from "@/components/landing/zylmero-landing";
+import { HomePage } from "@/components/home/HomePage";
 
 export function LandingPage() {
-  return <ZylmeroLanding />;
+  return <HomePage />;
 }
