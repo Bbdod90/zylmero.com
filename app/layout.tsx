@@ -31,10 +31,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   viewportFit: "cover",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "hsl(210 32% 98%)" },
-    { media: "(prefers-color-scheme: dark)", color: "hsl(228 32% 4%)" },
-  ],
+  /** Default dark; ThemeColorSync overschrijft na mount voor licht/donker match met body. */
+  themeColor: "#05070D",
 };
 
 export default function RootLayout({

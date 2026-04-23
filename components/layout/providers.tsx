@@ -3,6 +3,7 @@
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 import type { ReactNode } from "react";
+import { ThemeColorSync } from "@/components/layout/theme-color-sync";
 
 function Providers({ children }: { children: ReactNode }) {
   return (
@@ -13,6 +14,7 @@ function Providers({ children }: { children: ReactNode }) {
       storageKey="zylmero-theme"
       disableTransitionOnChange
     >
+      <ThemeColorSync />
       {children}
       <Toaster
         richColors

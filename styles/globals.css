@@ -43,6 +43,7 @@
     --cf-mesh-a: hsl(222 42% 42% / 0.07);
     --cf-mesh-b: hsl(262 40% 55% / 0.05);
     --cf-mesh-c: hsl(220 30% 50% / 0.04);
+    color-scheme: light;
   }
 
   .dark {
@@ -79,6 +80,7 @@
     --cf-mesh-a: hsl(var(--primary) / 0.08);
     --cf-mesh-b: hsl(var(--accent) / 0.05);
     --cf-mesh-c: hsl(220 40% 40% / 0.04);
+    color-scheme: dark;
   }
 }
 
@@ -87,7 +89,7 @@
     @apply border-border;
   }
   html {
-    @apply scroll-smooth;
+    @apply scroll-smooth bg-background;
     scrollbar-gutter: stable;
     overflow-x: clip;
     -webkit-text-size-adjust: 100%;
