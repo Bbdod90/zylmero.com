@@ -11,16 +11,13 @@ import { BRAND_LOGO_MONOGRAM } from "@/lib/brand";
 
 export default function SignupPage() {
   return (
-    <div className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-background px-safe py-8 sm:p-6">
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.22]"
-        style={{
-          backgroundImage: `radial-gradient(circle at 1px 1px, hsl(var(--muted-foreground) / 0.22) 1px, transparent 0)`,
-          backgroundSize: "22px 22px",
-        }}
-        aria-hidden
-      />
-      <div className="absolute left-[max(1rem,env(safe-area-inset-left))] top-[max(1rem,env(safe-area-inset-top))] z-10">
+    <div className="relative flex min-h-dvh items-center justify-center overflow-hidden zm-landing-atmosphere px-safe py-8 sm:p-6">
+      <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
+        <div className="absolute inset-0 zm-landing-spotlight opacity-85 dark:opacity-95" />
+        <div className="absolute inset-0 zm-landing-dots opacity-[0.38] dark:opacity-[0.32]" />
+      </div>
+      <div className="zm-landing-grain-fixed" aria-hidden />
+      <div className="absolute left-[max(1rem,env(safe-area-inset-left))] top-[max(1rem,env(safe-area-inset-top))] z-20">
         <Link
           href="/"
           className="inline-flex size-10 items-center justify-center rounded-xl border border-border/60 bg-background/90 text-muted-foreground shadow-sm backdrop-blur-sm transition hover:bg-muted hover:text-foreground"
@@ -29,10 +26,10 @@ export default function SignupPage() {
           <X className="size-5" strokeWidth={2} />
         </Link>
       </div>
-      <div className="absolute right-[max(1rem,env(safe-area-inset-right))] top-[max(1rem,env(safe-area-inset-top))] z-10">
+      <div className="absolute right-[max(1rem,env(safe-area-inset-right))] top-[max(1rem,env(safe-area-inset-top))] z-20">
         <ThemeToggle />
       </div>
-      <div className="relative z-[1] w-full max-w-md space-y-5 sm:space-y-6">
+      <div className="relative z-10 w-full max-w-md space-y-5 sm:space-y-6">
         <div className="text-center">
           <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/26 to-accent/16 text-lg font-bold text-primary shadow-sm ring-1 ring-primary/15">
             {BRAND_LOGO_MONOGRAM}
@@ -45,7 +42,7 @@ export default function SignupPage() {
           </p>
         </div>
         <LocalhostMobileHint />
-        <Card className="rounded-2xl border-border/70 bg-card/85 shadow-lg shadow-black/5 backdrop-blur-sm dark:shadow-black/25">
+        <Card className="cf-landing-pro-card rounded-[1.15rem] border-border/55 shadow-[0_24px_70px_-40px_rgb(0_0_0/0.2)] dark:shadow-[0_28px_80px_-40px_rgb(0_0_0/0.55)]">
           <CardHeader>
             <CardTitle className="text-base">Start in één tik</CardTitle>
           </CardHeader>

@@ -34,17 +34,18 @@ const fadeUp = {
   transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] },
 };
 
-const LANDING_MAX = "mx-auto w-full max-w-[1180px] px-4 sm:px-6 lg:px-8";
+const LANDING_MAX = "mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8";
 
 export function ZylmeroLanding() {
   return (
-    <div className="relative min-h-dvh zm-landing-atmosphere overflow-x-hidden pb-28 text-foreground md:pb-24">
+    <div className="relative min-h-dvh zm-landing-atmosphere overflow-x-hidden pb-24 text-foreground md:pb-20">
       <div className="pointer-events-none fixed inset-0 z-0" aria-hidden>
         <div className="absolute inset-0 zm-landing-spotlight opacity-90 dark:opacity-100" />
         <div className="absolute inset-0 zm-landing-edge-glow opacity-70 dark:opacity-90" />
         <div className="absolute inset-0 zm-landing-radial-fade opacity-75" />
         <div className="absolute inset-0 zm-landing-dots opacity-[0.55] dark:opacity-[0.42]" />
       </div>
+      <div className="zm-landing-grain-fixed" aria-hidden />
 
       <div className="relative z-10">
         <LandingNav />
@@ -54,16 +55,16 @@ export function ZylmeroLanding() {
           <div
             className={cn(
               LANDING_MAX,
-              "grid gap-10 py-14 md:gap-12 md:py-16 lg:grid-cols-[1.02fr_0.98fr] lg:items-center lg:gap-10",
+              "grid gap-8 py-11 md:gap-10 md:py-12 lg:grid-cols-[1.02fr_0.98fr] lg:items-center lg:gap-9",
             )}
           >
             <motion.div {...fadeUp}>
-              <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">{POSITIONING}</p>
-              <h1 className="mt-4 text-balance text-[2.15rem] font-semibold leading-[1.08] tracking-[-0.035em] sm:text-4xl md:text-[2.75rem] lg:text-[3.15rem]">
+              <p className="cf-landing-eyebrow">{POSITIONING}</p>
+              <h1 className="mt-3 text-balance text-[2rem] font-semibold leading-[1.07] tracking-[-0.038em] sm:text-[2.35rem] md:text-[2.65rem] lg:text-[3rem]">
                 <span className="zm-text-gradient block">Elke gemiste aanvraag</span>
                 <span className="mt-1 block text-foreground">kost je geld</span>
               </h1>
-              <p className="mt-5 max-w-xl text-pretty text-base leading-relaxed text-muted-foreground md:text-[17px]">
+              <p className="mt-4 max-w-xl text-pretty text-[15px] leading-relaxed text-muted-foreground md:text-[16px]">
                 {BRAND_NAME} bundelt mail, WhatsApp en site, antwoordt direct met context en zet warme leads om in afspraken.
               </p>
               <div className="mt-5 flex flex-wrap gap-2">
@@ -76,7 +77,7 @@ export function ZylmeroLanding() {
                   </span>
                 ))}
               </div>
-              <div className="mt-8 flex flex-col gap-2.5 sm:flex-row sm:items-center">
+              <div className="mt-7 flex flex-col gap-2.5 sm:flex-row sm:items-center">
                 <Button
                   asChild
                   size="lg"
@@ -109,23 +110,22 @@ export function ZylmeroLanding() {
 
         <motion.section
           id="hoe-het-werkt"
-          className="scroll-mt-24 border-t border-border/45 bg-muted/12 py-12 md:py-14 dark:border-white/[0.08] dark:bg-white/[0.02]"
+          className="scroll-mt-24 border-t border-border/45 bg-muted/12 py-9 md:py-11 dark:border-white/[0.08] dark:bg-white/[0.02]"
           {...fadeUp}
         >
           <div className={LANDING_MAX}>
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
               <div>
-                <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">Proces</p>
-                <h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-foreground md:text-3xl">Zo werkt het</h2>
+                <p className="cf-landing-eyebrow">Proces</p>
+                <h2 className="cf-landing-h2 mt-2 max-w-xl">Zo werkt het</h2>
               </div>
-              <p className="max-w-md text-sm text-muted-foreground">Drie stappen — daarna draait het zonder dat jij 24/7 bereikbaar hoeft te zijn.</p>
+              <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
+                Drie stappen — daarna draait het zonder dat jij 24/7 bereikbaar hoeft te zijn.
+              </p>
             </div>
-            <ol className="mt-8 grid gap-4 md:grid-cols-3 md:gap-5">
+            <ol className="mt-6 grid gap-3 md:grid-cols-3 md:gap-4">
               {HOW_STEPS.map((line, i) => (
-                <li
-                  key={line}
-                  className="relative rounded-2xl border border-border/45 bg-card/50 p-5 dark:border-white/[0.08] dark:bg-white/[0.03]"
-                >
+                <li key={line} className="cf-landing-pro-card p-5 md:p-5">
                   <span className="font-mono text-[11px] font-bold tabular-nums text-primary">{String(i + 1).padStart(2, "0")}</span>
                   <p className="mt-2 text-[15px] font-medium leading-snug text-foreground">{line}</p>
                 </li>
@@ -140,14 +140,14 @@ export function ZylmeroLanding() {
 
         <motion.section
           id="prijzen"
-          className="scroll-mt-24 border-t border-border/45 bg-muted/15 py-12 md:py-16 dark:border-white/[0.08] dark:bg-white/[0.03]"
+          className="scroll-mt-24 border-t border-border/45 bg-muted/15 py-9 md:py-12 dark:border-white/[0.08] dark:bg-white/[0.03]"
           {...fadeUp}
         >
           <div className={LANDING_MAX}>
-            <p className="text-center font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">Abonnementen</p>
-            <h2 className="mt-2 text-center text-2xl font-semibold tracking-[-0.03em] text-foreground md:text-4xl">Prijzen</h2>
-            <p className="mx-auto mt-2 max-w-lg text-center text-sm text-muted-foreground md:text-base">Start klein, schaal mee.</p>
-            <div className="mx-auto mt-8 grid max-w-[1040px] gap-4 md:grid-cols-3 md:gap-5">
+            <p className="cf-landing-eyebrow text-center">Abonnementen</p>
+            <h2 className="cf-landing-h2 mx-auto mt-2 max-w-3xl text-center">Prijzen</h2>
+            <p className="mx-auto mt-2 max-w-lg text-center text-sm text-muted-foreground md:text-[15px]">Start klein, schaal mee.</p>
+            <div className="mx-auto mt-7 grid max-w-[1040px] gap-3 md:grid-cols-3 md:gap-4">
               {BILLING_PLANS.map((plan) => (
                 <div
                   key={plan.id}
@@ -200,8 +200,8 @@ export function ZylmeroLanding() {
 
         <LandingFinalCtaSection />
 
-        <footer className="border-t border-border/50 bg-muted/10 py-10 dark:border-white/[0.1] dark:bg-transparent">
-          <div className={cn(LANDING_MAX, "flex flex-col items-center justify-between gap-6 md:flex-row")}>
+        <footer className="border-t border-border/50 bg-background/70 py-8 backdrop-blur-xl dark:border-white/[0.1] dark:bg-[hsl(222_40%_6%/0.65)]">
+          <div className={cn(LANDING_MAX, "flex flex-col items-center justify-between gap-5 md:flex-row")}>
             <div className="flex items-center gap-3">
               <div className="flex size-9 items-center justify-center rounded-xl bg-primary text-[11px] font-bold text-primary-foreground shadow-md ring-1 ring-black/10 dark:ring-white/15">
                 {BRAND_LOGO_MONOGRAM}

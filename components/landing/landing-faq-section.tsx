@@ -33,24 +33,24 @@ export function LandingFaqSection() {
   return (
     <motion.section
       id="faq"
-      className="scroll-mt-24 border-t border-border/45 bg-muted/15 py-12 md:py-14 dark:border-white/[0.08] dark:bg-white/[0.02]"
+      className="scroll-mt-24 border-t border-border/45 bg-muted/15 py-9 md:py-11 dark:border-white/[0.08] dark:bg-white/[0.02]"
       {...fade}
     >
       <div className="mx-auto max-w-[720px] px-4 sm:px-6 lg:px-8">
-        <p className="text-center font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">FAQ</p>
-        <h2 className="mt-2 text-center text-balance text-2xl font-semibold tracking-[-0.035em] text-foreground md:text-3xl">Veelgestelde vragen</h2>
+        <p className="cf-landing-eyebrow text-center">FAQ</p>
+        <h2 className="cf-landing-h2 mx-auto mt-2 max-w-2xl text-center">Veelgestelde vragen</h2>
         <p className="mx-auto mt-2 max-w-lg text-center text-sm text-muted-foreground">Kort antwoord.</p>
-        <div className="mt-6 space-y-2">
+        <div className="cf-landing-pro-card mx-auto mt-5 overflow-hidden p-0">
           {ITEMS.map((item) => (
             <details
               key={item.q}
-              className="group rounded-2xl border border-border/50 bg-card/60 open:bg-card/85 dark:border-white/[0.09] dark:open:bg-[hsl(222_28%_10%/0.95)]"
+              className="group border-b border-border/40 last:border-b-0 dark:border-white/[0.07]"
             >
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-4 py-3 text-left text-[14px] font-semibold text-foreground md:px-5 md:py-4">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 bg-card/40 px-4 py-3.5 text-left text-[14px] font-semibold text-foreground transition-colors hover:bg-muted/25 md:px-5 md:py-4 dark:bg-transparent dark:hover:bg-white/[0.04]">
                 {item.q}
                 <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" aria-hidden />
               </summary>
-              <p className="border-t border-border/40 px-4 pb-4 pt-2 text-[14px] leading-relaxed text-muted-foreground md:px-5 md:pb-4 dark:border-white/[0.07]">
+              <p className="border-t border-border/35 bg-card/30 px-4 pb-4 pt-3 text-[14px] leading-relaxed text-muted-foreground md:px-5 md:pb-4 dark:border-white/[0.06] dark:bg-white/[0.02]">
                 {item.a}
               </p>
             </details>

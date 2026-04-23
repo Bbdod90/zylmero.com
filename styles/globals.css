@@ -161,17 +161,28 @@
         transparent 45%
       );
   }
-  /** Marketing — verticale diepte (light + dark) */
+  /** Marketing — verticale diepte + iets rijkere lagen (light + dark) */
   .zm-landing-atmosphere {
-    background: linear-gradient(
-      180deg,
-      hsl(220 24% 98%) 0%,
-      hsl(220 18% 97%) 45%,
-      hsl(220 16% 96%) 100%
-    );
+    background:
+      radial-gradient(ellipse 120% 80% at 50% -20%, hsl(222 45% 42% / 0.06), transparent 52%),
+      linear-gradient(180deg, hsl(220 26% 99%) 0%, hsl(220 18% 97%) 48%, hsl(220 14% 95%) 100%);
   }
   .dark .zm-landing-atmosphere {
-    background: linear-gradient(180deg, hsl(222 44% 8%) 0%, hsl(222 44% 6%) 42%, hsl(225 38% 5%) 100%);
+    background:
+      radial-gradient(ellipse 100% 70% at 50% -15%, hsl(218 55% 38% / 0.22), transparent 55%),
+      linear-gradient(180deg, hsl(222 40% 9%) 0%, hsl(222 44% 6%) 45%, hsl(225 38% 4.5%) 100%);
+  }
+  /** Zeer subtiele film grain over de hele marketingpagina (fixed) */
+  .zm-landing-grain-fixed {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    opacity: 0.032;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.65'/%3E%3C/svg%3E");
+  }
+  .dark .zm-landing-grain-fixed {
+    opacity: 0.048;
   }
   .zm-landing-spotlight {
     background: radial-gradient(
@@ -283,9 +294,9 @@
     opacity: 0.055;
   }
 
-  /** Landing — gepolijste kaarten (depth + top highlight, zonder drukte) */
+  /** Landing — gepolijste kaarten (depth + top highlight + inner lift) */
   .cf-landing-pro-card {
-    @apply relative overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-b from-card via-card/95 to-card/85 shadow-[0_22px_60px_-36px_rgb(15_23_42/0.55)] backdrop-blur-sm dark:border-white/[0.1] dark:from-[hsl(222_30%_13%/0.97)] dark:via-[hsl(222_32%_10%/0.98)] dark:to-[hsl(222_38%_7%/0.99)] dark:shadow-[0_28px_70px_-36px_rgb(0_0_0/0.72),inset_0_1px_0_0_rgb(255_255_255/0.04)];
+    @apply relative overflow-hidden rounded-[1.15rem] border border-border/50 bg-gradient-to-b from-card via-card/95 to-card/85 shadow-[0_20px_50px_-32px_rgb(15_23_42/0.45),inset_0_1px_0_0_rgb(255_255_255/0.65)] backdrop-blur-sm dark:border-white/[0.11] dark:from-[hsl(222_30%_13%/0.97)] dark:via-[hsl(222_32%_10%/0.98)] dark:to-[hsl(222_38%_7%/0.99)] dark:shadow-[0_28px_72px_-34px_rgb(0_0_0/0.68),inset_0_1px_0_0_rgb(255_255_255/0.05)];
   }
   .cf-landing-pro-card::before {
     content: "";
@@ -322,18 +333,18 @@
 
   /** Landing — sectielabels en koppen (één ritme op de homepage) */
   .cf-landing-eyebrow {
-    @apply text-[0.6875rem] font-semibold uppercase tracking-[0.22em] text-primary;
+    @apply font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-primary;
   }
   .cf-landing-h2 {
-    @apply text-balance text-[1.625rem] font-semibold tracking-tight text-foreground sm:text-3xl md:text-[2.25rem] md:leading-[1.15];
+    @apply text-balance text-[1.75rem] font-semibold tracking-[-0.04em] text-foreground sm:text-[2rem] md:text-[2.4rem] md:leading-[1.1];
   }
 
-  /** Sticky CTA — zwevende dock (desktop) */
+  /** Sticky CTA — zwevende dock (strakker, glas) */
   .cf-sticky-dock {
-    @apply fixed bottom-0 left-0 right-0 z-50 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 md:px-6 md:pb-5;
+    @apply fixed bottom-0 left-0 right-0 z-50 pb-[max(0.65rem,env(safe-area-inset-bottom))] pt-2 md:px-6 md:pb-4;
   }
   .cf-sticky-dock-inner {
-    @apply mx-3 flex max-w-[1180px] flex-col gap-3 rounded-2xl border border-border/50 bg-background/[0.92] px-4 py-3.5 shadow-[0_32px_100px_-48px_rgb(0_0_0/0.45)] backdrop-blur-2xl ring-1 ring-black/[0.04] dark:border-white/[0.12] dark:bg-[hsl(228_28%_6%/0.92)] dark:shadow-[0_40px_120px_-50px_rgb(0_0_0/0.65)] dark:ring-white/[0.06] sm:mx-auto sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-6 sm:py-4;
+    @apply mx-3 flex max-w-[1200px] flex-col gap-2.5 rounded-2xl border border-border/55 bg-background/[0.94] px-4 py-3 shadow-[0_24px_80px_-40px_rgb(0_0_0/0.38),inset_0_1px_0_0_rgb(255_255_255/0.55)] backdrop-blur-2xl ring-1 ring-black/[0.05] dark:border-white/[0.1] dark:bg-[hsl(228_26%_7%/0.94)] dark:shadow-[0_32px_100px_-48px_rgb(0_0_0/0.72),inset_0_1px_0_0_rgb(255_255_255/0.04)] dark:ring-white/[0.07] sm:mx-auto sm:flex-row sm:items-center sm:justify-between sm:gap-5 sm:px-5 sm:py-3;
   }
 }
 

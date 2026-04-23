@@ -150,19 +150,15 @@ export function LandingProductTour({ className }: { className?: string }) {
   const tab = useMemo(() => TABS.find((t) => t.id === active)!, [active]);
 
   return (
-    <section className={cn("scroll-mt-24 border-t border-border/45 py-12 md:py-14 dark:border-white/[0.08]", className)} id="demo">
-      <div className="mx-auto max-w-[1180px] px-4 sm:px-6 lg:px-8">
-        <p className="text-center font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">
-          Product tour
-        </p>
-        <h2 className="mx-auto mt-2 max-w-3xl text-balance text-center text-2xl font-semibold tracking-[-0.04em] text-foreground md:text-[2.25rem] md:leading-[1.1]">
-          In de app
-        </h2>
+    <section className={cn("scroll-mt-24 border-t border-border/45 py-9 md:py-11 dark:border-white/[0.08]", className)} id="demo">
+      <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+        <p className="cf-landing-eyebrow text-center">Product tour</p>
+        <h2 className="cf-landing-h2 mx-auto mt-2 max-w-3xl text-center">In de app</h2>
         <p className="mx-auto mt-2 max-w-2xl text-center text-sm text-muted-foreground md:text-[15px]">
           Inbox → reactie → afspraak. Dat is de flow.
         </p>
 
-        <div className="mx-auto mt-6 flex max-w-3xl flex-wrap justify-center gap-2">
+        <div className="mx-auto mt-5 flex max-w-3xl flex-wrap justify-center gap-2">
           {TABS.map((t) => (
             <button
               key={t.id}
@@ -181,9 +177,9 @@ export function LandingProductTour({ className }: { className?: string }) {
           ))}
         </div>
 
-        <div className="mx-auto mt-6 grid max-w-[1040px] gap-5 lg:grid-cols-[minmax(0,0.85fr)_1.15fr] lg:items-start lg:gap-6">
+        <div className="mx-auto mt-5 grid max-w-[1040px] gap-4 lg:grid-cols-[minmax(0,0.85fr)_1.15fr] lg:items-start lg:gap-5">
           <div>
-            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">Focus</p>
+            <p className="cf-landing-eyebrow">Focus</p>
             <h3 className="mt-2 text-balance text-xl font-semibold tracking-[-0.03em] text-foreground md:text-2xl">
               {tab.title}
             </h3>

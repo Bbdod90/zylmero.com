@@ -21,19 +21,19 @@ export function LandingPlatformBento() {
   return (
     <motion.section
       id="platform"
-      className="scroll-mt-24 border-t border-border/45 py-12 md:py-16 dark:border-white/[0.08]"
+      className="scroll-mt-24 border-t border-border/45 py-9 md:py-12 dark:border-white/[0.08]"
       {...fade}
     >
-      <div className="mx-auto max-w-[1180px] px-4 sm:px-6 lg:px-8">
-        <p className="text-center font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">Platform</p>
-        <h2 className="mx-auto mt-2 max-w-[820px] text-balance text-center text-2xl font-semibold tracking-[-0.035em] text-foreground md:text-[2.25rem] md:leading-[1.12]">
+      <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+        <p className="cf-landing-eyebrow text-center">Platform</p>
+        <h2 className="cf-landing-h2 mx-auto mt-2 max-w-[860px] text-center">
           Van aanvraag naar omzet — één systeem
         </h2>
-        <p className="mx-auto mt-3 max-w-2xl text-center text-sm text-muted-foreground md:text-[15px]">
+        <p className="mx-auto mt-2 max-w-2xl text-center text-sm text-muted-foreground md:text-[15px]">
           Intake, gesprek en opvolging zonder losse tools.
         </p>
 
-        <div className="mt-8 grid gap-3 md:grid-cols-12 md:gap-4">
+        <div className="mt-6 grid gap-3 md:grid-cols-12 md:gap-3">
           <div className="cf-landing-pro-card md:col-span-7 md:row-span-2 md:flex md:min-h-[240px] md:flex-col md:justify-between md:p-8 p-6">
             <div>
               <span className="inline-flex size-12 items-center justify-center rounded-xl bg-primary/14 text-primary ring-1 ring-primary/25">

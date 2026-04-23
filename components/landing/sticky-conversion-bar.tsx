@@ -23,7 +23,7 @@ export function StickyConversionBar() {
     <>
       <div
         className={cn(
-          "pointer-events-none fixed bottom-0 left-0 right-0 z-40 h-20 bg-gradient-to-t from-background via-background/85 to-transparent transition-opacity duration-300 md:h-24",
+          "pointer-events-none fixed bottom-0 left-0 right-0 z-40 h-16 bg-gradient-to-t from-background via-background/80 to-transparent transition-opacity duration-300 md:h-[4.5rem]",
           visible ? "opacity-100" : "opacity-0",
         )}
       />

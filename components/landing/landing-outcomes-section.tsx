@@ -20,21 +20,19 @@ const fade = {
 
 export function LandingOutcomesSection() {
   return (
-    <motion.section id="resultaten" className="scroll-mt-24 border-t border-border/45 py-12 md:py-14 dark:border-white/[0.08]" {...fade}>
-      <div className="mx-auto max-w-[1180px] px-4 sm:px-6 lg:px-8">
-        <p className="text-center font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">Resultaat</p>
-        <h2 className="mt-2 text-center text-balance text-2xl font-semibold tracking-[-0.038em] text-foreground md:text-3xl">
-          Wat dit je oplevert
-        </h2>
+    <motion.section id="resultaten" className="scroll-mt-24 border-t border-border/45 py-9 md:py-11 dark:border-white/[0.08]" {...fade}>
+      <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+        <p className="cf-landing-eyebrow text-center">Resultaat</p>
+        <h2 className="cf-landing-h2 mx-auto mt-2 max-w-3xl text-center">Wat dit je oplevert</h2>
         <p className="mx-auto mt-2 max-w-xl text-center text-sm text-muted-foreground">
           Geen trucs — dit zijn de hefbomen waar teams op sturen.
         </p>
 
-        <div className="mx-auto mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mx-auto mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {ITEMS.map(({ line, Icon }) => (
             <div
               key={line}
-              className="flex items-start gap-3 rounded-xl border border-border/45 bg-card/60 p-4 dark:border-white/[0.08] dark:bg-white/[0.03]"
+              className="cf-landing-pro-card flex items-start gap-3 p-4"
             >
               <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/12 text-primary ring-1 ring-primary/18 dark:bg-primary/15">
                 <Icon className="size-[18px]" strokeWidth={1.65} aria-hidden />
@@ -44,9 +42,9 @@ export function LandingOutcomesSection() {
           ))}
         </div>
 
-        <div className="mx-auto mt-6 max-w-[720px] overflow-hidden rounded-xl border border-primary/25 bg-gradient-to-br from-primary/[0.1] via-card to-card p-[1px] dark:from-primary/[0.15] dark:via-[hsl(222_30%_10%)] dark:to-[hsl(222_34%_7%)]">
-          <div className="rounded-[11px] bg-card/95 px-6 py-6 text-center dark:bg-[hsl(222_30%_9%/0.92)]">
-            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">Indicatief</p>
+        <div className="mx-auto mt-5 max-w-[720px] overflow-hidden rounded-[1.1rem] border border-primary/22 bg-gradient-to-br from-primary/[0.09] via-card to-card p-[1px] dark:from-primary/[0.14] dark:via-[hsl(222_30%_10%)] dark:to-[hsl(222_34%_7%)]">
+          <div className="rounded-[1.05rem] bg-card/95 px-5 py-5 text-center dark:bg-[hsl(222_30%_9%/0.92)]">
+            <p className="cf-landing-eyebrow text-center">Indicatief</p>
             <p className="mt-2 text-3xl font-semibold tracking-[-0.04em] text-foreground md:text-4xl">+32% meer conversie</p>
             <p className="mt-2 text-xs text-muted-foreground">Verschil per branche en aanbod.</p>
           </div>

@@ -15,8 +15,8 @@ export function LandingHeroConversation({ className }: { className?: string }) {
       {/* Telefoonframe */}
       <div
         className={cn(
-          "relative mx-auto rounded-[2rem] border-[3px] border-border/40 bg-[hsl(222_42%_6%)] p-2 shadow-[0_40px_90px_-40px_rgb(0_0_0/0.85),inset_0_1px_0_0_rgb(255_255_255/0.06)]",
-          "dark:border-white/[0.14] dark:bg-[hsl(224_44%_5%)]",
+          "relative mx-auto rounded-[2rem] border-[3px] border-border/40 bg-[hsl(222_42%_6%)] p-2 shadow-[0_40px_90px_-40px_rgb(0_0_0/0.85),inset_0_1px_0_0_rgb(255_255_255/0.06)] ring-1 ring-black/25",
+          "dark:border-white/[0.14] dark:bg-[hsl(224_44%_5%)] dark:ring-black/40",
         )}
       >
         {/* notch */}
@@ -24,9 +24,10 @@ export function LandingHeroConversation({ className }: { className?: string }) {
           <span className="h-1 w-14 rounded-full bg-black/80" aria-hidden />
         </div>
 
-        <div className="overflow-hidden rounded-[1.35rem] border border-white/[0.06] bg-[hsl(222_35%_9%)] shadow-inner">
+        <div className="relative overflow-hidden rounded-[1.35rem] border border-white/[0.06] bg-[hsl(222_35%_9%)] shadow-inner">
+          <div className="cf-landing-grain pointer-events-none absolute inset-0 opacity-[0.04]" aria-hidden />
           {/* Chat header */}
-          <div className="flex items-center gap-3 border-b border-white/[0.06] bg-white/[0.03] px-4 py-3 backdrop-blur-sm">
+          <div className="relative z-[1] flex items-center gap-3 border-b border-white/[0.06] bg-white/[0.03] px-4 py-3 backdrop-blur-sm">
             <div className="flex size-10 items-center justify-center rounded-full bg-[#25D366]/22 text-[11px] font-bold text-[#dcf8c6] ring-1 ring-[#25D366]/30">
               WA
             </div>
@@ -41,7 +42,7 @@ export function LandingHeroConversation({ className }: { className?: string }) {
             </span>
           </div>
 
-          <div className="bg-gradient-to-b from-transparent to-black/20 px-3 py-4">
+          <div className="relative z-[1] bg-gradient-to-b from-transparent to-black/25 px-3 py-4">
             <p className="mb-4 text-center font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground">
               Vandaag 14:02
             </p>

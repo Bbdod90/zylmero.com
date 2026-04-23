@@ -15,21 +15,22 @@ const fade = {
 export function LandingFinalCtaSection() {
   return (
     <motion.section {...fade} id="start" className="relative border-t border-border/45 dark:border-white/[0.1]">
-      <div className="relative overflow-hidden bg-[hsl(222_44%_9%)] py-14 text-white md:py-16 dark:bg-[hsl(222_38%_7%)]">
+      <div className="relative overflow-hidden bg-[hsl(222_44%_9%)] py-11 text-white md:py-12 dark:bg-[hsl(222_38%_7%)]">
         <div
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_55%_at_50%_-30%,hsl(218_55%_45%/0.35),transparent_55%)]"
           aria-hidden
         />
+        <div className="cf-landing-grain pointer-events-none absolute inset-0 opacity-[0.06]" aria-hidden />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" aria-hidden />
         <div className="relative mx-auto max-w-[760px] px-4 text-center sm:px-6">
           <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-white/65">Nu starten</p>
-          <h2 className="mt-4 text-balance text-2xl font-semibold tracking-[-0.04em] text-white md:text-4xl md:leading-[1.08]">
+          <h2 className="mt-3 text-balance text-[1.75rem] font-semibold tracking-[-0.04em] text-white sm:text-3xl md:text-[2.35rem] md:leading-[1.08]">
             Stop met klanten missen
           </h2>
-          <p className="mx-auto mt-4 max-w-lg text-[15px] leading-relaxed text-white/75 md:text-base">
+          <p className="mx-auto mt-3 max-w-lg text-[15px] leading-relaxed text-white/75 md:text-base">
             Aanvragen naar afspraken — 24/7 voor je aan de slag.
           </p>
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button
               asChild
               size="lg"
@@ -44,7 +45,7 @@ export function LandingFinalCtaSection() {
               Bekijk product tour <ArrowRight className="size-4" aria-hidden />
             </Link>
           </div>
-          <p className="mt-6 font-mono text-[11px] font-medium text-white/55 md:text-xs">Binnen 5 minuten actief · geen creditcard</p>
+          <p className="mt-5 font-mono text-[11px] font-medium text-white/55 md:text-xs">Binnen 5 minuten actief · geen creditcard</p>
         </div>
       </div>
     </motion.section>

@@ -34,7 +34,7 @@ export function LandingNav() {
           : "border-transparent bg-background/70 backdrop-blur-md dark:bg-background/60",
       )}
     >
-      <div className="mx-auto flex h-[3.65rem] max-w-[1180px] items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-[3.5rem] max-w-[1200px] items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex min-w-0 shrink-0 items-center gap-2.5 text-foreground">
           <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary text-[11px] font-bold text-primary-foreground shadow-sm ring-1 ring-black/5 dark:ring-white/10">
             {BRAND_LOGO_MONOGRAM}
@@ -46,7 +46,7 @@ export function LandingNav() {
             <a
               key={l.href}
               href={l.href}
-              className="rounded-full px-3.5 py-2 text-[13px] font-medium text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+              className="rounded-full px-3 py-1.5 text-[13px] font-medium tracking-tight text-muted-foreground transition-colors hover:bg-primary/[0.08] hover:text-foreground"
             >
               {l.label}
             </a>
