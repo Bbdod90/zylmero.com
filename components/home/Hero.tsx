@@ -20,7 +20,7 @@ export function Hero() {
         "border-slate-200/70 bg-white/25 dark:border-white/[0.06] dark:bg-transparent",
       )}
     >
-      <div className="mx-auto grid max-w-[1200px] items-center gap-10 px-5 py-20 sm:px-8 md:grid-cols-2 md:gap-14 md:py-28 lg:gap-16 lg:py-32">
+      <div className="mx-auto grid max-w-[1200px] items-center gap-10 px-5 pb-20 pt-8 sm:px-8 sm:pt-10 md:grid-cols-2 md:gap-14 md:pb-28 md:pt-12 lg:gap-16 lg:pb-32 lg:pt-14">
         <motion.div {...fadeIn}>
           <h1
             className={cn(
