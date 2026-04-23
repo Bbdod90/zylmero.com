@@ -2,224 +2,191 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, Check } from "lucide-react";
-import { LandingFaqSection } from "@/components/landing/landing-faq-section";
-import { LandingFinalCtaSection } from "@/components/landing/landing-final-cta-section";
-import { LandingHeroConversation } from "@/components/landing/landing-hero-conversation";
+import { ArrowRight } from "lucide-react";
+import { LandingHeroFlowVisual } from "@/components/landing/landing-hero-flow-visual";
 import { LandingNav } from "@/components/landing/landing-nav";
-import { LandingOutcomesSection } from "@/components/landing/landing-outcomes-section";
-import { LandingPainCostSection } from "@/components/landing/landing-pain-cost-section";
-import { LandingPlatformBento } from "@/components/landing/landing-platform-bento";
-import { LandingProductTour } from "@/components/landing/landing-product-tour";
 import { StickyConversionBar } from "@/components/landing/sticky-conversion-bar";
 import { Button } from "@/components/ui/button";
-import { BILLING_PLANS } from "@/lib/billing/plans";
 import { BRAND_CONTACT_EMAIL, BRAND_LOGO_MONOGRAM, BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
-const POSITIONING = "Aanvragen opvangen, direct antwoord, serieuze leads naar afspraak.";
-
-const HOW_STEPS = [
-  "Koppel WhatsApp, site en mail",
-  "AI reageert meteen met context",
-  "Jij pakt alleen deals die tellen",
-] as const;
-
-const CHANNEL_BADGES = ["WhatsApp", "Website", "E-mail"] as const;
-
-const fadeUp = {
-  initial: { opacity: 0, y: 12 },
+const fade = {
+  initial: { opacity: 0, y: 20 },
   whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: "-40px" },
-  transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] },
+  viewport: { once: true, margin: "-80px" },
+  transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] },
 };
 
-const LANDING_MAX = "mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8";
+const LANDING_MAX = "mx-auto w-full max-w-[1100px] px-5 sm:px-8";
+
+function SectionShell({
+  id,
+  className,
+  children,
+}: {
+  id?: string;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section id={id} className={cn("scroll-mt-28", className)}>
+      <div className={cn(LANDING_MAX, "py-20 md:py-28")}>{children}</div>
+    </section>
+  );
+}
 
 export function ZylmeroLanding() {
   return (
-    <div className="relative min-h-dvh zm-landing-atmosphere overflow-x-hidden pb-24 text-foreground md:pb-20">
+    <div className="relative min-h-dvh zm-landing-atmosphere overflow-x-hidden pb-28 text-foreground md:pb-24">
       <div className="pointer-events-none fixed inset-0 z-0" aria-hidden>
         <div className="absolute inset-0 zm-landing-spotlight opacity-90 dark:opacity-100" />
-        <div className="absolute inset-0 zm-landing-edge-glow opacity-70 dark:opacity-90" />
-        <div className="absolute inset-0 zm-landing-radial-fade opacity-75" />
-        <div className="absolute inset-0 zm-landing-dots opacity-[0.55] dark:opacity-[0.42]" />
+        <div className="absolute inset-0 zm-landing-edge-glow opacity-60 dark:opacity-85" />
+        <div className="absolute inset-0 zm-landing-radial-fade opacity-70" />
+        <div className="absolute inset-0 zm-landing-dots opacity-[0.45] dark:opacity-[0.35]" />
       </div>
       <div className="zm-landing-grain-fixed" aria-hidden />
 
       <div className="relative z-10">
         <LandingNav />
 
-        {/* Hero */}
-        <section className="border-b border-border/50 dark:border-white/[0.09]">
+        {/* 1 — Hero */}
+        <header className="border-b border-border/40 dark:border-white/[0.08]">
           <div
             className={cn(
               LANDING_MAX,
-              "grid gap-8 py-11 md:gap-10 md:py-12 lg:grid-cols-[1.02fr_0.98fr] lg:items-center lg:gap-9",
+              "grid gap-14 py-20 md:grid-cols-[1.05fr_0.95fr] md:items-center md:gap-16 md:py-24 lg:py-28",
             )}
           >
-            <motion.div {...fadeUp}>
-              <p className="cf-landing-eyebrow">{POSITIONING}</p>
-              <h1 className="mt-3 text-balance text-[2rem] font-semibold leading-[1.07] tracking-[-0.038em] sm:text-[2.35rem] md:text-[2.65rem] lg:text-[3rem]">
-                <span className="zm-text-gradient block">Elke gemiste aanvraag</span>
-                <span className="mt-1 block text-foreground">kost je geld</span>
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <h1 className="max-w-[22ch] text-balance text-[2.25rem] font-semibold leading-[1.05] tracking-[-0.045em] text-foreground sm:text-5xl md:text-[3.25rem] lg:text-[3.5rem]">
+                Je mist klanten — zonder dat je het doorhebt
               </h1>
-              <p className="mt-4 max-w-xl text-pretty text-[15px] leading-relaxed text-muted-foreground md:text-[16px]">
-                {BRAND_NAME} bundelt mail, WhatsApp en site, antwoordt direct met context en zet warme leads om in afspraken.
+              <p className="mt-8 max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl">
+                Zylmero reageert automatisch op elke aanvraag en zet ze om in afspraken. Jij hoeft niets meer te doen.
               </p>
-              <div className="mt-5 flex flex-wrap gap-2">
-                {CHANNEL_BADGES.map((c) => (
-                  <span
-                    key={c}
-                    className="rounded-full border border-border/55 bg-card/70 px-2.5 py-1 font-mono text-[10px] font-medium uppercase tracking-wider text-muted-foreground backdrop-blur-sm dark:border-white/[0.12] dark:bg-white/[0.05]"
-                  >
-                    {c}
-                  </span>
-                ))}
-              </div>
-              <div className="mt-7 flex flex-col gap-2.5 sm:flex-row sm:items-center">
+              <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <Button
                   asChild
                   size="lg"
-                  className="h-12 rounded-full px-8 text-[14px] font-semibold shadow-[0_2px_20px_-6px_hsl(var(--primary)/0.55)] sm:h-[3rem] sm:px-10"
+                  className="h-14 rounded-full px-10 text-base font-semibold shadow-[0_4px_24px_-8px_hsl(var(--primary)/0.5)]"
                 >
                   <Link href="/signup">Start gratis</Link>
                 </Button>
                 <Button
                   asChild
                   size="lg"
-                  variant="outline"
-                  className="h-12 w-full rounded-full border-border/65 bg-background/70 px-8 text-[14px] font-semibold backdrop-blur-md sm:h-[3rem] sm:w-auto dark:border-white/[0.16] dark:bg-white/[0.04]"
+                  variant="ghost"
+                  className="h-14 rounded-full px-6 text-base font-semibold text-foreground hover:bg-foreground/[0.06]"
                 >
-                  <Link href="#demo">
-                    Product tour
-                    <ArrowRight className="ml-2 size-4 opacity-80" aria-hidden />
-                  </Link>
+                  <a href="#oplossing" className="inline-flex items-center gap-2">
+                    Bekijk hoe het werkt
+                    <ArrowRight className="size-5 opacity-70" aria-hidden />
+                  </a>
                 </Button>
               </div>
             </motion.div>
-            <motion.div {...fadeUp} transition={{ ...fadeUp.transition, delay: 0.06 }}>
-              <LandingHeroConversation />
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <LandingHeroFlowVisual />
             </motion.div>
           </div>
-        </section>
+        </header>
 
-        <LandingPainCostSection />
+        {/* 2 — Probleem */}
+        <SectionShell id="probleem">
+          <motion.div {...fade}>
+            <h2 className="max-w-[18ch] text-balance text-3xl font-semibold tracking-[-0.04em] text-foreground sm:text-4xl md:text-5xl md:leading-[1.08]">
+              Dit kost je elke dag klanten
+            </h2>
+            <ul className="mt-14 max-w-2xl space-y-8 text-xl font-medium leading-snug tracking-tight text-foreground md:text-2xl md:leading-snug">
+              <li className="border-b border-border/30 pb-8 dark:border-white/[0.08]">
+                Je reageert te laat → klant kiest iemand anders
+              </li>
+              <li className="border-b border-border/30 pb-8 dark:border-white/[0.08]">Je mist berichten buiten werktijd</li>
+              <li>Je verliest overzicht in WhatsApp / mail</li>
+            </ul>
+            <p className="mt-14 text-xl font-semibold tracking-tight text-foreground md:text-2xl">En dat zie je terug in je omzet.</p>
+          </motion.div>
+        </SectionShell>
 
-        <LandingPlatformBento />
+        {/* 3 — Oplossing */}
+        <SectionShell id="oplossing" className="bg-muted/20 dark:bg-white/[0.02]">
+          <motion.div {...fade}>
+            <h2 className="max-w-[20ch] text-balance text-3xl font-semibold tracking-[-0.04em] text-foreground sm:text-4xl md:text-5xl md:leading-[1.08]">
+              {BRAND_NAME} lost dit volledig voor je op
+            </h2>
+            <ul className="mt-14 max-w-2xl space-y-8 text-xl font-medium leading-snug tracking-tight text-foreground md:text-2xl md:leading-snug">
+              <li className="border-b border-border/30 pb-8 dark:border-white/[0.08]">Reageert direct op elke aanvraag</li>
+              <li className="border-b border-border/30 pb-8 dark:border-white/[0.08]">Filtert alleen serieuze klanten</li>
+              <li>Plant automatisch afspraken in</li>
+            </ul>
+          </motion.div>
+        </SectionShell>
 
-        <motion.section
-          id="hoe-het-werkt"
-          className="scroll-mt-24 border-t border-border/45 bg-muted/12 py-9 md:py-11 dark:border-white/[0.08] dark:bg-white/[0.02]"
-          {...fadeUp}
-        >
-          <div className={LANDING_MAX}>
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
-              <div>
-                <p className="cf-landing-eyebrow">Proces</p>
-                <h2 className="cf-landing-h2 mt-2 max-w-xl">Zo werkt het</h2>
-              </div>
-              <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
-                Drie stappen — daarna draait het zonder dat jij 24/7 bereikbaar hoeft te zijn.
-              </p>
+        {/* 4 — Resultaat */}
+        <SectionShell id="resultaat">
+          <motion.div {...fade}>
+            <h2 className="text-3xl font-semibold tracking-[-0.04em] text-foreground sm:text-4xl md:text-5xl">Wat dit je oplevert</h2>
+            <ul className="mt-14 max-w-3xl space-y-6 text-lg font-medium leading-snug text-foreground md:space-y-7 md:text-xl">
+              <li>+ Meer aanvragen die klant worden</li>
+              <li>+ Minder tijd kwijt aan reageren</li>
+              <li>+ Altijd direct antwoord</li>
+              <li>+ Meer omzet zonder extra werk</li>
+            </ul>
+            <div className="mt-16 rounded-3xl border border-primary/25 bg-gradient-to-br from-primary/[0.12] via-card to-card px-8 py-14 text-center dark:from-primary/[0.14] dark:via-[hsl(222_28%_10%)] dark:to-[hsl(222_32%_7%)] md:mt-20 md:px-12 md:py-16">
+              <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">Indicatief</p>
+              <p className="mt-4 text-5xl font-semibold tracking-[-0.05em] text-foreground sm:text-6xl md:text-7xl">+32%</p>
+              <p className="mt-2 text-lg font-medium text-foreground md:text-xl">meer conversie</p>
             </div>
-            <ol className="mt-6 grid gap-3 md:grid-cols-3 md:gap-4">
-              {HOW_STEPS.map((line, i) => (
-                <li key={line} className="cf-landing-pro-card p-5 md:p-5">
-                  <span className="font-mono text-[11px] font-bold tabular-nums text-primary">{String(i + 1).padStart(2, "0")}</span>
-                  <p className="mt-2 text-[15px] font-medium leading-snug text-foreground">{line}</p>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </motion.section>
+          </motion.div>
+        </SectionShell>
 
-        <LandingOutcomesSection />
-
-        <LandingProductTour />
-
-        <motion.section
-          id="prijzen"
-          className="scroll-mt-24 border-t border-border/45 bg-muted/15 py-9 md:py-12 dark:border-white/[0.08] dark:bg-white/[0.03]"
-          {...fadeUp}
-        >
-          <div className={LANDING_MAX}>
-            <p className="cf-landing-eyebrow text-center">Abonnementen</p>
-            <h2 className="cf-landing-h2 mx-auto mt-2 max-w-3xl text-center">Prijzen</h2>
-            <p className="mx-auto mt-2 max-w-lg text-center text-sm text-muted-foreground md:text-[15px]">Start klein, schaal mee.</p>
-            <div className="mx-auto mt-7 grid max-w-[1040px] gap-3 md:grid-cols-3 md:gap-4">
-              {BILLING_PLANS.map((plan) => (
-                <div
-                  key={plan.id}
-                  className={cn(
-                    "cf-landing-pro-card flex flex-col p-6 transition-all duration-300 md:p-7",
-                    "hover:-translate-y-0.5",
-                    plan.popular && "cf-landing-feature-ring md:scale-[1.02]",
-                  )}
+        {/* 5 — CTA */}
+        <motion.section id="start" className="scroll-mt-28" {...fade}>
+          <div className="relative overflow-hidden bg-[hsl(222_44%_9%)] py-20 text-white md:py-28 dark:bg-[hsl(222_36%_6%)]">
+            <div
+              className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_100%_70%_at_50%_-20%,hsl(218_55%_42%/0.4),transparent_55%)]"
+              aria-hidden
+            />
+            <div className="cf-landing-grain pointer-events-none absolute inset-0 opacity-[0.07]" aria-hidden />
+            <div className={cn(LANDING_MAX, "relative text-center")}>
+              <h2 className="text-balance text-3xl font-semibold tracking-[-0.04em] sm:text-4xl md:text-5xl">Stop met klanten missen</h2>
+              <p className="mx-auto mt-6 max-w-md text-lg text-white/75 md:text-xl">Binnen 5 minuten actief</p>
+              <div className="mt-10">
+                <Button
+                  asChild
+                  size="lg"
+                  className="h-14 rounded-full bg-white px-12 text-base font-semibold text-[hsl(222_44%_9%)] shadow-lg shadow-black/30 hover:bg-white/95"
                 >
-                  {plan.popular ? (
-                    <span className="mb-3 inline-flex w-fit rounded-full bg-primary px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary-foreground">
-                      Populair
-                    </span>
-                  ) : (
-                    <span className="mb-3 block h-6" aria-hidden />
-                  )}
-                  <h3 className="text-base font-semibold tracking-tight">{plan.name}</h3>
-                  <p className="mt-3 flex items-baseline gap-1">
-                    <span className="text-3xl font-semibold tracking-[-0.04em] tabular-nums text-foreground md:text-[2.25rem]">
-                      €{plan.priceEur}
-                    </span>
-                    <span className="text-xs font-medium text-muted-foreground">/mnd</span>
-                  </p>
-                  <p className="mt-1 font-mono text-[11px] text-muted-foreground">{plan.leadCapLabel}</p>
-                  <ul className="mt-6 flex-1 space-y-2.5 text-[14px] leading-snug text-foreground">
-                    {plan.features.map((f) => (
-                      <li key={f} className="flex gap-2.5">
-                        <Check className="mt-0.5 size-3.5 shrink-0 text-primary" aria-hidden />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <Button
-                    asChild
-                    className={cn(
-                      "mt-8 h-11 w-full rounded-full text-[14px] font-semibold",
-                      plan.popular ? "" : "border-border/65 dark:border-white/[0.14]",
-                    )}
-                    variant={plan.popular ? "default" : "outline"}
-                  >
-                    <Link href="/signup">Start gratis</Link>
-                  </Button>
-                </div>
-              ))}
+                  <Link href="/signup">Start gratis</Link>
+                </Button>
+              </div>
+              <p className="mt-6 font-mono text-xs text-white/55">Geen creditcard nodig</p>
             </div>
           </div>
         </motion.section>
 
-        <LandingFaqSection />
-
-        <LandingFinalCtaSection />
-
-        <footer className="border-t border-border/50 bg-background/70 py-8 backdrop-blur-xl dark:border-white/[0.1] dark:bg-[hsl(222_40%_6%/0.65)]">
-          <div className={cn(LANDING_MAX, "flex flex-col items-center justify-between gap-5 md:flex-row")}>
+        <footer className="border-t border-border/45 bg-background/80 py-10 backdrop-blur-xl dark:border-white/[0.08] dark:bg-[hsl(222_38%_6%/0.7)]">
+          <div className={cn(LANDING_MAX, "flex flex-col items-center justify-between gap-6 sm:flex-row")}>
             <div className="flex items-center gap-3">
               <div className="flex size-9 items-center justify-center rounded-xl bg-primary text-[11px] font-bold text-primary-foreground shadow-md ring-1 ring-black/10 dark:ring-white/15">
                 {BRAND_LOGO_MONOGRAM}
               </div>
               <span className="text-sm font-semibold tracking-tight text-foreground">{BRAND_NAME}</span>
             </div>
-            <nav className="flex flex-wrap justify-center gap-x-8 gap-y-2 text-sm font-medium text-muted-foreground">
+            <nav className="flex flex-wrap justify-center gap-x-10 gap-y-2 text-sm font-medium text-muted-foreground">
               <Link href="/login" className="transition-colors hover:text-foreground">
                 Inloggen
               </Link>
               <a href={`mailto:${BRAND_CONTACT_EMAIL}`} className="transition-colors hover:text-foreground">
                 Contact
-              </a>
-              <a href="#prijzen" className="transition-colors hover:text-foreground">
-                Prijzen
-              </a>
-              <a href="#faq" className="transition-colors hover:text-foreground">
-                FAQ
               </a>
             </nav>
           </div>
