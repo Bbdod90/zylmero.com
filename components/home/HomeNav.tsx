@@ -76,6 +76,18 @@ export function HomeNav() {
           />
           <Button
             asChild
+            variant="ghost"
+            className={cn(
+              "h-9 min-h-0 shrink-0 rounded-full px-3 text-[13px] font-semibold transition-all duration-200 hover:-translate-y-0.5 sm:h-10 sm:px-4",
+              isDark
+                ? "text-white/88 hover:bg-white/[0.1] hover:text-white"
+                : "text-slate-700 hover:bg-slate-900/[0.06] hover:text-slate-950",
+            )}
+          >
+            <Link href="/login">Inloggen</Link>
+          </Button>
+          <Button
+            asChild
             className={cn(
               "h-10 rounded-full px-4 text-[13px] font-semibold shadow-md transition-all duration-300 hover:-translate-y-0.5 sm:px-5",
               isDark
