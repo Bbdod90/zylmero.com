@@ -8,7 +8,7 @@ import {
   countLeadsThisMonth,
   maxLeadsPerMonth,
 } from "@/lib/billing/entitlements";
-import { hasSubscriptionAccess } from "@/lib/billing/trial";
+import { hasEffectiveProductAccess } from "@/lib/platform/host-access";
 import { siteUrl } from "@/lib/stripe/server";
 
 export default async function SettingsPage({
@@ -50,7 +50,7 @@ export default async function SettingsPage({
         <SettingsTabs
           company={auth.company}
           widgetEmbedToken={auth.company.widget_embed_token}
-          websiteWidgetActive={hasSubscriptionAccess(auth.company)}
+          websiteWidgetActive={hasEffectiveProductAccess(auth.company, auth.user?.id)}
           leadsThisMonth={leadsThisMonth}
           leadCap={leadCap}
           siteOrigin={siteUrl()}

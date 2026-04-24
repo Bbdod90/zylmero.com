@@ -3,24 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  BarChart3,
-  BookOpen,
-  CalendarDays,
-  Gauge,
-  Inbox,
-  LogOut,
-  Settings2,
-  Sparkles,
-  Users,
-  FileText,
-  Zap,
   CreditCard,
-  Rocket,
-  Target,
-  Kanban,
-  UsersRound,
-  ClipboardList,
-  Brain,
+  FileText,
+  LogOut,
+  MessageCircle,
+  Settings2,
 } from "lucide-react";
 import type { AppNotification } from "@/lib/types";
 import { BRAND_LOGO_MONOGRAM, BRAND_NAME } from "@/lib/brand";
@@ -29,74 +16,18 @@ import { signOutAction } from "@/actions/auth";
 import { DemoModeToggle } from "@/components/sales/demo-mode-toggle";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 
-type NavItem = { href: string; label: string; icon: typeof Gauge };
+type NavItem = { href: string; label: string; icon: typeof MessageCircle };
 
-const GROUPS: { title: string; items: NavItem[] }[] = [
-  {
-    title: "Overzicht",
-    items: [
-      { href: "/dashboard", label: "Dashboard", icon: Gauge },
-      { href: "/dashboard/insights", label: "Prestaties", icon: BarChart3 },
-    ],
-  },
-  {
-    title: "Pipeline",
-    items: [
-      { href: "/dashboard/growth", label: "Groei", icon: Rocket },
-      { href: "/dashboard/pipeline", label: "Pipeline", icon: Kanban },
-      { href: "/dashboard/leads", label: "Leads", icon: Users },
-      { href: "/dashboard/inbox", label: "Berichten", icon: Inbox },
-      { href: "/dashboard/quotes", label: "Offertes", icon: FileText },
-      { href: "/dashboard/appointments", label: "Afspraken", icon: CalendarDays },
-    ],
-  },
-  {
-    title: "AI & klanten",
-    items: [
-      { href: "/dashboard/ai-koppelingen", label: "AI & koppelingen", icon: Brain },
-      { href: "/dashboard/playbooks", label: "Playbooks", icon: BookOpen },
-    ],
-  },
-  {
-    title: "Automatisering",
-    items: [{ href: "/dashboard/automations", label: "Automatiseringen", icon: Zap }],
-  },
-  {
-    title: "Bedrijf",
-    items: [
-      { href: "/dashboard/team", label: "Team", icon: UsersRound },
-      {
-        href: "/dashboard/templates",
-        label: "Snelle antwoorden",
-        icon: ClipboardList,
-      },
-      { href: "/dashboard/settings", label: "Instellingen", icon: Settings2 },
-      { href: "/dashboard/ai", label: "AI-instellingen", icon: Sparkles },
-    ],
-  },
+/** Minimaal menu: rustig, alleen wat je dagelijks nodig hebt. */
+const PRIMARY_NAV: NavItem[] = [
+  { href: "/dashboard/inbox", label: "Chat", icon: MessageCircle },
+  { href: "/dashboard/quotes", label: "Offertes", icon: FileText },
 ];
 
-/** Kortere zijbalk voor anonieme demo-rondleiding (minder keuzestress). */
-const ANONYMOUS_PREVIEW_GROUPS: { title: string; items: NavItem[] }[] = [
-  {
-    title: "Demo",
-    items: [
-      { href: "/dashboard", label: "Overzicht", icon: Gauge },
-      { href: "/dashboard/inbox", label: "Berichten", icon: Inbox },
-      { href: "/dashboard/pipeline", label: "Pipeline", icon: Kanban },
-      { href: "/dashboard/leads", label: "Leads", icon: Users },
-      { href: "/dashboard/quotes", label: "Offertes", icon: FileText },
-      { href: "/dashboard/appointments", label: "Afspraken", icon: CalendarDays },
-    ],
-  },
-  {
-    title: "AI voor klanten",
-    items: [
-      { href: "/dashboard/ai-koppelingen", label: "AI & koppelingen", icon: Brain },
-      { href: "/dashboard/ai-knowledge", label: "AI-kennis (detail)", icon: Sparkles },
-    ],
-  },
-];
+function isNavActive(pathname: string, href: string): boolean {
+  if (href === "/dashboard") return pathname === "/dashboard";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 function NavLink({
   item,
@@ -108,9 +39,7 @@ function NavLink({
   onNavigate?: () => void;
 }) {
   const Icon = item.icon;
-  const active =
-    pathname === item.href ||
-    (item.href !== "/dashboard" && pathname.startsWith(item.href));
+  const active = isNavActive(pathname, item.href);
   return (
     <Link
       href={item.href}
@@ -118,8 +47,8 @@ function NavLink({
       className={cn(
         "group relative flex min-h-11 touch-manipulation items-center gap-3 rounded-xl px-3 py-2.5 text-[0.8125rem] font-medium transition-all duration-200 active:scale-[0.99]",
         active
-          ? "bg-primary/[0.09] text-foreground shadow-sm ring-1 ring-primary/15 before:absolute before:left-0 before:top-1/2 before:h-8 before:w-[3px] before:-translate-y-1/2 before:rounded-full before:bg-primary dark:bg-white/[0.07] dark:ring-white/[0.08] dark:before:bg-primary"
-          : "text-muted-foreground hover:bg-muted/55 hover:text-foreground dark:hover:bg-white/[0.045]",
+          ? "bg-primary/[0.09] text-foreground shadow-sm ring-1 ring-primary/15 before:absolute before:left-0 before:top-1/2 before:h-8 before:w-[3px] before:-translate-y-1/2 before:rounded-full before:bg-primary dark:bg-white/[0.08] dark:ring-white/[0.12] dark:before:bg-primary"
+          : "text-muted-foreground hover:bg-muted/55 hover:text-foreground dark:text-white/72 dark:hover:bg-white/[0.07] dark:hover:text-white",
       )}
     >
       <span
@@ -127,7 +56,7 @@ function NavLink({
           "flex size-8 shrink-0 items-center justify-center rounded-lg border transition-colors",
           active
             ? "border-primary/20 bg-background/80 text-primary dark:border-white/[0.1] dark:bg-black/20 dark:text-primary"
-            : "border-transparent bg-muted/25 text-muted-foreground group-hover:border-border/60 group-hover:bg-background/60 group-hover:text-foreground dark:bg-white/[0.04]",
+            : "border-transparent bg-muted/25 text-muted-foreground group-hover:border-border/60 group-hover:bg-background/60 group-hover:text-foreground dark:bg-white/[0.06] dark:text-white/70 dark:group-hover:text-white",
         )}
       >
         <Icon className="size-[1.0625rem]" strokeWidth={2} />
@@ -144,8 +73,7 @@ export type AppSidebarProps = {
   trialDaysLeft?: number | null;
   isAnonymousPreview?: boolean;
   notifications?: AppNotification[];
-  founderSales?: boolean;
-  /** Root <aside> (bijv. `hidden lg:flex` voor desktop-only) */
+  /** Root <aside> (bijv. `hidden md:flex` — smalle schermen: zie `DashboardNavRail`) */
   className?: string;
   /** Sluit mobiel menu na navigatie */
   onNavLinkClick?: () => void;
@@ -160,27 +88,11 @@ export function AppSidebar({
   trialDaysLeft,
   isAnonymousPreview,
   notifications = [],
-  founderSales = false,
   className,
   onNavLinkClick,
   hideNotificationBell = false,
 }: AppSidebarProps) {
   const pathname = usePathname();
-
-  const baseGroups = isAnonymousPreview ? ANONYMOUS_PREVIEW_GROUPS : GROUPS;
-
-  const groups = baseGroups.map((g) => {
-    if (g.title !== "Pipeline" || isAnonymousPreview) return g;
-    const items = [...g.items];
-    if (founderSales) {
-      items.splice(1, 0, {
-        href: "/dashboard/sales",
-        label: "Verkoop",
-        icon: Target,
-      });
-    }
-    return { ...g, items };
-  });
 
   const showAccountUpgrade = trialDaysLeft == null || trialDaysLeft <= 0;
 
@@ -188,16 +100,16 @@ export function AppSidebar({
     <aside
       className={cn(
         "sticky top-0 flex h-dvh max-h-dvh w-full min-w-0 shrink-0 flex-col",
-        "border-r border-border/60 bg-gradient-to-b from-card via-background/98 to-muted/[0.28]",
+        "border-r border-border/70 bg-gradient-to-b from-card via-background/98 to-muted/[0.28]",
         "shadow-[inset_-1px_0_0_hsl(220_14%_76%/0.45)] backdrop-blur-xl",
-        "dark:border-white/[0.07] dark:from-[hsl(222_26%_8%/0.92)] dark:via-background dark:to-muted/5 dark:shadow-[inset_-1px_0_0_hsl(220_16%_18%/0.45)]",
-        "lg:w-[17rem]",
+        "dark:border-white/[0.14] dark:bg-[hsl(222_26%_11%)] dark:from-[hsl(222_26%_11%)] dark:via-[hsl(222_26%_10%)] dark:to-[hsl(222_28%_9%)] dark:shadow-[inset_-1px_0_0_hsl(220_16%_22%/0.55)]",
+        "md:w-[15.5rem]",
         className,
       )}
     >
       <div className="flex min-h-[3.75rem] items-center gap-3 border-b border-border/55 px-3 py-3.5 sm:min-h-[4rem] sm:px-4 dark:border-white/[0.06]">
         <Link
-          href="/"
+          href="/dashboard"
           onClick={() => onNavLinkClick?.()}
           className="group flex min-w-0 flex-1 items-center gap-3"
         >
@@ -205,15 +117,16 @@ export function AppSidebar({
             {BRAND_LOGO_MONOGRAM}
           </div>
           <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold leading-tight tracking-tight text-foreground">
-            {companyName}
-          </p>
-          <p className="text-2xs text-muted-foreground">{BRAND_NAME}</p>
-          {trialDaysLeft != null && trialDaysLeft > 0 ? (
-            <p className="mt-1.5 text-2xs font-medium leading-snug text-amber-900 dark:text-amber-200">
-              Proefperiode · nog {trialDaysLeft} {trialDaysLeft === 1 ? "dag" : "dagen"}
+            <p className="truncate text-sm font-semibold leading-tight tracking-tight text-foreground">
+              {companyName}
             </p>
-          ) : null}
+            <p className="text-2xs text-muted-foreground">{BRAND_NAME}</p>
+            {trialDaysLeft != null && trialDaysLeft > 0 ? (
+              <p className="mt-1.5 text-2xs font-medium leading-snug text-amber-900 dark:text-amber-200">
+                Proefperiode · nog {trialDaysLeft}{" "}
+                {trialDaysLeft === 1 ? "dag" : "dagen"}
+              </p>
+            ) : null}
           </div>
         </Link>
         {!isAnonymousPreview && !hideNotificationBell ? (
@@ -232,31 +145,33 @@ export function AppSidebar({
           </Link>
         </div>
       ) : null}
-      <nav className="flex flex-1 flex-col gap-0 overflow-y-auto overscroll-contain px-2.5 py-3 sm:px-3">
-        {groups.map((group, gi) => (
-          <div
-            key={group.title}
+      <nav className="flex flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-2.5 py-4 sm:px-3">
+        <div className="flex flex-col gap-1">
+          {PRIMARY_NAV.map((item) => (
+            <NavLink
+              key={item.href}
+              item={item}
+              pathname={pathname}
+              onNavigate={onNavLinkClick}
+            />
+          ))}
+        </div>
+        <div className="px-2">
+          <Link
+            href="/dashboard/settings"
+            onClick={() => onNavLinkClick?.()}
             className={cn(
-              gi > 0 && "mt-4 border-t border-border/45 pt-4 dark:border-white/[0.06]",
+              "flex min-h-10 items-center gap-2 rounded-lg px-2 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground dark:text-white/65 dark:hover:text-white",
+              isNavActive(pathname, "/dashboard/settings") &&
+                "bg-muted/40 text-foreground dark:bg-white/[0.08] dark:text-white",
             )}
           >
-            <p className="mb-2 px-3 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground/90">
-              {group.title}
-            </p>
-            <div className="flex flex-col gap-1">
-              {group.items.map((item) => (
-                <NavLink
-                  key={item.href}
-                  item={item}
-                  pathname={pathname}
-                  onNavigate={onNavLinkClick}
-                />
-              ))}
-            </div>
-          </div>
-        ))}
+            <Settings2 className="size-3.5 shrink-0 opacity-80" aria-hidden />
+            Instellingen
+          </Link>
+        </div>
         {showAccountUpgrade ? (
-          <div className="mt-4 border-t border-border/45 pt-4 dark:border-white/[0.06]">
+          <div className="mt-auto border-t border-border/45 pt-4 dark:border-white/[0.06]">
             <p className="mb-2 px-3 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground/90">
               Account
             </p>

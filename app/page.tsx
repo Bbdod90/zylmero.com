@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import { getAuth } from "@/lib/auth";
 import { ANONYMOUS_DEMO_USER_ID } from "@/lib/auth/constants";
-import { hasSubscriptionAccess, isDemoCompanyId } from "@/lib/billing/trial";
+import { isDemoCompanyId } from "@/lib/billing/trial";
+import { hasEffectiveProductAccess } from "@/lib/platform/host-access";
 import { LandingPage } from "@/components/landing/landing-page";
 
 export default async function Home() {
@@ -22,7 +23,7 @@ export default async function Home() {
     }
     if (
       !isDemoCompanyId(auth.company.id) &&
-      !hasSubscriptionAccess(auth.company)
+      !hasEffectiveProductAccess(auth.company, auth.user.id)
     ) {
       redirect("/dashboard/upgrade");
     }

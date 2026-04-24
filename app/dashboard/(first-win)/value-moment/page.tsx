@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getAuth } from "@/lib/auth";
-import { hasSubscriptionAccess, isDemoCompanyId } from "@/lib/billing/trial";
+import { isDemoCompanyId } from "@/lib/billing/trial";
+import { hasEffectiveProductAccess } from "@/lib/platform/host-access";
 import { ValueMomentClient } from "@/components/monetization/value-moment-client";
 import { BRAND_NAME } from "@/lib/brand";
 
@@ -9,7 +10,7 @@ export default async function ValueMomentPage() {
   if (!auth.user) redirect("/login");
   if (!auth.company) redirect("/dashboard/onboarding");
   if (isDemoCompanyId(auth.company.id)) redirect("/dashboard");
-  if (!hasSubscriptionAccess(auth.company)) redirect("/dashboard/upgrade");
+  if (!hasEffectiveProductAccess(auth.company, auth.user.id)) redirect("/dashboard/upgrade");
 
   if (auth.company.value_moment_completed_at) redirect("/dashboard");
 

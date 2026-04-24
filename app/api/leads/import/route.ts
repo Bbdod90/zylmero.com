@@ -4,7 +4,7 @@ import Papa from "papaparse";
 import { getAuth } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { leadInsertJsonDefaults } from "@/lib/leads/insert-defaults";
-import { hasSubscriptionAccess } from "@/lib/billing/trial";
+import { hasEffectiveProductAccess } from "@/lib/platform/host-access";
 import { PAYWALL_AI_LEADS } from "@/lib/billing/paywall";
 
 export const dynamic = "force-dynamic";
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
   if (!auth.user || !auth.company) {
     return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
   }
-  if (!hasSubscriptionAccess(auth.company)) {
+  if (!hasEffectiveProductAccess(auth.company, auth.user.id)) {
     return NextResponse.json({ ok: false, error: PAYWALL_AI_LEADS }, { status: 402 });
   }
 

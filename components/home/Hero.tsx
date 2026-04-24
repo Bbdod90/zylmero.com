@@ -52,14 +52,10 @@ export function Hero() {
             </Button>
             <Button
               type="button"
+              variant="demo"
               size="lg"
-              variant="outline"
               onClick={openDemo}
-              className={cn(
-                "h-12 rounded-full border px-7 text-base font-semibold transition-all duration-300 hover:-translate-y-1 sm:h-14",
-                "border-slate-300/90 bg-white/80 text-slate-900 hover:bg-white",
-                "dark:border-white/15 dark:bg-white/[0.06] dark:text-white dark:hover:bg-white/[0.1]",
-              )}
+              className="h-12 min-h-0 rounded-full px-7 text-base transition-all duration-300 hover:-translate-y-1 sm:h-14"
             >
               Bekijk demo
             </Button>

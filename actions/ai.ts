@@ -17,7 +17,7 @@ import {
   canUseQuotes,
   entitlementUpgradeMessage,
 } from "@/lib/billing/entitlements";
-import { hasSubscriptionAccess } from "@/lib/billing/trial";
+import { hasEffectiveProductAccess } from "@/lib/platform/host-access";
 import { PAYWALL_AI_LEADS } from "@/lib/billing/paywall";
 import { incrementAiUsage } from "@/lib/billing/ai-usage";
 import type { Company, Lead, LeadStatus, Message, Quote } from "@/lib/types";
@@ -45,7 +45,7 @@ async function getCtx() {
   if (!auth.user || !auth.company) {
     return { ok: false as const, error: "Niet ingelogd of geen bedrijf." };
   }
-  if (!hasSubscriptionAccess(auth.company)) {
+  if (!hasEffectiveProductAccess(auth.company, auth.user.id)) {
     return { ok: false as const, error: PAYWALL_AI_LEADS };
   }
   return {

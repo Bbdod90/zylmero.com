@@ -94,6 +94,9 @@
     overflow-x: clip;
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
+    /* Volledige viewport-kleur bij iOS-overscroll / rubber band */
+    min-height: 100%;
+    min-height: 100dvh;
   }
   body {
     @apply overflow-x-hidden bg-background text-foreground antialiased;

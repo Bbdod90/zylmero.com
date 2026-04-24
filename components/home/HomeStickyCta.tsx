@@ -58,13 +58,9 @@ export function HomeStickyCta() {
           <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:justify-end">
             <Button
               type="button"
-              variant="outline"
+              variant="demo"
               onClick={openDemo}
-              className={cn(
-                "h-11 w-full rounded-full text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5 sm:w-auto sm:min-w-[120px]",
-                "border-slate-300 bg-white/90 text-slate-800 hover:bg-white",
-                "dark:border-white/18 dark:bg-white/[0.04] dark:text-white dark:hover:bg-white/[0.1]",
-              )}
+              className="h-11 min-h-0 w-full rounded-full text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5 sm:w-auto sm:min-w-[132px]"
             >
               Bekijk demo
             </Button>

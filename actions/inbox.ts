@@ -9,7 +9,7 @@ import type { Message } from "@/lib/types";
 import type { ActionResult } from "@/actions/ai";
 import { getCompanySettings } from "@/lib/company-settings";
 import { incrementAiUsage } from "@/lib/billing/ai-usage";
-import { hasSubscriptionAccess } from "@/lib/billing/trial";
+import { hasEffectiveProductAccess } from "@/lib/platform/host-access";
 import { PAYWALL_AI_LEADS } from "@/lib/billing/paywall";
 import { logTeamActivity } from "@/lib/team-activity";
 
@@ -24,7 +24,7 @@ export async function sendInboxMessage(
   if (!auth.user || !auth.company) {
     return { ok: false, error: "Niet ingelogd." };
   }
-  if (!hasSubscriptionAccess(auth.company)) {
+  if (!hasEffectiveProductAccess(auth.company, auth.user.id)) {
     return { ok: false, error: PAYWALL_AI_LEADS };
   }
   const text = content.trim();
@@ -131,7 +131,7 @@ export async function generateInboxReply(
   if (!auth.user || !auth.company) {
     return { ok: false, error: "Niet ingelogd." };
   }
-  if (!hasSubscriptionAccess(auth.company)) {
+  if (!hasEffectiveProductAccess(auth.company, auth.user.id)) {
     return { ok: false, error: PAYWALL_AI_LEADS };
   }
   if (!process.env.OPENAI_API_KEY) {

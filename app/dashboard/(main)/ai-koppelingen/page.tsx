@@ -1,7 +1,8 @@
 import { getAuth } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { isDemoMode } from "@/lib/env";
-import { hasSubscriptionAccess, isDemoCompanyId } from "@/lib/billing/trial";
+import { isDemoCompanyId } from "@/lib/billing/trial";
+import { hasEffectiveProductAccess } from "@/lib/platform/host-access";
 import { mapCompanySettingsRow } from "@/lib/queries/map-company-settings";
 import { resolveSiteUrl } from "@/lib/site-url";
 import { DashboardWorkSurface } from "@/components/layout/dashboard-work-surface";
@@ -68,7 +69,7 @@ export default async function AiKoppelcentrumPage() {
           whatsappAutoReply={Boolean(mapped?.auto_reply_enabled)}
           whatsappProvider={whatsappProvider}
           hasWidgetToken={Boolean(auth.company.widget_embed_token)}
-          websiteWidgetActive={hasSubscriptionAccess(auth.company)}
+          websiteWidgetActive={hasEffectiveProductAccess(auth.company, auth.user?.id)}
           hasContactEmail={Boolean(auth.company.contact_email?.trim())}
           emailInboundEnabled={Boolean(mapped?.email_inbound_enabled)}
         />

@@ -6,6 +6,7 @@ import {
   isDemoCompanyId,
   trialDaysRemaining,
 } from "@/lib/billing/trial";
+import { hasEffectiveProductAccess } from "@/lib/platform/host-access";
 import { getUpgradeNudgeSignals } from "@/lib/queries/monetization";
 import { MonetizationClient } from "@/components/monetization/monetization-client";
 import { isDemoMode, isForcedDemoEnv } from "@/lib/env";
@@ -17,10 +18,6 @@ import { createClient } from "@/lib/supabase/server";
 import { syncNotificationsForCompany } from "@/lib/notifications/sync";
 import { fetchNotificationsForCompany } from "@/lib/queries/notifications";
 import { PastDueBanner } from "@/components/billing/past-due-banner";
-import { ProfileIntakeBanner } from "@/components/dashboard/profile-intake-banner";
-import { DeferredSetupBanner } from "@/components/dashboard/deferred-setup-banner";
-import { ConversionUrgencyBar } from "@/components/dashboard/conversion-urgency-bar";
-import { isFounderUser } from "@/lib/founder/access";
 import type { AppNotification } from "@/lib/types";
 
 export default async function MainDashboardLayout({
@@ -35,7 +32,7 @@ export default async function MainDashboardLayout({
 
   if (
     !isDemoCompanyId(auth.company.id) &&
-    !hasSubscriptionAccess(auth.company)
+    !hasEffectiveProductAccess(auth.company, auth.user.id)
   ) {
     redirect("/dashboard/upgrade");
   }
@@ -49,19 +46,6 @@ export default async function MainDashboardLayout({
   const isAnonymousPreview = auth.user.id === ANONYMOUS_DEMO_USER_ID;
 
   const supabase = await createClient();
-  const founderSales = await isFounderUser(supabase, auth.user.id);
-
-  let needsAiSetupNudge = false;
-  let needsValueMomentNudge = false;
-  if (!demoOn && !isDemoCompanyId(auth.company.id)) {
-    needsValueMomentNudge = !auth.company.value_moment_completed_at;
-    const { data: stRow } = await supabase
-      .from("company_settings")
-      .select("ai_setup_completed_at")
-      .eq("company_id", auth.company.id)
-      .maybeSingle();
-    needsAiSetupNudge = !stRow?.ai_setup_completed_at;
-  }
 
   let notifications: AppNotification[] = [];
   let showUpgradeNudge = false;
@@ -84,7 +68,6 @@ export default async function MainDashboardLayout({
     trialDaysLeft: trialDays,
     isAnonymousPreview: isAnonymousPreview,
     notifications,
-    founderSales,
   };
 
   return (
@@ -93,18 +76,6 @@ export default async function MainDashboardLayout({
         <DemoBanner forced={demoForced} demoNicheId={getDemoNicheId()} />
       ) : null}
       <PastDueBanner company={auth.company} />
-      {!demoOn &&
-      !isDemoCompanyId(auth.company.id) &&
-      !auth.company.profile_intake_completed ? (
-        <ProfileIntakeBanner />
-      ) : null}
-      {!demoOn && !isDemoCompanyId(auth.company.id) ? (
-        <DeferredSetupBanner
-          needsAiSetup={needsAiSetupNudge}
-          needsValueMoment={needsValueMomentNudge}
-        />
-      ) : null}
-      <ConversionUrgencyBar demoMode={demoOn} />
       <MonetizationClient
         companyId={auth.company.id}
         plan={auth.company.plan}

@@ -17,36 +17,17 @@ const LINKS = [
 ] as const;
 
 export function HomeNav() {
-  const [scrolled, setScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
   const { openDemo } = useHomeDemo();
 
   useEffect(() => setMounted(true), []);
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
   /** Tov defaultTheme=dark: vóór hydrate donker nav voorkomt lichte flits. */
   const isDark = !mounted || resolvedTheme === "dark";
 
   return (
-    <header
-      className={cn(
-        "sticky top-0 z-[70] border-b transition-[background-color,backdrop-filter,box-shadow,border-color] duration-300",
-        scrolled
-          ? isDark
-            ? "border-white/[0.1] bg-[#070b12]/95 shadow-[0_1px_0_0_rgba(255,255,255,0.07)] backdrop-blur-2xl supports-[backdrop-filter]:bg-[#070b12]/88"
-            : "border-slate-200/85 bg-white/92 shadow-[0_1px_0_0_rgba(15,23,42,0.06)] backdrop-blur-xl"
-          : isDark
-            ? "border-transparent bg-transparent"
-            : "border-transparent bg-transparent",
-      )}
-    >
+    <header className="sticky top-0 z-[70] border-b border-transparent bg-transparent">
       <div className="mx-auto flex h-[3.65rem] max-w-[1200px] items-center justify-between gap-3 px-5 sm:gap-4 sm:px-8">
         <Link href="/" className="flex min-w-0 items-center gap-2.5">
           <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-[11px] font-bold text-white shadow-md ring-1 ring-slate-900/10 dark:from-blue-500 dark:shadow-blue-500/25 dark:ring-white/15">
@@ -80,15 +61,10 @@ export function HomeNav() {
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
           <Button
             type="button"
-            variant="ghost"
+            variant="demo"
             size="sm"
             onClick={openDemo}
-            className={cn(
-              "hidden rounded-full px-3.5 text-[13px] font-semibold transition-all duration-200 hover:-translate-y-0.5 sm:inline-flex",
-              isDark
-                ? "text-white/92 hover:bg-white/[0.1] hover:text-white"
-                : "text-slate-800 hover:bg-slate-900/[0.06]",
-            )}
+            className="h-9 min-h-0 shrink-0 rounded-full px-3.5 text-[13px] transition-all duration-200 hover:-translate-y-0.5 sm:h-10 sm:px-4"
           >
             Demo
           </Button>

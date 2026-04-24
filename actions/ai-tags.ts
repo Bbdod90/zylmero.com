@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { getAuth } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { isDemoMode } from "@/lib/env";
-import { hasSubscriptionAccess } from "@/lib/billing/trial";
+import { hasEffectiveProductAccess } from "@/lib/platform/host-access";
 import { PAYWALL_AI_LEADS } from "@/lib/billing/paywall";
 import { classifyLeadTags } from "@/lib/openai/classify-lead-tags";
 import type { ActionResult } from "@/actions/ai";
@@ -21,7 +21,7 @@ export async function refreshLeadAiTags(
   if (!auth.user || !auth.company) {
     return { ok: false, error: "Niet ingelogd." };
   }
-  if (!hasSubscriptionAccess(auth.company)) {
+  if (!hasEffectiveProductAccess(auth.company, auth.user.id)) {
     return { ok: false, error: PAYWALL_AI_LEADS };
   }
   if (!process.env.OPENAI_API_KEY) {

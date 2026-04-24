@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Check } from "lucide-react";
 import { getAuth } from "@/lib/auth";
 import { hasSubscriptionAccess, isDemoCompanyId } from "@/lib/billing/trial";
+import { hasEffectiveProductAccess, isPlatformHostUser } from "@/lib/platform/host-access";
 import { BILLING_PLANS } from "@/lib/billing/plans";
 import type { BillingPlanId } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -19,11 +20,12 @@ export default async function UpgradePage() {
     redirect("/dashboard/onboarding");
   }
 
-  const expired = !hasSubscriptionAccess(auth.company);
+  const expired =
+    !hasSubscriptionAccess(auth.company) && !isPlatformHostUser(auth.user.id);
 
   if (
     !isDemoCompanyId(auth.company.id) &&
-    hasSubscriptionAccess(auth.company) &&
+    hasEffectiveProductAccess(auth.company, auth.user.id) &&
     auth.company.plan !== "trial"
   ) {
     redirect("/dashboard");
