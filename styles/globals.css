@@ -413,3 +413,17 @@
     box-shadow: 0 1px 4px rgb(0 0 0 / 0.2);
   }
 }
+
+/**
+ * Horizontale tab-/chip-rijen (dashboard): losse swipe, minder strijd met verticale scroll.
+ * Zelfde idee als `touch-action: none` op sliders — hier expliciet horizontaal.
+ */
+@layer utilities {
+  .cf-dashboard-inline-scroll {
+    touch-action: pan-x pinch-zoom;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: 0.5rem;
+  }
+}

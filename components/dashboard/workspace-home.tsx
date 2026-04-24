@@ -1,11 +1,5 @@
 import Link from "next/link";
-import {
-  ArrowRight,
-  ArrowUpRight,
-  FileText,
-  MessageCircle,
-  Settings2,
-} from "lucide-react";
+import { ArrowRight, FileText, MessageCircle } from "lucide-react";
 import { PageFrame } from "@/components/layout/page-frame";
 import { cn } from "@/lib/utils";
 import type { WorkspaceHomeSnapshot } from "@/lib/queries/workspace-home-snapshot";
@@ -181,45 +175,15 @@ export function WorkspaceHome({
           </div>
         </div>
 
-        <Link
-          href="/dashboard/settings"
-          className={cn(
-            "group relative flex items-center justify-between gap-4 overflow-hidden rounded-2xl border px-5 py-5 sm:px-7 sm:py-6",
-            "border-border/50 bg-muted/25 transition-all duration-300 hover:border-primary/25 hover:bg-primary/[0.06]",
-            "dark:border-white/[0.1] dark:bg-white/[0.03] dark:hover:border-primary/30 dark:hover:bg-primary/[0.08]",
-          )}
-        >
-          <div
-            className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-            style={{
-              background:
-                "radial-gradient(ellipse 80% 80% at 0% 50%, hsl(var(--primary) / 0.1), transparent 55%)",
-            }}
-          />
-          <div className="relative flex min-w-0 items-center gap-4">
-            <span
-              className={cn(
-                "flex size-11 shrink-0 items-center justify-center rounded-xl border",
-                "border-border/60 bg-background/80 text-foreground shadow-sm",
-                "dark:border-white/[0.1] dark:bg-white/[0.06]",
-              )}
-            >
-              <Settings2 className="size-5" strokeWidth={1.65} aria-hidden />
-            </span>
-            <div className="min-w-0">
-              <p className="text-sm font-semibold tracking-tight text-foreground sm:text-base">
-                Instellingen & kanalen
-              </p>
-              <p className="mt-0.5 text-sm text-muted-foreground">
-                Bedrijfsprofiel, AI-kennis, WhatsApp, widget en facturatie.
-              </p>
-            </div>
-          </div>
-          <ArrowUpRight
-            className="relative size-5 shrink-0 text-muted-foreground transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-foreground"
-            aria-hidden
-          />
-        </Link>
+        <p className="text-center text-2xs text-muted-foreground/90 dark:text-white/45">
+          <Link
+            href="/dashboard/settings"
+            className="font-medium text-muted-foreground underline decoration-border/80 underline-offset-4 transition-colors hover:text-foreground hover:decoration-primary/50 dark:decoration-white/20 dark:hover:text-white/80"
+          >
+            Instellingen
+          </Link>
+          <span className="text-muted-foreground/60"> · alle koppelingen en facturatie</span>
+        </p>
       </div>
     </PageFrame>
   );

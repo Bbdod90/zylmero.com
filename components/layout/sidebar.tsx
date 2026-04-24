@@ -2,27 +2,17 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  CreditCard,
-  FileText,
-  LogOut,
-  MessageCircle,
-  Settings2,
-} from "lucide-react";
+import { CreditCard, LogOut, Settings2 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import type { AppNotification } from "@/lib/types";
 import { BRAND_LOGO_MONOGRAM, BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 import { signOutAction } from "@/actions/auth";
 import { DemoModeToggle } from "@/components/sales/demo-mode-toggle";
 import { NotificationBell } from "@/components/notifications/notification-bell";
+import { DASHBOARD_NAV_GROUPS } from "@/lib/navigation/dashboard-nav";
 
-type NavItem = { href: string; label: string; icon: typeof MessageCircle };
-
-/** Minimaal menu: rustig, alleen wat je dagelijks nodig hebt. */
-const PRIMARY_NAV: NavItem[] = [
-  { href: "/dashboard/inbox", label: "Chat", icon: MessageCircle },
-  { href: "/dashboard/quotes", label: "Offertes", icon: FileText },
-];
+type NavItem = { href: string; label: string; icon: LucideIcon };
 
 function isNavActive(pathname: string, href: string): boolean {
   if (href === "/dashboard") return pathname === "/dashboard";
@@ -103,7 +93,7 @@ export function AppSidebar({
         "border-r border-border/70 bg-gradient-to-b from-card via-background/98 to-muted/[0.28]",
         "shadow-[inset_-1px_0_0_hsl(220_14%_76%/0.45)] backdrop-blur-xl",
         "dark:border-white/[0.14] dark:bg-[hsl(222_26%_11%)] dark:from-[hsl(222_26%_11%)] dark:via-[hsl(222_26%_10%)] dark:to-[hsl(222_28%_9%)] dark:shadow-[inset_-1px_0_0_hsl(220_16%_22%/0.55)]",
-        "md:w-[15.5rem]",
+        "md:w-[17rem]",
         className,
       )}
     >
@@ -145,31 +135,22 @@ export function AppSidebar({
           </Link>
         </div>
       ) : null}
-      <nav className="flex flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-2.5 py-4 sm:px-3">
-        <div className="flex flex-col gap-1">
-          {PRIMARY_NAV.map((item) => (
-            <NavLink
-              key={item.href}
-              item={item}
-              pathname={pathname}
-              onNavigate={onNavLinkClick}
-            />
-          ))}
-        </div>
-        <div className="px-2">
-          <Link
-            href="/dashboard/settings"
-            onClick={() => onNavLinkClick?.()}
-            className={cn(
-              "flex min-h-10 items-center gap-2 rounded-lg px-2 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground dark:text-white/65 dark:hover:text-white",
-              isNavActive(pathname, "/dashboard/settings") &&
-                "bg-muted/40 text-foreground dark:bg-white/[0.08] dark:text-white",
-            )}
-          >
-            <Settings2 className="size-3.5 shrink-0 opacity-80" aria-hidden />
-            Instellingen
-          </Link>
-        </div>
+      <nav className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-2.5 py-4 sm:px-3">
+        {DASHBOARD_NAV_GROUPS.map((group) => (
+          <div key={group.id} className="flex flex-col gap-1">
+            <p className="px-3 pb-0.5 text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground/85">
+              {group.label}
+            </p>
+            {group.items.map((item) => (
+              <NavLink
+                key={item.href}
+                item={item}
+                pathname={pathname}
+                onNavigate={onNavLinkClick}
+              />
+            ))}
+          </div>
+        ))}
         {showAccountUpgrade ? (
           <div className="mt-auto border-t border-border/45 pt-4 dark:border-white/[0.06]">
             <p className="mb-2 px-3 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground/90">
@@ -200,11 +181,23 @@ export function AppSidebar({
           </div>
         ) : null}
       </nav>
-      {!isAnonymousPreview ? (
-        <div className="border-t border-border/50 bg-muted/[0.15] px-2 py-2 dark:border-white/[0.06] dark:bg-white/[0.02]">
+      <div className="border-t border-border/50 bg-muted/[0.15] px-2 py-2 dark:border-white/[0.06] dark:bg-white/[0.02]">
+        <Link
+          href="/dashboard/settings"
+          onClick={() => onNavLinkClick?.()}
+          className={cn(
+            "mb-1.5 flex min-h-8 items-center gap-1.5 rounded-md px-2 py-1.5 text-2xs font-medium text-muted-foreground/80 transition-colors hover:bg-muted/40 hover:text-muted-foreground dark:text-white/45 dark:hover:bg-white/[0.04] dark:hover:text-white/70",
+            isNavActive(pathname, "/dashboard/settings") &&
+              "text-foreground/90 dark:text-white/80",
+          )}
+        >
+          <Settings2 className="size-3 shrink-0 opacity-70" aria-hidden />
+          Instellingen
+        </Link>
+        {!isAnonymousPreview ? (
           <DemoModeToggle active={demoActive} forced={demoForced} />
-        </div>
-      ) : null}
+        ) : null}
+      </div>
       <form
         action={signOutAction}
         className="border-t border-border/60 bg-background/60 p-3 dark:border-white/[0.06] dark:bg-card/30 sm:p-4"

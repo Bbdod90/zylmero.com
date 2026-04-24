@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { AppSidebar, type AppSidebarProps } from "@/components/layout/sidebar";
 import { DashboardNavRail } from "@/components/layout/dashboard-nav-rail";
+import { CommandPalette } from "@/components/layout/command-palette";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { BRAND_NAME } from "@/lib/brand";
@@ -33,6 +34,7 @@ export function DashboardShell({
 
   return (
     <div className="flex min-h-dvh w-full max-w-[100vw] bg-background">
+      <CommandPalette />
       <DashboardNavRail className="md:hidden" />
       <AppSidebar
         {...sidebarProps}

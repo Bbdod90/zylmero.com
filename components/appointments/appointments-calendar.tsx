@@ -413,7 +413,7 @@ export function AppointmentsCalendar({
       </motion.div>
 
       <TabsContent value="week" className="mt-0 outline-none">
-        <div className="-mx-1 flex gap-4 overflow-x-auto px-1 pb-1 pt-0.5">
+        <div className="cf-dashboard-inline-scroll -mx-1 flex cursor-grab gap-4 overflow-x-auto px-1 pb-1 pt-0.5 [-webkit-overflow-scrolling:touch] active:cursor-grabbing">
           {weekRange.days.map((day, index) => {
             const key = format(day, "yyyy-MM-dd");
             const list = byDayWeek.get(key) || [];

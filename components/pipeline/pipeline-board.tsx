@@ -428,7 +428,7 @@ export function PipelineBoard({
       onDragCancel={() => setActiveId(null)}
       onDragEnd={onDragEnd}
     >
-      <div className="-mx-1 flex snap-x snap-mandatory gap-4 overflow-x-auto overflow-y-visible px-1 pb-8 pt-1 [scrollbar-gutter:stable] [-webkit-overflow-scrolling:touch] min-[1200px]:mx-0 min-[1200px]:grid min-[1200px]:w-full min-[1200px]:snap-none min-[1200px]:grid-cols-5 min-[1200px]:gap-5 min-[1200px]:overflow-visible min-[1200px]:px-0 min-[1200px]:pb-10">
+      <div className="-mx-1 flex snap-x snap-mandatory gap-4 overflow-x-auto overflow-y-visible overscroll-x-contain px-1 pb-8 pt-1 [scrollbar-gutter:stable] [-webkit-overflow-scrolling:touch] min-[1200px]:mx-0 min-[1200px]:grid min-[1200px]:w-full min-[1200px]:snap-none min-[1200px]:grid-cols-5 min-[1200px]:gap-5 min-[1200px]:overflow-visible min-[1200px]:px-0 min-[1200px]:pb-10">
         {PIPELINE_COLUMNS.map((col) => {
           const list = byColumn.get(col.id) || [];
           return (

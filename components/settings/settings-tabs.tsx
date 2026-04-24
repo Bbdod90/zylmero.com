@@ -1,6 +1,12 @@
 "use client";
 
 import type { ComponentProps } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import {
   updateBusinessProfileAction,
@@ -48,7 +54,7 @@ const VALID_TABS = new Set([
 ]);
 
 const tabTriggerClass =
-  "relative shrink-0 whitespace-nowrap rounded-none border-b-2 border-transparent bg-transparent px-2.5 py-2.5 text-[0.8125rem] font-medium text-muted-foreground shadow-none ring-offset-background transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none sm:px-4 sm:py-3 sm:text-sm";
+  "relative shrink-0 snap-start scroll-m-1 whitespace-nowrap rounded-none border-b-2 border-transparent bg-transparent px-2.5 py-2.5 text-[0.8125rem] font-medium text-muted-foreground shadow-none ring-offset-background transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none sm:px-4 sm:py-3 sm:text-sm";
 
 function FormShell({ className, ...props }: ComponentProps<"div">) {
   return (
@@ -125,8 +131,29 @@ export function SettingsTabs({
       ? settings.business_hours.text
       : JSON.stringify(settings.business_hours || {}, null, 2);
 
-  const tab =
+  const initialTab =
     defaultTab && VALID_TABS.has(defaultTab) ? defaultTab : "business";
+  const [activeTab, setActiveTab] = useState(initialTab);
+  const tabListScrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setActiveTab(initialTab);
+  }, [initialTab]);
+
+  /** Actief tabblad horizontaal in beeld — zachte swipe-UX (zoals losse carrousel). */
+  useLayoutEffect(() => {
+    const scroller = tabListScrollRef.current;
+    if (!scroller) return;
+    const activeEl = scroller.querySelector(
+      '[role="tab"][data-state="active"]',
+    ) as HTMLElement | null;
+    activeEl?.scrollIntoView({
+      behavior: "smooth",
+      inline: "center",
+      block: "nearest",
+    });
+  }, [activeTab]);
+
   /** Client-safe: niet trial.ts importeren (trekt server-only demo-map mee). */
   const trialExpiredHint =
     company.plan === "trial" &&
@@ -141,9 +168,16 @@ export function SettingsTabs({
 
   return (
     <div className="mx-auto w-full max-w-4xl">
-      <Tabs defaultValue={tab} className="w-full">
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="w-full"
+      >
         <div className="sticky top-0 z-10 -mx-1 mb-4 border-b border-border/60 bg-background/90 pb-0 pt-0.5 backdrop-blur-md dark:bg-background/80">
-          <div className="overflow-x-auto overflow-y-hidden [-webkit-overflow-scrolling:touch] [scrollbar-width:thin]">
+          <div
+            ref={tabListScrollRef}
+            className="cf-dashboard-inline-scroll cursor-grab overflow-x-auto overflow-y-hidden pb-0.5 pt-0.5 [-webkit-overflow-scrolling:touch] [scrollbar-width:thin] active:cursor-grabbing"
+          >
             <TabsList className="inline-flex h-11 min-h-[2.75rem] w-max max-w-none flex-nowrap items-stretch justify-start gap-0 rounded-none border-0 bg-transparent p-0 pr-1">
             <TabsTrigger value="business" className={tabTriggerClass}>
               Bedrijf
