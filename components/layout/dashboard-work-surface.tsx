@@ -10,7 +10,7 @@ export function DashboardWorkSurface({
   className?: string;
 }) {
   return (
-    <div className={cn("mx-auto w-full max-w-[1200px] space-y-8", className)}>
+    <div className={cn("mx-auto w-full max-w-[1200px] space-y-9 sm:space-y-10", className)}>
       {children}
     </div>
   );

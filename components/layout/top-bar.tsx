@@ -41,7 +41,7 @@ export function TopBar({
             </Link>
           ) : null}
           <div className="min-w-0 flex-1 space-y-1.5">
-            <h1 className="truncate text-lg font-semibold tracking-tight text-foreground sm:text-xl">
+            <h1 className="truncate text-lg font-semibold tracking-tight text-foreground sm:text-2xl sm:font-medium sm:tracking-[-0.02em]">
               {title}
             </h1>
             {subtitle ? (
@@ -54,9 +54,9 @@ export function TopBar({
         <div className="flex shrink-0 items-center gap-2">
           <Badge
             variant="outline"
-            className="hidden rounded-full border-emerald-400/50 bg-emerald-50 px-2.5 py-0.5 text-2xs font-semibold uppercase tracking-[0.16em] text-emerald-950 shadow-sm dark:border-emerald-600/50 dark:bg-emerald-950/55 dark:text-emerald-50 sm:inline-flex"
+            className="hidden rounded-full border-border/60 bg-muted/40 px-2.5 py-0.5 text-2xs font-medium uppercase tracking-[0.18em] text-muted-foreground shadow-sm backdrop-blur-sm dark:border-white/[0.1] dark:bg-white/[0.05] dark:text-white/55 sm:inline-flex"
           >
-            Live
+            Workspace
           </Badge>
           <ThemeToggle />
         </div>

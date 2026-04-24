@@ -106,7 +106,7 @@ export function DashboardShell({
             {...sidebarProps}
             className={cn(
               "flex min-h-0 flex-1 flex-col overflow-y-auto border-0 bg-transparent shadow-none backdrop-blur-none dark:bg-transparent",
-              "!h-auto !max-h-none max-h-full min-h-0",
+              "!h-auto max-h-full min-h-0",
             )}
             hideNotificationBell
             onNavLinkClick={() => setMobileNavOpen(false)}
