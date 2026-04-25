@@ -18,7 +18,7 @@ export function businessContextBlock(
     settings?.niche?.trim() || niche.label;
 
   const prefs = settings?.automation_preferences as
-    | { niche_intake?: Record<string, string> }
+    | { niche_intake?: Record<string, string>; ai_knowledge_crawled_document?: string }
     | undefined;
   const intake =
     settings?.niche_intake && Object.keys(settings.niche_intake).length > 0
@@ -66,6 +66,9 @@ export function businessContextBlock(
       : "",
     settings?.ai_knowledge_document
       ? `Document / vrije kennis voor AI:\n${settings.ai_knowledge_document}`
+      : "",
+    prefs?.ai_knowledge_crawled_document
+      ? `Automatisch gescande website-pagina's:\n${prefs.ai_knowledge_crawled_document}`
       : "",
   ]
     .filter(Boolean)

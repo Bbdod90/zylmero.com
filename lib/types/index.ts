@@ -74,6 +74,13 @@ export interface KnowledgeSnippet {
   body: string;
 }
 
+export interface AiKnowledgePage {
+  url: string;
+  title: string;
+  excerpt: string;
+  saved_at: string;
+}
+
 export interface CompanySettings {
   company_id: string;
   niche: string | null;

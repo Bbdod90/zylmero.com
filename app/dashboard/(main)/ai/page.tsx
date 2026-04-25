@@ -17,18 +17,13 @@ export default async function AiSettingsPage() {
   const rawPrefs = s?.automation_preferences;
   let automationNote = "";
   if (rawPrefs && typeof rawPrefs === "object" && rawPrefs !== null) {
-    if ("note" in rawPrefs) {
-      automationNote = String((rawPrefs as { note?: string }).note || "");
-    } else {
-      const j = JSON.stringify(rawPrefs);
-      automationNote = j === "{}" ? "" : j;
-    }
+    automationNote = String((rawPrefs as { note?: string }).note || "");
   }
 
   return (
     <PageFrame
       title="AI-assistent"
-      subtitle="Premium tone, antwoordstijl en automationscontext — volledig onder controle."
+      subtitle="Stel simpel in hoe je AI klinkt, schrijft en opvolgt."
       dismissHref="/dashboard/ai-koppelingen"
       dismissLabel="AI & koppelingen"
     >

@@ -51,7 +51,7 @@ export default async function AutomationsPage() {
   return (
     <PageFrame
       title="Automatiseringen"
-      subtitle="Laat opvolging automatisch lopen met duidelijke regels die iedereen in je team begrijpt."
+      subtitle="Stel in 1 minuut in wanneer een klant automatisch een bericht krijgt."
     >
       <DashboardWorkSurface>
         <section className="cf-dashboard-panel border-primary/20 bg-gradient-to-br from-primary/[0.1] via-background to-background px-5 py-5 dark:border-primary/30 dark:from-primary/[0.16] sm:px-6">
@@ -61,22 +61,23 @@ export default async function AutomationsPage() {
                 Duidelijk overzicht
               </p>
               <h2 className="mt-1.5 text-xl font-semibold tracking-tight text-foreground">
-                Zo werkt het
+                Zo werkt het echt simpel
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                <strong className="text-foreground">Opvolging</strong> stuurt automatische berichten op
-                vaste momenten. <strong className="text-foreground">Regels</strong> reageren op situaties
-                zoals “geen reactie” of “hete lead”.
+                Je hoeft alleen 3 dingen te kiezen:
+                <strong className="text-foreground"> naam</strong>,
+                <strong className="text-foreground"> wanneer versturen</strong> en
+                <strong className="text-foreground"> berichttekst</strong>. Klaar.
               </p>
             </div>
             <div className="flex flex-col gap-2 text-xs text-muted-foreground">
               <p className="inline-flex items-center gap-2">
                 <CheckCircle2 className="size-4 text-primary" aria-hidden />
-                Begin met standaard opvolging
+                Start met standaard berichten
               </p>
               <p className="inline-flex items-center gap-2">
                 <Wand2 className="size-4 text-primary" aria-hidden />
-                Verfijn daarna regels
+                Pas daarna alleen tekst en timing aan
               </p>
             </div>
           </div>

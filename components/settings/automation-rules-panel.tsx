@@ -151,21 +151,9 @@ export function AutomationRulesPanel({
       <div className="cf-dashboard-panel border-amber-500/30 bg-amber-500/[0.06] p-6 sm:p-7 dark:bg-amber-500/[0.05]">
         <p className="font-semibold text-foreground">Slimme regels zijn nog niet beschikbaar</p>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          De server mist nog de tabel{" "}
-          <code className="rounded bg-muted px-1.5 py-0.5 text-xs">automation_rules</code> of de schema-cache
-          is nog niet ververst.
+          Dit onderdeel is nog niet geactiveerd voor jouw omgeving. Je kunt wel gewoon
+          automatische berichten gebruiken in het tabblad links.
         </p>
-        <p className="mt-3 text-sm text-muted-foreground">
-          <span className="font-medium text-foreground">Oplossing:</span> draai de migratie{" "}
-          <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
-            20260415120000_enterprise_team_pipeline.sql
-          </code>{" "}
-          op je Supabase-project. Daarna in de SQL Editor:{" "}
-          <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
-            {`NOTIFY pgrst, 'reload schema';`}
-          </code>
-        </p>
-        <p className="mt-3 text-2xs text-muted-foreground/90">Technisch: {schemaError}</p>
       </div>
     );
   }
@@ -176,7 +164,8 @@ export function AutomationRulesPanel({
         <CardHeader>
           <CardTitle className="text-base">Nieuwe slimme regel</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Laat de app automatisch reageren op situaties zoals “geen reactie” of “hete lead”.
+            Alleen gebruiken als je extra logica nodig hebt. Voor de meeste teams zijn automatische
+            berichten voldoende.
           </p>
         </CardHeader>
         <CardContent>
@@ -190,7 +179,7 @@ export function AutomationRulesPanel({
         </p>
         <p className="inline-flex items-center gap-2 text-xs text-muted-foreground">
           <Sparkles className="size-3.5 text-primary" aria-hidden />
-          Start met 1 regel tegelijk, test in inbox en breid daarna uit.
+          Houd het simpel: start met 1 regel, test, en voeg pas daarna een tweede toe.
         </p>
       </div>
 

@@ -38,7 +38,7 @@ export default async function LeadsPage() {
           </p>
         </section>
         {!demo ? (
-          <div className="w-full max-w-4xl">
+          <div className="w-full max-w-3xl">
             <LeadImport disabled={false} />
           </div>
         ) : null}

@@ -9,9 +9,18 @@ import {
   normalizeKnowledgeWebsiteUrl,
 } from "@/lib/url/public-site-url";
 import { isDemoMode } from "@/lib/env";
-import type { KnowledgeSnippet } from "@/lib/types";
+import type { AiKnowledgePage, KnowledgeSnippet } from "@/lib/types";
 
 export type SettingsFormState = { ok?: boolean; error?: string };
+
+const MAX_AI_KNOWLEDGE_PAGES = 40;
+const MAX_CRAWL_DEPTH = 2;
+const MAX_TEXT_PER_PAGE = 2200;
+
+type CrawlResult = {
+  pages: AiKnowledgePage[];
+  crawledDocument: string;
+};
 
 function parseKnowledgeSnippets(raw: string): KnowledgeSnippet[] {
   const out: KnowledgeSnippet[] = [];
@@ -26,6 +35,98 @@ function parseKnowledgeSnippets(raw: string): KnowledgeSnippet[] {
     if (title && body) out.push({ title, body });
   }
   return out;
+}
+
+function stripHtml(input: string): string {
+  return input
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, " ")
+    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function extractTitle(html: string): string {
+  const m = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+  return m?.[1]?.replace(/\s+/g, " ").trim() || "";
+}
+
+function extractLinks(html: string, baseUrl: URL): URL[] {
+  const links: URL[] = [];
+  const re = /href\s*=\s*["']([^"'#]+)["']/gi;
+  let match: RegExpExecArray | null = null;
+  while ((match = re.exec(html))) {
+    try {
+      const raw = match[1]?.trim();
+      if (!raw) continue;
+      if (raw.startsWith("mailto:") || raw.startsWith("tel:") || raw.startsWith("javascript:")) continue;
+      const u = new URL(raw, baseUrl);
+      u.hash = "";
+      if (u.pathname !== "/" && u.pathname.endsWith("/")) u.pathname = u.pathname.slice(0, -1);
+      links.push(u);
+    } catch {
+      continue;
+    }
+  }
+  return links;
+}
+
+async function crawlKnowledgeWebsite(startWebsite: string): Promise<CrawlResult> {
+  const start = new URL(startWebsite);
+  const startHost = start.host;
+  const queue: Array<{ url: URL; depth: number }> = [{ url: start, depth: 0 }];
+  const seen = new Set<string>();
+  const pages: AiKnowledgePage[] = [];
+
+  while (queue.length > 0 && pages.length < MAX_AI_KNOWLEDGE_PAGES) {
+    const next = queue.shift();
+    if (!next) break;
+    const key = next.url.toString();
+    if (seen.has(key)) continue;
+    seen.add(key);
+
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 9000);
+      const res = await fetch(key, {
+        redirect: "follow",
+        signal: controller.signal,
+        headers: { "user-agent": "ZylmeroKnowledgeBot/1.0 (+https://zylmero.com)" },
+      });
+      clearTimeout(timer);
+      if (!res.ok) continue;
+      const contentType = res.headers.get("content-type") || "";
+      if (!contentType.includes("text/html")) continue;
+      const html = await res.text();
+      const title = extractTitle(html) || next.url.pathname || next.url.host;
+      const text = stripHtml(html).slice(0, MAX_TEXT_PER_PAGE);
+      if (text.length < 80) continue;
+      pages.push({
+        url: key,
+        title: title.slice(0, 140),
+        excerpt: text.slice(0, 320),
+        saved_at: new Date().toISOString(),
+      });
+
+      if (next.depth >= MAX_CRAWL_DEPTH) continue;
+      const links = extractLinks(html, next.url);
+      for (const link of links) {
+        if (link.host !== startHost) continue;
+        if (!["http:", "https:"].includes(link.protocol)) continue;
+        if (/\.(png|jpe?g|gif|webp|svg|pdf|zip|mp4|mp3|woff2?)$/i.test(link.pathname)) continue;
+        if (!seen.has(link.toString())) queue.push({ url: link, depth: next.depth + 1 });
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  const crawledDocument = pages
+    .map((p) => `URL: ${p.url}\nTitel: ${p.title}\nSamenvatting: ${p.excerpt}`)
+    .join("\n\n---\n\n");
+  return { pages, crawledDocument };
 }
 
 export async function updateBusinessProfileAction(
@@ -471,10 +572,25 @@ export async function updateAiKnowledgeAction(
   const prevAi =
     (settingsRow?.automation_preferences as Record<string, unknown>) || {};
 
+  let pages: AiKnowledgePage[] = [];
+  let crawledDocument = "";
+  if (website) {
+    try {
+      const crawled = await crawlKnowledgeWebsite(website);
+      pages = crawled.pages;
+      crawledDocument = crawled.crawledDocument;
+    } catch {
+      // Non-blocking: user can still save manual knowledge.
+    }
+  }
+
   const automation_preferences = {
     ...prevAi,
     ai_knowledge_website: website || null,
     ai_knowledge_document: document || null,
+    ai_knowledge_pages: pages,
+    ai_knowledge_crawled_document: crawledDocument || null,
+    ai_knowledge_last_scanned_at: new Date().toISOString(),
     niche_key: auth.company.niche ?? prevAi.niche_key,
   };
 
@@ -512,6 +628,84 @@ export async function updateAiKnowledgeAction(
   revalidatePath("/dashboard/ai");
   revalidatePath("/dashboard/settings");
   return { ok: true };
+}
+
+export async function removeAiKnowledgePageAction(
+  formData: FormData,
+): Promise<SettingsFormState> {
+  if (isDemoMode()) {
+    return { error: "Niet beschikbaar in demo-modus." };
+  }
+  const auth = await getAuth();
+  if (!auth.user || !auth.company) {
+    return { error: "Niet ingelogd." };
+  }
+
+  const targetUrl = String(formData.get("url") || "").trim();
+  if (!targetUrl) return { error: "Geen URL gekozen." };
+
+  const supabase = await createClient();
+  const { data: settingsRow } = await supabase
+    .from("company_settings")
+    .select("*")
+    .eq("company_id", auth.company.id)
+    .maybeSingle();
+  const prev = mapCompanySettingsRow(settingsRow as Record<string, unknown>);
+  const prevAi =
+    (settingsRow?.automation_preferences as Record<string, unknown>) || {};
+  const rawPages = Array.isArray(prevAi.ai_knowledge_pages)
+    ? (prevAi.ai_knowledge_pages as AiKnowledgePage[])
+    : [];
+  const nextPages = rawPages.filter((p) => p && typeof p.url === "string" && p.url !== targetUrl);
+  const nextCrawled = nextPages
+    .map((p) => `URL: ${p.url}\nTitel: ${p.title}\nSamenvatting: ${p.excerpt}`)
+    .join("\n\n---\n\n");
+
+  const { error } = await supabase.from("company_settings").upsert(
+    {
+      company_id: auth.company.id,
+      niche: prev?.niche ?? null,
+      services: prev?.services ?? [],
+      faq: prev?.faq ?? [],
+      pricing_hints: prev?.pricing_hints ?? null,
+      business_hours: prev?.business_hours ?? {},
+      booking_link: prev?.booking_link ?? null,
+      tone: prev?.tone ?? null,
+      reply_style: prev?.reply_style ?? null,
+      language: prev?.language ?? "nl",
+      automation_preferences: {
+        ...prevAi,
+        ai_knowledge_pages: nextPages,
+        ai_knowledge_crawled_document: nextCrawled || null,
+        ai_knowledge_last_scanned_at: new Date().toISOString(),
+        niche_key: auth.company.niche ?? prevAi.niche_key,
+      },
+      whatsapp_channel: prev?.whatsapp_channel ?? {
+        provider: "mock",
+        connected: false,
+      },
+      auto_reply_enabled: prev?.auto_reply_enabled ?? false,
+      auto_reply_delay_seconds: prev?.auto_reply_delay_seconds ?? 30,
+      ai_usage_count: prev?.ai_usage_count ?? 0,
+      ai_setup_completed_at: prev?.ai_setup_completed_at ?? null,
+      niche_intake: prev?.niche_intake ?? {},
+      knowledge_snippets: prev?.knowledge_snippets ?? [],
+      white_label_logo_url: prev?.white_label_logo_url ?? null,
+      white_label_primary: prev?.white_label_primary ?? null,
+    },
+    { onConflict: "company_id" },
+  );
+
+  if (error) return { error: error.message };
+  revalidatePath("/dashboard/ai-knowledge");
+  revalidatePath("/dashboard/ai");
+  return { ok: true };
+}
+
+export async function removeAiKnowledgePageSubmitAction(
+  formData: FormData,
+): Promise<void> {
+  await removeAiKnowledgePageAction(formData);
 }
 
 export async function updateQuoteTemplateAction(

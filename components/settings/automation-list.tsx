@@ -26,6 +26,20 @@ const triggerNl: Record<string, string> = {
   no_reply: "Klant reageert niet",
 };
 
+function formatDelayNl(minutes: number): string {
+  if (!Number.isFinite(minutes) || minutes < 0) return `${minutes} min`;
+  if (minutes < 60) return `${minutes} min`;
+  if (minutes % (60 * 24) === 0) {
+    const d = minutes / (60 * 24);
+    return `${d} dag${d === 1 ? "" : "en"}`;
+  }
+  if (minutes % 60 === 0) {
+    const h = minutes / 60;
+    return `${h} uur`;
+  }
+  return `${minutes} min`;
+}
+
 function Row({
   a,
   canUseAutomations,
@@ -43,7 +57,7 @@ function Row({
         <div>
           <CardTitle className="text-base">{a.name}</CardTitle>
           <p className="text-xs text-muted-foreground">
-            Moment: {triggerLabel} · Versturen na {a.delay_minutes} min
+            Moment: {triggerLabel} · Versturen na {formatDelayNl(a.delay_minutes)}
           </p>
         </div>
         <Toggle
@@ -65,10 +79,10 @@ function Row({
             />
           </div>
           <div className="rounded-xl border border-border/50 bg-muted/20 px-3 py-2 text-xs text-muted-foreground dark:border-white/[0.08] dark:bg-white/[0.03]">
-            Deze automatisering gaat af op: <span className="font-medium text-foreground">{triggerLabel}</span>
+            Deze gaat af op: <span className="font-medium text-foreground">{triggerLabel}</span>
           </div>
           <div className="space-y-2">
-            <Label htmlFor={`delay-${a.id}`}>Vertraging (minuten)</Label>
+            <Label htmlFor={`delay-${a.id}`}>Wanneer versturen?</Label>
             <Input
               id={`delay-${a.id}`}
               name="delay_minutes"
@@ -76,9 +90,12 @@ function Row({
               defaultValue={a.delay_minutes}
               className="rounded-xl border-border/60 bg-background/80 dark:border-white/[0.1] dark:bg-white/[0.03]"
             />
+            <p className="text-2xs text-muted-foreground">
+              Nu: {a.delay_minutes} min ({formatDelayNl(a.delay_minutes)})
+            </p>
           </div>
           <div className="space-y-2">
-            <Label htmlFor={`tpl-${a.id}`}>Berichttekst</Label>
+            <Label htmlFor={`tpl-${a.id}`}>Bericht naar klant</Label>
             <Textarea
               id={`tpl-${a.id}`}
               name="template_text"
@@ -86,7 +103,7 @@ function Row({
               className="min-h-[100px] rounded-xl"
             />
             <p className="text-2xs text-muted-foreground">
-              Tip: gebruik <code className="rounded bg-muted px-1 py-0.5">{"{{name}}"}</code> voor de naam.
+              Gebruik <code className="rounded bg-muted px-1 py-0.5">{"{{name}}"}</code> om de naam automatisch in te vullen.
             </p>
           </div>
           {state.error ? (
@@ -153,15 +170,10 @@ export function AutomationList({
     <div className="space-y-4">
       {schemaError ? (
         <div className="rounded-2xl border border-amber-500/30 bg-amber-500/[0.07] p-5 text-sm shadow-sm backdrop-blur-sm dark:bg-amber-500/[0.06]">
-          <p className="font-semibold text-foreground">Automatiseringen zijn nog niet klaar op de server</p>
+          <p className="font-semibold text-foreground">Automatische berichten zijn nog niet beschikbaar</p>
           <p className="mt-2 text-muted-foreground">
-            Voer de Supabase-migratie uit die de tabel{" "}
-            <code className="rounded bg-muted px-1.5 py-0.5 text-xs">automations</code>{" "}
-            aanmaakt (bestand{" "}
-            <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
-              20260410120000_automations.sql
-            </code>
-            ), daarna opnieuw laden.
+            Deze functie wordt nog geactiveerd voor jouw omgeving. Kom zo terug of neem contact op
+            met support als dit blijft staan.
           </p>
         </div>
       ) : null}
@@ -206,6 +218,9 @@ export function AutomationList({
       >
         Standaardautomatiseringen aanmaken
       </Button>
+      <p className="text-xs text-muted-foreground">
+        Tip: begin met de standaardset en pas alleen de tekst aan. Dat is meestal genoeg.
+      </p>
       {items.map((a) => (
         <Row key={a.id} a={a} canUseAutomations={canUseAutomations} />
       ))}
