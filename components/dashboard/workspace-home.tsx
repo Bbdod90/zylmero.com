@@ -26,63 +26,81 @@ function nlGreeting(): string {
   return "Goedenavond";
 }
 
-function HubCard({
-  href,
-  title,
-  description,
-  icon: Icon,
-}: {
-  href: string;
-  title: string;
-  description: string;
-  icon: typeof MessageCircle;
-}) {
+/** Chat + Offertes als één strak paneel met middenlijn (desktop). */
+function PrimaryFlowDuo() {
+  const cells = [
+    {
+      href: "/dashboard/inbox",
+      title: "Chat",
+      description: "WhatsApp, e-mail en widget — één inbox.",
+      icon: MessageCircle,
+    },
+    {
+      href: "/dashboard/quotes",
+      title: "Offertes",
+      description: "Concepten versturen en deals afronden.",
+      icon: FileText,
+    },
+  ] as const;
+
   return (
-    <Link
-      href={href}
+    <div
       className={cn(
-        "group relative flex flex-col gap-4 overflow-hidden rounded-2xl border p-5 sm:p-6",
-        "border-border/55 bg-card/80 shadow-sm backdrop-blur-sm",
-        "transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_20px_50px_-28px_hsl(var(--primary)/0.35)]",
-        "dark:border-white/[0.1] dark:bg-[hsl(222_28%_11%/0.85)] dark:hover:border-primary/35",
+        "overflow-hidden rounded-[1.35rem] border border-border/50 shadow-sm",
+        "bg-gradient-to-br from-card via-card/95 to-muted/[0.12]",
+        "dark:border-white/[0.1] dark:from-[hsl(222_30%_13%/0.98)] dark:via-[hsl(222_28%_11%/0.95)] dark:to-[hsl(228_32%_9%/0.88)]",
       )}
     >
-      <div
-        className={cn(
-          "pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100",
-          "bg-[radial-gradient(ellipse_80%_60%_at_90%_0%,hsl(var(--primary)/0.14),transparent_55%)]",
-          "dark:bg-[radial-gradient(ellipse_80%_60%_at_90%_0%,hsl(var(--primary)/0.22),transparent_55%)]",
-        )}
-      />
-      <div className="relative flex items-start justify-between gap-3">
-        <span
-          className={cn(
-            "flex size-11 shrink-0 items-center justify-center rounded-2xl border text-primary",
-            "border-primary/20 bg-primary/[0.08] ring-1 ring-primary/10",
-            "dark:border-primary/30 dark:bg-primary/[0.14] dark:ring-primary/20",
-          )}
-        >
-          <Icon className="size-5" strokeWidth={1.75} aria-hidden />
-        </span>
-        <span
-          className={cn(
-            "flex size-9 shrink-0 items-center justify-center rounded-full border text-muted-foreground transition-all",
-            "border-border/60 bg-background/80",
-            "group-hover:border-primary/25 group-hover:text-primary",
-            "dark:border-white/[0.1] dark:bg-white/[0.05]",
-          )}
-          aria-hidden
-        >
-          <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5" />
-        </span>
+      <div className="grid divide-y divide-border/55 md:grid-cols-2 md:divide-x md:divide-y-0 dark:divide-white/[0.08]">
+        {cells.map(({ href, title, description, icon: Icon }) => (
+          <Link
+            key={href}
+            href={href}
+            className={cn(
+              "group relative flex min-h-[7.5rem] flex-col justify-between gap-4 p-5 sm:p-6 md:min-h-[8.25rem]",
+              "transition-colors duration-200 hover:bg-primary/[0.045] dark:hover:bg-primary/[0.07]",
+            )}
+          >
+            <div
+              className={cn(
+                "pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100",
+                "bg-[radial-gradient(ellipse_70%_80%_at_100%_0%,hsl(var(--primary)/0.12),transparent_55%)]",
+                "dark:bg-[radial-gradient(ellipse_70%_80%_at_100%_0%,hsl(var(--primary)/0.18),transparent_55%)]",
+              )}
+            />
+            <div className="relative flex items-start justify-between gap-3">
+              <div className="flex min-w-0 flex-1 items-start gap-3.5">
+                <span
+                  className={cn(
+                    "flex size-11 shrink-0 items-center justify-center rounded-2xl border text-primary",
+                    "border-primary/20 bg-primary/[0.08] ring-1 ring-primary/10",
+                    "dark:border-primary/35 dark:bg-primary/[0.12] dark:ring-primary/15",
+                  )}
+                >
+                  <Icon className="size-5" strokeWidth={1.75} aria-hidden />
+                </span>
+                <div className="min-w-0 space-y-1">
+                  <h2 className="text-lg font-semibold tracking-tight text-foreground sm:text-xl">
+                    {title}
+                  </h2>
+                  <p className="text-sm leading-relaxed text-muted-foreground">{description}</p>
+                </div>
+              </div>
+              <span
+                className={cn(
+                  "flex size-10 shrink-0 items-center justify-center rounded-full border text-muted-foreground transition-all",
+                  "border-border/55 bg-background/70 group-hover:border-primary/30 group-hover:text-primary",
+                  "dark:border-white/[0.1] dark:bg-white/[0.05]",
+                )}
+                aria-hidden
+              >
+                <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+              </span>
+            </div>
+          </Link>
+        ))}
       </div>
-      <div className="relative space-y-1.5">
-        <h2 className="text-lg font-semibold tracking-tight text-foreground">{title}</h2>
-        <p className="max-w-md text-pretty text-sm leading-relaxed text-muted-foreground">
-          {description}
-        </p>
-      </div>
-    </Link>
+    </div>
   );
 }
 
@@ -125,7 +143,8 @@ function StatLink({
   );
 }
 
-function QuickLink({
+/** Compacte route-tegel voor de onderste rij (4 kolommen). */
+function RouteTile({
   href,
   title,
   hint,
@@ -139,19 +158,27 @@ function QuickLink({
   return (
     <Link
       href={href}
+      title={hint}
       className={cn(
-        "group flex items-center gap-3 rounded-2xl border border-border/50 bg-background/60 px-3.5 py-3 transition-all",
-        "hover:border-primary/30 hover:bg-muted/30 dark:border-white/[0.08] dark:bg-white/[0.03] dark:hover:bg-white/[0.06]",
+        "group flex flex-col items-center gap-2.5 rounded-2xl border border-border/50 bg-background/70 px-3 py-4 text-center transition-all",
+        "hover:border-primary/35 hover:bg-muted/25 hover:shadow-sm",
+        "dark:border-white/[0.08] dark:bg-white/[0.03] dark:hover:bg-white/[0.06]",
       )}
     >
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-muted/50 text-foreground/80 ring-1 ring-border/40 transition-colors group-hover:bg-primary/10 group-hover:text-primary group-hover:ring-primary/20 dark:bg-white/[0.06] dark:ring-white/[0.08]">
+      <span
+        className={cn(
+          "flex size-11 items-center justify-center rounded-2xl border text-primary transition-colors",
+          "border-primary/15 bg-primary/[0.07] ring-1 ring-primary/5",
+          "group-hover:border-primary/30 group-hover:bg-primary/[0.11]",
+          "dark:border-primary/25 dark:bg-primary/[0.12] dark:ring-primary/10",
+        )}
+      >
         <Icon className="size-[1.125rem]" strokeWidth={2} aria-hidden />
       </span>
-      <span className="min-w-0 flex-1">
-        <span className="block text-sm font-semibold tracking-tight text-foreground">{title}</span>
-        <span className="mt-0.5 block text-xs text-muted-foreground">{hint}</span>
+      <span className="text-xs font-semibold leading-tight tracking-tight text-foreground sm:text-[0.8125rem]">
+        {title}
       </span>
-      <ArrowRight className="size-4 shrink-0 text-muted-foreground/50 transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
+      <span className="line-clamp-2 text-[0.65rem] leading-snug text-muted-foreground">{hint}</span>
     </Link>
   );
 }
@@ -241,19 +268,24 @@ export function WorkspaceHome({
           </div>
         </section>
 
-        <div className="grid gap-6 lg:grid-cols-12 lg:gap-8">
-          <div className="space-y-6 lg:col-span-7">
-            <div>
-              <p className="mb-3 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+        <div className="space-y-6 sm:space-y-7">
+          <div>
+            <p className="mb-2.5 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+              Primair
+            </p>
+            <PrimaryFlowDuo />
+          </div>
+
+          <div className="grid gap-5 lg:grid-cols-12 lg:gap-6">
+            <div className="lg:col-span-8">
+              <p className="mb-2.5 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                 Activiteit
               </p>
               <DashboardInboxPanel messages={snapshot.recentMessages} />
             </div>
-          </div>
 
-          <div className="space-y-6 lg:col-span-5">
-            <div>
-              <p className="mb-3 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+            <div className="lg:col-span-4">
+              <p className="mb-2.5 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                 Agenda
               </p>
               <ProDashboardCard
@@ -297,58 +329,38 @@ export function WorkspaceHome({
                 )}
               </ProDashboardCard>
             </div>
-
-            <div>
-              <p className="mb-3 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                Snel naar
-              </p>
-              <div className="grid gap-2.5 rounded-2xl border border-border/50 bg-muted/[0.08] p-3 dark:border-white/[0.08] dark:bg-white/[0.02]">
-                <QuickLink
-                  href="/dashboard/ai-koppelingen"
-                  title="AI & koppelingen"
-                  hint="Kennis, WhatsApp, widget, e-mail"
-                  icon={Sparkles}
-                />
-                <QuickLink
-                  href="/dashboard/ai-knowledge"
-                  title="AI-kennis"
-                  hint="Website en vrije tekst"
-                  icon={BookMarked}
-                />
-                <QuickLink
-                  href="/dashboard/leads"
-                  title="Klanten"
-                  hint="Pipeline en opvolging"
-                  icon={Users}
-                />
-                <QuickLink
-                  href="/dashboard/pipeline"
-                  title="Pipeline"
-                  hint="Fases en prioriteit"
-                  icon={Kanban}
-                />
-              </div>
-            </div>
           </div>
-        </div>
 
-        <div>
-          <p className="mb-3 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-            Kernflows
-          </p>
-          <div className="grid gap-4 sm:grid-cols-2 sm:gap-5">
-            <HubCard
-              href="/dashboard/inbox"
-              title="Chat"
-              description="Alle gesprekken — WhatsApp, e-mail en widget in één inbox."
-              icon={MessageCircle}
-            />
-            <HubCard
-              href="/dashboard/quotes"
-              title="Offertes"
-              description="Concepten en verzonden voorstellen — opvolgen en converteren."
-              icon={FileText}
-            />
+          <div>
+            <p className="mb-2.5 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+              Meer routes
+            </p>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+              <RouteTile
+                href="/dashboard/ai-koppelingen"
+                title="AI & koppelingen"
+                hint="Kennis, WhatsApp, widget, e-mail"
+                icon={Sparkles}
+              />
+              <RouteTile
+                href="/dashboard/ai-knowledge"
+                title="AI-kennis"
+                hint="Website en vrije tekst"
+                icon={BookMarked}
+              />
+              <RouteTile
+                href="/dashboard/leads"
+                title="Klanten"
+                hint="Pipeline en opvolging"
+                icon={Users}
+              />
+              <RouteTile
+                href="/dashboard/pipeline"
+                title="Pipeline"
+                hint="Fases en prioriteit"
+                icon={Kanban}
+              />
+            </div>
           </div>
         </div>
 

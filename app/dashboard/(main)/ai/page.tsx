@@ -23,7 +23,7 @@ export default async function AiSettingsPage() {
   return (
     <PageFrame
       title="AI-assistent"
-      subtitle="Kies voorbeelden voor toon en antwoorden — of pas alles vrij aan. Geen verplicht vakjargon."
+      subtitle="Zelfde breedte als de rest van je dashboard: voorbeelden links, jouw eigen tekst rechts — alles bewerkbaar."
       dismissHref="/dashboard/ai-koppelingen"
       dismissLabel="AI & koppelingen"
     >
