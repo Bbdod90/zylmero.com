@@ -22,7 +22,7 @@ export default async function LeadsPage() {
   return (
     <PageFrame
       title="Leads"
-      subtitle="Prioriteit, status en waarde — werk eerst aan wat het meest oplevert."
+      subtitle="Strak pipeline-overzicht met focus op prioriteit, snelheid en omzetkans."
     >
       <DashboardWorkSurface>
         {!demo ? (

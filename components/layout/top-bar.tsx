@@ -17,7 +17,7 @@ export function TopBar({
   dismissLabel?: string;
 }) {
   return (
-    <header className="sticky top-0 z-30 border-b border-border/50 bg-background/82 backdrop-blur-xl supports-[backdrop-filter]:bg-background/68 dark:border-white/[0.08] dark:bg-[hsl(228_32%_4%/0.82)]">
+    <header className="sticky top-0 z-30 border-b border-border/55 bg-background/82 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70 dark:border-white/[0.09] dark:bg-[hsl(228_32%_4%/0.84)]">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/35 to-transparent" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-border/35 to-transparent dark:via-white/[0.06]" />
       <div className="mx-auto flex min-h-[3.5rem] max-w-[1200px] items-center justify-between gap-3 px-safe py-2 sm:min-h-[3.65rem] sm:gap-4 sm:px-6 lg:px-8">
@@ -26,8 +26,8 @@ export function TopBar({
             <Link
               href={dismissHref}
               className={cn(
-                "group mt-0.5 flex shrink-0 items-center gap-2 rounded-xl border border-border/55 bg-muted/25 px-2.5 py-2 text-sm font-medium text-muted-foreground shadow-sm transition-all",
-                "hover:border-primary/28 hover:bg-primary/[0.07] hover:text-foreground hover:shadow-md",
+                "group mt-0.5 flex shrink-0 items-center gap-2 rounded-xl border border-border/60 bg-muted/25 px-2.5 py-2 text-sm font-medium text-muted-foreground shadow-sm transition-all",
+                "hover:border-primary/35 hover:bg-primary/[0.1] hover:text-foreground hover:shadow-md",
                 "dark:border-white/[0.09] dark:bg-white/[0.04] dark:hover:bg-white/[0.07]",
               )}
               aria-label={dismissLabel}
@@ -41,11 +41,11 @@ export function TopBar({
             </Link>
           ) : null}
           <div className="min-w-0 flex-1 space-y-1.5">
-            <h1 className="truncate text-lg font-semibold tracking-tight text-foreground sm:text-2xl sm:font-medium sm:tracking-[-0.02em]">
+            <h1 className="truncate text-lg font-semibold tracking-tight text-foreground sm:text-2xl sm:font-semibold sm:tracking-[-0.02em]">
               {title}
             </h1>
             {subtitle ? (
-              <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground sm:max-w-2xl">
+              <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground/95 sm:max-w-2xl">
                 {subtitle}
               </p>
             ) : null}

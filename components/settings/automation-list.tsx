@@ -56,7 +56,12 @@ function Row({
           <input type="hidden" name="id" value={a.id} />
           <div className="space-y-2">
             <Label htmlFor={`name-${a.id}`}>Naam</Label>
-            <Input id={`name-${a.id}`} name="name" defaultValue={a.name} />
+            <Input
+              id={`name-${a.id}`}
+              name="name"
+              defaultValue={a.name}
+              className="rounded-xl border-border/60 bg-background/80 dark:border-white/[0.1] dark:bg-white/[0.03]"
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor={`delay-${a.id}`}>Vertraging (minuten)</Label>
@@ -65,6 +70,7 @@ function Row({
               name="delay_minutes"
               type="number"
               defaultValue={a.delay_minutes}
+              className="rounded-xl border-border/60 bg-background/80 dark:border-white/[0.1] dark:bg-white/[0.03]"
             />
           </div>
           <div className="space-y-2">
@@ -85,7 +91,7 @@ function Row({
           <Button
             type="submit"
             size="sm"
-            className="rounded-xl"
+            className="rounded-xl shadow-sm"
             disabled={!canUseAutomations}
           >
             Opslaan
@@ -165,7 +171,7 @@ export function AutomationList({
       <Button
         type="button"
         variant="secondary"
-        className="rounded-lg"
+        className="rounded-xl border border-border/60 bg-background/70 dark:border-white/[0.1] dark:bg-white/[0.03]"
         disabled={pending || !canUseAutomations}
         onClick={() => {
           start(async () => {

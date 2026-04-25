@@ -13,8 +13,8 @@ export function LeadImport({ disabled }: { disabled: boolean }) {
   const [file, setFile] = useState<File | null>(null);
 
   return (
-    <div className="cf-dashboard-panel">
-      <div className="border-b border-border/40 px-6 py-5 dark:border-white/[0.06] sm:px-7 sm:py-6">
+    <div className="cf-dashboard-panel overflow-hidden">
+      <div className="border-b border-border/40 bg-gradient-to-r from-primary/[0.08] via-primary/[0.04] to-transparent px-6 py-5 dark:border-white/[0.06] dark:from-primary/[0.18] dark:via-primary/[0.08] sm:px-7 sm:py-6">
         <h3 className="text-base font-semibold tracking-tight text-foreground">
           Import (CSV / Excel)
         </h3>
@@ -25,8 +25,10 @@ export function LeadImport({ disabled }: { disabled: boolean }) {
       </div>
       <div className="space-y-4 p-6 sm:p-7">
         <div className="space-y-2">
-          <Label htmlFor="import-file">Bestand</Label>
-          <div className="relative overflow-hidden rounded-lg border border-dashed border-border/60 bg-muted/20 transition-colors hover:border-primary/35 hover:bg-muted/30 dark:border-white/[0.1]">
+          <Label htmlFor="import-file" className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+            Bestand
+          </Label>
+          <div className="relative overflow-hidden rounded-xl border border-dashed border-border/60 bg-gradient-to-br from-muted/30 to-transparent transition-colors hover:border-primary/35 hover:from-primary/[0.06] dark:border-white/[0.12] dark:from-white/[0.03]">
             <input
               id="import-file"
               type="file"
@@ -35,8 +37,8 @@ export function LeadImport({ disabled }: { disabled: boolean }) {
               className="absolute inset-0 z-10 h-full min-h-[5.5rem] w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
             />
-            <div className="pointer-events-none flex min-h-[5.5rem] flex-col items-center justify-center gap-1 px-4 py-6 text-center">
-              <span className="text-sm font-medium text-foreground">
+            <div className="pointer-events-none flex min-h-[6.25rem] flex-col items-center justify-center gap-1 px-4 py-6 text-center">
+              <span className="text-sm font-semibold text-foreground">
                 {file ? file.name : "Sleep een bestand hierheen of klik om te kiezen"}
               </span>
               <span className="text-2xs text-muted-foreground">.csv, .xlsx of .xls</span>
@@ -45,7 +47,7 @@ export function LeadImport({ disabled }: { disabled: boolean }) {
         </div>
         <Button
           type="button"
-          className="rounded-lg"
+          className="rounded-xl px-5 shadow-sm"
           disabled={disabled || pending || !file}
           onClick={() => {
             if (!file) return;

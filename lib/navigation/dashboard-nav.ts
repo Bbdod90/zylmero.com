@@ -13,11 +13,9 @@ import {
   Puzzle,
   Share2,
   Sparkles,
-  TrendingUp,
   UserSearch,
   Users,
   Workflow,
-  Zap,
 } from "lucide-react";
 
 export type DashboardNavItem = {
@@ -47,11 +45,9 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
   },
   {
     id: "inzicht",
-    label: "Inzicht & groei",
+    label: "Inzicht",
     items: [
       { href: "/dashboard/insights", label: "Insights", icon: BarChart3 },
-      { href: "/dashboard/growth", label: "Growth", icon: TrendingUp },
-      { href: "/dashboard/sales", label: "Sales", icon: Zap },
     ],
   },
   {

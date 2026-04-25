@@ -55,7 +55,7 @@ export function ReplyTemplatesPanel({ items }: { items: ReplyTemplate[] }) {
               id="title"
               name="title"
               required
-              className="rounded-lg"
+              className="rounded-xl border-border/60 bg-background/80 dark:border-white/[0.1] dark:bg-white/[0.03]"
               placeholder="Bijv. Afspraak bevestiging"
             />
           </div>
@@ -66,7 +66,7 @@ export function ReplyTemplatesPanel({ items }: { items: ReplyTemplate[] }) {
             <Input
               id="shortcut"
               name="shortcut"
-              className="rounded-lg"
+              className="rounded-xl border-border/60 bg-background/80 dark:border-white/[0.1] dark:bg-white/[0.03]"
               placeholder="/bevestig"
             />
           </div>
@@ -79,11 +79,11 @@ export function ReplyTemplatesPanel({ items }: { items: ReplyTemplate[] }) {
               name="body"
               required
               rows={6}
-              className="min-h-[140px] rounded-lg resize-y"
+              className="min-h-[140px] resize-y rounded-xl border-border/60 bg-background/80 dark:border-white/[0.1] dark:bg-white/[0.03]"
               placeholder="Beste {{naam}}, ..."
             />
           </div>
-          <Button type="submit" disabled={pending} className="rounded-lg px-6 font-semibold shadow-sm">
+          <Button type="submit" disabled={pending} className="rounded-xl px-6 font-semibold shadow-sm">
             {pending ? <Loader2 className="size-4 animate-spin" /> : null}
             Opslaan
           </Button>
@@ -102,7 +102,7 @@ export function ReplyTemplatesPanel({ items }: { items: ReplyTemplate[] }) {
         {items.map((t) => (
           <div
             key={t.id}
-            className="cf-dashboard-panel flex flex-col gap-4 p-5 sm:flex-row sm:items-start sm:justify-between"
+            className="cf-dashboard-panel flex flex-col gap-4 border-border/60 p-5 sm:flex-row sm:items-start sm:justify-between dark:border-white/[0.08]"
           >
             <div className="min-w-0 flex-1">
               <p className="font-semibold text-foreground">{t.title}</p>

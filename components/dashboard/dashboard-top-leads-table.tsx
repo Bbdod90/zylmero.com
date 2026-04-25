@@ -12,7 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles, Users } from "lucide-react";
+import { ArrowRight, Users } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { LeadStatusMenu } from "@/components/leads/lead-status-menu";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -71,9 +71,8 @@ export function DashboardTopLeadsTable({
               </p>
             </div>
             <Button asChild variant="outline" className="rounded-lg shadow-sm">
-              <Link href="/dashboard/growth">
-                <Sparkles className="mr-2 size-4" aria-hidden />
-                Klanten werven
+              <Link href="/dashboard/inbox">
+                Open inbox
               </Link>
             </Button>
           </div>

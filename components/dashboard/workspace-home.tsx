@@ -106,7 +106,7 @@ export function WorkspaceHome({
   return (
     <PageFrame
       title={companyName}
-      subtitle="Berichten en offertes — rustig overzicht, zonder ruis."
+      subtitle="Je command center voor gesprekken, offertes en dagelijkse focus."
     >
       <div className="mx-auto w-full max-w-[960px] space-y-8 sm:space-y-10">
         <div
@@ -131,7 +131,7 @@ export function WorkspaceHome({
               </p>
               <p className="mt-1 max-w-lg text-sm leading-relaxed text-muted-foreground">
                 Hier zie je in één oogopslag wat er speelt. Gebruik Chat voor
-                antwoorden en Offertes om prijzen strak af te handelen.
+                antwoorden en Offertes om deals strak af te handelen.
               </p>
             </div>
             <p className="shrink-0 text-sm font-medium capitalize text-muted-foreground sm:text-right">

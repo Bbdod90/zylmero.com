@@ -50,15 +50,15 @@ export default async function AutomationsPage() {
   return (
     <PageFrame
       title="Automatiseringen"
-      subtitle="Opvolging, als-dan regels en slimme acties — gekoppeld aan leads en berichten."
+      subtitle="Opvolging en regels met premium controle — strak, overzichtelijk en direct inzetbaar."
     >
       <DashboardWorkSurface>
         <Tabs defaultValue="followup" className="mt-2 w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-2 rounded-lg border border-border/50 bg-muted/30 p-1 dark:border-white/[0.08]">
-            <TabsTrigger value="followup" className="rounded-md data-[state=active]:shadow-sm">
+          <TabsList className="grid w-full max-w-md grid-cols-2 rounded-xl border border-border/50 bg-muted/30 p-1 dark:border-white/[0.08]">
+            <TabsTrigger value="followup" className="rounded-lg data-[state=active]:shadow-sm">
               Opvolging
             </TabsTrigger>
-            <TabsTrigger value="rules" className="rounded-md data-[state=active]:shadow-sm">
+            <TabsTrigger value="rules" className="rounded-lg data-[state=active]:shadow-sm">
               Regels (als → dan)
             </TabsTrigger>
           </TabsList>

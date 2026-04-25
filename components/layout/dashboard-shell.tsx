@@ -42,16 +42,16 @@ export function DashboardShell({
       />
       <div className="relative zm-landing-atmosphere flex min-h-0 min-w-0 flex-1 flex-col">
         <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
-          <div className="absolute inset-0 zm-landing-spotlight opacity-[0.55] dark:opacity-[0.75]" />
-          <div className="absolute inset-0 zm-landing-edge-glow opacity-45 dark:opacity-[0.65]" />
-          <div className="absolute inset-0 zm-landing-radial-fade opacity-50 dark:opacity-[0.6]" />
+          <div className="absolute inset-0 zm-landing-spotlight opacity-[0.6] dark:opacity-[0.8]" />
+          <div className="absolute inset-0 zm-landing-edge-glow opacity-50 dark:opacity-[0.7]" />
+          <div className="absolute inset-0 zm-landing-radial-fade opacity-55 dark:opacity-[0.65]" />
           <div className="absolute inset-0 zm-landing-dots opacity-[0.35] dark:opacity-[0.28]" />
           <div className="cf-landing-grain absolute inset-0" aria-hidden />
         </div>
         <div className="relative z-[1] flex min-h-0 min-w-0 flex-1 flex-col">
         <header
           className={cn(
-            "sticky top-0 z-30 flex items-center gap-2 border-b border-border/55 bg-background/90 py-2.5 backdrop-blur-md supports-[backdrop-filter]:bg-background/75 dark:border-white/[0.06] md:hidden",
+            "sticky top-0 z-30 flex items-center gap-2 border-b border-border/55 bg-background/92 py-2.5 backdrop-blur-md supports-[backdrop-filter]:bg-background/78 dark:border-white/[0.08] md:hidden",
             "pl-[max(0.75rem,env(safe-area-inset-left))] pr-[max(0.75rem,env(safe-area-inset-right))] pt-[max(0.5rem,env(safe-area-inset-top))]",
           )}
         >

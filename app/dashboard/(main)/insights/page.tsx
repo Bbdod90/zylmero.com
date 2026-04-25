@@ -35,11 +35,11 @@ function KpiPanel({
   iconClass?: string;
 }) {
   return (
-    <div className="cf-dashboard-panel flex flex-col rounded-2xl p-5 sm:p-6">
+    <div className="cf-dashboard-panel flex flex-col rounded-2xl bg-gradient-to-br from-card to-card/80 p-5 sm:p-6">
       <div className="flex items-start gap-3">
         <div
           className={cn(
-            "flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary ring-1 ring-primary/12",
+            "flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/12 text-primary ring-1 ring-primary/20",
             iconClass,
           )}
         >
@@ -89,6 +89,19 @@ export default async function InsightsPage() {
       subtitle="Reactiesnelheid, pijplijn en omzet — dezelfde data als op je dashboard, hier gericht op inzicht en actie."
     >
       <div className="mx-auto w-full max-w-[1100px] space-y-10">
+        <div className="cf-dashboard-panel overflow-hidden p-6 sm:p-7">
+          <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+            Executive snapshot
+          </p>
+          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+            Focus op snelheid en marge
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+            Dit overzicht combineert reactietijd, conversie en omzetverlies in een enkel
+            luxe dashboard zodat je direct ziet waar de grootste winst zit.
+          </p>
+        </div>
+
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <KpiPanel
             icon={Clock}
@@ -138,10 +151,12 @@ export default async function InsightsPage() {
                 </h2>
               </div>
             </div>
-            <SalesChart title="" />
+            <div className="cf-dashboard-panel p-3 sm:p-4">
+              <SalesChart title="" />
+            </div>
           </div>
 
-          <div className="cf-dashboard-panel flex flex-col rounded-2xl p-6 lg:col-span-1">
+          <div className="cf-dashboard-panel flex flex-col rounded-2xl bg-gradient-to-br from-primary/[0.08] via-transparent to-transparent p-6 lg:col-span-1 dark:from-primary/[0.14]">
             <p className="text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
               Actie
             </p>
@@ -159,7 +174,7 @@ export default async function InsightsPage() {
                 <Link href="/dashboard">Volledig dashboard</Link>
               </Button>
               <Button variant="outline" className="h-11 w-full rounded-lg font-semibold" asChild>
-                <Link href="/dashboard/growth">Groei &amp; referrals</Link>
+                <Link href="/dashboard/leads">Bekijk leads</Link>
               </Button>
             </div>
           </div>

@@ -12,7 +12,7 @@ export default async function TemplatesPage() {
   return (
     <PageFrame
       title="Snelle antwoorden"
-      subtitle="Templates voor bevestigingen, prijsindicaties en follow-up — invoegen in de inbox."
+      subtitle="Professionele templates voor bevestigingen, prijsindicaties en follow-up — direct inzetbaar in de inbox."
     >
       <DashboardWorkSurface>
         <ReplyTemplatesPanel items={items} />

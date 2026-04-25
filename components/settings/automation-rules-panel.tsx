@@ -48,7 +48,7 @@ function CreateForm({
             required
             disabled={!canUse || disabled}
             placeholder="Bijv. Hete lead opvolging"
-            className="rounded-xl"
+            className="rounded-xl border-border/60 bg-background/80 dark:border-white/[0.1] dark:bg-white/[0.03]"
           />
         </div>
         <div className="space-y-2">
@@ -61,6 +61,7 @@ function CreateForm({
             className={cn(
               "flex h-10 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm",
               "ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              "dark:border-white/[0.1] dark:bg-white/[0.03]",
             )}
           >
             <option value="lead_is_hot">Lead is heet</option>
@@ -78,7 +79,7 @@ function CreateForm({
             max={168}
             defaultValue={24}
             disabled={!canUse || disabled}
-            className="rounded-xl"
+            className="rounded-xl border-border/60 bg-background/80 dark:border-white/[0.1] dark:bg-white/[0.03]"
           />
         </div>
         <div className="space-y-2 sm:col-span-2">
@@ -91,6 +92,7 @@ function CreateForm({
             className={cn(
               "flex h-10 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm",
               "ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              "dark:border-white/[0.1] dark:bg-white/[0.03]",
             )}
           >
             <option value="notify_in_app">Melding in app</option>
@@ -106,7 +108,7 @@ function CreateForm({
             rows={2}
             disabled={!canUse || disabled}
             placeholder="Alleen bij actie ‘Melding in app’"
-            className="rounded-xl"
+            className="rounded-xl border-border/60 bg-background/80 dark:border-white/[0.1] dark:bg-white/[0.03]"
           />
         </div>
         <div className="space-y-2 sm:col-span-2">
@@ -117,14 +119,14 @@ function CreateForm({
             rows={3}
             disabled={!canUse || disabled}
             placeholder="Gebruik {{name}} voor de voornaam / naam."
-            className="rounded-xl"
+            className="rounded-xl border-border/60 bg-background/80 dark:border-white/[0.1] dark:bg-white/[0.03]"
           />
         </div>
       </div>
       <Button
         type="submit"
         disabled={!canUse || disabled || pending}
-        className="rounded-xl"
+        className="rounded-xl shadow-sm"
       >
         {pending ? <Loader2 className="size-4 animate-spin" /> : null}
         Regel toevoegen
@@ -190,7 +192,7 @@ export function AutomationRulesPanel({
         {items.map((r) => (
           <div
             key={r.id}
-            className="cf-dashboard-panel flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
+            className="cf-dashboard-panel flex flex-col gap-3 border-border/60 p-4 sm:flex-row sm:items-center sm:justify-between dark:border-white/[0.08]"
           >
             <div className="min-w-0 space-y-1">
               <p className="font-medium leading-tight">{r.name}</p>

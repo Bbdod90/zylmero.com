@@ -3,7 +3,7 @@ import { ANONYMOUS_DEMO_USER_ID } from "@/lib/auth/constants";
 
 /**
  * Founder-only internal CRM. Set FOUNDER_USER_IDS (comma-separated UUIDs) and/or
- * insert into founder_access (or visit /dashboard/sales once with env set to auto-bootstrap).
+ * insert into founder_access.
  */
 export function getFounderUserIdsFromEnv(): string[] {
   const raw = process.env.FOUNDER_USER_IDS ?? "";

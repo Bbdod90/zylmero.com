@@ -121,7 +121,7 @@ export function LeadsExplorer({
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Zoek op naam, e-mail, intentie…"
-              className="h-12 rounded-lg border-border/60 pl-11 shadow-sm dark:border-white/[0.1]"
+              className="h-12 rounded-xl border-border/60 bg-background/70 pl-11 shadow-sm dark:border-white/[0.1] dark:bg-white/[0.02]"
             />
           </div>
           <NewLeadDialog
@@ -131,7 +131,7 @@ export function LeadsExplorer({
         </div>
         <div className="flex flex-wrap gap-3">
           <select
-            className="h-12 min-h-[44px] rounded-lg border border-border/60 bg-background px-3.5 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:border-white/[0.1] dark:bg-background/60"
+            className="h-12 min-h-[44px] rounded-xl border border-border/60 bg-background/80 px-3.5 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:border-white/[0.1] dark:bg-white/[0.02]"
             value={status}
             onChange={(e) => setStatus(e.target.value as LeadStatus | "all")}
           >
@@ -144,7 +144,7 @@ export function LeadsExplorer({
             <option value="lost">Verloren</option>
           </select>
           <select
-            className="h-12 min-h-[44px] rounded-lg border border-border/60 bg-background px-3.5 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:border-white/[0.1] dark:bg-background/60"
+            className="h-12 min-h-[44px] rounded-xl border border-border/60 bg-background/80 px-3.5 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:border-white/[0.1] dark:bg-white/[0.02]"
             value={source}
             onChange={(e) => setSource(e.target.value)}
           >
@@ -161,7 +161,7 @@ export function LeadsExplorer({
             ))}
           </select>
           <select
-            className="h-12 min-h-[44px] rounded-lg border border-border/60 bg-background px-3.5 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:border-white/[0.1] dark:bg-background/60"
+            className="h-12 min-h-[44px] rounded-xl border border-border/60 bg-background/80 px-3.5 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:border-white/[0.1] dark:bg-white/[0.02]"
             value={sort}
             onChange={(e) =>
               setSort(e.target.value as "activity" | "value" | "score")
@@ -192,14 +192,14 @@ export function LeadsExplorer({
         ) : (
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Naam</TableHead>
-                <TableHead>Bron</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Prioriteit</TableHead>
-                <TableHead>Score</TableHead>
-                <TableHead>Waarde</TableHead>
-                <TableHead>Laatste activiteit</TableHead>
+              <TableRow className="border-b border-border/40 dark:border-white/[0.06]">
+                <TableHead className="h-11 pl-6 text-2xs uppercase tracking-[0.13em] text-muted-foreground sm:pl-7">Naam</TableHead>
+                <TableHead className="h-11 text-2xs uppercase tracking-[0.13em] text-muted-foreground">Bron</TableHead>
+                <TableHead className="h-11 text-2xs uppercase tracking-[0.13em] text-muted-foreground">Status</TableHead>
+                <TableHead className="h-11 text-2xs uppercase tracking-[0.13em] text-muted-foreground">Prioriteit</TableHead>
+                <TableHead className="h-11 text-2xs uppercase tracking-[0.13em] text-muted-foreground">Score</TableHead>
+                <TableHead className="h-11 text-2xs uppercase tracking-[0.13em] text-muted-foreground">Waarde</TableHead>
+                <TableHead className="h-11 pr-6 text-2xs uppercase tracking-[0.13em] text-muted-foreground sm:pr-7">Laatste activiteit</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -211,7 +211,7 @@ export function LeadsExplorer({
                 return (
                   <TableRow
                     key={l.id}
-                    className="cursor-pointer border-b border-border/35 transition-colors hover:bg-muted/50 dark:border-white/[0.04] dark:hover:bg-white/[0.04]"
+                    className="cursor-pointer border-b border-border/35 transition-colors hover:bg-primary/[0.04] dark:border-white/[0.04] dark:hover:bg-white/[0.04]"
                     role="link"
                     tabIndex={0}
                     aria-label={`Lead openen: ${l.full_name}`}
@@ -223,7 +223,7 @@ export function LeadsExplorer({
                       }
                     }}
                   >
-                    <TableCell className="max-w-[min(42vw,16rem)] min-w-0 font-medium">
+                    <TableCell className="max-w-[min(42vw,16rem)] min-w-0 py-3.5 pl-6 font-medium sm:pl-7">
                       <span
                         className="block truncate text-primary underline-offset-4 hover:underline"
                         title={l.full_name}
@@ -231,17 +231,17 @@ export function LeadsExplorer({
                         {l.full_name}
                       </span>
                     </TableCell>
-                    <TableCell className="max-w-[10rem] min-w-0 truncate text-muted-foreground" title={l.source || ""}>
+                    <TableCell className="max-w-[10rem] min-w-0 truncate py-3.5 text-muted-foreground" title={l.source || ""}>
                       {l.source || "—"}
                     </TableCell>
                     <TableCell
-                      className="min-w-0 max-w-[11rem]"
+                      className="min-w-0 max-w-[11rem] py-3.5"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <LeadStatusMenu leadId={l.id} status={l.status} demoMode={demoMode} compact />
                     </TableCell>
                     <TableCell
-                      className="min-w-0 max-w-[12rem]"
+                      className="min-w-0 max-w-[12rem] py-3.5"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <div className="flex flex-wrap items-center gap-2">
@@ -262,15 +262,15 @@ export function LeadsExplorer({
                         ) : null}
                       </div>
                     </TableCell>
-                    <TableCell className="tabular-nums text-muted-foreground">
+                    <TableCell className="py-3.5 tabular-nums text-muted-foreground">
                       {display}
                     </TableCell>
-                    <TableCell className="text-base font-semibold tabular-nums text-foreground">
+                    <TableCell className="py-3.5 text-base font-semibold tabular-nums text-foreground">
                       {l.estimated_value != null
                         ? formatCurrency(l.estimated_value)
                         : "—"}
                     </TableCell>
-                    <TableCell className="text-muted-foreground">
+                    <TableCell className="py-3.5 pr-6 text-muted-foreground sm:pr-7">
                       {l.last_message_at
                         ? formatDateTime(l.last_message_at)
                         : "—"}

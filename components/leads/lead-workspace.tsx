@@ -274,21 +274,21 @@ export function LeadWorkspace({
   return (
     <div className="space-y-5">
       <div className="grid gap-3 lg:grid-cols-3">
-        <div className="rounded-2xl border border-white/[0.06] bg-gradient-to-br from-primary/[0.1] to-transparent px-4 py-3 text-sm font-medium leading-snug">
-          Deze lead is{" "}
+        <div className="cf-dashboard-panel border-primary/20 bg-gradient-to-br from-primary/[0.18] via-primary/[0.1] to-transparent px-4 py-3 text-sm font-medium leading-snug dark:border-primary/35 dark:from-primary/[0.3] dark:via-primary/[0.16]">
+          Potentiële waarde:{" "}
           <span className="font-semibold text-foreground">
             {lead.estimated_value != null
-              ? `${formatCurrency(lead.estimated_value)} waard`
-              : "nog niet ingeschat — voeg een waarde toe"}
+              ? `${formatCurrency(lead.estimated_value)}`
+              : "nog niet ingeschat"}
           </span>
         </div>
-        <div className="rounded-2xl border border-amber-500/25 bg-amber-500/[0.08] px-4 py-3 text-sm font-medium leading-snug text-amber-100">
-          Antwoord binnen 2 minuten om deze klus te winnen
+        <div className="cf-dashboard-panel border-amber-500/25 bg-gradient-to-br from-amber-500/[0.2] via-amber-500/[0.08] to-transparent px-4 py-3 text-sm font-medium leading-snug text-amber-950 dark:text-amber-100">
+          Snelheid wint deals: antwoord idealiter binnen 2 minuten.
         </div>
-        <div className="rounded-2xl border border-destructive/25 bg-destructive/[0.08] px-4 py-3 text-sm font-medium leading-snug text-destructive">
+        <div className="cf-dashboard-panel border-destructive/25 bg-gradient-to-br from-destructive/[0.18] via-destructive/[0.07] to-transparent px-4 py-3 text-sm font-medium leading-snug text-destructive">
           {staleReply
-            ? "Je kunt deze klant verliezen — antwoord nu"
-            : "Trage antwoorden lekken omzet naar concurrenten"}
+            ? "Risico is hoog: reageer direct om deze klant te behouden."
+            : "Voorkom omzetverlies met consequente follow-up."}
         </div>
       </div>
       <div className="grid gap-6 xl:grid-cols-[minmax(0,420px)_1fr] xl:gap-8">

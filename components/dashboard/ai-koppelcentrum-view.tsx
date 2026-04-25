@@ -109,8 +109,8 @@ export function AiKoppelcentrumView({
         : "todo";
 
   return (
-    <div className="space-y-10">
-      <div className="rounded-2xl border border-border/60 bg-gradient-to-br from-primary/[0.07] via-background to-background p-6 shadow-sm dark:border-white/[0.08] sm:p-8">
+    <div className="space-y-8">
+      <div className="cf-dashboard-panel border-primary/20 bg-gradient-to-br from-primary/[0.14] via-background to-background p-6 shadow-sm dark:border-primary/30 dark:from-primary/[0.2] sm:p-8">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-2xl space-y-2">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
@@ -129,13 +129,13 @@ export function AiKoppelcentrumView({
             </p>
           </div>
           <div className="flex shrink-0 flex-col gap-2 sm:flex-row lg:flex-col">
-            <Button asChild variant="default" className="rounded-xl">
+            <Button asChild variant="default" className="rounded-xl shadow-sm">
               <Link href="/dashboard/inbox">
                 <Inbox className="mr-2 size-4" />
                 Naar berichten
               </Link>
             </Button>
-            <Button asChild variant="outline" className="rounded-xl">
+            <Button asChild variant="outline" className="rounded-xl border-border/60 bg-background/70 dark:border-white/[0.1] dark:bg-white/[0.03]">
               <Link href="/dashboard/settings">
                 <Settings2 className="mr-2 size-4" />
                 Alle instellingen
@@ -146,7 +146,7 @@ export function AiKoppelcentrumView({
       </div>
 
       {demoMode ? (
-        <p className="rounded-xl border border-amber-500/25 bg-amber-500/[0.07] px-4 py-3 text-sm text-amber-950 dark:text-amber-100">
+        <p className="rounded-xl border border-amber-500/25 bg-gradient-to-r from-amber-500/[0.15] to-amber-500/[0.06] px-4 py-3 text-sm text-amber-950 dark:text-amber-100">
           <strong className="font-semibold">Demo:</strong> koppelingen zijn gesimuleerd. Met een echt
           account stel je hier je eigen kanalen in.
         </p>
@@ -180,7 +180,7 @@ export function AiKoppelcentrumView({
       ) : null}
 
       <div className="grid gap-5 md:grid-cols-2">
-        <Card id="kennis" className="scroll-mt-24 rounded-2xl border-border/70 shadow-sm dark:border-white/[0.08]">
+        <Card id="kennis" className="cf-dashboard-panel scroll-mt-24 border-border/70 shadow-sm dark:border-white/[0.08]">
           <CardHeader className="space-y-3">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-2 text-primary">
@@ -215,7 +215,7 @@ export function AiKoppelcentrumView({
           </CardContent>
         </Card>
 
-        <Card id="whatsapp" className="scroll-mt-24 rounded-2xl border-border/70 shadow-sm dark:border-white/[0.08]">
+        <Card id="whatsapp" className="cf-dashboard-panel scroll-mt-24 border-border/70 shadow-sm dark:border-white/[0.08]">
           <CardHeader className="space-y-3">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-2 text-primary">
@@ -244,7 +244,7 @@ export function AiKoppelcentrumView({
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="rounded-xl border border-border/60 bg-muted/20 px-3 py-2 font-mono text-[0.7rem] leading-relaxed text-muted-foreground break-all sm:text-xs">
+            <div className="rounded-xl border border-border/60 bg-background/70 px-3 py-2 font-mono text-[0.7rem] leading-relaxed text-muted-foreground break-all dark:bg-white/[0.03] sm:text-xs">
               POST {webhookUrl}
             </div>
             <p className="text-2xs text-muted-foreground">
@@ -261,7 +261,7 @@ export function AiKoppelcentrumView({
           </CardContent>
         </Card>
 
-        <Card id="widget" className="scroll-mt-24 rounded-2xl border-border/70 shadow-sm dark:border-white/[0.08]">
+        <Card id="widget" className="cf-dashboard-panel scroll-mt-24 border-border/70 shadow-sm dark:border-white/[0.08]">
           <CardHeader className="space-y-3">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-2 text-primary">
@@ -307,7 +307,7 @@ export function AiKoppelcentrumView({
           </CardContent>
         </Card>
 
-        <Card id="email" className="scroll-mt-24 rounded-2xl border-border/70 shadow-sm dark:border-white/[0.08]">
+        <Card id="email" className="cf-dashboard-panel scroll-mt-24 border-border/70 shadow-sm dark:border-white/[0.08]">
           <CardHeader className="space-y-3">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-2 text-primary">
@@ -337,7 +337,7 @@ export function AiKoppelcentrumView({
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="rounded-xl border border-border/60 bg-muted/20 px-3 py-2 font-mono text-[0.7rem] leading-relaxed text-muted-foreground break-all sm:text-xs">
+            <div className="rounded-xl border border-border/60 bg-background/70 px-3 py-2 font-mono text-[0.7rem] leading-relaxed text-muted-foreground break-all dark:bg-white/[0.03] sm:text-xs">
               POST {emailWebhookUrl}
             </div>
             <div className="flex flex-wrap gap-2">
@@ -358,7 +358,7 @@ export function AiKoppelcentrumView({
         </Card>
       </div>
 
-      <Card className="rounded-2xl border-dashed border-border/80 bg-muted/10 dark:border-white/[0.1]">
+      <Card className="cf-dashboard-panel border-dashed border-border/80 bg-muted/10 dark:border-white/[0.1]">
         <CardHeader>
           <div className="flex items-center gap-2 text-muted-foreground">
             <Puzzle className="size-4" />

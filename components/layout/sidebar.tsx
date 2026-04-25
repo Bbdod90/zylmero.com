@@ -37,7 +37,7 @@ function NavLink({
       className={cn(
         "group relative flex min-h-11 touch-manipulation items-center gap-3 rounded-xl px-3 py-2.5 text-[0.8125rem] font-medium transition-all duration-200 active:scale-[0.99]",
         active
-          ? "bg-primary/[0.09] text-foreground shadow-sm ring-1 ring-primary/15 before:absolute before:left-0 before:top-1/2 before:h-8 before:w-[3px] before:-translate-y-1/2 before:rounded-full before:bg-primary dark:bg-white/[0.08] dark:ring-white/[0.12] dark:before:bg-primary"
+          ? "bg-gradient-to-r from-primary/[0.2] via-primary/[0.12] to-transparent text-foreground shadow-[0_8px_24px_-16px_hsl(var(--primary)/0.75)] ring-1 ring-primary/25 before:absolute before:left-0 before:top-1/2 before:h-8 before:w-[3px] before:-translate-y-1/2 before:rounded-full before:bg-primary dark:from-primary/[0.26] dark:via-primary/[0.14] dark:ring-primary/35 dark:before:bg-primary"
           : "text-muted-foreground hover:bg-muted/55 hover:text-foreground dark:text-white/72 dark:hover:bg-white/[0.07] dark:hover:text-white",
       )}
     >
@@ -45,7 +45,7 @@ function NavLink({
         className={cn(
           "flex size-8 shrink-0 items-center justify-center rounded-lg border transition-colors",
           active
-            ? "border-primary/20 bg-background/80 text-primary dark:border-white/[0.1] dark:bg-black/20 dark:text-primary"
+            ? "border-primary/30 bg-background/90 text-primary dark:border-primary/35 dark:bg-black/20 dark:text-primary"
             : "border-transparent bg-muted/25 text-muted-foreground group-hover:border-border/60 group-hover:bg-background/60 group-hover:text-foreground dark:bg-white/[0.06] dark:text-white/70 dark:group-hover:text-white",
         )}
       >
@@ -92,18 +92,18 @@ export function AppSidebar({
         "sticky top-0 flex h-dvh max-h-dvh w-full min-w-0 shrink-0 flex-col",
         "border-r border-border/70 bg-gradient-to-b from-card via-background/98 to-muted/[0.28]",
         "shadow-[inset_-1px_0_0_hsl(220_14%_76%/0.45)] backdrop-blur-xl",
-        "dark:border-white/[0.14] dark:bg-[hsl(222_26%_11%)] dark:from-[hsl(222_26%_11%)] dark:via-[hsl(222_26%_10%)] dark:to-[hsl(222_28%_9%)] dark:shadow-[inset_-1px_0_0_hsl(220_16%_22%/0.55)]",
+        "dark:border-white/[0.14] dark:bg-[radial-gradient(140%_120%_at_0%_0%,hsl(220_56%_22%/0.26),transparent_45%),linear-gradient(180deg,hsl(224_30%_13%)_0%,hsl(223_31%_10%)_48%,hsl(225_36%_8%)_100%)] dark:shadow-[inset_-1px_0_0_hsl(220_16%_22%/0.55)]",
         "md:w-[17rem]",
         className,
       )}
     >
-      <div className="flex min-h-[3.75rem] items-center gap-3 border-b border-border/55 px-3 py-3.5 sm:min-h-[4rem] sm:px-4 dark:border-white/[0.06]">
+      <div className="flex min-h-[3.75rem] items-center gap-3 border-b border-border/55 px-3 py-3.5 sm:min-h-[4rem] sm:px-4 dark:border-white/[0.08]">
         <Link
           href="/dashboard"
           onClick={() => onNavLinkClick?.()}
           className="group flex min-w-0 flex-1 items-center gap-3"
         >
-          <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-[11px] font-bold text-primary-foreground shadow-sm ring-1 ring-black/5 dark:ring-white/10">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-[11px] font-bold text-primary-foreground shadow-sm ring-1 ring-black/5 dark:shadow-[0_0_0_1px_hsl(var(--primary)/0.35),0_14px_32px_-16px_hsl(var(--primary)/0.9)] dark:ring-0">
             {BRAND_LOGO_MONOGRAM}
           </div>
           <div className="min-w-0 flex-1">
@@ -128,7 +128,7 @@ export function AppSidebar({
           <Link
             href="/dashboard/upgrade"
             onClick={() => onNavLinkClick?.()}
-            className="flex min-h-11 touch-manipulation items-center justify-center gap-2 rounded-xl border border-primary/25 bg-primary/[0.08] px-3 py-2.5 text-xs font-semibold text-primary shadow-sm transition-all hover:border-primary/35 hover:bg-primary/[0.12] active:scale-[0.99] dark:border-primary/30 dark:bg-primary/[0.14] dark:text-foreground dark:hover:bg-primary/[0.2]"
+            className="flex min-h-11 touch-manipulation items-center justify-center gap-2 rounded-xl border border-primary/25 bg-gradient-to-r from-primary/[0.16] via-primary/[0.1] to-primary/[0.08] px-3 py-2.5 text-xs font-semibold text-primary shadow-sm transition-all hover:border-primary/35 hover:brightness-110 active:scale-[0.99] dark:border-primary/30 dark:from-primary/[0.3] dark:via-primary/[0.2] dark:to-primary/[0.12] dark:text-foreground"
           >
             <CreditCard className="size-3.5 shrink-0 opacity-90" />
             Abonnement & betaling
@@ -138,7 +138,7 @@ export function AppSidebar({
       <nav className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-2.5 py-4 sm:px-3">
         {DASHBOARD_NAV_GROUPS.map((group) => (
           <div key={group.id} className="flex flex-col gap-1">
-            <p className="px-3 pb-0.5 text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground/85">
+            <p className="px-3 pb-0.5 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground/80">
               {group.label}
             </p>
             {group.items.map((item) => (
@@ -181,7 +181,7 @@ export function AppSidebar({
           </div>
         ) : null}
       </nav>
-      <div className="border-t border-border/50 bg-muted/[0.15] px-2 py-2 dark:border-white/[0.06] dark:bg-white/[0.02]">
+      <div className="border-t border-border/50 bg-muted/[0.15] px-2 py-2 dark:border-white/[0.08] dark:bg-white/[0.02]">
         <Link
           href="/dashboard/settings"
           onClick={() => onNavLinkClick?.()}
