@@ -48,7 +48,7 @@ export async function updateAppointmentStatus(
 }
 
 export async function createAppointment(input: {
-  lead_id: string;
+  lead_id?: string | null;
   starts_at: string;
   ends_at?: string | null;
   notes?: string | null;
@@ -74,22 +74,26 @@ export async function createAppointment(input: {
     ends = new Date(starts.getTime() + 60 * 60 * 1000);
   }
 
+  const leadId = input.lead_id?.trim() || null;
+
   const supabase = await createClient();
-  const { data: lead } = await supabase
-    .from("leads")
-    .select("id")
-    .eq("id", input.lead_id)
-    .eq("company_id", auth.company.id)
-    .maybeSingle();
-  if (!lead) {
-    return { ok: false, error: "Lead niet gevonden." };
+  if (leadId) {
+    const { data: lead } = await supabase
+      .from("leads")
+      .select("id")
+      .eq("id", leadId)
+      .eq("company_id", auth.company.id)
+      .maybeSingle();
+    if (!lead) {
+      return { ok: false, error: "Klant niet gevonden." };
+    }
   }
 
   const { data: row, error } = await supabase
     .from("appointments")
     .insert({
       company_id: auth.company.id,
-      lead_id: input.lead_id,
+      lead_id: leadId,
       starts_at: starts.toISOString(),
       ends_at: ends.toISOString(),
       status: "scheduled",
@@ -104,7 +108,9 @@ export async function createAppointment(input: {
 
   revalidatePath("/dashboard/appointments");
   revalidatePath("/dashboard/leads");
-  revalidatePath(`/dashboard/leads/${input.lead_id}`);
+  if (leadId) {
+    revalidatePath(`/dashboard/leads/${leadId}`);
+  }
   revalidatePath("/dashboard");
   return { ok: true, data: { appointmentId: row.id as string } };
 }

@@ -23,7 +23,7 @@ export default async function AiSettingsPage() {
   return (
     <PageFrame
       title="AI-assistent"
-      subtitle="Zelfde breedte als de rest van je dashboard: voorbeelden links, jouw eigen tekst rechts — alles bewerkbaar."
+      subtitle="Bolletjes voor snelle keuzes, tekstvelden voor je eigen woorden — volledige breedte van je werkruimte."
       dismissHref="/dashboard/ai-koppelingen"
       dismissLabel="AI & koppelingen"
     >

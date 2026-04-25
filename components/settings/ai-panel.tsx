@@ -1,7 +1,13 @@
 "use client";
 
 import { useFormState, useFormStatus } from "react-dom";
-import { useCallback, useRef, useState, type RefObject } from "react";
+import {
+  useCallback,
+  useRef,
+  useState,
+  type ReactNode,
+  type RefObject,
+} from "react";
 import { updateAiSettingsAction, type SettingsFormState } from "@/actions/settings";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -16,7 +22,6 @@ import {
 import { cn } from "@/lib/utils";
 import {
   CheckCircle2,
-  ChevronDown,
   Languages,
   MessageCircleHeart,
   PenLine,
@@ -39,130 +44,127 @@ function Submit() {
 
 const initial: SettingsFormState = {};
 
-type ChoiceCardProps = {
+/** Strakke keuze met bolletje (radiogroup-pattern). */
+function PresetRadioRow({
+  selected,
+  onSelect,
+  label,
+  hint,
+}: {
   selected: boolean;
   onSelect: () => void;
   label: string;
   hint: string;
-};
-
-function ChoiceCard({ selected, onSelect, label, hint }: ChoiceCardProps) {
+}) {
   return (
     <button
       type="button"
+      role="radio"
+      aria-checked={selected}
       onClick={onSelect}
-      aria-pressed={selected}
       className={cn(
-        "group text-left transition-all duration-200",
-        "rounded-2xl border p-4 sm:p-5",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        "flex w-full items-start gap-3 rounded-xl border px-3 py-2.5 text-left transition-colors",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/45 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         selected
-          ? "border-primary/45 bg-gradient-to-br from-primary/[0.12] via-primary/[0.06] to-transparent shadow-[0_12px_40px_-24px_hsl(var(--primary)/0.55)] ring-1 ring-primary/25 dark:from-primary/[0.18] dark:via-primary/[0.08] dark:ring-primary/35"
-          : "border-border/60 bg-background/40 hover:border-primary/35 hover:bg-muted/25 dark:border-white/[0.1] dark:bg-white/[0.02] dark:hover:border-primary/30 dark:hover:bg-white/[0.04]",
+          ? "border-primary/55 bg-primary/[0.1] shadow-sm dark:border-primary/50 dark:bg-primary/[0.14]"
+          : "border-border/50 bg-transparent hover:border-border hover:bg-muted/25 dark:border-white/[0.08] dark:hover:bg-white/[0.04]",
       )}
     >
-      <p className="text-sm font-semibold tracking-tight text-foreground">{label}</p>
-      <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{hint}</p>
+      <span
+        className={cn(
+          "mt-0.5 flex size-[1.125rem] shrink-0 items-center justify-center rounded-full border-2 transition-colors",
+          selected
+            ? "border-primary bg-primary shadow-[inset_0_0_0_3px_hsl(var(--background))]"
+            : "border-muted-foreground/40 bg-background dark:border-white/35",
+        )}
+        aria-hidden
+      />
+      <span className="min-w-0">
+        <span className="block text-sm font-semibold leading-snug text-foreground">{label}</span>
+        <span className="mt-0.5 block text-xs leading-snug text-muted-foreground">{hint}</span>
+      </span>
     </button>
   );
 }
 
-/** Rechterkolom: maakt expliciet dat dit het bewerkbare AI-script is. */
-function AiLiveEditorPanel({
-  presetAnchorId,
+function PresetRadioList({
+  id,
+  label,
+  children,
+}: {
+  id: string;
+  label: string;
+  children: ReactNode;
+}) {
+  return (
+    <div id={id} className="space-y-2">
+      <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+        {label}
+      </p>
+      <div
+        role="radiogroup"
+        aria-label={label}
+        className="flex flex-col gap-1.5 rounded-xl border border-border/40 bg-muted/[0.15] p-2 dark:border-white/[0.08] dark:bg-white/[0.03]"
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/** Rechterkolom: compact, geen dubbele knoppen — één duidelijke boodschap. */
+function AiScriptField({
   editorRef,
   inputId,
-  headline,
-  badge,
-  helper,
+  title,
+  tag,
+  hint,
+  footnote,
   value,
   onChange,
   rows,
   placeholder,
 }: {
-  presetAnchorId: string;
   editorRef: RefObject<HTMLTextAreaElement>;
   inputId: string;
-  headline: string;
-  badge: string;
-  helper: string;
+  title: string;
+  tag: string;
+  hint: string;
+  footnote: string;
   value: string;
   onChange: (v: string) => void;
   rows: number;
   placeholder: string;
 }) {
-  const scrollToPresets = () => {
-    document.getElementById(presetAnchorId)?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
-  };
-
   return (
-    <div
-      className={cn(
-        "flex h-full min-h-0 flex-col rounded-2xl border-2 border-primary/25 bg-gradient-to-br from-primary/[0.08] via-primary/[0.03] to-transparent p-[3px] shadow-[0_20px_50px_-28px_hsl(var(--primary)/0.35)]",
-        "dark:border-primary/40 dark:from-primary/[0.14] dark:via-primary/[0.06] dark:to-transparent",
-      )}
-    >
-      <div className="flex min-h-[min(100%,22rem)] flex-1 flex-col rounded-[13px] bg-background/98 p-4 sm:p-5 dark:bg-[hsl(222_28%_10%/0.97)]">
-        <div className="mb-3 flex flex-col gap-3 border-b border-border/40 pb-3 sm:flex-row sm:items-start sm:justify-between dark:border-white/[0.08]">
-          <div className="flex min-w-0 items-start gap-2.5">
-            <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary ring-1 ring-primary/20">
-              <PenLine className="size-4" strokeWidth={2} aria-hidden />
-            </span>
-            <div className="min-w-0">
-              <p className="text-base font-semibold tracking-tight text-foreground">{headline}</p>
-              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{helper}</p>
-            </div>
-          </div>
-          <span className="shrink-0 self-start rounded-full bg-primary px-3 py-1 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-primary-foreground shadow-sm">
-            {badge}
-          </span>
+    <div className="flex flex-col rounded-xl border border-border/55 bg-card/90 p-4 shadow-sm dark:border-white/[0.1] dark:bg-[hsl(222_28%_11%/0.92)]">
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <PenLine className="size-4 shrink-0 text-primary" strokeWidth={2} aria-hidden />
+          <span className="text-sm font-semibold tracking-tight text-foreground">{title}</span>
         </div>
-
-        <div className="mb-3 flex flex-wrap gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="h-9 rounded-lg border-primary/25 text-xs font-semibold hover:bg-primary/[0.06]"
-            onClick={scrollToPresets}
-          >
-            Voorbeelden hierboven
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            className="h-9 rounded-lg bg-primary text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/92"
-            onClick={() => editorRef.current?.focus()}
-          >
-            Ik typ zelf — focus veld
-          </Button>
-        </div>
-
-        <Label htmlFor={inputId} className="sr-only">
-          {headline}
-        </Label>
-        <Textarea
-          ref={editorRef}
-          id={inputId}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          rows={rows}
-          placeholder={placeholder}
-          className={cn(
-            "min-h-[9.5rem] flex-1 resize-y rounded-xl border-2 border-primary/20 bg-background/90 py-3.5 text-sm leading-relaxed transition-shadow",
-            "placeholder:text-muted-foreground/75 focus-visible:border-primary/45 focus-visible:ring-2 focus-visible:ring-primary/35",
-            "dark:border-primary/30 dark:bg-white/[0.04]",
-          )}
-        />
-        <p className="mt-2.5 text-[0.7rem] leading-relaxed text-muted-foreground">
-          <span className="font-semibold text-foreground/90">Dit veld telt.</span> De AI gebruikt{" "}
-          <span className="italic">exact</span> wat je hier neerzet — ook als je alles wist en zelf typt.
-          Klik eerst een voorbeeld, of begin direct hier.
-        </p>
+        <span className="rounded-md border border-primary/25 bg-primary/10 px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider text-primary">
+          {tag}
+        </span>
       </div>
+      <p className="mb-2 text-xs leading-snug text-muted-foreground">{hint}</p>
+      <Label htmlFor={inputId} className="sr-only">
+        {title}
+      </Label>
+      <Textarea
+        ref={editorRef}
+        id={inputId}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        rows={rows}
+        placeholder={placeholder}
+        className={cn(
+          "min-h-[4.75rem] resize-y rounded-lg border border-border/70 bg-background py-2.5 text-sm leading-relaxed",
+          "placeholder:text-muted-foreground/70 focus-visible:border-primary/45 focus-visible:ring-2 focus-visible:ring-primary/30",
+          "dark:border-white/[0.12] dark:bg-white/[0.04]",
+        )}
+      />
+      <p className="mt-2 text-[0.65rem] leading-relaxed text-muted-foreground">{footnote}</p>
     </div>
   );
 }
@@ -220,74 +222,54 @@ export function AiPanel({
     setFollowPresetId(matchPresetId(v, AI_FOLLOWUP_PRESETS));
   }, []);
 
-  const langLabel =
-    AI_LANGUAGE_OPTIONS.find((o) => o.code === language)?.label ?? language;
-
   return (
     <form
       action={action}
-      className="cf-dashboard-panel w-full space-y-6 overflow-hidden border-border/60 p-5 sm:p-6 lg:p-8"
+      className="cf-dashboard-panel w-full max-w-none space-y-5 overflow-hidden border-border/60 p-4 sm:p-6 lg:p-7"
     >
       <input type="hidden" name="tone" value={tone} />
       <input type="hidden" name="reply_style" value={replyStyle} />
       <input type="hidden" name="language" value={language} />
       <input type="hidden" name="automation_preferences" value={followNote} />
 
-      <header className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/[0.14] via-background to-background p-5 sm:p-6 lg:p-8 dark:border-primary/30 dark:from-primary/[0.2]">
-        <div className="pointer-events-none absolute -right-24 -top-20 size-56 rounded-full bg-primary/[0.12] blur-3xl dark:bg-primary/[0.22]" />
-        <div className="pointer-events-none absolute -bottom-16 left-1/3 size-40 rounded-full bg-primary/[0.08] blur-2xl" />
-        <div className="relative grid gap-6 lg:grid-cols-12 lg:items-center">
-          <div className="flex items-start gap-4 lg:col-span-7">
-            <span className="mt-0.5 flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/15 text-primary shadow-inner ring-1 ring-primary/25 dark:bg-primary/22 dark:ring-primary/35">
-              <Sparkles className="size-5" strokeWidth={2} />
-            </span>
-            <div className="min-w-0">
-              <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                AI-assistent
-              </p>
-              <h2 className="mt-1.5 text-xl font-semibold tracking-tight text-foreground sm:text-2xl lg:text-3xl">
-                Voorbeelden + jouw eigen woorden
-              </h2>
-              <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground sm:text-[0.9375rem]">
-                Links kies je snel een basis; rechts staat het <strong className="font-semibold text-foreground">tekstveld dat de AI echt leest</strong>. Typ daar gerust je volledige eigen tekst — niets is verplicht uit de kaarten.
-              </p>
-            </div>
-          </div>
-          <div className="rounded-2xl border border-primary/15 bg-primary/[0.06] px-4 py-3 text-sm leading-relaxed text-foreground/90 dark:border-primary/25 dark:bg-primary/[0.1] lg:col-span-5">
-            <p className="font-semibold text-foreground">Zo werkt het</p>
-            <ol className="mt-2 list-decimal space-y-1.5 pl-4 text-muted-foreground">
-              <li>Klik een voorbeeld — de tekst verschijnt rechts.</li>
-              <li>Pas alles aan in het grote veld, of wis het en typ zelf.</li>
-              <li>Opslaan — klaar.</li>
-            </ol>
+      <header className="rounded-xl border border-primary/20 bg-gradient-to-r from-primary/[0.1] to-transparent px-4 py-4 sm:px-5 dark:border-primary/30 dark:from-primary/[0.14]">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary ring-1 ring-primary/25">
+            <Sparkles className="size-[1.125rem]" strokeWidth={2} aria-hidden />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              AI-assistent
+            </p>
+            <h2 className="mt-1 text-lg font-semibold tracking-tight text-foreground sm:text-xl">
+              Bolletje = voorbeeld · tekstveld = jouw woorden
+            </h2>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+              Klik links een <strong className="font-medium text-foreground">rondje</strong> om een kant-en-klare tekst te zetten. Rechts pas je alles aan of vervang je het volledig — dat is wat de AI gebruikt.
+            </p>
           </div>
         </div>
       </header>
 
       {/* Stap 1 */}
-      <section className="rounded-2xl border border-border/55 bg-background/50 p-5 sm:p-6 lg:p-8 dark:border-white/[0.08] dark:bg-white/[0.02]">
-        <div className="mb-6 flex items-start gap-3.5">
-          <span className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-2xl bg-primary/12 text-primary ring-1 ring-primary/20 dark:bg-primary/20">
-            <MessageCircleHeart className="size-[1.125rem]" strokeWidth={2} />
+      <section className="rounded-xl border border-border/55 bg-background/50 p-4 sm:p-5 lg:p-6 dark:border-white/[0.08] dark:bg-white/[0.02]">
+        <div className="mb-4 flex items-start gap-3">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/12 text-primary">
+            <MessageCircleHeart className="size-4" strokeWidth={2} />
           </span>
           <div>
-            <h3 className="text-base font-semibold tracking-tight text-foreground sm:text-lg">
-              Stap 1 — Hoe klinkt je merk?
-            </h3>
-            <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-              Twee kolommen op groot scherm: voorbeelden links, <span className="font-medium text-foreground">jouw tekst voor de AI</span> rechts.
+            <h3 className="text-base font-semibold text-foreground">Stap 1 — Toon van je merk</h3>
+            <p className="mt-0.5 text-xs text-muted-foreground sm:text-sm">
+              Eén bolletje kiezen vult het veld rechts; je mag direct zelf typen zonder bolletje.
             </p>
           </div>
         </div>
 
-        <div className="grid gap-6 xl:grid-cols-12 xl:gap-8">
-          <div id="tone-presets" className="space-y-3 xl:col-span-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-              Voorbeelden — één klik
-            </p>
-            <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-5 xl:grid-cols-12 xl:gap-6">
+          <div className="xl:col-span-5">
+            <PresetRadioList id="tone-presets" label="Kies een basis">
               {AI_TONE_PRESETS.map((p) => (
-                <ChoiceCard
+                <PresetRadioRow
                   key={p.id}
                   selected={tonePresetId === p.id}
                   onSelect={() => {
@@ -298,49 +280,44 @@ export function AiPanel({
                   hint={p.hint}
                 />
               ))}
-            </div>
+            </PresetRadioList>
           </div>
-          <div className="min-h-0 xl:col-span-6">
-            <AiLiveEditorPanel
-              presetAnchorId="tone-presets"
+          <div className="min-w-0 xl:col-span-7">
+            <AiScriptField
               editorRef={toneRef}
               inputId="tone-edit"
-              headline="Jouw toon — dit leest de AI"
-              badge="Live tekst"
-              helper="Typ hier je eigen zinnen, of pas een gekozen voorbeeld aan. Je mag ook direct typen zonder eerst een kaart te kiezen."
+              title="Tekst voor de AI"
+              tag="bewerkbaar"
+              hint="Dit is de promptregel voor toon: korter of langer, jouw woorden."
+              footnote="Tip: tik in dit veld om te bewijzen dat het vrij bewerkbaar is — je hoeft geen bolletje te gebruiken."
               value={tone}
               onChange={onToneChange}
-              rows={5}
-              placeholder="Bijv. Kort en warm. We spreken klanten aan met ‘je’. Geen prijzen in het eerste bericht."
+              rows={4}
+              placeholder="Bijv. Kort en warm. ‘Je’ ipv ‘u’. Geen prijzen in het eerste bericht."
             />
           </div>
         </div>
       </section>
 
       {/* Stap 2 */}
-      <section className="rounded-2xl border border-border/55 bg-background/50 p-5 sm:p-6 lg:p-8 dark:border-white/[0.08] dark:bg-white/[0.02]">
-        <div className="mb-6 flex items-start gap-3.5">
-          <span className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-2xl bg-primary/12 text-primary ring-1 ring-primary/20 dark:bg-primary/20">
-            <Languages className="size-[1.125rem]" strokeWidth={2} />
+      <section className="rounded-xl border border-border/55 bg-background/50 p-4 sm:p-5 lg:p-6 dark:border-white/[0.08] dark:bg-white/[0.02]">
+        <div className="mb-4 flex items-start gap-3">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/12 text-primary">
+            <Languages className="size-4" strokeWidth={2} />
           </span>
           <div>
-            <h3 className="text-base font-semibold tracking-tight text-foreground sm:text-lg">
-              Stap 2 — Hoe zien antwoorden eruit?
-            </h3>
-            <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-              Zelfde patroon: voorbeelden links, <span className="font-medium text-foreground">jouw instructies</span> rechts. Taal kies je onderaan deze stap.
+            <h3 className="text-base font-semibold text-foreground">Stap 2 — Antwoordvorm</h3>
+            <p className="mt-0.5 text-xs text-muted-foreground sm:text-sm">
+              Zelfde werkwijze. Taal van antwoorden kies je hieronder met bolletjes.
             </p>
           </div>
         </div>
 
-        <div className="grid gap-6 xl:grid-cols-12 xl:gap-8">
-          <div id="reply-presets" className="space-y-3 xl:col-span-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-              Voorbeelden — één klik
-            </p>
-            <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-5 xl:grid-cols-12 xl:gap-6">
+          <div className="xl:col-span-5">
+            <PresetRadioList id="reply-presets" label="Kies een basis">
               {AI_REPLY_STYLE_PRESETS.map((p) => (
-                <ChoiceCard
+                <PresetRadioRow
                   key={p.id}
                   selected={replyPresetId === p.id}
                   onSelect={() => {
@@ -351,85 +328,87 @@ export function AiPanel({
                   hint={p.hint}
                 />
               ))}
-            </div>
+            </PresetRadioList>
           </div>
-          <div className="min-h-0 xl:col-span-6">
-            <AiLiveEditorPanel
-              presetAnchorId="reply-presets"
+          <div className="min-w-0 xl:col-span-7">
+            <AiScriptField
               editorRef={replyRef}
               inputId="reply-edit"
-              headline="Jouw antwoordstijl — dit leest de AI"
-              badge="Live tekst"
-              helper="Beschrijf lengte, structuur en hoe je wilt afsluiten (bijv. met een concrete stap). Volledig eigen tekst is prima."
+              title="Instructies voor lengte & afsluiting"
+              tag="bewerkbaar"
+              hint="Beschrijf hoe lang antwoorden mogen zijn en hoe je wilt eindigen (actie, vraag, …)."
+              footnote="Ook hier: volledig overschrijven met eigen tekst is precies goed."
               value={replyStyle}
               onChange={onReplyChange}
-              rows={5}
-              placeholder="Bijv. Max. vier zinnen. Sluit altijd af met één duidelijke vraag of actie (bellen, offerte, link)."
+              rows={4}
+              placeholder="Bijv. Max. vier zinnen. Altijd één concrete vervolgstap."
             />
           </div>
         </div>
 
-        <div className="mt-8 border-t border-border/40 pt-6 dark:border-white/[0.06]">
-          <Label htmlFor="ai-language" className="text-sm font-medium text-foreground">
-            Taal van antwoorden
-          </Label>
-          <p className="mt-1 max-w-3xl text-xs text-muted-foreground sm:text-sm">
-            Kies de taal waarin de AI naar klanten schrijft (los van de taal van het binnenkomende bericht).
+        <div className="mt-5 border-t border-border/40 pt-4 dark:border-white/[0.06]">
+          <Label className="text-sm font-medium text-foreground">Taal van antwoorden</Label>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            Klik een taal — de AI antwoordt standaard in die taal.
           </p>
-          <div className="relative mt-3 max-w-lg">
-            <select
-              id="ai-language"
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              className={cn(
-                "h-12 w-full cursor-pointer appearance-none rounded-2xl border border-border/60 bg-background/95 py-2 pl-4 pr-11",
-                "text-sm font-medium text-foreground shadow-sm transition-colors",
-                "hover:border-primary/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                "dark:border-white/[0.12] dark:bg-white/[0.04] dark:hover:border-primary/35",
-              )}
-            >
-              {AI_LANGUAGE_OPTIONS.map((o) => (
-                <option key={o.code} value={o.code}>
+          <div
+            className="mt-3 flex flex-wrap gap-2"
+            role="radiogroup"
+            aria-label="Taal van antwoorden"
+          >
+            {AI_LANGUAGE_OPTIONS.map((o) => {
+              const sel = language === o.code;
+              return (
+                <button
+                  key={o.code}
+                  type="button"
+                  role="radio"
+                  aria-checked={sel}
+                  onClick={() => setLanguage(o.code)}
+                  className={cn(
+                    "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2",
+                    sel
+                      ? "border-primary/50 bg-primary text-primary-foreground shadow-sm"
+                      : "border-border/60 bg-background/80 text-foreground hover:bg-muted/40 dark:border-white/[0.1]",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "flex size-3.5 shrink-0 items-center justify-center rounded-full border-2",
+                      sel ? "border-primary-foreground/80 bg-primary-foreground/20" : "border-muted-foreground/40",
+                    )}
+                    aria-hidden
+                  >
+                    {sel ? <span className="size-1.5 rounded-full bg-primary-foreground" /> : null}
+                  </span>
                   {o.label}
-                </option>
-              ))}
-            </select>
-            <ChevronDown
-              className="pointer-events-none absolute right-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-              aria-hidden
-            />
+                </button>
+              );
+            })}
           </div>
-          <p className="mt-2 text-2xs text-muted-foreground/90">
-            Geselecteerd: <span className="font-medium text-foreground/80">{langLabel}</span> (
-            <span className="font-mono text-[0.65rem]">{language}</span>)
-          </p>
         </div>
       </section>
 
       {/* Stap 3 */}
-      <section className="rounded-2xl border border-border/55 bg-background/50 p-5 sm:p-6 lg:p-8 dark:border-white/[0.08] dark:bg-white/[0.02]">
-        <div className="mb-6 flex items-start gap-3.5">
-          <span className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-2xl bg-primary/12 text-primary ring-1 ring-primary/20 dark:bg-primary/20">
-            <StickyNote className="size-[1.125rem]" strokeWidth={2} />
+      <section className="rounded-xl border border-border/55 bg-background/50 p-4 sm:p-5 lg:p-6 dark:border-white/[0.08] dark:bg-white/[0.02]">
+        <div className="mb-4 flex items-start gap-3">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/12 text-primary">
+            <StickyNote className="size-4" strokeWidth={2} />
           </span>
           <div>
-            <h3 className="text-base font-semibold tracking-tight text-foreground sm:text-lg">
-              Stap 3 — Extra voor jouw team (optioneel)
-            </h3>
-            <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-              Alleen intern. Ook hier: rechts <span className="font-medium text-foreground">eigen regels</span> intypen is mogelijk — klanten zien dit nooit.
+            <h3 className="text-base font-semibold text-foreground">Stap 3 — Intern voor team (optioneel)</h3>
+            <p className="mt-0.5 text-xs text-muted-foreground sm:text-sm">
+              Klanten zien dit niet. Bolletje of leeg, en/of eigen regels in het veld rechts.
             </p>
           </div>
         </div>
 
-        <div className="grid gap-6 xl:grid-cols-12 xl:gap-8">
-          <div id="follow-presets" className="space-y-3 xl:col-span-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-              Voorbeelden — één klik
-            </p>
-            <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-5 xl:grid-cols-12 xl:gap-6">
+          <div className="xl:col-span-5">
+            <PresetRadioList id="follow-presets" label="Kies een basis">
               {AI_FOLLOWUP_PRESETS.map((p) => (
-                <ChoiceCard
+                <PresetRadioRow
                   key={p.id}
                   selected={followPresetId === p.id}
                   onSelect={() => {
@@ -440,38 +419,38 @@ export function AiPanel({
                   hint={p.hint}
                 />
               ))}
-            </div>
+            </PresetRadioList>
           </div>
-          <div className="min-h-0 xl:col-span-6">
-            <AiLiveEditorPanel
-              presetAnchorId="follow-presets"
+          <div className="min-w-0 xl:col-span-7">
+            <AiScriptField
               editorRef={followRef}
               inputId="follow-edit"
-              headline="Eigen interne instructie — alleen voor jullie"
-              badge="Team only"
-              helper="Typ hier extra afspraken voor je team (niet zichtbaar voor klanten). Leeg laten is oké."
+              title="Eigen teamregels"
+              tag="intern"
+              hint="Extra afspraken voor collega’s en AI — niet zichtbaar voor klanten."
+              footnote="Leeg laten mag. Alleen bolletje kiezen mag ook. Alleen typen mag ook."
               value={followNote}
               onChange={onFollowChange}
-              rows={4}
-              placeholder="Bijv. Bij spoed altijd ‘bel binnen 2 uur’ vermelden. Geen kortingscodes in chat tenzij goedgekeurd."
+              rows={3}
+              placeholder="Bijv. Spoed = ‘bel binnen 2 uur’ vermelden."
             />
           </div>
         </div>
       </section>
 
-      <section className="rounded-2xl border border-border/55 bg-muted/20 p-4 sm:p-6 dark:border-white/[0.08] dark:bg-white/[0.02]">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-          Zo houd je het scherp
+      <section className="rounded-xl border border-border/55 bg-muted/15 p-4 dark:border-white/[0.08]">
+        <p className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+          Checklist
         </p>
-        <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
           {[
             "Zelfde toon op chat, mail en offerte waar het kan",
-            "Elk antwoord sluit af met iets concreets om op door te gaan",
-            "Korte zinnen; geen onnodig vakjargon",
-            "Menselijk blijven — geen robotachtige standaardzinnen",
+            "Einde van antwoord: concrete vervolgstap",
+            "Korte zinnen, geen onnodig jargon",
+            "Menselijk — geen standaardrobotzinnen",
           ].map((item) => (
-            <p key={item} className="flex items-start gap-2 text-sm text-foreground/90">
-              <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
+            <p key={item} className="flex items-start gap-2 text-xs text-foreground/90 sm:text-sm">
+              <CheckCircle2 className="mt-0.5 size-3.5 shrink-0 text-primary sm:size-4" aria-hidden />
               <span>{item}</span>
             </p>
           ))}
@@ -479,18 +458,18 @@ export function AiPanel({
       </section>
 
       {state.error ? (
-        <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+        <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
           {state.error}
         </p>
       ) : null}
       {state.ok ? (
-        <p className="rounded-xl border border-primary/25 bg-primary/[0.08] px-4 py-3 text-sm text-primary">
+        <p className="rounded-lg border border-primary/25 bg-primary/[0.08] px-3 py-2 text-sm text-primary">
           Opgeslagen. Je AI gebruikt direct deze instellingen.
         </p>
       ) : null}
-      <div className="flex flex-col gap-4 border-t border-border/40 pt-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between dark:border-white/[0.06]">
-        <p className="max-w-2xl text-xs leading-relaxed text-muted-foreground sm:text-sm">
-          Tip: open <span className="font-medium text-foreground/85">Chat</span> en stuur jezelf een testbericht om het resultaat te zien.
+      <div className="flex flex-col gap-3 border-t border-border/40 pt-3 sm:flex-row sm:items-center sm:justify-between dark:border-white/[0.06]">
+        <p className="text-xs text-muted-foreground sm:text-sm">
+          Test in <span className="font-medium text-foreground">Chat</span> met een bericht naar jezelf.
         </p>
         <Submit />
       </div>

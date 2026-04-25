@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CalendarPlus } from "lucide-react";
+import Link from "next/link";
 import type { AgendaAppointment } from "@/components/appointments/agenda-types";
 
 function buildDemoAppointment(
@@ -89,8 +90,7 @@ export function NewAppointmentDialog({
         <Button
           type="button"
           variant="default"
-          className="h-10 min-h-10 rounded-lg px-4 text-sm font-semibold shadow-md shadow-primary/18 transition-[box-shadow,transform] hover:shadow-lg hover:shadow-primary/22 active:scale-[0.99] disabled:opacity-60"
-          disabled={leads.length === 0}
+          className="h-10 min-h-10 rounded-lg px-4 text-sm font-semibold shadow-md shadow-primary/18 transition-[box-shadow,transform] hover:shadow-lg hover:shadow-primary/22 active:scale-[0.99]"
         >
           <CalendarPlus className="mr-2 size-4 shrink-0" />
           Nieuwe afspraak
@@ -121,7 +121,7 @@ export function NewAppointmentDialog({
               const ends_at = String(fd.get("ends_at") || "");
               const notes = String(fd.get("notes") || "");
               const res = await createAppointment({
-                lead_id,
+                lead_id: lead_id || null,
                 starts_at,
                 ends_at: ends_at || null,
                 notes: notes || null,
@@ -136,14 +136,22 @@ export function NewAppointmentDialog({
             });
           }}
         >
+          {leads.length === 0 ? (
+            <p className="rounded-lg border border-border/60 bg-muted/30 px-3 py-2 text-xs leading-relaxed text-muted-foreground dark:border-white/[0.1]">
+              Je hebt nog geen klanten in de lijst. Je mag alsnog een afspraak plannen zonder klant, of{" "}
+              <Link href="/dashboard/leads" className="font-semibold text-primary underline underline-offset-2">
+                voeg eerst een klant toe
+              </Link>
+              .
+            </p>
+          ) : null}
           <div className="space-y-1.5">
             <Label htmlFor="appt_lead" className="text-xs font-medium">
-              Klant
+              Klant (optioneel)
             </Label>
             <select
               id="appt_lead"
               name="lead_id"
-              required
               className="flex h-10 w-full rounded-lg border border-white/[0.08] bg-background/50 px-3 text-sm"
               defaultValue={
                 defaultLeadId && leads.some((l) => l.id === defaultLeadId)
@@ -152,7 +160,7 @@ export function NewAppointmentDialog({
               }
               key={defaultLeadId || "none"}
             >
-              <option value="">Kies een klant</option>
+              <option value="">Geen klant gekoppeld</option>
               {leads.map((l) => (
                 <option key={l.id} value={l.id}>
                   {l.full_name}
