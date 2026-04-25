@@ -21,7 +21,7 @@ export function QuotesPageToolbar({
           </Button>
         ) : null}
         <Button variant="secondary" asChild className="rounded-lg">
-          <Link href="/dashboard/leads">Nieuwe offerte via lead</Link>
+          <Link href="/dashboard/leads">Nieuwe offerte via klant</Link>
         </Button>
       </div>
     );

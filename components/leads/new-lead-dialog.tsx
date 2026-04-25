@@ -45,16 +45,16 @@ export function NewLeadDialog({
       <DialogTrigger asChild>
         <Button
           type="button"
-          className="h-12 min-h-[44px] rounded-xl px-5"
+          className="h-10 min-h-[40px] rounded-lg px-4 text-sm"
           disabled={disabled}
         >
           <Plus className="mr-2 size-4" />
-          Nieuwe lead
+          Nieuwe klant
         </Button>
       </DialogTrigger>
       <DialogContent className="rounded-2xl sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Nieuwe lead</DialogTitle>
+          <DialogTitle>Nieuwe klant</DialogTitle>
         </DialogHeader>
         <form
           className="space-y-4 pt-2"
@@ -68,7 +68,7 @@ export function NewLeadDialog({
               const source = String(fd.get("source") || "").trim();
               if (demoMode) {
                 toast.success(
-                  `Demo: “${full_name || "Nieuwe lead"}” — zo werkt aanmaken. In je echte account wordt dit opgeslagen.`,
+                  `Demo: “${full_name || "Nieuwe klant"}” — zo werkt aanmaken. In je echte account wordt dit opgeslagen.`,
                 );
                 setOpen(false);
                 if (demoSampleLeadId) {
@@ -92,7 +92,7 @@ export function NewLeadDialog({
                 });
                 return;
               }
-              toast.success("Lead aangemaakt");
+              toast.success("Klant aangemaakt");
               setOpen(false);
               router.push(`/dashboard/leads/${res.data.leadId}`);
               router.refresh();
@@ -146,7 +146,7 @@ export function NewLeadDialog({
             className="w-full rounded-xl"
             disabled={pending}
           >
-            {pending ? "Opslaan…" : demoMode ? "Demo: voorbeeld doorlopen" : "Lead aanmaken"}
+            {pending ? "Opslaan…" : demoMode ? "Demo: voorbeeld doorlopen" : "Klant aanmaken"}
           </Button>
         </form>
       </DialogContent>

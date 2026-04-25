@@ -91,7 +91,7 @@ export async function createAutomationRule(
     then_config,
   });
   if (error) return { error: error.message };
-  revalidatePath("/dashboard/automations");
+  revalidatePath("/dashboard");
   return { ok: true };
 }
 
@@ -111,7 +111,7 @@ export async function toggleAutomationRule(
     .eq("id", id)
     .eq("company_id", auth.company.id);
   if (error) return { error: error.message };
-  revalidatePath("/dashboard/automations");
+  revalidatePath("/dashboard");
   return { ok: true };
 }
 
@@ -125,7 +125,7 @@ export async function deleteAutomationRule(id: string): Promise<RuleFormState> {
     .eq("id", id)
     .eq("company_id", auth.company.id);
   if (error) return { error: error.message };
-  revalidatePath("/dashboard/automations");
+  revalidatePath("/dashboard");
   return { ok: true };
 }
 
@@ -164,5 +164,5 @@ export async function ensureDefaultCustomRules(): Promise<void> {
     },
   ]);
   if (error) return;
-  revalidatePath("/dashboard/automations");
+  revalidatePath("/dashboard");
 }

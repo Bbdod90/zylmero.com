@@ -46,7 +46,7 @@ export default async function NewQuotePage() {
                 </Button>
               ) : null}
               <Button variant="secondary" asChild className="rounded-lg">
-                <Link href="/dashboard/leads">Naar leads</Link>
+                <Link href="/dashboard/leads">Naar klanten</Link>
               </Button>
             </CardContent>
           </Card>

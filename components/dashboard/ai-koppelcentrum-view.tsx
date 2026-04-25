@@ -109,39 +109,45 @@ export function AiKoppelcentrumView({
         : "todo";
 
   return (
-    <div className="space-y-8">
-      <div className="cf-dashboard-panel border-primary/20 bg-gradient-to-br from-primary/[0.14] via-background to-background p-6 shadow-sm dark:border-primary/30 dark:from-primary/[0.2] sm:p-8">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-          <div className="max-w-2xl space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-              Alles op één plek
-            </p>
-            <h2 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
-              Train je AI en sluit kanalen aan
-            </h2>
-            <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">
-              Hier zie je in één oogopslag wat al klaarstaat. Begin met kennis (website + tekst), zet
-              daarna WhatsApp en je site-widget aan voor snelle antwoorden. E-mail en aanvragen landen in{" "}
-              <strong className="font-medium text-foreground">Berichten</strong>: zet inbound aan
-              (webhook) en vul je contactmail in — dezelfde{" "}
-              <strong className="font-medium text-foreground">AI auto-antwoord</strong> als bij
-              WhatsApp kun je onder WhatsApp inschakelen.
-            </p>
-          </div>
-          <div className="flex shrink-0 flex-col gap-2 sm:flex-row lg:flex-col">
-            <Button asChild variant="default" className="rounded-xl shadow-sm">
-              <Link href="/dashboard/inbox">
-                <Inbox className="mr-2 size-4" />
-                Naar berichten
-              </Link>
-            </Button>
-            <Button asChild variant="outline" className="rounded-xl border-border/60 bg-background/70 dark:border-white/[0.1] dark:bg-white/[0.03]">
-              <Link href="/dashboard/settings">
-                <Settings2 className="mr-2 size-4" />
-                Alle instellingen
-              </Link>
-            </Button>
-          </div>
+    <div className="space-y-6 sm:space-y-7">
+      <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+        <div
+          className="pointer-events-none absolute -inset-x-4 -top-1 h-px bg-gradient-to-r from-transparent via-primary/25 to-transparent sm:-inset-x-6 dark:via-primary/35"
+          aria-hidden
+        />
+        <p className="max-w-xl text-[13px] leading-relaxed tracking-[-0.01em] text-muted-foreground">
+          <span className="font-semibold text-foreground/90">Volgorde:</span> eerst kennis, daarna
+          WhatsApp, widget en e-mail. Inkomend werk vind je altijd onder{" "}
+          <Link
+            href="/dashboard/inbox"
+            className="font-medium text-foreground underline decoration-primary/40 underline-offset-2 transition hover:decoration-primary"
+          >
+            Berichten
+          </Link>
+          .
+        </p>
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="h-9 rounded-full border-border/70 bg-background/80 px-4 text-xs font-semibold shadow-sm backdrop-blur-sm transition hover:border-primary/30 hover:bg-muted/40 dark:border-white/[0.12] dark:bg-white/[0.04] dark:hover:border-primary/35"
+          >
+            <Link href="/dashboard/inbox">
+              <Inbox className="size-3.5 opacity-80" aria-hidden />
+              Berichten
+            </Link>
+          </Button>
+          <Button
+            asChild
+            size="sm"
+            className="h-9 rounded-full bg-gradient-to-r from-primary to-primary/88 px-4 text-xs font-semibold text-primary-foreground shadow-[0_1px_0_0_hsl(0_0%_0%/0.08)] dark:shadow-[0_1px_0_0_hsl(0_0%_0%/0.25)]"
+          >
+            <Link href="/dashboard/settings">
+              <Settings2 className="size-3.5 opacity-90" aria-hidden />
+              Instellingen
+            </Link>
+          </Button>
         </div>
       </div>
 
@@ -364,14 +370,9 @@ export function AiKoppelcentrumView({
             <Puzzle className="size-4" />
             <CardTitle className="text-base font-semibold">Meer</CardTitle>
           </div>
-          <CardDescription>
-            Automatiseringen en facturatie blijven bereikbaar via het menu.
-          </CardDescription>
+          <CardDescription>Facturatie en abonnement vind je hier.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
-          <Button asChild variant="secondary" size="sm" className="rounded-xl">
-            <Link href="/dashboard/automations">Automatiseringen</Link>
-          </Button>
           <Button asChild variant="secondary" size="sm" className="rounded-xl">
             <Link href="/dashboard/settings?tab=billing">Facturatie</Link>
           </Button>

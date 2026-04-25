@@ -14,7 +14,17 @@ import { Textarea } from "@/components/ui/textarea";
 import type { AiKnowledgePage } from "@/lib/types";
 import { normalizeKnowledgeWebsiteUrl } from "@/lib/url/public-site-url";
 import { cn } from "@/lib/utils";
-import { FileText, Globe, Link2, ShieldCheck, Sparkles, Trash2, Upload } from "lucide-react";
+import { AI_KNOWLEDGE_MAX_PAGES } from "@/lib/ai/knowledge-crawl-config";
+import {
+  ChevronDown,
+  FileText,
+  Globe,
+  Link2,
+  ShieldCheck,
+  Sparkles,
+  Trash2,
+  Upload,
+} from "lucide-react";
 
 const initial: SettingsFormState = {};
 
@@ -33,12 +43,14 @@ export function AiKnowledgeForm({
   initialDocument,
   scannedPages,
   lastScannedAt,
+  crawlCapped,
 }: {
   demoMode: boolean;
   initialWebsite: string;
   initialDocument: string;
   scannedPages: AiKnowledgePage[];
   lastScannedAt: string | null;
+  crawlCapped: boolean;
 }) {
   const [state, action] = useFormState(updateAiKnowledgeAction, initial);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -61,8 +73,9 @@ export function AiKnowledgeForm({
                 Train je AI op jouw site
               </h2>
               <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
-                Vul je website in: bij opslaan scannen we automatisch alle pagina&apos;s op je eigen domein.
-                Je ziet hieronder precies welke URL&apos;s zijn opgeslagen en kunt ze per stuk verwijderen.
+                Bij opslaan lezen we je site (incl. sitemap waar beschikbaar) en slaan we tot{" "}
+                {AI_KNOWLEDGE_MAX_PAGES} pagina&apos;s op hetzelfde domein op. De lijst met URL&apos;s staat
+                standaard dicht; klik om alles te bekijken of te verwijderen.
               </p>
             </div>
             <div className="grid grid-cols-2 gap-2 sm:w-[15.5rem]">
@@ -122,61 +135,97 @@ export function AiKnowledgeForm({
             />
             <p className="text-xs leading-relaxed text-muted-foreground">
               Je mag een domein zonder <code className="rounded bg-muted px-1 font-mono text-[0.65rem]">https://</code>{" "}
-              — dat wordt automatisch aangevuld bij opslaan. We nemen alleen pagina&apos;s mee van ditzelfde domein.
+              — dat wordt automatisch aangevuld bij opslaan. Alleen hetzelfde domein; sitemap wordt meegenomen als die
+              er is.
             </p>
           </section>
 
-          <section className="space-y-4 rounded-2xl border border-border/50 bg-gradient-to-br from-muted/25 to-transparent p-5 dark:border-white/[0.08] dark:bg-white/[0.02] sm:p-6">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="flex items-center gap-2.5">
-                <span className="flex size-8 items-center justify-center rounded-lg bg-background/80 text-primary shadow-sm ring-1 ring-border/50 dark:bg-white/[0.04] dark:ring-white/[0.08]">
-                  <Link2 className="size-4" aria-hidden />
-                </span>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">Opgeslagen website URLs</p>
-                  <p className="text-2xs text-muted-foreground">
-                    {lastScannedAt
-                      ? `Laatste scan: ${new Date(lastScannedAt).toLocaleString("nl-NL")}`
-                      : "Nog geen scan uitgevoerd"}
-                  </p>
-                </div>
-              </div>
-              <span className="rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-2xs font-medium text-muted-foreground dark:border-white/[0.1] dark:bg-white/[0.03]">
-                {scannedPages.length} URL{scannedPages.length === 1 ? "" : "s"}
-              </span>
-            </div>
+          <section className="space-y-3 rounded-2xl border border-border/50 bg-gradient-to-br from-muted/25 to-transparent p-5 dark:border-white/[0.08] dark:bg-white/[0.02] sm:p-6">
             {scannedPages.length === 0 ? (
-              <p className="rounded-xl border border-dashed border-border/60 bg-background/65 px-4 py-3 text-xs text-muted-foreground dark:border-white/[0.1] dark:bg-white/[0.02]">
-                Nog geen URL&apos;s opgeslagen. Vul je website in en klik op opslaan.
-              </p>
-            ) : (
-              <ul className="space-y-2">
-                {scannedPages.map((page) => (
-                  <li
-                    key={page.url}
-                    className="flex flex-wrap items-start justify-between gap-3 rounded-xl border border-border/55 bg-background/70 px-3.5 py-3 dark:border-white/[0.1] dark:bg-white/[0.02]"
-                  >
-                    <div className="min-w-0 space-y-1">
-                      <p className="text-xs font-semibold text-foreground">{page.title || page.url}</p>
-                      <p className="truncate text-2xs text-muted-foreground">{page.url}</p>
+              <>
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <span className="flex size-8 items-center justify-center rounded-lg bg-background/80 text-primary shadow-sm ring-1 ring-border/50 dark:bg-white/[0.04] dark:ring-white/[0.08]">
+                      <Link2 className="size-4" aria-hidden />
+                    </span>
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">Opgeslagen website URLs</p>
+                      <p className="text-2xs text-muted-foreground">
+                        {lastScannedAt
+                          ? `Laatste scan: ${new Date(lastScannedAt).toLocaleString("nl-NL")}`
+                          : "Nog geen scan uitgevoerd"}
+                      </p>
                     </div>
-                    {!demoMode ? (
-                      <form action={removeAiKnowledgePageSubmitAction}>
-                        <input type="hidden" name="url" value={page.url} />
-                        <Button
-                          type="submit"
-                          variant="outline"
-                          size="sm"
-                          className="h-8 rounded-lg border-border/60 px-2.5 text-2xs dark:border-white/[0.12]"
-                        >
-                          <Trash2 className="mr-1 size-3.5" aria-hidden />
-                          Verwijderen
-                        </Button>
-                      </form>
-                    ) : null}
-                  </li>
-                ))}
-              </ul>
+                  </div>
+                </div>
+                <p className="rounded-xl border border-dashed border-border/60 bg-background/65 px-4 py-3 text-xs text-muted-foreground dark:border-white/[0.1] dark:bg-white/[0.02]">
+                  Nog geen URL&apos;s opgeslagen. Vul je website in en klik op opslaan.
+                </p>
+              </>
+            ) : (
+              <details className="group rounded-xl border border-border/55 bg-background/50 dark:border-white/[0.1] dark:bg-white/[0.03]">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3.5 marker:content-none [&::-webkit-details-marker]:hidden">
+                  <div className="flex min-w-0 flex-1 items-center gap-2.5">
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-background/80 text-primary shadow-sm ring-1 ring-border/50 dark:bg-white/[0.04] dark:ring-white/[0.08]">
+                      <Link2 className="size-4" aria-hidden />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-foreground">Opgeslagen website URLs</p>
+                      <p className="text-2xs text-muted-foreground">
+                        {lastScannedAt
+                          ? `Laatste scan: ${new Date(lastScannedAt).toLocaleString("nl-NL")}`
+                          : ""}{" "}
+                        · Klik om alle {scannedPages.length} URL{scannedPages.length === 1 ? "" : "s"} te tonen
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <span className="rounded-full border border-border/60 bg-background/80 px-2.5 py-1 text-2xs font-medium text-muted-foreground dark:border-white/[0.12]">
+                      {scannedPages.length}
+                    </span>
+                    <ChevronDown className="size-4 text-muted-foreground transition-transform duration-200 group-open:rotate-180" aria-hidden />
+                  </div>
+                </summary>
+                {crawlCapped ? (
+                  <p className="border-t border-amber-500/20 bg-amber-500/[0.06] px-4 py-2.5 text-xs text-amber-950 dark:border-amber-500/25 dark:text-amber-100/95">
+                    Er staan nog meer pagina&apos;s op je site: we stoppen bij {AI_KNOWLEDGE_MAX_PAGES} URL&apos;s per
+                    scan. Dit zijn de eerste {scannedPages.length}; opnieuw opslaan na verwijderen kan andere pagina&apos;s
+                    opleveren.
+                  </p>
+                ) : (
+                  <p className="border-t border-border/40 px-4 py-2 text-2xs text-muted-foreground dark:border-white/[0.08]">
+                    {scannedPages.length} pagina&apos;s opgeslagen voor dit domein (max. {AI_KNOWLEDGE_MAX_PAGES} per
+                    scan).
+                  </p>
+                )}
+                <ul className="max-h-[min(70vh,28rem)] space-y-2 overflow-y-auto border-t border-border/40 px-3 py-3 dark:border-white/[0.08]">
+                  {scannedPages.map((page) => (
+                    <li
+                      key={page.url}
+                      className="flex flex-wrap items-start justify-between gap-3 rounded-xl border border-border/55 bg-background/70 px-3.5 py-3 dark:border-white/[0.1] dark:bg-white/[0.02]"
+                    >
+                      <div className="min-w-0 space-y-1">
+                        <p className="text-xs font-semibold text-foreground">{page.title || page.url}</p>
+                        <p className="truncate text-2xs text-muted-foreground">{page.url}</p>
+                      </div>
+                      {!demoMode ? (
+                        <form action={removeAiKnowledgePageSubmitAction}>
+                          <input type="hidden" name="url" value={page.url} />
+                          <Button
+                            type="submit"
+                            variant="outline"
+                            size="sm"
+                            className="h-8 rounded-lg border-border/60 px-2.5 text-2xs dark:border-white/[0.12]"
+                          >
+                            <Trash2 className="mr-1 size-3.5" aria-hidden />
+                            Verwijderen
+                          </Button>
+                        </form>
+                      ) : null}
+                    </li>
+                  ))}
+                </ul>
+              </details>
             )}
           </section>
 

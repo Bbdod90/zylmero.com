@@ -59,7 +59,7 @@ export function LeadsExplorer({
   leads: Lead[];
   staleReplyLeadIds?: string[];
   demoMode?: boolean;
-  /** Demo: navigatie na “nieuwe lead” (voorbeeld openen). */
+  /** Demo: navigatie na nieuwe klant (voorbeeld openen). */
   demoSampleLeadId?: string | null;
 }) {
   const router = useRouter();
@@ -111,17 +111,17 @@ export function LeadsExplorer({
   }, [leads, dq, status, source, sort, stale]);
 
   return (
-    <div className="space-y-6">
-      <div className="cf-dashboard-panel border-border/60 bg-gradient-to-br from-white via-white to-slate-50/35 p-4 dark:from-[hsl(222_30%_13%/0.97)] dark:via-[hsl(222_32%_10%/0.98)] dark:to-[hsl(222_38%_7%/0.99)] sm:p-5 lg:p-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div className="flex w-full flex-1 flex-col gap-3 sm:flex-row sm:items-stretch">
+    <div className="space-y-3">
+      <div className="cf-dashboard-panel border-border/60 bg-gradient-to-br from-white via-white to-slate-50/35 p-3 dark:from-[hsl(222_30%_13%/0.97)] dark:via-[hsl(222_32%_10%/0.98)] dark:to-[hsl(222_38%_7%/0.99)] sm:p-4">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex w-full flex-1 flex-col gap-2.5 sm:flex-row sm:items-stretch">
             <div className="relative min-w-0 flex-1">
-              <Search className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="Zoek op naam, e-mail, intentie…"
-                className="h-12 rounded-xl border-border/60 bg-white pl-11 shadow-sm dark:border-white/[0.1] dark:bg-white/[0.02]"
+                placeholder="Zoek op naam, e-mail of intentie…"
+                className="h-10 rounded-lg border-border/60 bg-white pl-10 text-sm shadow-sm dark:border-white/[0.1] dark:bg-white/[0.02]"
               />
             </div>
             <NewLeadDialog
@@ -129,9 +129,9 @@ export function LeadsExplorer({
               demoSampleLeadId={demoSampleLeadId}
             />
           </div>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2">
             <select
-              className="h-12 min-h-[44px] rounded-xl border border-border/60 bg-white px-3.5 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:border-white/[0.1] dark:bg-white/[0.02]"
+              className="h-10 min-h-[40px] rounded-lg border border-border/60 bg-white px-3 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:border-white/[0.1] dark:bg-white/[0.02]"
               value={status}
               onChange={(e) => setStatus(e.target.value as LeadStatus | "all")}
             >
@@ -144,7 +144,7 @@ export function LeadsExplorer({
               <option value="lost">Verloren</option>
             </select>
             <select
-              className="h-12 min-h-[44px] rounded-xl border border-border/60 bg-white px-3.5 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:border-white/[0.1] dark:bg-white/[0.02]"
+              className="h-10 min-h-[40px] rounded-lg border border-border/60 bg-white px-3 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:border-white/[0.1] dark:bg-white/[0.02]"
               value={source}
               onChange={(e) => setSource(e.target.value)}
             >
@@ -161,7 +161,7 @@ export function LeadsExplorer({
               ))}
             </select>
             <select
-              className="h-12 min-h-[44px] rounded-xl border border-border/60 bg-white px-3.5 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:border-white/[0.1] dark:bg-white/[0.02]"
+              className="h-10 min-h-[40px] rounded-lg border border-border/60 bg-white px-3 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:border-white/[0.1] dark:bg-white/[0.02]"
               value={sort}
               onChange={(e) =>
                 setSort(e.target.value as "activity" | "value" | "score")
@@ -177,12 +177,12 @@ export function LeadsExplorer({
 
       <div className="cf-dashboard-panel overflow-hidden border-border/60 bg-gradient-to-br from-white via-white to-slate-50/35 dark:from-[hsl(222_30%_13%/0.97)] dark:via-[hsl(222_32%_10%/0.98)] dark:to-[hsl(222_38%_7%/0.99)]">
         {filtered.length === 0 ? (
-          <div className="flex flex-col items-center px-8 py-16 text-center">
-            <div className="mb-5 flex size-14 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary ring-1 ring-primary/15">
-              <Inbox className="size-7" />
+          <div className="flex flex-col items-center px-6 py-10 text-center sm:py-12">
+            <div className="mb-4 flex size-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary ring-1 ring-primary/15">
+              <Inbox className="size-6" />
             </div>
-            <p className="text-lg font-semibold tracking-tight text-foreground">
-              Geen leads gevonden
+            <p className="text-base font-semibold tracking-tight text-foreground">
+              Geen klanten gevonden
             </p>
             <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
               Wis filters — of breng meer inbound binnen zodat {BRAND_NAME} elk bericht
@@ -214,7 +214,7 @@ export function LeadsExplorer({
                     className="cursor-pointer border-b border-border/35 transition-colors hover:bg-primary/[0.04] dark:border-white/[0.04] dark:hover:bg-white/[0.04]"
                     role="link"
                     tabIndex={0}
-                    aria-label={`Lead openen: ${l.full_name}`}
+                    aria-label={`Klant openen: ${l.full_name}`}
                     onClick={() => router.push(`/dashboard/leads/${l.id}`)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " ") {

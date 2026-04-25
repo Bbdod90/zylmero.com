@@ -6,7 +6,6 @@ import {
   MessageSquare,
   Sparkles,
   Users,
-  Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BRAND_NAME } from "@/lib/brand";
@@ -57,16 +56,10 @@ export function DashboardAiHub({
     },
     {
       href: leadHref,
-      title: priorityLeadId ? "Top lead (AI-acties)" : "Leads",
+      title: priorityLeadId ? "Top klant (AI-acties)" : "Klanten",
       description:
-        "Samenvatting, score, AI-antwoord en slimme opvolging — per lead in het werkblad.",
+        "Samenvatting, score, AI-antwoord en slimme opvolging — per klant in het werkblad.",
       icon: Users,
-    },
-    {
-      href: "/dashboard/automations",
-      title: "Automatiseringen",
-      description: "Opvolgingsritmes en regels, inclusief optie AI-antwoord.",
-      icon: Zap,
     },
   ];
 

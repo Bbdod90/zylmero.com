@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Settings2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DASHBOARD_NAV_FLAT } from "@/lib/navigation/dashboard-nav";
 
@@ -49,25 +48,6 @@ export function DashboardNavRail({ className }: { className?: string }) {
             </Link>
           );
         })}
-      </div>
-
-      <div className="shrink-0 border-t border-border/50 py-2 dark:border-white/[0.08]">
-        <Link
-          href="/dashboard/settings"
-          title="Instellingen"
-          aria-label="Instellingen"
-          aria-current={
-            isActive(pathname, "/dashboard/settings") ? "page" : undefined
-          }
-          className={cn(
-            "mx-auto flex size-9 shrink-0 items-center justify-center rounded-lg border text-sm opacity-70 transition-colors hover:opacity-100",
-            isActive(pathname, "/dashboard/settings")
-              ? "border-primary/30 bg-primary/[0.12] text-primary opacity-100 dark:border-primary/35 dark:bg-primary/[0.18]"
-              : "border-transparent text-muted-foreground hover:border-border/60 hover:bg-muted/50 dark:text-white/50 dark:hover:text-white/75",
-          )}
-        >
-          <Settings2 className="size-[1rem]" strokeWidth={2} aria-hidden />
-        </Link>
       </div>
     </nav>
   );

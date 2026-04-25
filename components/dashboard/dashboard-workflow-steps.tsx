@@ -11,7 +11,7 @@ const STEPS = [
   },
   {
     step: 2,
-    label: "Leads",
+    label: "Klanten",
     hint: "Kwalificeren",
     href: "/dashboard/leads",
   },

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CreditCard, LogOut, Settings2 } from "lucide-react";
+import { CreditCard, LogOut } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { AppNotification } from "@/lib/types";
 import { BRAND_LOGO_MONOGRAM, BRAND_NAME } from "@/lib/brand";
@@ -182,18 +182,6 @@ export function AppSidebar({
         ) : null}
       </nav>
       <div className="border-t border-border/50 bg-muted/[0.15] px-2 py-2 dark:border-white/[0.08] dark:bg-white/[0.02]">
-        <Link
-          href="/dashboard/settings"
-          onClick={() => onNavLinkClick?.()}
-          className={cn(
-            "mb-1.5 flex min-h-8 items-center gap-1.5 rounded-md px-2 py-1.5 text-2xs font-medium text-muted-foreground/80 transition-colors hover:bg-muted/40 hover:text-muted-foreground dark:text-white/45 dark:hover:bg-white/[0.04] dark:hover:text-white/70",
-            isNavActive(pathname, "/dashboard/settings") &&
-              "text-foreground/90 dark:text-white/80",
-          )}
-        >
-          <Settings2 className="size-3 shrink-0 opacity-70" aria-hidden />
-          Instellingen
-        </Link>
         {!isAnonymousPreview ? (
           <DemoModeToggle active={demoActive} forced={demoForced} />
         ) : null}

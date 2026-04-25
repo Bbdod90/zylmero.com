@@ -6,7 +6,6 @@ import { getAuth } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getNicheConfig, isNicheId, type NicheId } from "@/lib/niches";
 import { getOpenAI, OPENAI_MODEL } from "@/lib/openai/client";
-import { createDefaultAutomations } from "@/actions/automations";
 import { mapCompanySettingsRow } from "@/lib/queries/map-company-settings";
 
 function parseFaq(source: string) {
@@ -184,11 +183,6 @@ async function persistAiSetup(
   let toneOut = tone;
   let replyOut = reply_style;
   let pricingOut = pricing_hints;
-
-  const auto = await createDefaultAutomations();
-  if (auto.error) {
-    return { error: auto.error };
-  }
 
   if (runOpenAi && process.env.OPENAI_API_KEY) {
     try {

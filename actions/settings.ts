@@ -9,17 +9,21 @@ import {
   normalizeKnowledgeWebsiteUrl,
 } from "@/lib/url/public-site-url";
 import { isDemoMode } from "@/lib/env";
+import {
+  AI_KNOWLEDGE_MAX_DEPTH,
+  AI_KNOWLEDGE_MAX_PAGES,
+} from "@/lib/ai/knowledge-crawl-config";
 import type { AiKnowledgePage, KnowledgeSnippet } from "@/lib/types";
 
 export type SettingsFormState = { ok?: boolean; error?: string };
 
-const MAX_AI_KNOWLEDGE_PAGES = 40;
-const MAX_CRAWL_DEPTH = 2;
 const MAX_TEXT_PER_PAGE = 2200;
 
 type CrawlResult = {
   pages: AiKnowledgePage[];
   crawledDocument: string;
+  /** True als er nog URL’s in de wachtrij zaten (we stoppen bij het maximum). */
+  capped: boolean;
 };
 
 function parseKnowledgeSnippets(raw: string): KnowledgeSnippet[] {
@@ -48,9 +52,96 @@ function stripHtml(input: string): string {
     .trim();
 }
 
+function decodeHtmlEntities(raw: string): string {
+  let s = raw
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => {
+      const code = parseInt(hex, 16);
+      return Number.isFinite(code) && code > 0 ? String.fromCodePoint(code) : "";
+    })
+    .replace(/&#(\d+);/g, (_, dec) => {
+      const code = parseInt(dec, 10);
+      return Number.isFinite(code) && code > 0 ? String.fromCodePoint(code) : "";
+    });
+  const named: Record<string, string> = {
+    amp: "&",
+    lt: "<",
+    gt: ">",
+    quot: '"',
+    apos: "'",
+    nbsp: " ",
+    ndash: "–",
+    mdash: "—",
+    hellip: "…",
+  };
+  s = s.replace(/&([a-z]+);/gi, (match, name) => named[name.toLowerCase()] ?? match);
+  return s;
+}
+
 function extractTitle(html: string): string {
   const m = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
-  return m?.[1]?.replace(/\s+/g, " ").trim() || "";
+  const raw = m?.[1]?.replace(/\s+/g, " ").trim() || "";
+  return decodeHtmlEntities(raw.replace(/<[^>]+>/g, "").trim());
+}
+
+async function fetchSitemapBody(url: URL): Promise<string | null> {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 12_000);
+    const res = await fetch(url.toString(), {
+      redirect: "follow",
+      signal: controller.signal,
+      headers: { "user-agent": "ZylmeroKnowledgeBot/1.0 (+https://zylmero.com)" },
+    });
+    clearTimeout(timer);
+    if (!res.ok) return null;
+    const ct = res.headers.get("content-type") || "";
+    if (!ct.includes("xml") && !ct.includes("text") && !ct.includes("html")) return null;
+    return await res.text();
+  } catch {
+    return null;
+  }
+}
+
+/** Haalt pagina-URL’s uit sitemap(s); volgt geneste .xml-sitemaps (bijv. Shopify index). */
+async function discoverUrlsFromSitemaps(origin: URL): Promise<URL[]> {
+  const pageUrls: URL[] = [];
+  const seenXml = new Set<string>();
+  const seeds = [
+    new URL("/sitemap.xml", origin),
+    new URL("/sitemap_index.xml", origin),
+    new URL("/sitemap_products_1.xml", origin),
+  ];
+
+  async function walkXmlSitemap(xmlUrl: URL, depth: number): Promise<void> {
+    const key = xmlUrl.toString();
+    if (depth > 4 || seenXml.has(key)) return;
+    seenXml.add(key);
+    const body = await fetchSitemapBody(xmlUrl);
+    if (!body) return;
+    const locRe = /<loc>\s*([^<\s]+)\s*<\/loc>/gi;
+    let m: RegExpExecArray | null;
+    while ((m = locRe.exec(body))) {
+      try {
+        const u = new URL(m[1]);
+        u.hash = "";
+        if (u.host !== origin.host) continue;
+        if (!["http:", "https:"].includes(u.protocol)) continue;
+        if (u.pathname !== "/" && u.pathname.endsWith("/")) u.pathname = u.pathname.slice(0, -1);
+        if (/\.xml$/i.test(u.pathname)) {
+          await walkXmlSitemap(u, depth + 1);
+        } else {
+          pageUrls.push(u);
+        }
+      } catch {
+        continue;
+      }
+    }
+  }
+
+  for (const sm of seeds) {
+    await walkXmlSitemap(sm, 0);
+  }
+  return pageUrls;
 }
 
 function extractLinks(html: string, baseUrl: URL): URL[] {
@@ -80,7 +171,17 @@ async function crawlKnowledgeWebsite(startWebsite: string): Promise<CrawlResult>
   const seen = new Set<string>();
   const pages: AiKnowledgePage[] = [];
 
-  while (queue.length > 0 && pages.length < MAX_AI_KNOWLEDGE_PAGES) {
+  try {
+    const fromSitemap = await discoverUrlsFromSitemaps(start);
+    for (const u of fromSitemap) {
+      const k = u.toString();
+      if (!seen.has(k)) queue.push({ url: u, depth: 0 });
+    }
+  } catch {
+    /* sitemap optioneel */
+  }
+
+  while (queue.length > 0 && pages.length < AI_KNOWLEDGE_MAX_PAGES) {
     const next = queue.shift();
     if (!next) break;
     const key = next.url.toString();
@@ -89,7 +190,7 @@ async function crawlKnowledgeWebsite(startWebsite: string): Promise<CrawlResult>
 
     try {
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 9000);
+      const timer = setTimeout(() => controller.abort(), 12_000);
       const res = await fetch(key, {
         redirect: "follow",
         signal: controller.signal,
@@ -110,23 +211,27 @@ async function crawlKnowledgeWebsite(startWebsite: string): Promise<CrawlResult>
         saved_at: new Date().toISOString(),
       });
 
-      if (next.depth >= MAX_CRAWL_DEPTH) continue;
+      if (next.depth >= AI_KNOWLEDGE_MAX_DEPTH) continue;
       const links = extractLinks(html, next.url);
       for (const link of links) {
         if (link.host !== startHost) continue;
         if (!["http:", "https:"].includes(link.protocol)) continue;
         if (/\.(png|jpe?g|gif|webp|svg|pdf|zip|mp4|mp3|woff2?)$/i.test(link.pathname)) continue;
-        if (!seen.has(link.toString())) queue.push({ url: link, depth: next.depth + 1 });
+        const lk = link.toString();
+        if (!seen.has(lk)) queue.push({ url: link, depth: next.depth + 1 });
       }
     } catch {
       continue;
     }
   }
 
+  const capped =
+    pages.length >= AI_KNOWLEDGE_MAX_PAGES && queue.length > 0;
+
   const crawledDocument = pages
     .map((p) => `URL: ${p.url}\nTitel: ${p.title}\nSamenvatting: ${p.excerpt}`)
     .join("\n\n---\n\n");
-  return { pages, crawledDocument };
+  return { pages, crawledDocument, capped };
 }
 
 export async function updateBusinessProfileAction(
@@ -363,7 +468,7 @@ export async function updateAiSettingsAction(
     (settingsRow?.automation_preferences as Record<string, unknown>) || {};
   const automation_preferences = {
     ...prevAi,
-    ...(auto ? { note: auto } : {}),
+    note: auto,
     niche_key: auth.company.niche ?? prevAi.niche_key,
   };
 
@@ -574,11 +679,13 @@ export async function updateAiKnowledgeAction(
 
   let pages: AiKnowledgePage[] = [];
   let crawledDocument = "";
+  let crawlCapped = false;
   if (website) {
     try {
       const crawled = await crawlKnowledgeWebsite(website);
       pages = crawled.pages;
       crawledDocument = crawled.crawledDocument;
+      crawlCapped = crawled.capped;
     } catch {
       // Non-blocking: user can still save manual knowledge.
     }
@@ -591,6 +698,7 @@ export async function updateAiKnowledgeAction(
     ai_knowledge_pages: pages,
     ai_knowledge_crawled_document: crawledDocument || null,
     ai_knowledge_last_scanned_at: new Date().toISOString(),
+    ai_knowledge_crawl_capped: website ? crawlCapped : false,
     niche_key: auth.company.niche ?? prevAi.niche_key,
   };
 

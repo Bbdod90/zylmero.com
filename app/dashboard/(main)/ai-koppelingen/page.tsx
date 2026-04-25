@@ -56,7 +56,7 @@ export default async function AiKoppelcentrumPage() {
   return (
     <PageFrame
       title="AI & koppelingen"
-      subtitle="Eén premium hub voor AI-training, WhatsApp, e-mail en widget — overzichtelijk, strak en direct actiegericht."
+      subtitle="Kennis eerst, daarna kanalen. Alles wat je nodig hebt staat in de stappen hieronder."
     >
       <DashboardWorkSurface>
         <AiKoppelcentrumView

@@ -23,7 +23,7 @@ export default async function AiSettingsPage() {
   return (
     <PageFrame
       title="AI-assistent"
-      subtitle="Stel simpel in hoe je AI klinkt, schrijft en opvolgt."
+      subtitle="Kies voorbeelden voor toon en antwoorden — of pas alles vrij aan. Geen verplicht vakjargon."
       dismissHref="/dashboard/ai-koppelingen"
       dismissLabel="AI & koppelingen"
     >

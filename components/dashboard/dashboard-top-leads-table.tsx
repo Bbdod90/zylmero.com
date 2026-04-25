@@ -44,7 +44,7 @@ export function DashboardTopLeadsTable({
           id="dashboard-top-leads-heading"
           className="text-lg font-semibold tracking-tight sm:text-xl"
         >
-          Top 3 leads
+          Top 3 klanten
         </CardTitle>
         <Button
           variant="ghost"
@@ -65,7 +65,7 @@ export function DashboardTopLeadsTable({
               <Users className="size-6" aria-hidden />
             </div>
             <div className="max-w-sm space-y-2">
-              <p className="text-sm font-medium text-foreground">Nog geen leads in je top 3</p>
+              <p className="text-sm font-medium text-foreground">Nog geen klanten in je top 3</p>
               <p className="text-sm leading-relaxed text-muted-foreground">
                 Zodra aanvragen binnenkomen, tonen we hier automatisch waar de meeste geschatte waarde zit.
               </p>

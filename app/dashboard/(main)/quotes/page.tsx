@@ -89,7 +89,7 @@ export default async function QuotesPage() {
                   </Button>
                 ) : null}
                 <Button variant="outline" asChild className="rounded-lg">
-                  <Link href="/dashboard/leads">Naar leads</Link>
+                  <Link href="/dashboard/leads">Naar klanten</Link>
                 </Button>
               </>
             }

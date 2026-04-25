@@ -35,7 +35,7 @@ export function DashboardRevenueHero({
             <span className="zm-text-gradient">Pipeline-waarde</span>
           </h2>
           <p className="text-pretty text-sm leading-relaxed text-muted-foreground sm:text-[15px]">
-            Geschat op basis van je leads — plus snelle links naar planning en inbox.
+            Geschat op basis van je klanten — plus snelle links naar planning en inbox.
           </p>
         </div>
 
@@ -76,7 +76,7 @@ export function DashboardRevenueHero({
             <Link href="/dashboard/pipeline">Pipeline</Link>
           </Button>
           <Button variant="outline" size="default" className="h-10 rounded-full border-border/65 px-6 text-[13px] font-semibold dark:border-white/[0.14]" asChild>
-            <Link href="/dashboard/leads">Leads</Link>
+            <Link href="/dashboard/leads">Klanten</Link>
           </Button>
         </div>
       </div>

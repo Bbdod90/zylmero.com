@@ -81,7 +81,7 @@ export function DashboardKpiRail({
       }
     >
       <div className="grid grid-cols-2 gap-3 sm:gap-3.5">
-        <KpiTile icon={Users} label="Leads" value={totalLeads} />
+        <KpiTile icon={Users} label="Klanten" value={totalLeads} />
         <KpiTile
           icon={Kanban}
           label="In pipeline"

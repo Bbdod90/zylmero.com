@@ -28,6 +28,7 @@ export default async function AiKnowledgePage() {
     typeof prefs.ai_knowledge_last_scanned_at === "string"
       ? prefs.ai_knowledge_last_scanned_at
       : null;
+  const crawlCapped = Boolean(prefs.ai_knowledge_crawl_capped);
 
   return (
     <PageFrame
@@ -42,6 +43,7 @@ export default async function AiKnowledgePage() {
         initialDocument={mapped?.ai_knowledge_document ?? ""}
         scannedPages={scannedPages}
         lastScannedAt={lastScannedAt}
+        crawlCapped={crawlCapped}
       />
     </PageFrame>
   );
