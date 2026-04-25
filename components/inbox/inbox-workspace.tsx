@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 import Link from "next/link";
 import type { InboxThread } from "@/lib/queries/inbox";
-import type { Lead, Message, ReplyTemplate } from "@/lib/types";
+import type { Lead, Message } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -12,13 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn, formatCurrency, formatDateTime } from "@/lib/utils";
 import { LeadStatusMenu } from "@/components/leads/lead-status-menu";
-import { Search, FileText } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Search } from "lucide-react";
 import { sendInboxMessage, generateInboxReply } from "@/actions/inbox";
 import { useRouter } from "next/navigation";
 import type { LeadTemperature } from "@/lib/sales/scoring";
@@ -31,12 +25,10 @@ export function InboxWorkspace({
   threads,
   staleReplyLeadIds = [],
   demoMode = false,
-  replyTemplates = [],
 }: {
   threads: InboxThread[];
   staleReplyLeadIds?: string[];
   demoMode?: boolean;
-  replyTemplates?: ReplyTemplate[];
 }) {
   const router = useRouter();
   const stale = useMemo(() => new Set(staleReplyLeadIds), [staleReplyLeadIds]);
@@ -312,37 +304,6 @@ export function InboxWorkspace({
 
             <div className="space-y-4 border-t border-border/60 bg-background/50 p-4 backdrop-blur-md dark:border-white/[0.06] md:static md:rounded-b-2xl">
               <div className="flex flex-wrap gap-2">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="rounded-xl"
-                      disabled={pending || demoMode || replyTemplates.length === 0}
-                    >
-                      <FileText className="mr-2 size-4" />
-                      Snel invoegen
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="max-h-72 overflow-y-auto">
-                    {replyTemplates.map((t) => (
-                      <DropdownMenuItem
-                        key={t.id}
-                        onClick={() => {
-                          const first = String(active.lead.full_name || "")
-                            .split(/\s+/)[0]
-                            .trim();
-                          const body = t.body.replace(/\{\{naam\}\}/gi, first);
-                          setCompose((c) => (c ? `${c}\n\n${body}` : body));
-                          toast.message(`Sjabloon: ${t.title}`);
-                        }}
-                      >
-                        {t.title}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
                 <Button
                   type="button"
                   variant="secondary"

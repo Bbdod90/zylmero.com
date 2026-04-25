@@ -112,73 +112,73 @@ export function LeadsExplorer({
 
   return (
     <div className="space-y-6">
-      <div className="cf-dashboard-panel p-4 sm:p-5 lg:p-6">
+      <div className="cf-dashboard-panel border-border/60 bg-gradient-to-br from-white via-white to-slate-50/35 p-4 dark:from-[hsl(222_30%_13%/0.97)] dark:via-[hsl(222_32%_10%/0.98)] dark:to-[hsl(222_38%_7%/0.99)] sm:p-5 lg:p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div className="flex w-full flex-1 flex-col gap-3 sm:flex-row sm:items-stretch">
-          <div className="relative min-w-0 flex-1">
-            <Search className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Zoek op naam, e-mail, intentie…"
-              className="h-12 rounded-xl border-border/60 bg-background/70 pl-11 shadow-sm dark:border-white/[0.1] dark:bg-white/[0.02]"
+          <div className="flex w-full flex-1 flex-col gap-3 sm:flex-row sm:items-stretch">
+            <div className="relative min-w-0 flex-1">
+              <Search className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Zoek op naam, e-mail, intentie…"
+                className="h-12 rounded-xl border-border/60 bg-white pl-11 shadow-sm dark:border-white/[0.1] dark:bg-white/[0.02]"
+              />
+            </div>
+            <NewLeadDialog
+              demoMode={demoMode}
+              demoSampleLeadId={demoSampleLeadId}
             />
           </div>
-          <NewLeadDialog
-            demoMode={demoMode}
-            demoSampleLeadId={demoSampleLeadId}
-          />
-        </div>
-        <div className="flex flex-wrap gap-3">
-          <select
-            className="h-12 min-h-[44px] rounded-xl border border-border/60 bg-background/80 px-3.5 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:border-white/[0.1] dark:bg-white/[0.02]"
-            value={status}
-            onChange={(e) => setStatus(e.target.value as LeadStatus | "all")}
-          >
-            <option value="all">Alle statussen</option>
-            <option value="new">Nieuw</option>
-            <option value="active">Actief</option>
-            <option value="quote_sent">Offerte verstuurd</option>
-            <option value="appointment_booked">Afspraak ingepland</option>
-            <option value="won">Gewonnen</option>
-            <option value="lost">Verloren</option>
-          </select>
-          <select
-            className="h-12 min-h-[44px] rounded-xl border border-border/60 bg-background/80 px-3.5 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:border-white/[0.1] dark:bg-white/[0.02]"
-            value={source}
-            onChange={(e) => setSource(e.target.value)}
-          >
-            {SOURCES.map((s) => (
-              <option key={s} value={s}>
-                {s === "all"
-                  ? "Alle bronnen"
-                  : s === "Referral"
-                    ? "Doorverwijzing"
-                    : s === "Cold call"
-                      ? "Koude acquisitie"
-                      : s}
-              </option>
-            ))}
-          </select>
-          <select
-            className="h-12 min-h-[44px] rounded-xl border border-border/60 bg-background/80 px-3.5 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:border-white/[0.1] dark:bg-white/[0.02]"
-            value={sort}
-            onChange={(e) =>
-              setSort(e.target.value as "activity" | "value" | "score")
-            }
-          >
-            <option value="activity">Sorteer: laatste activiteit</option>
-            <option value="value">Sorteer: waarde</option>
-            <option value="score">Sorteer: score</option>
-          </select>
-        </div>
+          <div className="flex flex-wrap gap-3">
+            <select
+              className="h-12 min-h-[44px] rounded-xl border border-border/60 bg-white px-3.5 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:border-white/[0.1] dark:bg-white/[0.02]"
+              value={status}
+              onChange={(e) => setStatus(e.target.value as LeadStatus | "all")}
+            >
+              <option value="all">Alle statussen</option>
+              <option value="new">Nieuw</option>
+              <option value="active">Actief</option>
+              <option value="quote_sent">Offerte verstuurd</option>
+              <option value="appointment_booked">Afspraak ingepland</option>
+              <option value="won">Gewonnen</option>
+              <option value="lost">Verloren</option>
+            </select>
+            <select
+              className="h-12 min-h-[44px] rounded-xl border border-border/60 bg-white px-3.5 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:border-white/[0.1] dark:bg-white/[0.02]"
+              value={source}
+              onChange={(e) => setSource(e.target.value)}
+            >
+              {SOURCES.map((s) => (
+                <option key={s} value={s}>
+                  {s === "all"
+                    ? "Alle bronnen"
+                    : s === "Referral"
+                      ? "Doorverwijzing"
+                      : s === "Cold call"
+                        ? "Koude acquisitie"
+                        : s}
+                </option>
+              ))}
+            </select>
+            <select
+              className="h-12 min-h-[44px] rounded-xl border border-border/60 bg-white px-3.5 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:border-white/[0.1] dark:bg-white/[0.02]"
+              value={sort}
+              onChange={(e) =>
+                setSort(e.target.value as "activity" | "value" | "score")
+              }
+            >
+              <option value="activity">Sorteer: laatste activiteit</option>
+              <option value="value">Sorteer: waarde</option>
+              <option value="score">Sorteer: score</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      <div className="cf-dashboard-panel overflow-hidden">
+      <div className="cf-dashboard-panel overflow-hidden border-border/60 bg-gradient-to-br from-white via-white to-slate-50/35 dark:from-[hsl(222_30%_13%/0.97)] dark:via-[hsl(222_32%_10%/0.98)] dark:to-[hsl(222_38%_7%/0.99)]">
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center px-8 py-16 text-center">
-            <div className="mb-5 flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary ring-1 ring-primary/15">
+            <div className="mb-5 flex size-14 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary ring-1 ring-primary/15">
               <Inbox className="size-7" />
             </div>
             <p className="text-lg font-semibold tracking-tight text-foreground">

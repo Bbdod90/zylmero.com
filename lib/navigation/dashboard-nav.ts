@@ -1,16 +1,12 @@
 import type { LucideIcon } from "lucide-react";
 import {
-  BarChart3,
   BookMarked,
-  BookOpen,
   CalendarDays,
   FileText,
   Kanban,
-  LayoutTemplate,
   LayoutDashboard,
   Link2,
   MessageCircle,
-  Puzzle,
   Share2,
   Sparkles,
   UserSearch,
@@ -44,13 +40,6 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
     ],
   },
   {
-    id: "inzicht",
-    label: "Inzicht",
-    items: [
-      { href: "/dashboard/insights", label: "Insights", icon: BarChart3 },
-    ],
-  },
-  {
     id: "ai",
     label: "AI & koppelingen",
     items: [
@@ -58,9 +47,6 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
       { href: "/dashboard/ai-koppelingen", label: "AI-koppelingen", icon: Link2 },
       { href: "/dashboard/ai-knowledge", label: "AI-kennis", icon: BookMarked },
       { href: "/dashboard/automations", label: "Automations", icon: Workflow },
-      { href: "/dashboard/playbooks", label: "Playbooks", icon: BookOpen },
-      { href: "/dashboard/templates", label: "Templates", icon: LayoutTemplate },
-      { href: "/dashboard/integrations", label: "Integraties", icon: Puzzle },
       { href: "/dashboard/socials", label: "Socials", icon: Share2 },
     ],
   },

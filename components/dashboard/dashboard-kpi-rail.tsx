@@ -76,7 +76,7 @@ export function DashboardKpiRail({
       title="Snel overzicht"
       action={
         <Button variant="ghost" size="sm" className="h-8 rounded-full px-2 text-2xs" asChild>
-          <Link href="/dashboard/insights">Prestaties</Link>
+          <Link href="/dashboard">Dashboard</Link>
         </Button>
       }
     >

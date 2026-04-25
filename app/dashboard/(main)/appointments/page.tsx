@@ -37,40 +37,37 @@ export default async function AppointmentsPage({
     .sort()
     .join("|");
 
-  const canUseAgenda = leads.length > 0 || appointments.length > 0;
-
   return (
     <PageFrame
       title="Afspraken"
       subtitle="Week, maand of drie maanden — overzicht dat meegroeit met je zaak."
     >
       <DashboardWorkSurface>
-        {!canUseAgenda ? (
-          <div className="cf-dashboard-panel flex flex-col items-center border-dashed border-border/55 px-8 py-16 text-center dark:border-white/[0.12]">
+        {leads.length === 0 ? (
+          <div className="cf-dashboard-panel mb-6 flex flex-col items-center border-dashed border-border/55 px-8 py-10 text-center dark:border-white/[0.12]">
             <div className="mb-5 flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary ring-1 ring-primary/15">
               <CalendarDays className="size-7" />
             </div>
-            <p className="text-lg font-semibold tracking-tight text-foreground">
-              Eerst een klant in je pipeline
+            <p className="text-base font-semibold tracking-tight text-foreground">
+              Apple Agenda-modus staat klaar
             </p>
-            <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
-              Voeg een klant toe of importeer leads — daarna kun je hier afspraken
-              inplannen en volgen.
+            <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
+              Voeg eerst een klant toe om afspraken te plannen. De volledige kalender is
+              hieronder al beschikbaar.
             </p>
             <Button asChild className="mt-8 rounded-lg">
               <Link href="/dashboard/leads">Naar klanten</Link>
             </Button>
           </div>
-        ) : (
-          <AppointmentsPageClient
-            agendaItems={agendaItems}
-            agendaRevision={agendaRevision}
-            demoMode={demo}
-            leads={leads}
-            defaultLeadId={defaultLeadId}
-            initialOpen={Boolean(defaultLeadId)}
-          />
-        )}
+        ) : null}
+        <AppointmentsPageClient
+          agendaItems={agendaItems}
+          agendaRevision={agendaRevision}
+          demoMode={demo}
+          leads={leads}
+          defaultLeadId={defaultLeadId}
+          initialOpen={Boolean(defaultLeadId)}
+        />
       </DashboardWorkSurface>
     </PageFrame>
   );

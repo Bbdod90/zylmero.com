@@ -7,6 +7,7 @@ import { AutomationRulesPanel } from "@/components/settings/automation-rules-pan
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { canUseAutomations } from "@/lib/billing/entitlements";
 import type { Automation } from "@/lib/types";
+import { CheckCircle2, Wand2 } from "lucide-react";
 import {
   ensureDefaultCustomRules,
   listAutomationRules,
@@ -50,16 +51,44 @@ export default async function AutomationsPage() {
   return (
     <PageFrame
       title="Automatiseringen"
-      subtitle="Opvolging en regels met premium controle — strak, overzichtelijk en direct inzetbaar."
+      subtitle="Laat opvolging automatisch lopen met duidelijke regels die iedereen in je team begrijpt."
     >
       <DashboardWorkSurface>
+        <section className="cf-dashboard-panel border-primary/20 bg-gradient-to-br from-primary/[0.1] via-background to-background px-5 py-5 dark:border-primary/30 dark:from-primary/[0.16] sm:px-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="max-w-3xl">
+              <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                Duidelijk overzicht
+              </p>
+              <h2 className="mt-1.5 text-xl font-semibold tracking-tight text-foreground">
+                Zo werkt het
+              </h2>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                <strong className="text-foreground">Opvolging</strong> stuurt automatische berichten op
+                vaste momenten. <strong className="text-foreground">Regels</strong> reageren op situaties
+                zoals “geen reactie” of “hete lead”.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 text-xs text-muted-foreground">
+              <p className="inline-flex items-center gap-2">
+                <CheckCircle2 className="size-4 text-primary" aria-hidden />
+                Begin met standaard opvolging
+              </p>
+              <p className="inline-flex items-center gap-2">
+                <Wand2 className="size-4 text-primary" aria-hidden />
+                Verfijn daarna regels
+              </p>
+            </div>
+          </div>
+        </section>
+
         <Tabs defaultValue="followup" className="mt-2 w-full">
           <TabsList className="grid w-full max-w-md grid-cols-2 rounded-xl border border-border/50 bg-muted/30 p-1 dark:border-white/[0.08]">
             <TabsTrigger value="followup" className="rounded-lg data-[state=active]:shadow-sm">
-              Opvolging
+              Automatische berichten
             </TabsTrigger>
             <TabsTrigger value="rules" className="rounded-lg data-[state=active]:shadow-sm">
-              Regels (als → dan)
+              Slimme regels
             </TabsTrigger>
           </TabsList>
           <TabsContent value="followup" className="mt-8">

@@ -61,7 +61,7 @@ npm run supabase:raise-rate-limits
 ## Routes
 
 - `/login`, `/signup`
-- `/dashboard`, `/dashboard/insights`, `/dashboard/playbooks`, `/dashboard/integrations`, `/dashboard/leads`, `/dashboard/leads/[id]`, `/dashboard/inbox`, `/dashboard/quotes`, `/dashboard/appointments`, `/dashboard/settings`, `/dashboard/ai`, `/dashboard/automations`, `/dashboard/onboarding`
+- `/dashboard`, `/dashboard/integrations`, `/dashboard/leads`, `/dashboard/leads/[id]`, `/dashboard/inbox`, `/dashboard/quotes`, `/dashboard/appointments`, `/dashboard/settings`, `/dashboard/ai`, `/dashboard/automations`, `/dashboard/onboarding`
 
 ## Server actions
 

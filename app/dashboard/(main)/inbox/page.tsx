@@ -9,7 +9,6 @@ import { MessageSquare } from "lucide-react";
 import { getDemoInboxThreads, getDemoSla } from "@/lib/demo/dashboard-data";
 import { isDemoMode } from "@/lib/env";
 import { analyzeSla } from "@/lib/queries/sla";
-import { listReplyTemplates } from "@/actions/reply-templates";
 
 export default async function InboxPage() {
   const auth = await getAuth();
@@ -20,7 +19,6 @@ export default async function InboxPage() {
     ? getDemoInboxThreads()
     : await fetchInboxThreads(supabase, auth.company.id);
   const sla = demo ? getDemoSla() : await analyzeSla(supabase, auth.company.id);
-  const templates = demo ? [] : await listReplyTemplates();
 
   return (
     <PageFrame
@@ -39,7 +37,6 @@ export default async function InboxPage() {
             threads={threads}
             staleReplyLeadIds={Array.from(sla.staleReplyLeadIds)}
             demoMode={demo}
-            replyTemplates={templates}
           />
         )}
       </DashboardWorkSurface>

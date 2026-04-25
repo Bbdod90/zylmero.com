@@ -2,12 +2,10 @@ import Link from "next/link";
 import {
   ArrowUpRight,
   Brain,
-  ClipboardList,
   Inbox,
   MessageSquare,
   Sparkles,
   Users,
-  Wand2,
   Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -69,18 +67,6 @@ export function DashboardAiHub({
       title: "Automatiseringen",
       description: "Opvolgingsritmes en regels, inclusief optie AI-antwoord.",
       icon: Zap,
-    },
-    {
-      href: "/dashboard/playbooks",
-      title: "Playbooks",
-      description: "Korte werkwijzen: snel antwoorden, offerte-flow, AI als voorstel.",
-      icon: Wand2,
-    },
-    {
-      href: "/dashboard/templates",
-      title: "Snelle antwoorden",
-      description: "Vaste stukken tekst om in de inbox te plakken.",
-      icon: ClipboardList,
     },
   ];
 

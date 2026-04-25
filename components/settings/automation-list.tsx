@@ -18,11 +18,12 @@ import {
   type AutoState,
 } from "@/actions/automations";
 import Link from "next/link";
+import { CheckCircle2, Clock3, MessageSquareText } from "lucide-react";
 
 const triggerNl: Record<string, string> = {
-  lead_created: "lead aangemaakt",
-  quote_sent: "offerte verstuurd",
-  no_reply: "geen antwoord",
+  lead_created: "Nieuwe lead binnen",
+  quote_sent: "Offerte verstuurd",
+  no_reply: "Klant reageert niet",
 };
 
 function Row({
@@ -42,7 +43,7 @@ function Row({
         <div>
           <CardTitle className="text-base">{a.name}</CardTitle>
           <p className="text-xs text-muted-foreground">
-            {triggerLabel} · vertraging {a.delay_minutes} min
+            Moment: {triggerLabel} · Versturen na {a.delay_minutes} min
           </p>
         </div>
         <Toggle
@@ -63,6 +64,9 @@ function Row({
               className="rounded-xl border-border/60 bg-background/80 dark:border-white/[0.1] dark:bg-white/[0.03]"
             />
           </div>
+          <div className="rounded-xl border border-border/50 bg-muted/20 px-3 py-2 text-xs text-muted-foreground dark:border-white/[0.08] dark:bg-white/[0.03]">
+            Deze automatisering gaat af op: <span className="font-medium text-foreground">{triggerLabel}</span>
+          </div>
           <div className="space-y-2">
             <Label htmlFor={`delay-${a.id}`}>Vertraging (minuten)</Label>
             <Input
@@ -74,19 +78,25 @@ function Row({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor={`tpl-${a.id}`}>Sjabloon</Label>
+            <Label htmlFor={`tpl-${a.id}`}>Berichttekst</Label>
             <Textarea
               id={`tpl-${a.id}`}
               name="template_text"
               defaultValue={a.template_text}
               className="min-h-[100px] rounded-xl"
             />
+            <p className="text-2xs text-muted-foreground">
+              Tip: gebruik <code className="rounded bg-muted px-1 py-0.5">{"{{name}}"}</code> voor de naam.
+            </p>
           </div>
           {state.error ? (
             <p className="text-sm text-destructive">{state.error}</p>
           ) : null}
           {state.ok ? (
-            <p className="text-sm text-primary">Opgeslagen.</p>
+            <p className="inline-flex items-center gap-1.5 text-sm text-primary">
+              <CheckCircle2 className="size-4" aria-hidden />
+              Opgeslagen.
+            </p>
           ) : null}
           <Button
             type="submit"
@@ -143,9 +153,7 @@ export function AutomationList({
     <div className="space-y-4">
       {schemaError ? (
         <div className="rounded-2xl border border-amber-500/30 bg-amber-500/[0.07] p-5 text-sm shadow-sm backdrop-blur-sm dark:bg-amber-500/[0.06]">
-          <p className="font-semibold text-foreground">
-            Automatiseringen zijn nog niet beschikbaar in de database
-          </p>
+          <p className="font-semibold text-foreground">Automatiseringen zijn nog niet klaar op de server</p>
           <p className="mt-2 text-muted-foreground">
             Voer de Supabase-migratie uit die de tabel{" "}
             <code className="rounded bg-muted px-1.5 py-0.5 text-xs">automations</code>{" "}
@@ -168,6 +176,21 @@ export function AutomationList({
           </Button>
         </div>
       ) : null}
+      <div className="rounded-xl border border-border/55 bg-background/70 p-3 dark:border-white/[0.08] dark:bg-white/[0.02]">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+          Snel starten
+        </p>
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Clock3 className="size-3.5" aria-hidden />
+            Basis-opvolging in 1 klik
+          </span>
+          <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+            <MessageSquareText className="size-3.5" aria-hidden />
+            Pas teksten daarna aan
+          </span>
+        </div>
+      </div>
       <Button
         type="button"
         variant="secondary"

@@ -27,8 +27,8 @@ export default async function AiSettingsPage() {
 
   return (
     <PageFrame
-      title="AI-instellingen"
-      subtitle="Toon en antwoordstijl — onderdeel van AI & koppelingen."
+      title="AI-assistent"
+      subtitle="Premium tone, antwoordstijl en automationscontext — volledig onder controle."
       dismissHref="/dashboard/ai-koppelingen"
       dismissLabel="AI & koppelingen"
     >

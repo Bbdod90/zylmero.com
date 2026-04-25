@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import { updateAiKnowledgeAction } from "@/actions/settings";
 import type { SettingsFormState } from "@/actions/settings";
@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { normalizeKnowledgeWebsiteUrl } from "@/lib/url/public-site-url";
 import { cn } from "@/lib/utils";
-import { FileText, Globe, Sparkles, Upload } from "lucide-react";
+import { FileText, Globe, ShieldCheck, Sparkles, Upload } from "lucide-react";
 
 const initial: SettingsFormState = {};
 
@@ -34,27 +34,38 @@ export function AiKnowledgeForm({
 }) {
   const [state, action] = useFormState(updateAiKnowledgeAction, initial);
   const fileRef = useRef<HTMLInputElement>(null);
+  const [docLength, setDocLength] = useState(initialDocument.length);
 
   return (
-    <form action={action} className="mx-auto max-w-3xl space-y-6">
-      <div className="cf-dashboard-panel overflow-hidden">
-        <div className="relative border-b border-border/40 bg-gradient-to-br from-primary/[0.08] via-transparent to-accent/[0.04] px-6 py-7 sm:px-8 sm:py-8 dark:border-white/[0.06] dark:from-primary/[0.12]">
+    <form action={action} className="mx-auto max-w-5xl space-y-6">
+      <div className="cf-dashboard-panel overflow-hidden border-border/60">
+        <div className="relative border-b border-border/40 bg-gradient-to-br from-primary/[0.1] via-transparent to-accent/[0.05] px-6 py-7 sm:px-8 sm:py-8 dark:border-white/[0.06] dark:from-primary/[0.16]">
           <div className="pointer-events-none absolute -right-20 -top-20 size-56 rounded-full bg-primary/10 blur-3xl dark:bg-primary/15" />
-          <div className="relative flex flex-col gap-5 sm:flex-row sm:items-start sm:gap-6">
+          <div className="relative flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
             <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-primary/15 text-primary shadow-sm ring-1 ring-primary/20 dark:bg-primary/20 dark:ring-primary/30">
               <Sparkles className="size-7" strokeWidth={1.5} aria-hidden />
             </div>
-            <div className="min-w-0 space-y-2">
-              <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-primary">
+            <div className="min-w-0 flex-1 space-y-2">
+              <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">
                 AI-training
               </p>
               <h2 className="text-balance text-xl font-bold tracking-tight text-foreground sm:text-2xl">
                 Train je AI op jouw site
               </h2>
-              <p className="max-w-prose text-sm leading-relaxed text-muted-foreground">
-                Koppel je publieke site en vul praktische kennis aan — denk aan openingstijden, tarieven,
-                levertijden en USP’s. Zo worden antwoorden in inbox en playbooks scherper en consistenter.
+              <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
+                Geef je assistant context over je bedrijf, aanbod en spelregels. Zo worden antwoorden
+                consistenter, professioneler en direct bruikbaar in inbox, templates en automations.
               </p>
+            </div>
+            <div className="grid grid-cols-2 gap-2 sm:w-[15.5rem]">
+              <div className="rounded-xl border border-border/50 bg-background/70 px-3 py-2.5 text-center dark:border-white/[0.08] dark:bg-white/[0.03]">
+                <p className="text-2xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">URL</p>
+                <p className="mt-1 text-xs font-semibold text-foreground">Broncontext</p>
+              </div>
+              <div className="rounded-xl border border-border/50 bg-background/70 px-3 py-2.5 text-center dark:border-white/[0.08] dark:bg-white/[0.03]">
+                <p className="text-2xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">Tekst</p>
+                <p className="mt-1 text-xs font-semibold text-foreground">Kennisbank</p>
+              </div>
             </div>
           </div>
         </div>
@@ -71,7 +82,7 @@ export function AiKnowledgeForm({
             </p>
           ) : null}
 
-          <section className="space-y-4 rounded-2xl border border-border/50 bg-muted/20 p-5 dark:border-white/[0.08] dark:bg-white/[0.02] sm:p-6">
+          <section className="space-y-4 rounded-2xl border border-border/50 bg-gradient-to-br from-muted/25 to-transparent p-5 dark:border-white/[0.08] dark:bg-white/[0.02] sm:p-6">
             <div className="flex items-center gap-2.5">
               <span className="flex size-8 items-center justify-center rounded-lg bg-background/80 text-primary shadow-sm ring-1 ring-border/50 dark:bg-white/[0.04] dark:ring-white/[0.08]">
                 <Globe className="size-4" aria-hidden />
@@ -108,7 +119,7 @@ export function AiKnowledgeForm({
             </p>
           </section>
 
-          <section className="space-y-4 rounded-2xl border border-border/50 bg-muted/20 p-5 dark:border-white/[0.08] dark:bg-white/[0.02] sm:p-6">
+          <section className="space-y-4 rounded-2xl border border-border/50 bg-gradient-to-br from-muted/25 to-transparent p-5 dark:border-white/[0.08] dark:bg-white/[0.02] sm:p-6">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="flex items-center gap-2.5">
                 <span className="flex size-8 items-center justify-center rounded-lg bg-background/80 text-primary shadow-sm ring-1 ring-border/50 dark:bg-white/[0.04] dark:ring-white/[0.08]">
@@ -164,6 +175,7 @@ export function AiKnowledgeForm({
               placeholder="Plak hier prijslijsten, openingstijden, USP’s, garantievoorwaarden, veelgestelde vragen…"
               defaultValue={initialDocument}
               disabled={demoMode}
+              onChange={(e) => setDocLength(e.target.value.length)}
               className={cn(
                 "min-h-[220px] max-h-[min(70vh,28rem)] resize-y rounded-xl border-border/60 bg-background/80 p-4 text-sm leading-relaxed shadow-inner-soft",
                 "placeholder:text-muted-foreground/70 dark:border-white/[0.1] dark:bg-[hsl(228_24%_8%)]",
@@ -171,10 +183,17 @@ export function AiKnowledgeForm({
             />
             <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border/40 pt-3 text-2xs text-muted-foreground dark:border-white/[0.06]">
               <span>Max. 48.000 tekens · geen gevoelige klantdata</span>
+              <span className={cn("font-medium", docLength > 43000 && "text-amber-600 dark:text-amber-300")}>
+                {docLength.toLocaleString("nl-NL")} / 48.000
+              </span>
             </div>
           </section>
 
-          <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border/40 pt-2 dark:border-white/[0.06]">
+          <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border/55 bg-background/70 px-4 py-3 dark:border-white/[0.08] dark:bg-white/[0.02]">
+            <div className="flex items-start gap-2 text-xs text-muted-foreground">
+              <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
+              <span>Opslaan maakt deze kennis direct actief voor AI-antwoordsuggesties.</span>
+            </div>
             <SubmitButton disabled={demoMode} />
             {demoMode ? (
               <span className="rounded-full border border-amber-500/25 bg-amber-500/[0.08] px-3 py-1 text-xs font-medium text-amber-950 dark:text-amber-100/95">

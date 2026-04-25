@@ -72,10 +72,10 @@ export function GrowthResultsStrip(props: {
           </div>
         </div>
         <Link
-          href="/dashboard/insights"
+          href="/dashboard"
           className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-primary/25 bg-primary/[0.08] px-4 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/[0.14] dark:border-primary/30"
         >
-          Bekijk prestaties
+          Naar dashboard
           <ArrowRight className="size-4 opacity-90" />
         </Link>
       </div>

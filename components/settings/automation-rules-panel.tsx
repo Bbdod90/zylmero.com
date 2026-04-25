@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Trash2 } from "lucide-react";
+import { CheckCircle2, Loader2, Sparkles, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 function CreateForm({
@@ -52,7 +52,7 @@ function CreateForm({
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="if_type">Als (voorwaarde)</Label>
+          <Label htmlFor="if_type">Wanneer gebeurt dit?</Label>
           <select
             id="if_type"
             name="if_type"
@@ -70,7 +70,7 @@ function CreateForm({
           </select>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="hours">Uren wachten (bij geen reactie)</Label>
+          <Label htmlFor="hours">Hoeveel uur wachten? (alleen bij “geen reactie”)</Label>
           <Input
             id="hours"
             name="hours"
@@ -83,7 +83,7 @@ function CreateForm({
           />
         </div>
         <div className="space-y-2 sm:col-span-2">
-          <Label htmlFor="then_type">Dan (actie)</Label>
+          <Label htmlFor="then_type">Wat moet er dan gebeuren?</Label>
           <select
             id="then_type"
             name="then_type"
@@ -112,7 +112,7 @@ function CreateForm({
           />
         </div>
         <div className="space-y-2 sm:col-span-2">
-          <Label htmlFor="followup_message">Follow-upbericht</Label>
+          <Label htmlFor="followup_message">Bericht aan klant</Label>
           <Textarea
             id="followup_message"
             name="followup_message"
@@ -129,7 +129,7 @@ function CreateForm({
         className="rounded-xl shadow-sm"
       >
         {pending ? <Loader2 className="size-4 animate-spin" /> : null}
-        Regel toevoegen
+        Regel opslaan
       </Button>
     </form>
   );
@@ -149,9 +149,11 @@ export function AutomationRulesPanel({
   if (schemaError) {
     return (
       <div className="cf-dashboard-panel border-amber-500/30 bg-amber-500/[0.06] p-6 sm:p-7 dark:bg-amber-500/[0.05]">
-        <p className="font-semibold text-foreground">Regels (als → dan) zijn nog niet beschikbaar</p>
+        <p className="font-semibold text-foreground">Slimme regels zijn nog niet beschikbaar</p>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          De database mist de tabel <code className="rounded bg-muted px-1.5 py-0.5 text-xs">automation_rules</code> of PostgREST heeft de schema-cache nog niet ververst.
+          De server mist nog de tabel{" "}
+          <code className="rounded bg-muted px-1.5 py-0.5 text-xs">automation_rules</code> of de schema-cache
+          is nog niet ververst.
         </p>
         <p className="mt-3 text-sm text-muted-foreground">
           <span className="font-medium text-foreground">Oplossing:</span> draai de migratie{" "}
@@ -172,10 +174,9 @@ export function AutomationRulesPanel({
     <div className="space-y-8">
       <Card className="cf-dashboard-panel overflow-hidden border-0 shadow-none">
         <CardHeader>
-          <CardTitle className="text-base">Nieuwe regel</CardTitle>
+          <CardTitle className="text-base">Nieuwe slimme regel</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Als-dan automatisering: bijvoorbeeld hete leads of geen reactie binnen
-            X uur.
+            Laat de app automatisch reageren op situaties zoals “geen reactie” of “hete lead”.
           </p>
         </CardHeader>
         <CardContent>
@@ -183,10 +184,20 @@ export function AutomationRulesPanel({
         </CardContent>
       </Card>
 
+      <div className="rounded-xl border border-border/55 bg-background/70 p-3 dark:border-white/[0.08] dark:bg-white/[0.02]">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+          Regel-tip
+        </p>
+        <p className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+          <Sparkles className="size-3.5 text-primary" aria-hidden />
+          Start met 1 regel tegelijk, test in inbox en breid daarna uit.
+        </p>
+      </div>
+
       <div className="space-y-3">
         {items.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            Nog geen regels — voeg er een toe of gebruik de standaardset.
+            Nog geen regels — voeg hieronder je eerste regel toe.
           </p>
         ) : null}
         {items.map((r) => (
@@ -197,7 +208,7 @@ export function AutomationRulesPanel({
             <div className="min-w-0 space-y-1">
               <p className="font-medium leading-tight">{r.name}</p>
               <p className="text-2xs text-muted-foreground">
-                Als: {r.if_type} · Dan: {r.then_type}
+                Trigger: {r.if_type} · Actie: {r.then_type}
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -232,6 +243,12 @@ export function AutomationRulesPanel({
                 <Trash2 className="size-4" />
               </Button>
             </div>
+            {r.enabled ? (
+              <p className="inline-flex items-center gap-1.5 text-2xs text-primary">
+                <CheckCircle2 className="size-3.5" aria-hidden />
+                Regel staat aan
+              </p>
+            ) : null}
           </div>
         ))}
       </div>

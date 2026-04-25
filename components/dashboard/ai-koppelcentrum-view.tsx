@@ -365,13 +365,10 @@ export function AiKoppelcentrumView({
             <CardTitle className="text-base font-semibold">Meer</CardTitle>
           </div>
           <CardDescription>
-            Playbooks, automatiseringen en facturatie blijven bereikbaar via het menu.
+            Automatiseringen en facturatie blijven bereikbaar via het menu.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
-          <Button asChild variant="secondary" size="sm" className="rounded-xl">
-            <Link href="/dashboard/playbooks">Playbooks</Link>
-          </Button>
           <Button asChild variant="secondary" size="sm" className="rounded-xl">
             <Link href="/dashboard/automations">Automatiseringen</Link>
           </Button>
