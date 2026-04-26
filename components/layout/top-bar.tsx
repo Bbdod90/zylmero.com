@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { cn } from "@/lib/utils";
 
@@ -41,23 +40,17 @@ export function TopBar({
             </Link>
           ) : null}
           <div className="min-w-0 flex-1 space-y-1.5">
-            <h1 className="truncate text-lg font-semibold tracking-tight text-foreground sm:text-2xl sm:font-semibold sm:tracking-[-0.02em]">
+            <h1 className="truncate text-lg font-semibold tracking-[-0.02em] text-foreground sm:text-2xl sm:font-semibold">
               {title}
             </h1>
             {subtitle ? (
-              <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground/95 sm:max-w-2xl">
+              <p className="line-clamp-2 max-w-2xl text-sm font-medium leading-relaxed text-foreground/70 sm:text-[0.9375rem]">
                 {subtitle}
               </p>
             ) : null}
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-2">
-          <Badge
-            variant="outline"
-            className="hidden rounded-full border-border/60 bg-muted/40 px-2.5 py-0.5 text-2xs font-medium uppercase tracking-[0.18em] text-muted-foreground shadow-sm backdrop-blur-sm dark:border-white/[0.1] dark:bg-white/[0.05] dark:text-white/55 sm:inline-flex"
-          >
-            Workspace
-          </Badge>
           <ThemeToggle />
         </div>
       </div>

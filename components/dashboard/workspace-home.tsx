@@ -208,7 +208,7 @@ export function WorkspaceHome({
   return (
     <PageFrame
       title={companyName}
-      subtitle="Zet je kanalen live — hier zie je wat er binnenkomt en wat je vandaag doet."
+      subtitle="Jouw centrale plek voor aanvragen, berichten en vervolg — overzichtelijk en rustig gehouden."
     >
       <DashboardWorkSurface>
         <div className="space-y-5">
@@ -218,9 +218,9 @@ export function WorkspaceHome({
 
         <section
           className={cn(
-            "relative overflow-hidden rounded-[1.25rem] border border-border/50 p-5 sm:p-7",
-            "bg-gradient-to-br from-card via-card/90 to-muted/15",
-            "shadow-[0_28px_80px_-48px_rgb(0_0_0/0.45)] dark:border-white/[0.09] dark:from-[hsl(222_30%_13%/0.97)] dark:via-[hsl(222_28%_11%/0.95)] dark:to-[hsl(228_32%_8%/0.9)] dark:shadow-[0_32px_90px_-48px_rgb(0_0_0/0.65)]",
+            "relative overflow-hidden rounded-[1.5rem] border border-border/55 p-5 sm:p-7",
+            "bg-gradient-to-br from-card via-card/92 to-muted/18",
+            "shadow-[0_32px_88px_-52px_hsl(222_47%_11%/0.35),0_1px_0_0_hsl(0_0%_100%/0.65)_inset] dark:border-white/[0.1] dark:from-[hsl(222_30%_13%/0.97)] dark:via-[hsl(222_28%_11%/0.95)] dark:to-[hsl(228_32%_8%/0.9)] dark:shadow-[0_36px_96px_-48px_rgb(0_0_0/0.55),0_1px_0_0_hsl(220_14%_18%/0.35)_inset]",
           )}
         >
           <div
@@ -234,9 +234,7 @@ export function WorkspaceHome({
 
           <div className="relative flex flex-col gap-8 lg:gap-10">
             <div className="min-w-0 space-y-3">
-              <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">
-                Workspace
-              </p>
+              <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">Vandaag</p>
               <h1
                 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl"
                 title={`${greeting} — ${companyName}`}
@@ -251,22 +249,22 @@ export function WorkspaceHome({
 
             <div className="grid gap-8 lg:grid-cols-12 lg:items-end lg:gap-10">
               <div className="space-y-3 lg:col-span-5">
-                <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
-                  Cijfers en laatste beweging. Start bij{" "}
+                <p className="max-w-md text-sm font-medium leading-relaxed text-foreground/70">
+                  Hier zie je in één oogopslag wat er speelt. Spring naar{" "}
                   <Link
                     href="/dashboard/inbox"
-                    className="font-medium text-foreground underline decoration-primary/35 underline-offset-2 hover:decoration-primary"
+                    className="font-semibold text-foreground underline decoration-primary/40 underline-offset-[3px] hover:decoration-primary"
                   >
                     Berichten
                   </Link>{" "}
-                  of werk je{" "}
+                  voor antwoorden, of naar{" "}
                   <Link
                     href="/dashboard/leads"
-                    className="font-medium text-foreground underline decoration-primary/35 underline-offset-2 hover:decoration-primary"
+                    className="font-semibold text-foreground underline decoration-primary/40 underline-offset-[3px] hover:decoration-primary"
                   >
-                    klanten
+                    Klanten
                   </Link>{" "}
-                  bij.
+                  om opvolging bij te houden.
                 </p>
                 <p className="text-xs font-medium capitalize text-muted-foreground/90">{today}</p>
               </div>

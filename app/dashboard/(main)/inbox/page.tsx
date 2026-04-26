@@ -53,7 +53,7 @@ export default async function InboxPage() {
   return (
     <PageFrame
       title="Berichten"
-      subtitle="Hier komen nieuwe klanten binnen — alles op één plek."
+      subtitle="Alle inkomende vragen op één plek — zodat je snel antwoordt en geen deal laat liggen."
     >
       <DashboardWorkSurface>
         {threads.length === 0 ? (

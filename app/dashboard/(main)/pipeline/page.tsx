@@ -30,7 +30,7 @@ export default async function PipelinePage() {
   return (
     <PageFrame
       title="Pipeline"
-      subtitle="Sleep klanten tussen fases — zie meteen waar het geld ligt."
+      subtitle="Sleep klanten tussen fases. Per kolom zie je meteen hoeveel kansen er liggen en wat het geschat samen waard is."
     >
       <DashboardWorkSurface>
         <div className="cf-dashboard-panel relative p-4 sm:p-6 lg:p-8">

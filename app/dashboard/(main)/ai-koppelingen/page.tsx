@@ -67,8 +67,8 @@ export default async function AiKoppelcentrumPage() {
 
   return (
     <PageFrame
-      title="Koppelingen"
-      subtitle="Laat klanten je vinden — WhatsApp, website of e-mail. Alles op één plek."
+      title="Kanalen"
+      subtitle="Kies waar jouw klanten je het liefst spreken. Alles komt netjes samen bij je berichten."
     >
       <DashboardWorkSurface>
         <AiKoppelcentrumView

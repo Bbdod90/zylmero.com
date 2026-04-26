@@ -46,7 +46,7 @@ function StatusBadge({ status, label }: { status: StepStatus; label: string }) {
 }
 
 const cardLift =
-  "transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md active:scale-[0.99]";
+  "transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/28 hover:shadow-[0_24px_56px_-36px_hsl(222_47%_11%/0.2)] active:scale-[0.99]";
 
 export type AiKoppelcentrumProps = {
   demoMode: boolean;
@@ -112,24 +112,24 @@ export function AiKoppelcentrumView({
       <OnboardingStepsStrip onboarding={onboarding} />
 
       {demoMode ? (
-        <p className="rounded-xl border border-amber-500/25 bg-amber-500/[0.08] px-4 py-3 text-sm text-amber-950 dark:text-amber-100">
-          <strong className="font-semibold">Demo:</strong> zo ziet het scherm eruit. Met je eigen account koppel je
-          echte kanalen.
+        <p className="rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-500/[0.12] to-amber-500/[0.05] px-5 py-4 text-sm font-medium leading-relaxed text-amber-950 shadow-sm dark:text-amber-50">
+          <span className="font-semibold">Demomodus.</span> Zo ziet alles eruit als je straks met echte klanten werkt —
+          koppelingen zijn alleen ter illustratie.
         </p>
       ) : null}
 
       {needsAiSetup ? (
-        <Card className={cn("rounded-2xl border-primary/25 bg-primary/[0.04] shadow-sm dark:border-primary/30", cardLift)}>
+        <Card className={cn("rounded-[1.35rem] border-primary/25 bg-primary/[0.05] shadow-md dark:border-primary/30", cardLift)}>
           <CardHeader className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-start gap-3">
-              <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">
+              <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary ring-1 ring-primary/20">
                 <Sparkles className="size-5" />
               </div>
               <div>
-                <CardTitle className="text-lg">Eerste keer: assistent laten meedenken</CardTitle>
-                <CardDescription className="text-sm text-muted-foreground">
-                  Vul in een paar minuten je diensten en veelgestelde vragen in — daarna kan je meteen antwoorden
-                  laten sturen.
+                <CardTitle className="text-lg tracking-tight">Start: je assistent laten meedenken</CardTitle>
+                <CardDescription className="text-sm font-medium leading-relaxed text-foreground/70">
+                  In een paar minuten vul je je diensten en veelgestelde vragen in. Daarna kan je meteen professioneel
+                  antwoorden — ook buiten kantooruren.
                 </CardDescription>
               </div>
             </div>
@@ -144,12 +144,12 @@ export function AiKoppelcentrumView({
       ) : null}
 
       <div className="grid gap-5 lg:grid-cols-2">
-        <Card className={cn("cf-dashboard-panel rounded-2xl border-border/70 shadow-sm dark:border-white/[0.08]", cardLift)}>
+        <Card className={cn("cf-dashboard-panel rounded-[1.35rem] border-border/60 shadow-[0_20px_50px_-40px_hsl(222_47%_11%/0.18)] dark:border-white/[0.1]", cardLift)}>
           <CardHeader className="space-y-3 p-5 sm:p-6">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-2 text-primary">
                 <Brain className="size-5 shrink-0" />
-                <CardTitle className="text-lg sm:text-xl">Je assistent is klaar</CardTitle>
+                <CardTitle className="text-lg tracking-tight sm:text-xl">Je assistent staat voor je klaar</CardTitle>
               </div>
               <StatusBadge
                 status={knowledgeStatus === "ok" ? "ok" : knowledgeStatus === "partial" ? "partial" : "todo"}
@@ -179,18 +179,19 @@ export function AiKoppelcentrumView({
           </CardContent>
         </Card>
 
-        <Card className={cn("cf-dashboard-panel rounded-2xl border-border/70 shadow-sm dark:border-white/[0.08]", cardLift)}>
+        <Card className={cn("cf-dashboard-panel rounded-[1.35rem] border-border/60 shadow-[0_20px_50px_-40px_hsl(222_47%_11%/0.18)] dark:border-white/[0.1]", cardLift)}>
           <CardHeader className="space-y-2 p-5 sm:p-6">
-            <CardTitle className="text-lg sm:text-xl">Kies waar klanten je bereiken</CardTitle>
-            <CardDescription className="text-sm leading-relaxed text-muted-foreground">
-              Koppel minstens één kanaal. Alles komt bij elkaar onder Berichten — nergens technisch gedoe.
+            <CardTitle className="text-lg tracking-tight sm:text-xl">Waar mogen klanten je bereiken?</CardTitle>
+            <CardDescription className="text-sm font-medium leading-relaxed text-foreground/70">
+              Je kiest wat bij je past. Alles wat binnenkomt, zie je rustig bij elkaar onder Berichten — zonder
+              heen-en-weer tussen apps.
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-3 px-5 pb-5 pt-0 sm:px-6 sm:pb-6">
             <Button
               asChild
               variant="outline"
-              className="h-auto justify-between rounded-xl border-border/70 py-4 text-left shadow-sm hover:bg-muted/40"
+              className="h-auto justify-between rounded-2xl border-border/55 py-4 text-left shadow-sm ring-1 ring-transparent transition-all hover:border-primary/25 hover:bg-muted/35 hover:ring-primary/10"
             >
               <Link href="/dashboard/settings?tab=whatsapp" className="flex w-full items-center gap-3">
                 <MessageCircle className="size-5 shrink-0 text-primary" aria-hidden />
@@ -208,7 +209,9 @@ export function AiKoppelcentrumView({
                 </span>
                 <StatusBadge
                   status={waStatus}
-                  label={demoMode ? "Demo" : waStatus === "ok" ? "Actief" : waStatus === "partial" ? "Deels" : "Open"}
+                  label={
+                    demoMode ? "Demo" : waStatus === "ok" ? "Actief" : waStatus === "partial" ? "Bijna klaar" : "Te doen"
+                  }
                 />
               </Link>
             </Button>
@@ -216,7 +219,7 @@ export function AiKoppelcentrumView({
             <Button
               asChild
               variant="outline"
-              className="h-auto justify-between rounded-xl border-border/70 py-4 text-left shadow-sm hover:bg-muted/40"
+              className="h-auto justify-between rounded-2xl border-border/55 py-4 text-left shadow-sm ring-1 ring-transparent transition-all hover:border-primary/25 hover:bg-muted/35 hover:ring-primary/10"
             >
               <Link href="/dashboard/settings?tab=widget" className="flex w-full items-center gap-3">
                 <Globe className="size-5 shrink-0 text-primary" aria-hidden />
@@ -235,7 +238,13 @@ export function AiKoppelcentrumView({
                 <StatusBadge
                   status={widgetStatus}
                   label={
-                    demoMode ? "Demo" : widgetLive ? "Actief" : widgetStatus === "partial" ? "Deels" : "Open"
+                    demoMode
+                      ? "Demo"
+                      : widgetLive
+                        ? "Actief"
+                        : widgetStatus === "partial"
+                          ? "Bijna klaar"
+                          : "Te doen"
                   }
                 />
               </Link>
@@ -244,7 +253,7 @@ export function AiKoppelcentrumView({
             <Button
               asChild
               variant="outline"
-              className="h-auto justify-between rounded-xl border-border/70 py-4 text-left shadow-sm hover:bg-muted/40"
+              className="h-auto justify-between rounded-2xl border-border/55 py-4 text-left shadow-sm ring-1 ring-transparent transition-all hover:border-primary/25 hover:bg-muted/35 hover:ring-primary/10"
             >
               <Link href="/dashboard/settings?tab=email" className="flex w-full items-center gap-3">
                 <Mail className="size-5 shrink-0 text-primary" aria-hidden />
@@ -263,7 +272,13 @@ export function AiKoppelcentrumView({
                 <StatusBadge
                   status={mailStatus}
                   label={
-                    demoMode ? "Demo" : mailStatus === "ok" ? "Actief" : mailStatus === "partial" ? "Deels" : "Open"
+                    demoMode
+                      ? "Demo"
+                      : mailStatus === "ok"
+                        ? "Actief"
+                        : mailStatus === "partial"
+                          ? "Bijna klaar"
+                          : "Te doen"
                   }
                 />
               </Link>
@@ -272,11 +287,11 @@ export function AiKoppelcentrumView({
         </Card>
       </div>
 
-      <div className="flex flex-col gap-3 rounded-2xl border border-border/60 bg-muted/15 p-4 sm:flex-row sm:items-center sm:justify-between dark:border-white/[0.08]">
-        <p className="text-sm text-muted-foreground">
+      <div className="flex flex-col gap-4 rounded-[1.35rem] border border-border/55 bg-gradient-to-r from-muted/30 to-transparent p-5 sm:flex-row sm:items-center sm:justify-between dark:border-white/[0.1] dark:from-white/[0.04]">
+        <p className="text-sm font-medium leading-relaxed text-foreground/75">
           {assistantFeelsReady
-            ? "Je bent goed bezig — test een gesprek vanaf je site of stuur jezelf een WhatsApp."
-            : "Rond eerst kennis en één kanaal af — dan mis je geen aanvraag."}
+            ? "Tip: stuur jezelf een testbericht of vraag iemand van het team — zo weet je zeker dat alles soepel aanvoelt voor echte klanten."
+            : "Begin met je kennis en kies daarna minstens één kanaal. Dan staat je vangnet echt open — en hoef je minder zelf achter aanvragen aan te bellen."}
         </p>
         <div className="flex flex-wrap gap-2">
           <Button

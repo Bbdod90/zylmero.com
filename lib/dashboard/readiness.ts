@@ -1,4 +1,4 @@
-/** Dashboard “klanten klaar” — geen technische termen naar de UI. */
+/** Dashboard “klanten klaar” — taal voor ondernemers, geen techniek. */
 
 export type ReadinessTone = "bad" | "warn" | "good";
 
@@ -37,7 +37,12 @@ export function buildCustomerReadiness(input: {
   if (input.demoMode) {
     return {
       rows: [
-        { id: "demo", tone: "good", label: "Demo: zo ziet je overzicht eruit met een echt account." },
+        {
+          id: "demo",
+          tone: "good",
+          label:
+            "Dit is een demoomgeving. Met je eigen account vul je hier straks je echte kanalen en kennis in.",
+        },
       ],
       percent: 72,
       onboarding: {
@@ -63,38 +68,38 @@ export function buildCustomerReadiness(input: {
     id: "web",
     tone: input.websiteLive ? "good" : "bad",
     label: input.websiteLive
-      ? "Websitechat staat aan — bezoekers kunnen je bereiken"
-      : "Websitechat nog niet actief",
+      ? "Websitechat staat live — bezoekers kunnen je direct een vraag stellen."
+      : "Websitechat staat nog uit — bezoekers op je site missen een snelle weg naar jou.",
   });
 
   rows.push({
     id: "wa",
     tone: waOk ? "good" : waPartial ? "warn" : "bad",
     label: waOk
-      ? "WhatsApp staat gekoppeld met automatische antwoorden"
+      ? "WhatsApp is gekoppeld en je assistent mag automatisch een eerste antwoord sturen."
       : waPartial
-        ? "WhatsApp deels ingesteld — rond dit af in Instellingen"
-        : "WhatsApp nog niet gekoppeld",
+        ? "WhatsApp is deels ingesteld — rond dit af bij Instellingen zodat niemand blijft wachten."
+        : "WhatsApp is nog niet gekoppeld — veel klanten stappen hier juist op in.",
   });
 
   rows.push({
     id: "mail",
     tone: mailOk ? "good" : mailPartial ? "warn" : "bad",
     label: mailOk
-      ? "E-mail komt binnen in je berichten"
+      ? "E-mail loopt binnen in je berichten, zodat je niets mist in je inbox."
       : mailPartial
-        ? "E-mail deels ingesteld — nog één stap"
-        : "E-mail nog niet gekoppeld",
+        ? "E-mail is deels klaar — nog één kleine stap bij Instellingen."
+        : "E-mail is nog niet gekoppeld — offerteaanvragen blijven dan buiten je overzicht.",
   });
 
   rows.push({
     id: "ai",
     tone: aiDone ? "good" : aiPartial ? "warn" : "bad",
     label: aiDone
-      ? "Je assistent is getraind op jouw bedrijf"
+      ? "Je assistent kent je bedrijf — antwoorden sluiten aan op wat jij aanbiedt."
       : aiPartial
-        ? "Assistent staat aan — vul nog kennis aan voor betere antwoorden"
-        : "Assistent nog niet klaar — start met trainen",
+        ? "Je assistent staat aan — vul nog je kennis aan voor nóg betere antwoorden."
+        : "Je assistent wacht op je input — begin met je aanbod en veelgestelde vragen.",
   });
 
   let score = 0;

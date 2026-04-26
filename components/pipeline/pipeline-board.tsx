@@ -261,7 +261,7 @@ function ColumnDrop({
             </h3>
             <p className="mt-0.5 text-2xs font-medium text-muted-foreground/80">{theme.hint}</p>
             <p className="mt-1.5 text-xs font-semibold tabular-nums tracking-tight text-foreground/95">
-              {count} {count === 1 ? "lead" : "leads"} · {formatCurrency(totalValue)}
+              {count} {count === 1 ? "klant" : "klanten"} · {formatCurrency(totalValue)} geschat
             </p>
           </div>
           <span

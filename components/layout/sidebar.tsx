@@ -106,8 +106,8 @@ export function AppSidebar({
           <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-[11px] font-bold text-primary-foreground shadow-sm ring-1 ring-black/5 dark:shadow-[0_0_0_1px_hsl(var(--primary)/0.35),0_14px_32px_-16px_hsl(var(--primary)/0.9)] dark:ring-0">
             {BRAND_LOGO_MONOGRAM}
           </div>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold leading-tight tracking-tight text-foreground">
+          <div className="min-w-0 flex-1" title={companyName}>
+            <p className="line-clamp-2 text-sm font-semibold leading-snug tracking-tight text-foreground break-words">
               {companyName}
             </p>
             <p className="text-2xs text-muted-foreground">{BRAND_NAME}</p>
