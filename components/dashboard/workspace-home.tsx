@@ -2,12 +2,12 @@ import Link from "next/link";
 import {
   ArrowRight,
   Bell,
-  BookMarked,
+  Bot,
   CalendarDays,
   FileText,
+  Kanban,
   Link2,
   MessageCircle,
-  Sparkles,
   Users,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -320,10 +320,10 @@ export function WorkspaceHome({
                 <p className="max-w-md text-xs font-medium leading-relaxed text-muted-foreground sm:text-sm">
                   Cijfers ter referentie —{" "}
                   <Link
-                    href="/dashboard/ai"
+                    href="/dashboard/chatbot"
                     className="font-semibold text-foreground underline decoration-primary/35 underline-offset-2 hover:decoration-primary"
                   >
-                    stel eerst je AI in
+                    stel eerst je chatbot in
                   </Link>{" "}
                   zodat binnenkomende vragen niet blijven liggen.
                 </p>
@@ -356,16 +356,16 @@ export function WorkspaceHome({
             </p>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
               <RouteTile
-                href="/dashboard/ai"
-                title="AI-assistent"
-                hint="Toon, taal, interne regels"
-                icon={Sparkles}
+                href="/dashboard/chatbot"
+                title="Chatbot & kennis"
+                hint="Site, teksten, toon"
+                icon={Bot}
               />
               <RouteTile
-                href="/dashboard/ai-knowledge"
-                title="AI-kennis"
-                hint="Site + praktische teksten"
-                icon={BookMarked}
+                href="/dashboard/pipeline"
+                title="Pipeline"
+                hint="Zie waar het geld ligt"
+                icon={Kanban}
               />
               <RouteTile
                 href="/dashboard/ai-koppelingen"
@@ -394,10 +394,10 @@ export function WorkspaceHome({
             ·
           </span>
           <Link
-            href="/dashboard/ai"
+            href="/dashboard/chatbot"
             className="font-medium text-foreground/80 underline decoration-border/70 underline-offset-4 transition hover:text-foreground hover:decoration-primary/50"
           >
-            AI-assistent
+            Chatbot & kennis
           </Link>
           <span className="hidden text-muted-foreground/50 sm:inline" aria-hidden>
             ·

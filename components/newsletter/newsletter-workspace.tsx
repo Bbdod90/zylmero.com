@@ -76,17 +76,17 @@ export function NewsletterWorkspace({
           ontvanger(s) met e-mail.
         </p>
 
-        <p className="mt-3 text-xs text-muted-foreground">
-          Technisch: verzending loopt via de bestaande wachtrij en cron{" "}
-          <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">
-            /api/cron/marketing-drip
-          </code>{" "}
-          (met <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">CRON_SECRET</code>
-          ). Zet <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">
-            RESEND_API_KEY
-          </code>{" "}
-          in productie.
-        </p>
+        <details className="mt-3 rounded-xl border border-border/50 bg-muted/20 px-3 py-2 text-xs text-muted-foreground dark:border-white/[0.08]">
+          <summary className="cursor-pointer font-medium text-foreground/80 outline-none hover:text-foreground">
+            Technische notitie (hosting / IT)
+          </summary>
+          <p className="mt-2 pl-0.5 leading-relaxed">
+            Verzending via wachtrij en cron{" "}
+            <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">/api/cron/marketing-drip</code> met{" "}
+            <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">CRON_SECRET</code>. In productie:{" "}
+            <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">RESEND_API_KEY</code>.
+          </p>
+        </details>
 
         {demoMode ? (
           <p className="mt-4 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-950 dark:text-amber-100">

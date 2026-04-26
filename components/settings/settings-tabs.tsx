@@ -28,7 +28,17 @@ import { WidgetSubscriptionGate } from "@/components/settings/widget-subscriptio
 import { FormBooleanSwitch } from "@/components/settings/form-boolean-switch";
 import { cn } from "@/lib/utils";
 import type { Company, WhatsAppChannelSettings } from "@/lib/types";
-import { Puzzle } from "lucide-react";
+import {
+  BookOpen,
+  Briefcase,
+  CreditCard,
+  FileText,
+  Mail,
+  MessageCircle,
+  Palette,
+  Puzzle,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 function Submit({ label }: { label: string }) {
   const { pending } = useFormStatus();
@@ -53,7 +63,24 @@ const VALID_TABS = new Set([
 ]);
 
 const tabTriggerClass =
-  "relative shrink-0 snap-start scroll-m-1 whitespace-nowrap rounded-none border-b-2 border-transparent bg-transparent px-2.5 py-2.5 text-[0.8125rem] font-medium text-muted-foreground shadow-none ring-offset-background transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none sm:px-4 sm:py-3 sm:text-sm";
+  "relative inline-flex shrink-0 snap-start scroll-m-1 items-center gap-2 whitespace-nowrap rounded-xl border border-transparent bg-transparent px-3 py-2.5 text-[0.8125rem] font-semibold text-muted-foreground shadow-none ring-offset-background transition-all hover:border-border/60 hover:bg-muted/30 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/45 focus-visible:ring-offset-2 data-[state=active]:border-primary/35 data-[state=active]:bg-primary/[0.1] data-[state=active]:text-foreground data-[state=active]:shadow-sm dark:hover:bg-white/[0.04] dark:data-[state=active]:border-primary/40 dark:data-[state=active]:bg-primary/[0.14] sm:px-4 sm:py-3 sm:text-sm";
+
+function TabTriggerWithIcon({
+  value,
+  icon: Icon,
+  children,
+}: {
+  value: string;
+  icon: LucideIcon;
+  children: React.ReactNode;
+}) {
+  return (
+    <TabsTrigger value={value} className={tabTriggerClass}>
+      <Icon className="size-3.5 shrink-0 opacity-85 sm:size-4" strokeWidth={2} aria-hidden />
+      {children}
+    </TabsTrigger>
+  );
+}
 
 function FormShell({ className, ...props }: ComponentProps<"div">) {
   return (
@@ -172,36 +199,39 @@ export function SettingsTabs({
         onValueChange={setActiveTab}
         className="w-full"
       >
-        <div className="sticky top-0 z-10 -mx-1 mb-4 border-b border-border/60 bg-background/90 pb-0 pt-0.5 backdrop-blur-md dark:bg-background/80">
+        <div className="sticky top-0 z-10 -mx-1 mb-5 rounded-2xl border border-border/50 bg-background/85 pb-1.5 pl-1 pr-1 pt-1.5 shadow-sm backdrop-blur-lg dark:border-white/[0.08] dark:bg-background/75">
+          <p className="mb-1.5 hidden px-2 text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground/90 sm:block">
+            Tabbladen
+          </p>
           <div
             ref={tabListScrollRef}
             className="cf-dashboard-inline-scroll cursor-grab overflow-x-auto overflow-y-hidden pb-0.5 pt-0.5 [-webkit-overflow-scrolling:touch] [scrollbar-width:thin] active:cursor-grabbing"
           >
-            <TabsList className="inline-flex h-11 min-h-[2.75rem] w-max max-w-none flex-nowrap items-stretch justify-start gap-0 rounded-none border-0 bg-transparent p-0 pr-1">
-            <TabsTrigger value="business" className={tabTriggerClass}>
-              Bedrijf
-            </TabsTrigger>
-            <TabsTrigger value="knowledge" className={tabTriggerClass}>
-              Kennis
-            </TabsTrigger>
-            <TabsTrigger value="quotes" className={tabTriggerClass}>
-              Offertes
-            </TabsTrigger>
-            <TabsTrigger value="branding" className={tabTriggerClass}>
-              Huisstijl
-            </TabsTrigger>
-            <TabsTrigger value="whatsapp" className={tabTriggerClass}>
-              WhatsApp
-            </TabsTrigger>
-            <TabsTrigger value="email" className={tabTriggerClass}>
-              E-mail
-            </TabsTrigger>
-            <TabsTrigger value="billing" className={tabTriggerClass}>
-              Facturatie
-            </TabsTrigger>
-            <TabsTrigger value="widget" className={tabTriggerClass}>
-              Widget
-            </TabsTrigger>
+            <TabsList className="inline-flex min-h-[2.75rem] w-max max-w-none flex-nowrap items-stretch justify-start gap-1.5 rounded-xl border-0 bg-transparent p-1 pr-2">
+              <TabTriggerWithIcon value="business" icon={Briefcase}>
+                Bedrijf
+              </TabTriggerWithIcon>
+              <TabTriggerWithIcon value="whatsapp" icon={MessageCircle}>
+                WhatsApp
+              </TabTriggerWithIcon>
+              <TabTriggerWithIcon value="email" icon={Mail}>
+                E-mail
+              </TabTriggerWithIcon>
+              <TabTriggerWithIcon value="widget" icon={Puzzle}>
+                Widget
+              </TabTriggerWithIcon>
+              <TabTriggerWithIcon value="knowledge" icon={BookOpen}>
+                Kennis
+              </TabTriggerWithIcon>
+              <TabTriggerWithIcon value="quotes" icon={FileText}>
+                Offertes
+              </TabTriggerWithIcon>
+              <TabTriggerWithIcon value="branding" icon={Palette}>
+                Huisstijl
+              </TabTriggerWithIcon>
+              <TabTriggerWithIcon value="billing" icon={CreditCard}>
+                Facturatie
+              </TabTriggerWithIcon>
             </TabsList>
           </div>
         </div>

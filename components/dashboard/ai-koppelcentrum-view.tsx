@@ -168,13 +168,13 @@ export function AiKoppelcentrumView({
           </CardHeader>
           <CardContent className="flex flex-wrap gap-2 px-5 pb-5 pt-0 sm:px-6 sm:pb-6">
             <Button asChild size="sm" className="rounded-xl shadow-sm">
-              <Link href="/dashboard/ai-knowledge">
+              <Link href="/dashboard/chatbot#kennis">
                 Kennis bewerken
                 <ArrowRight className="ml-1.5 size-3.5" />
               </Link>
             </Button>
             <Button asChild variant="outline" size="sm" className="rounded-xl">
-              <Link href="/dashboard/ai">Toon & antwoorden</Link>
+              <Link href="/dashboard/chatbot">Chatbot</Link>
             </Button>
           </CardContent>
         </Card>
@@ -201,10 +201,10 @@ export function AiKoppelcentrumView({
                     {demoMode
                       ? "Demo"
                       : waStatus === "ok"
-                        ? "Gekoppeld met automatische antwoorden"
+                        ? "Zelfde nummer als WhatsApp Business — chatbot actief"
                         : waStatus === "partial"
-                          ? "Nog afronden in Instellingen"
-                          : "Nog niet gekoppeld"}
+                          ? "Rond af onder Instellingen → WhatsApp"
+                          : "Koppel je zakelijke WhatsApp (Meta of Twilio)"}
                   </span>
                 </span>
                 <StatusBadge

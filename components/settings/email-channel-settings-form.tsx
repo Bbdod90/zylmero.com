@@ -56,19 +56,31 @@ export function EmailChannelSettingsForm({
   ].join("\n");
 
   return (
-    <form action={action} className="cf-dashboard-panel space-y-8 p-6 sm:p-8 lg:p-9">
-      <header className="flex gap-4 border-b border-border/50 pb-6">
-        <div className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary ring-1 ring-primary/15">
-          <Mail className="size-5" aria-hidden />
-        </div>
-        <div className="min-w-0 space-y-2">
-          <h2 className="text-lg font-semibold tracking-tight text-foreground">E-mail binnen laten komen</h2>
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            Klantmail verschijnt bij <strong className="font-medium text-foreground">Berichten</strong>, net als
-            WhatsApp. Zelfde assistent — één overzicht.
-          </p>
-        </div>
-      </header>
+    <form
+      action={action}
+      className={cn(
+        "cf-dashboard-panel overflow-hidden rounded-[1.35rem] border-border/55 p-0 shadow-[0_24px_64px_-40px_hsl(222_47%_11%/0.18)]",
+        "space-y-0",
+      )}
+    >
+      <div className="relative border-b border-border/45 bg-gradient-to-br from-sky-500/[0.08] via-card to-muted/15 px-5 py-7 sm:px-8 sm:py-8 dark:border-white/[0.08] dark:from-sky-500/[0.12]">
+        <div className="pointer-events-none absolute -left-10 -top-16 size-48 rounded-full bg-sky-400/15 blur-3xl" />
+        <header className="relative flex gap-4">
+          <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-primary/15 text-primary ring-1 ring-primary/20">
+            <Mail className="size-5" aria-hidden />
+          </div>
+          <div className="min-w-0 space-y-2">
+            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary/90">Kanaal</p>
+            <h2 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">E-mail binnen laten komen</h2>
+            <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-[0.9375rem]">
+              Klantmail verschijnt bij <strong className="font-medium text-foreground">Berichten</strong>, net als
+              WhatsApp — dezelfde chatbot, één overzicht.
+            </p>
+          </div>
+        </header>
+      </div>
+
+      <div className="space-y-8 px-5 py-7 sm:px-8 sm:py-9">
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="rounded-xl border border-border/55 bg-gradient-to-b from-card to-muted/15 p-4 shadow-sm dark:border-white/[0.08]">
@@ -133,6 +145,7 @@ export function EmailChannelSettingsForm({
         <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">Opgeslagen.</p>
       ) : null}
       <Submit label="Voorkeur opslaan" />
+      </div>
     </form>
   );
 }

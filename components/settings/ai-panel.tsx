@@ -21,11 +21,11 @@ import {
 } from "@/lib/ai/assistant-presets";
 import { cn } from "@/lib/utils";
 import {
+  Bot,
   CheckCircle2,
   Languages,
   MessageCircleHeart,
   PenLine,
-  Sparkles,
   StickyNote,
 } from "lucide-react";
 
@@ -37,7 +37,7 @@ function Submit() {
       disabled={pending}
       className="rounded-xl bg-gradient-to-r from-primary to-primary/85 px-6 font-semibold shadow-sm"
     >
-      {pending ? "Opslaan…" : "AI-instellingen opslaan"}
+      {pending ? "Opslaan…" : "Chatbot opslaan"}
     </Button>
   );
 }
@@ -176,11 +176,14 @@ export function AiPanel({
   reply_style: initialReplyStyle,
   language: initialLanguage,
   automationNote: initialNote,
+  hideIntroHeader,
 }: {
   tone: string | null;
   reply_style: string | null;
   language: string;
   automationNote: string;
+  /** Op gecombineerde chatbot+kennis-pagina staat de uitleg al boven de sectie. */
+  hideIntroHeader?: boolean;
 }) {
   const [state, action] = useFormState(updateAiSettingsAction, initial);
 
@@ -234,25 +237,30 @@ export function AiPanel({
       <input type="hidden" name="language" value={language} />
       <input type="hidden" name="automation_preferences" value={followNote} />
 
-      <header className="rounded-xl border border-primary/20 bg-gradient-to-r from-primary/[0.1] to-transparent px-4 py-4 sm:px-5 dark:border-primary/30 dark:from-primary/[0.14]">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary ring-1 ring-primary/25">
-            <Sparkles className="size-[1.125rem]" strokeWidth={2} aria-hidden />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-              AI-assistent
-            </p>
-            <h2 className="mt-1 text-lg font-semibold tracking-tight text-foreground sm:text-xl">
-              Drie korte stappen
-            </h2>
-            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-              <strong className="font-medium text-foreground">Links</strong> kies je een voorbeeld (mag je overslaan).
-              <strong className="font-medium text-foreground"> Rechts</strong> staat de tekst die de assistent echt gebruikt — typ daar gerust je eigen zinnen. Alleen invullen wat je nodig hebt is genoeg.
-            </p>
+      {hideIntroHeader ? null : (
+        <header className="rounded-xl border border-primary/20 bg-gradient-to-r from-primary/[0.1] to-transparent px-4 py-4 sm:px-5 dark:border-primary/30 dark:from-primary/[0.14]">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary ring-1 ring-primary/25">
+              <Bot className="size-[1.125rem]" strokeWidth={2} aria-hidden />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                AI-chatbot
+              </p>
+              <h2 className="mt-1 text-lg font-semibold tracking-tight text-foreground sm:text-xl">
+                Drie stappen
+              </h2>
+              <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                Dezelfde chatbot op <strong className="font-medium text-foreground">WhatsApp</strong>,{" "}
+                <strong className="font-medium text-foreground">je site</strong> en{" "}
+                <strong className="font-medium text-foreground">e-mail</strong>.{" "}
+                <strong className="font-medium text-foreground">Links</strong> kies je een voorbeeld (mag je overslaan).{" "}
+                <strong className="font-medium text-foreground">Rechts</strong> staat wat de chatbot echt gebruikt.
+              </p>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
       {/* Stap 1 */}
       <section className="rounded-xl border border-border/55 bg-background/50 p-4 sm:p-5 lg:p-6 dark:border-white/[0.08] dark:bg-white/[0.02]">
@@ -263,14 +271,14 @@ export function AiPanel({
           <div>
             <h3 className="text-base font-semibold text-foreground">Stap 1 — Toon</h3>
             <p className="mt-0.5 text-xs text-muted-foreground sm:text-sm">
-              Hoe moet de assistent tegenover je klanten klinken?
+              Hoe moet je chatbot tegenover klanten klinken?
             </p>
           </div>
         </div>
 
         <div className="mb-3 hidden gap-6 text-xs font-medium text-muted-foreground xl:grid xl:grid-cols-12">
           <div className="xl:col-span-5">Voorbeeld (optioneel)</div>
-          <div className="xl:col-span-7">Dit leest de assistent</div>
+          <div className="xl:col-span-7">Dit leest de chatbot</div>
         </div>
 
         <div className="grid gap-5 xl:grid-cols-12 xl:gap-6">
@@ -292,12 +300,12 @@ export function AiPanel({
             </PresetRadioList>
           </div>
           <div className="min-w-0 xl:col-span-7">
-            <p className="mb-2 text-xs font-medium text-muted-foreground xl:hidden">Dit leest de assistent</p>
+            <p className="mb-2 text-xs font-medium text-muted-foreground xl:hidden">Dit leest de chatbot</p>
             <AiScriptField
               editorRef={toneRef}
               inputId="tone-edit"
               title="Toon in je eigen woorden"
-              hint="Kort of uitgebreid: beschrijf hoe de assistent moet praten."
+              hint="Kort of uitgebreid: beschrijf hoe de chatbot moet praten."
               value={tone}
               onChange={onToneChange}
               rows={4}
@@ -316,14 +324,14 @@ export function AiPanel({
           <div>
             <h3 className="text-base font-semibold text-foreground">Stap 2 — Antwoorden</h3>
             <p className="mt-0.5 text-xs text-muted-foreground sm:text-sm">
-              Hoe kort of uitgebreid, en in welke taal de assistent antwoordt.
+              Hoe kort of uitgebreid, en in welke taal de chatbot antwoordt.
             </p>
           </div>
         </div>
 
         <div className="mb-3 hidden gap-6 text-xs font-medium text-muted-foreground xl:grid xl:grid-cols-12">
           <div className="xl:col-span-5">Voorbeeld (optioneel)</div>
-          <div className="xl:col-span-7">Dit leest de assistent</div>
+          <div className="xl:col-span-7">Dit leest de chatbot</div>
         </div>
 
         <div className="grid gap-5 xl:grid-cols-12 xl:gap-6">
@@ -345,7 +353,7 @@ export function AiPanel({
             </PresetRadioList>
           </div>
           <div className="min-w-0 xl:col-span-7">
-            <p className="mb-2 text-xs font-medium text-muted-foreground xl:hidden">Dit leest de assistent</p>
+            <p className="mb-2 text-xs font-medium text-muted-foreground xl:hidden">Dit leest de chatbot</p>
             <AiScriptField
               editorRef={replyRef}
               inputId="reply-edit"
@@ -362,7 +370,7 @@ export function AiPanel({
         <div className="mt-5 border-t border-border/40 pt-4 dark:border-white/[0.06]">
           <Label className="text-sm font-medium text-foreground">Taal</Label>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            Standaardtaal voor antwoorden van de assistent.
+            Standaardtaal voor antwoorden van de chatbot.
           </p>
           <div
             className="mt-3 flex flex-wrap gap-2"
@@ -420,7 +428,7 @@ export function AiPanel({
 
         <div className="mb-3 hidden gap-6 text-xs font-medium text-muted-foreground xl:grid xl:grid-cols-12">
           <div className="xl:col-span-5">Voorbeeld (optioneel)</div>
-          <div className="xl:col-span-7">Dit leest de assistent (niet zichtbaar voor klanten)</div>
+          <div className="xl:col-span-7">Dit leest de chatbot (niet zichtbaar voor klanten)</div>
         </div>
 
         <div className="grid gap-5 xl:grid-cols-12 xl:gap-6">
@@ -443,14 +451,14 @@ export function AiPanel({
           </div>
           <div className="min-w-0 xl:col-span-7">
             <p className="mb-2 text-xs font-medium text-muted-foreground xl:hidden">
-              Dit leest de assistent (niet zichtbaar voor klanten)
+              Dit leest de chatbot (niet zichtbaar voor klanten)
             </p>
             <AiScriptField
               editorRef={followRef}
               inputId="follow-edit"
               title="Extra teamregels"
               tag="Alleen intern"
-              hint="Alleen voor collega’s en de assistent — klanten zien dit niet."
+              hint="Alleen voor collega’s en de chatbot — klanten zien dit niet."
               value={followNote}
               onChange={onFollowChange}
               rows={3}
@@ -484,7 +492,7 @@ export function AiPanel({
       ) : null}
       {state.ok ? (
         <p className="rounded-lg border border-primary/25 bg-primary/[0.08] px-3 py-2 text-sm text-primary">
-          Opgeslagen. Je AI gebruikt direct deze instellingen.
+          Opgeslagen. Je chatbot gebruikt dit meteen.
         </p>
       ) : null}
       <div className="flex flex-col gap-3 border-t border-border/40 pt-3 sm:flex-row sm:items-center sm:justify-between dark:border-white/[0.06]">

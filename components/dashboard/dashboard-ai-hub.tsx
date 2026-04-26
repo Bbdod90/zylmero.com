@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, BookMarked, Inbox, Link2, Sparkles } from "lucide-react";
+import { ArrowUpRight, Bot, Inbox, Link2 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BRAND_NAME } from "@/lib/brand";
@@ -11,22 +11,15 @@ type HubLink = {
   icon: LucideIcon;
 };
 
-/** Centrale springplank: AI-assistent, kennis en kanalen — niet een chatbot-bouwer, maar antwoorden op echte aanvragen. */
+/** Centrale springplank: chatbot, kennis en kanalen — antwoorden op echte aanvragen (WhatsApp, site, mail). */
 export function DashboardAiHub({ demoMode }: { demoMode: boolean }) {
   const links: HubLink[] = [
     {
-      href: "/dashboard/ai",
-      title: "AI-assistent",
+      href: "/dashboard/chatbot",
+      title: "Chatbot & kennis",
       description:
-        "Toon, taal en regels: zo klink je professioneel op mail en WhatsApp, ook als je druk bent.",
-      icon: Sparkles,
-    },
-    {
-      href: "/dashboard/ai-knowledge",
-      title: "AI-kennis",
-      description:
-        "Je site en praktische feiten — prijzen, uren, aanbod — zodat antwoorden bij jouw zaak passen.",
-      icon: BookMarked,
+        "Site, teksten, toon en regels op één plek — dezelfde chatbot op WhatsApp, site en mail.",
+      icon: Bot,
     },
     {
       href: "/dashboard/ai-koppelingen",
@@ -82,7 +75,7 @@ export function DashboardAiHub({ demoMode }: { demoMode: boolean }) {
         </Button>
       </div>
 
-      <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {links.map((item) => {
           const Icon = item.icon;
           return (

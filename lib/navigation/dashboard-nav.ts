@@ -1,6 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import {
-  BookMarked,
+  Bot,
   CalendarDays,
   FileText,
   Kanban,
@@ -10,7 +10,6 @@ import {
   MessageCircle,
   Settings2,
   Share2,
-  Sparkles,
   UserSearch,
   Users,
 } from "lucide-react";
@@ -32,8 +31,7 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
     id: "ai",
     label: "AI & antwoorden",
     items: [
-      { href: "/dashboard/ai", label: "AI-assistent", icon: Sparkles },
-      { href: "/dashboard/ai-knowledge", label: "AI-kennis", icon: BookMarked },
+      { href: "/dashboard/chatbot", label: "Chatbot & kennis", icon: Bot },
       { href: "/dashboard/ai-koppelingen", label: "Kanalen", icon: Link2 },
       { href: "/dashboard/socials", label: "Socials", icon: Share2 },
     ],

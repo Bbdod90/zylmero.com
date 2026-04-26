@@ -1,40 +1,6 @@
-import { getAuth } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
-import { DashboardWorkSurface } from "@/components/layout/dashboard-work-surface";
-import { PageFrame } from "@/components/layout/page-frame";
-import { AiPanel } from "@/components/settings/ai-panel";
+import { redirect } from "next/navigation";
 
-export default async function AiSettingsPage() {
-  const auth = await getAuth();
-  if (!auth.company) return null;
-  const supabase = await createClient();
-  const { data: s } = await supabase
-    .from("company_settings")
-    .select("*")
-    .eq("company_id", auth.company.id)
-    .maybeSingle();
-
-  const rawPrefs = s?.automation_preferences;
-  let automationNote = "";
-  if (rawPrefs && typeof rawPrefs === "object" && rawPrefs !== null) {
-    automationNote = String((rawPrefs as { note?: string }).note || "");
-  }
-
-  return (
-    <PageFrame
-      title="AI-assistent"
-      subtitle="Hoe je klinkt op mail en WhatsApp wanneer een klant iets vraagt — geen scenario-bouwer, wel jouw toon en regels."
-      dismissHref="/dashboard/ai-koppelingen"
-      dismissLabel="Kanalen"
-    >
-      <DashboardWorkSurface>
-        <AiPanel
-          tone={s?.tone ?? null}
-          reply_style={s?.reply_style ?? null}
-          language={s?.language || "nl"}
-          automationNote={automationNote}
-        />
-      </DashboardWorkSurface>
-    </PageFrame>
-  );
+/** Oude URL: chatbot staat op `/dashboard/chatbot`. */
+export default function AiSettingsRedirectPage() {
+  redirect("/dashboard/chatbot");
 }

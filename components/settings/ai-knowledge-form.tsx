@@ -44,6 +44,7 @@ export function AiKnowledgeForm({
   scannedPages,
   lastScannedAt,
   crawlCapped,
+  compactHero,
 }: {
   demoMode: boolean;
   initialWebsite: string;
@@ -51,6 +52,8 @@ export function AiKnowledgeForm({
   scannedPages: AiKnowledgePage[];
   lastScannedAt: string | null;
   crawlCapped: boolean;
+  /** Kleinere kop op de gecombineerde chatbot+kennis-pagina. */
+  compactHero?: boolean;
 }) {
   const [state, action] = useFormState(updateAiKnowledgeAction, initial);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -59,23 +62,44 @@ export function AiKnowledgeForm({
   return (
     <form action={action} className="mx-auto max-w-5xl space-y-6">
       <div className="cf-dashboard-panel overflow-hidden border-border/60">
-        <div className="relative border-b border-border/40 bg-gradient-to-br from-primary/[0.1] via-transparent to-accent/[0.05] px-6 py-7 sm:px-8 sm:py-8 dark:border-white/[0.06] dark:from-primary/[0.16]">
-          <div className="pointer-events-none absolute -right-20 -top-20 size-56 rounded-full bg-primary/10 blur-3xl dark:bg-primary/15" />
-          <div className="relative flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
-            <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-primary/15 text-primary shadow-sm ring-1 ring-primary/20 dark:bg-primary/20 dark:ring-primary/30">
-              <Sparkles className="size-7" strokeWidth={1.5} aria-hidden />
+        <div
+          className={cn(
+            "relative border-b border-border/40 bg-gradient-to-br from-primary/[0.1] via-transparent to-accent/[0.05] dark:border-white/[0.06] dark:from-primary/[0.16]",
+            compactHero ? "px-4 py-4 sm:px-5 sm:py-5" : "px-6 py-7 sm:px-8 sm:py-8",
+          )}
+        >
+          {!compactHero ? (
+            <div className="pointer-events-none absolute -right-20 -top-20 size-56 rounded-full bg-primary/10 blur-3xl dark:bg-primary/15" />
+          ) : null}
+          <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-5">
+            <div
+              className={cn(
+                "flex shrink-0 items-center justify-center rounded-2xl bg-primary/15 text-primary shadow-sm ring-1 ring-primary/20 dark:bg-primary/20 dark:ring-primary/30",
+                compactHero ? "size-11" : "size-14",
+              )}
+            >
+              <Sparkles
+                className={compactHero ? "size-5" : "size-7"}
+                strokeWidth={1.5}
+                aria-hidden
+              />
             </div>
-            <div className="min-w-0 flex-1 space-y-2">
+            <div className="min-w-0 flex-1 space-y-1.5">
               <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">
-                AI-training
+                {compactHero ? "Bronnen" : "AI-training"}
               </p>
-              <h2 className="text-balance text-xl font-bold tracking-tight text-foreground sm:text-2xl">
-                Train je AI op jouw site
+              <h2
+                className={cn(
+                  "text-balance font-bold tracking-tight text-foreground",
+                  compactHero ? "text-lg sm:text-xl" : "text-xl sm:text-2xl",
+                )}
+              >
+                {compactHero ? "Site & kennisbank" : "Train je AI op jouw site"}
               </h2>
               <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
-                Bij opslaan lezen we je site (incl. sitemap waar beschikbaar) en slaan we tot{" "}
-                {AI_KNOWLEDGE_MAX_PAGES} pagina&apos;s op hetzelfde domein op. De lijst met URL&apos;s staat
-                standaard dicht; klik om alles te bekijken of te verwijderen.
+                {compactHero
+                  ? `We lezen je site (max. ${AI_KNOWLEDGE_MAX_PAGES} pagina’s op hetzelfde domein) en bewaren je tekstkennisbank.`
+                  : `Bij opslaan lezen we je site (incl. sitemap waar beschikbaar) en slaan we tot ${AI_KNOWLEDGE_MAX_PAGES} pagina’s op hetzelfde domein op. De lijst met URL’s staat standaard dicht; klik om alles te bekijken of te verwijderen.`}
               </p>
             </div>
             <div className="grid grid-cols-2 gap-2 sm:w-[15.5rem]">

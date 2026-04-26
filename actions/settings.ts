@@ -378,6 +378,7 @@ export async function updateKnowledgeAction(
   if (error) return { error: error.message };
   revalidatePath("/dashboard/settings");
   revalidatePath("/dashboard/ai");
+  revalidatePath("/dashboard/chatbot");
   return { ok: true };
 }
 
@@ -503,6 +504,7 @@ export async function updateAiSettingsAction(
 
   if (error) return { error: error.message };
   revalidatePath("/dashboard/ai");
+  revalidatePath("/dashboard/chatbot");
   return { ok: true };
 }
 
@@ -573,6 +575,7 @@ export async function updateWhatsAppSettingsAction(
 
   if (error) return { error: error.message };
   revalidatePath("/dashboard/settings");
+  revalidatePath("/dashboard/ai-koppelingen");
   return { ok: true };
 }
 
@@ -734,6 +737,7 @@ export async function updateAiKnowledgeAction(
   if (error) return { error: error.message };
   revalidatePath("/dashboard/ai-knowledge");
   revalidatePath("/dashboard/ai");
+  revalidatePath("/dashboard/chatbot");
   revalidatePath("/dashboard/settings");
   return { ok: true };
 }
@@ -807,6 +811,7 @@ export async function removeAiKnowledgePageAction(
   if (error) return { error: error.message };
   revalidatePath("/dashboard/ai-knowledge");
   revalidatePath("/dashboard/ai");
+  revalidatePath("/dashboard/chatbot");
   return { ok: true };
 }
 

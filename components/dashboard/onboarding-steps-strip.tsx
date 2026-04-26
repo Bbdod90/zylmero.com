@@ -104,8 +104,8 @@ export function OnboardingStepsStrip({
           n={1}
           title="Assistent op jouw zaak afstemmen"
           hint="Vertel wat je doet, voor wie, en hoe je graag praat. Dan klinken antwoorden meteen vertrouwd."
-          href="/dashboard/ai-knowledge"
-          cta="Naar kennis & aanbod →"
+          href="/dashboard/chatbot#kennis"
+          cta="Naar chatbot & kennis →"
           status={onboarding.ai}
         />
         <StepBlock
