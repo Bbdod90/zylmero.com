@@ -23,7 +23,7 @@ export default async function AiSettingsPage() {
   return (
     <PageFrame
       title="AI-assistent"
-      subtitle="Bolletjes voor snelle keuzes, tekstvelden voor je eigen woorden — volledige breedte van je werkruimte."
+      subtitle="Voorbeelden links, definitieve tekst rechts. Alleen invullen wat je nodig hebt."
       dismissHref="/dashboard/ai-koppelingen"
       dismissLabel="AI & koppelingen"
     >

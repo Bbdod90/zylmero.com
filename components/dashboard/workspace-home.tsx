@@ -220,50 +220,60 @@ export function WorkspaceHome({
             aria-hidden
           />
 
-          <div className="relative grid gap-8 lg:grid-cols-12 lg:items-end lg:gap-10">
-            <div className="space-y-3 lg:col-span-5">
+          <div className="relative flex flex-col gap-8 lg:gap-10">
+            <div className="min-w-0 space-y-3">
               <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">
                 Workspace
               </p>
-              <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-                {greeting}
-                <span className="font-normal text-muted-foreground"> — </span>
-                <span className="text-foreground">{companyName}</span>
+              <h1
+                className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl"
+                title={`${greeting} — ${companyName}`}
+              >
+                <span className="block truncate">
+                  {greeting}
+                  <span className="font-normal text-muted-foreground"> — </span>
+                  <span className="text-foreground">{companyName}</span>
+                </span>
               </h1>
-              <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
-                Hier zie je cijfers, laatste berichten en wat er op de planning staat. Start bij{" "}
-                <Link
-                  href="/dashboard/inbox"
-                  className="font-medium text-foreground underline decoration-primary/35 underline-offset-2 hover:decoration-primary"
-                >
-                  Chat
-                </Link>{" "}
-                of werk je pijplijn bij via{" "}
-                <Link
-                  href="/dashboard/leads"
-                  className="font-medium text-foreground underline decoration-primary/35 underline-offset-2 hover:decoration-primary"
-                >
-                  Klanten
-                </Link>
-                .
-              </p>
-              <p className="text-xs font-medium capitalize text-muted-foreground/90">{today}</p>
             </div>
 
-            <div className="grid grid-cols-2 gap-2.5 sm:gap-3 lg:col-span-7 lg:grid-cols-4">
-              <StatLink href="/dashboard/leads" label="Klanten" value={snapshot.leadCount} />
-              <StatLink
-                href="/dashboard/inbox"
-                label="Gesprekken"
-                value={snapshot.conversationCount}
-              />
-              <StatLink href="/dashboard/quotes" label="Offertes" value={snapshot.quoteCount} />
-              <StatLink
-                href="/dashboard/inbox"
-                label="Meldingen"
-                value={snapshot.unreadNotifications}
-                pulse={snapshot.unreadNotifications > 0}
-              />
+            <div className="grid gap-8 lg:grid-cols-12 lg:items-end lg:gap-10">
+              <div className="space-y-3 lg:col-span-5">
+                <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
+                  Hier zie je cijfers, laatste berichten en wat er op de planning staat. Start bij{" "}
+                  <Link
+                    href="/dashboard/inbox"
+                    className="font-medium text-foreground underline decoration-primary/35 underline-offset-2 hover:decoration-primary"
+                  >
+                    Chat
+                  </Link>{" "}
+                  of werk je pijplijn bij via{" "}
+                  <Link
+                    href="/dashboard/leads"
+                    className="font-medium text-foreground underline decoration-primary/35 underline-offset-2 hover:decoration-primary"
+                  >
+                    Klanten
+                  </Link>
+                  .
+                </p>
+                <p className="text-xs font-medium capitalize text-muted-foreground/90">{today}</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2.5 sm:gap-3 lg:col-span-7 lg:grid-cols-4">
+                <StatLink href="/dashboard/leads" label="Klanten" value={snapshot.leadCount} />
+                <StatLink
+                  href="/dashboard/inbox"
+                  label="Gesprekken"
+                  value={snapshot.conversationCount}
+                />
+                <StatLink href="/dashboard/quotes" label="Offertes" value={snapshot.quoteCount} />
+                <StatLink
+                  href="/dashboard/inbox"
+                  label="Meldingen"
+                  value={snapshot.unreadNotifications}
+                  pulse={snapshot.unreadNotifications > 0}
+                />
+              </div>
             </div>
           </div>
         </section>

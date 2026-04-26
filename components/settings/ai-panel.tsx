@@ -98,9 +98,7 @@ function PresetRadioList({
 }) {
   return (
     <div id={id} className="space-y-2">
-      <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-        {label}
-      </p>
+      <p className="text-xs font-semibold text-muted-foreground">{label}</p>
       <div
         role="radiogroup"
         aria-label={label}
@@ -112,7 +110,7 @@ function PresetRadioList({
   );
 }
 
-/** Rechterkolom: compact, geen dubbele knoppen — één duidelijke boodschap. */
+/** Rechterkolom: wat echt naar de AI gaat — kort, zonder ruis. */
 function AiScriptField({
   editorRef,
   inputId,
@@ -128,9 +126,9 @@ function AiScriptField({
   editorRef: RefObject<HTMLTextAreaElement>;
   inputId: string;
   title: string;
-  tag: string;
+  tag?: string;
   hint: string;
-  footnote: string;
+  footnote?: string;
   value: string;
   onChange: (v: string) => void;
   rows: number;
@@ -143,9 +141,11 @@ function AiScriptField({
           <PenLine className="size-4 shrink-0 text-primary" strokeWidth={2} aria-hidden />
           <span className="text-sm font-semibold tracking-tight text-foreground">{title}</span>
         </div>
-        <span className="rounded-md border border-primary/25 bg-primary/10 px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider text-primary">
-          {tag}
-        </span>
+        {tag ? (
+          <span className="rounded-md border border-muted-foreground/20 bg-muted/50 px-2 py-0.5 text-[0.65rem] font-medium text-muted-foreground">
+            {tag}
+          </span>
+        ) : null}
       </div>
       <p className="mb-2 text-xs leading-snug text-muted-foreground">{hint}</p>
       <Label htmlFor={inputId} className="sr-only">
@@ -164,7 +164,9 @@ function AiScriptField({
           "dark:border-white/[0.12] dark:bg-white/[0.04]",
         )}
       />
-      <p className="mt-2 text-[0.65rem] leading-relaxed text-muted-foreground">{footnote}</p>
+      {footnote ? (
+        <p className="mt-2 text-[0.65rem] leading-relaxed text-muted-foreground">{footnote}</p>
+      ) : null}
     </div>
   );
 }
@@ -242,10 +244,11 @@ export function AiPanel({
               AI-assistent
             </p>
             <h2 className="mt-1 text-lg font-semibold tracking-tight text-foreground sm:text-xl">
-              Bolletje = voorbeeld · tekstveld = jouw woorden
+              Drie korte stappen
             </h2>
             <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-              Klik links een <strong className="font-medium text-foreground">rondje</strong> om een kant-en-klare tekst te zetten. Rechts pas je alles aan of vervang je het volledig — dat is wat de AI gebruikt.
+              <strong className="font-medium text-foreground">Links</strong> kies je een voorbeeld (mag je overslaan).
+              <strong className="font-medium text-foreground"> Rechts</strong> staat de tekst die de assistent echt gebruikt — typ daar gerust je eigen zinnen. Alleen invullen wat je nodig hebt is genoeg.
             </p>
           </div>
         </div>
@@ -258,16 +261,22 @@ export function AiPanel({
             <MessageCircleHeart className="size-4" strokeWidth={2} />
           </span>
           <div>
-            <h3 className="text-base font-semibold text-foreground">Stap 1 — Toon van je merk</h3>
+            <h3 className="text-base font-semibold text-foreground">Stap 1 — Toon</h3>
             <p className="mt-0.5 text-xs text-muted-foreground sm:text-sm">
-              Eén bolletje kiezen vult het veld rechts; je mag direct zelf typen zonder bolletje.
+              Hoe moet de assistent tegenover je klanten klinken?
             </p>
           </div>
         </div>
 
+        <div className="mb-3 hidden gap-6 text-xs font-medium text-muted-foreground xl:grid xl:grid-cols-12">
+          <div className="xl:col-span-5">Voorbeeld (optioneel)</div>
+          <div className="xl:col-span-7">Dit leest de assistent</div>
+        </div>
+
         <div className="grid gap-5 xl:grid-cols-12 xl:gap-6">
           <div className="xl:col-span-5">
-            <PresetRadioList id="tone-presets" label="Kies een basis">
+            <p className="mb-2 text-xs font-medium text-muted-foreground xl:hidden">Voorbeeld (optioneel)</p>
+            <PresetRadioList id="tone-presets" label="Kies wat bij je past">
               {AI_TONE_PRESETS.map((p) => (
                 <PresetRadioRow
                   key={p.id}
@@ -283,13 +292,12 @@ export function AiPanel({
             </PresetRadioList>
           </div>
           <div className="min-w-0 xl:col-span-7">
+            <p className="mb-2 text-xs font-medium text-muted-foreground xl:hidden">Dit leest de assistent</p>
             <AiScriptField
               editorRef={toneRef}
               inputId="tone-edit"
-              title="Tekst voor de AI"
-              tag="bewerkbaar"
-              hint="Dit is de promptregel voor toon: korter of langer, jouw woorden."
-              footnote="Tip: tik in dit veld om te bewijzen dat het vrij bewerkbaar is — je hoeft geen bolletje te gebruiken."
+              title="Toon in je eigen woorden"
+              hint="Kort of uitgebreid: beschrijf hoe de assistent moet praten."
               value={tone}
               onChange={onToneChange}
               rows={4}
@@ -306,16 +314,22 @@ export function AiPanel({
             <Languages className="size-4" strokeWidth={2} />
           </span>
           <div>
-            <h3 className="text-base font-semibold text-foreground">Stap 2 — Antwoordvorm</h3>
+            <h3 className="text-base font-semibold text-foreground">Stap 2 — Antwoorden</h3>
             <p className="mt-0.5 text-xs text-muted-foreground sm:text-sm">
-              Zelfde werkwijze. Taal van antwoorden kies je hieronder met bolletjes.
+              Hoe kort of uitgebreid, en in welke taal de assistent antwoordt.
             </p>
           </div>
         </div>
 
+        <div className="mb-3 hidden gap-6 text-xs font-medium text-muted-foreground xl:grid xl:grid-cols-12">
+          <div className="xl:col-span-5">Voorbeeld (optioneel)</div>
+          <div className="xl:col-span-7">Dit leest de assistent</div>
+        </div>
+
         <div className="grid gap-5 xl:grid-cols-12 xl:gap-6">
           <div className="xl:col-span-5">
-            <PresetRadioList id="reply-presets" label="Kies een basis">
+            <p className="mb-2 text-xs font-medium text-muted-foreground xl:hidden">Voorbeeld (optioneel)</p>
+            <PresetRadioList id="reply-presets" label="Kies wat bij je past">
               {AI_REPLY_STYLE_PRESETS.map((p) => (
                 <PresetRadioRow
                   key={p.id}
@@ -331,13 +345,12 @@ export function AiPanel({
             </PresetRadioList>
           </div>
           <div className="min-w-0 xl:col-span-7">
+            <p className="mb-2 text-xs font-medium text-muted-foreground xl:hidden">Dit leest de assistent</p>
             <AiScriptField
               editorRef={replyRef}
               inputId="reply-edit"
-              title="Instructies voor lengte & afsluiting"
-              tag="bewerkbaar"
-              hint="Beschrijf hoe lang antwoorden mogen zijn en hoe je wilt eindigen (actie, vraag, …)."
-              footnote="Ook hier: volledig overschrijven met eigen tekst is precies goed."
+              title="Lengte en afsluiting"
+              hint="Hoe lang mogen antwoorden ongeveer zijn, en hoe moet een bericht eindigen (bijv. met een vraag of een volgende stap)?"
               value={replyStyle}
               onChange={onReplyChange}
               rows={4}
@@ -347,9 +360,9 @@ export function AiPanel({
         </div>
 
         <div className="mt-5 border-t border-border/40 pt-4 dark:border-white/[0.06]">
-          <Label className="text-sm font-medium text-foreground">Taal van antwoorden</Label>
+          <Label className="text-sm font-medium text-foreground">Taal</Label>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            Klik een taal — de AI antwoordt standaard in die taal.
+            Standaardtaal voor antwoorden van de assistent.
           </p>
           <div
             className="mt-3 flex flex-wrap gap-2"
@@ -397,16 +410,23 @@ export function AiPanel({
             <StickyNote className="size-4" strokeWidth={2} />
           </span>
           <div>
-            <h3 className="text-base font-semibold text-foreground">Stap 3 — Intern voor team (optioneel)</h3>
+            <h3 className="text-base font-semibold text-foreground">Stap 3 — Alleen voor jullie team</h3>
             <p className="mt-0.5 text-xs text-muted-foreground sm:text-sm">
-              Klanten zien dit niet. Bolletje of leeg, en/of eigen regels in het veld rechts.
+              Dit komt niet in de chat bij klanten. Handig voor interne afspraken (bijv. spoed, bellen, offertes).
+              Hele stap overslaan mag.
             </p>
           </div>
         </div>
 
+        <div className="mb-3 hidden gap-6 text-xs font-medium text-muted-foreground xl:grid xl:grid-cols-12">
+          <div className="xl:col-span-5">Voorbeeld (optioneel)</div>
+          <div className="xl:col-span-7">Dit leest de assistent (niet zichtbaar voor klanten)</div>
+        </div>
+
         <div className="grid gap-5 xl:grid-cols-12 xl:gap-6">
           <div className="xl:col-span-5">
-            <PresetRadioList id="follow-presets" label="Kies een basis">
+            <p className="mb-2 text-xs font-medium text-muted-foreground xl:hidden">Voorbeeld (optioneel)</p>
+            <PresetRadioList id="follow-presets" label="Kies wat bij je past">
               {AI_FOLLOWUP_PRESETS.map((p) => (
                 <PresetRadioRow
                   key={p.id}
@@ -422,13 +442,15 @@ export function AiPanel({
             </PresetRadioList>
           </div>
           <div className="min-w-0 xl:col-span-7">
+            <p className="mb-2 text-xs font-medium text-muted-foreground xl:hidden">
+              Dit leest de assistent (niet zichtbaar voor klanten)
+            </p>
             <AiScriptField
               editorRef={followRef}
               inputId="follow-edit"
-              title="Eigen teamregels"
-              tag="intern"
-              hint="Extra afspraken voor collega’s en AI — niet zichtbaar voor klanten."
-              footnote="Leeg laten mag. Alleen bolletje kiezen mag ook. Alleen typen mag ook."
+              title="Extra teamregels"
+              tag="Alleen intern"
+              hint="Alleen voor collega’s en de assistent — klanten zien dit niet."
               value={followNote}
               onChange={onFollowChange}
               rows={3}
@@ -439,9 +461,7 @@ export function AiPanel({
       </section>
 
       <section className="rounded-xl border border-border/55 bg-muted/15 p-4 dark:border-white/[0.08]">
-        <p className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-          Checklist
-        </p>
+        <p className="text-xs font-semibold text-muted-foreground">Ter herinnering (geen verplichte velden)</p>
         <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
           {[
             "Zelfde toon op chat, mail en offerte waar het kan",
