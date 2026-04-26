@@ -21,8 +21,12 @@ import {
   ChevronDown,
   FileText,
   Globe,
+  Inbox,
   Link2,
   Loader2,
+  Mail,
+  MessageCircle,
+  Settings2,
   ShieldCheck,
   Sparkles,
   Trash2,
@@ -347,10 +351,64 @@ export function AiKnowledgeForm({
   );
 
   if (compactHero) {
+    const step1Done = scannedPages.length > 0;
     return (
-      <div className="mx-auto w-full max-w-4xl space-y-6">
+      <div className="mx-auto w-full max-w-5xl space-y-6 pb-24 sm:pb-7">
         {removeFormSlots}
-        <form action={action} className="block w-full">
+
+        <ol className="grid list-none grid-cols-1 gap-3 sm:grid-cols-3" aria-label="Stappen je chatbot">
+          <li
+            className={cn(
+              "flex gap-3 rounded-2xl border p-4 sm:flex-col sm:p-5",
+              step1Done
+                ? "border-emerald-500/35 bg-emerald-500/[0.06] dark:border-emerald-500/30"
+                : "border-primary/35 bg-primary/[0.06] dark:border-primary/30",
+            )}
+          >
+            <span
+              className={cn(
+                "flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold",
+                step1Done
+                  ? "bg-emerald-500/20 text-emerald-800 dark:text-emerald-200"
+                  : "bg-primary/20 text-primary",
+              )}
+            >
+              {step1Done ? <CheckCircle2 className="size-5" /> : "1"}
+            </span>
+            <div>
+              <p className="font-semibold text-foreground">Website → kennis</p>
+              <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground sm:text-sm">
+                {step1Done
+                  ? `${scannedPages.length} pagina’s geladen.`
+                  : "Vul je site in en klik op Site laten leren."}
+              </p>
+            </div>
+          </li>
+          <li className="flex gap-3 rounded-2xl border border-border/60 bg-card p-4 sm:flex-col sm:p-5 dark:border-white/[0.1]">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted/80 text-sm font-bold text-foreground">
+              2
+            </span>
+            <div>
+              <p className="font-semibold text-foreground">WhatsApp & e-mail</p>
+              <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground sm:text-sm">
+                Koppelen doe je in Instellingen — hieronder staan de knoppen.
+              </p>
+            </div>
+          </li>
+          <li className="flex gap-3 rounded-2xl border border-border/60 bg-card p-4 sm:flex-col sm:p-5 dark:border-white/[0.1]">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted/80 text-sm font-bold text-foreground">
+              3
+            </span>
+            <div>
+              <p className="font-semibold text-foreground">Proberen</p>
+              <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground sm:text-sm">
+                Test in Berichten of alles goed overkomt.
+              </p>
+            </div>
+          </li>
+        </ol>
+
+        <form id="zyl-kennis-form" action={action} className="block w-full">
           <div className="relative w-full overflow-hidden rounded-[1.75rem] border border-border/60 bg-card shadow-[0_24px_80px_-48px_hsl(222_47%_11%/0.45)] dark:border-white/[0.09] dark:bg-[hsl(228_28%_6%)] dark:shadow-[0_28px_90px_-40px_rgba(0,0,0,0.65)]">
           <div
             className="pointer-events-none absolute inset-0 opacity-[0.45] dark:opacity-[0.2]"
@@ -370,21 +428,15 @@ export function AiKnowledgeForm({
               <p className="flex items-start gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/[0.08] px-4 py-3 text-sm text-emerald-950 dark:border-emerald-500/25 dark:text-emerald-100/95">
                 <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-emerald-600 dark:text-emerald-400" aria-hidden />
                 <span>
-                  <span className="font-semibold">Klaar.</span> Je bot gebruikt nu deze bronnen — scroll naar de
-                  volgende stap of open Berichten om te testen.
+                  <span className="font-semibold">Klaar — stap 1 is opgeslagen.</span> Ga naar stap 2 voor WhatsApp
+                  en mail, of direct naar Berichten om te testen.
                 </span>
               </p>
             ) : null}
 
-            <div className="flex justify-center gap-2" aria-hidden>
-              <span className="size-2 rounded-full bg-primary shadow-sm shadow-primary/40" />
-              <span className="size-2 rounded-full bg-muted-foreground/20 dark:bg-white/15" />
-              <span className="size-2 rounded-full bg-muted-foreground/20 dark:bg-white/15" />
-            </div>
-
             <div className="space-y-2 text-center">
               <h2 className="text-balance text-2xl font-bold tracking-tight text-foreground sm:text-[1.65rem]">
-                Heb je een website?
+                Stap 1 — Heb je een website?
               </h2>
               <p className="mx-auto max-w-2xl text-sm leading-relaxed text-muted-foreground">
                 We lezen je publieke pagina&apos;s (tot {AI_KNOWLEDGE_MAX_PAGES} op hetzelfde domein) zodat je chatbot
@@ -433,7 +485,7 @@ export function AiKnowledgeForm({
               >
                 Geen website — werk met tekst
               </Button>
-              <div className="flex flex-col items-stretch gap-2 sm:items-end">
+              <div className="hidden flex-col items-stretch gap-2 sm:flex sm:items-end">
                 <SubmitButton disabled={demoMode} trainStyle />
                 {demoMode ? (
                   <span className="text-center text-xs font-medium text-amber-700 dark:text-amber-300/95 sm:text-right">
@@ -446,36 +498,96 @@ export function AiKnowledgeForm({
             <p className="flex items-start justify-center gap-2 text-center text-2xs text-muted-foreground sm:text-xs">
               <ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-primary opacity-80" aria-hidden />
               <span className="max-w-md">
-                Eén URL, één actie — daarna test je je bot in Berichten.
+                Sla je site op, daarna stap 2 voor WhatsApp en e-mail, of test meteen in Berichten.
               </span>
             </p>
           </div>
         </div>
-        </form>
-
-        {state?.ok ? (
           <div
-            ref={nextStepRef}
-            id="chatbot-volgende-stap"
-            className="scroll-mt-8 rounded-[1.75rem] border border-primary/25 bg-primary/[0.06] px-6 py-8 dark:border-primary/30 dark:bg-primary/[0.1] sm:px-10"
+            className="fixed bottom-0 left-0 right-0 z-30 border-t border-border/50 bg-background/95 p-3 shadow-[0_-10px_40px_-8px_rgba(0,0,0,0.12)] backdrop-blur-md dark:border-white/[0.1] dark:bg-[hsl(228_32%_6%/0.94)] sm:hidden"
+            aria-label="Snel opslaan"
           >
-            <p className="text-center text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">
-              Volgende stap
-            </p>
-            <h3 className="mt-2 text-center text-xl font-bold tracking-tight text-foreground">Test je chatbot</h3>
-            <p className="mx-auto mt-2 max-w-lg text-center text-sm text-muted-foreground">
-              Stuur een testbericht in Berichten om te zien of antwoorden kloppen met je site en extra tekst.
-            </p>
-            <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <Button asChild size="lg" className="rounded-xl px-8 font-semibold">
-                <Link href="/dashboard/inbox">Naar Berichten</Link>
-              </Button>
-              <Button asChild variant="outline" size="lg" className="rounded-xl px-6">
-                <Link href="/dashboard">Terug naar home</Link>
-              </Button>
+            <div className="mx-auto w-full max-w-5xl px-1">
+              <SubmitButton disabled={demoMode} trainStyle />
+              {demoMode ? (
+                <p className="mt-2 text-center text-xs text-amber-700">Demo — alleen lezen</p>
+              ) : null}
             </div>
           </div>
-        ) : null}
+        </form>
+
+        <section
+          className="scroll-mt-8 rounded-[1.75rem] border border-border/60 bg-card px-5 py-7 shadow-sm dark:border-white/[0.1] sm:px-8 sm:py-8"
+          id="stap-2-kanalen"
+        >
+          <p className="text-xs font-semibold uppercase tracking-wider text-primary">Stap 2</p>
+          <h3 className="mt-1 text-lg font-bold tracking-tight text-foreground sm:text-xl">
+            WhatsApp en e-mail in Zylmero
+          </h3>
+          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+            <strong className="font-medium text-foreground">E-mail: geen inlog bij Zylmero.</strong> Je wachtwoord van
+            Gmail of Outlook blijft bij jou — we lezen nergens mee. Je stelt <strong>doorsturen</strong> in bij je
+            mailhost, dan verschijnen die mails bij <span className="font-medium text-foreground">Berichten</span>.
+            WhatsApp koppel je via <strong>Meta of Twilio</strong> in je eigen account; Zylmero sluit erop aan met
+            dezelfde chatbot.
+          </p>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <Button
+              asChild
+              size="lg"
+              className="h-12 justify-center gap-2 rounded-xl px-6 font-semibold sm:min-w-[12rem]"
+            >
+              <Link href="/dashboard/settings?tab=whatsapp">
+                <MessageCircle className="size-5" aria-hidden />
+                WhatsApp koppelen
+              </Link>
+            </Button>
+            <Button
+              asChild
+              size="lg"
+              className="h-12 justify-center gap-2 rounded-xl px-6 font-semibold sm:min-w-[12rem]"
+            >
+              <Link href="/dashboard/settings?tab=email">
+                <Mail className="size-5" aria-hidden />
+                E-mail instellen
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg" className="h-12 rounded-xl font-semibold">
+              <Link href="/dashboard/settings?tab=business">
+                <Settings2 className="mr-2 size-4" aria-hidden />
+                Contactmail (Bedrijf)
+              </Link>
+            </Button>
+            <Button asChild variant="secondary" size="lg" className="h-12 rounded-xl font-semibold">
+              <Link href="/dashboard/ai-koppelingen">Overzicht koppelingen</Link>
+            </Button>
+          </div>
+        </section>
+
+        <div
+          ref={nextStepRef}
+          id="chatbot-volgende-stap"
+          className="scroll-mt-8 rounded-[1.75rem] border border-primary/25 bg-primary/[0.07] px-5 py-7 dark:border-primary/35 dark:bg-primary/[0.12] sm:px-8 sm:py-9"
+        >
+          <p className="text-xs font-semibold uppercase tracking-wider text-primary">Stap 3</p>
+          <h3 className="mt-1 text-lg font-bold tracking-tight text-foreground sm:text-xl">Echte antwoorden testen</h3>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+            {state?.ok
+              ? "Je kennis van stap 1 staat. Na WhatsApp of mail zie je gesprekken hier."
+              : "Na stap 1 (en eventueel stap 2) stuur je een test — het is dezelfde chatbot overal."}
+          </p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Button asChild size="lg" className="h-12 rounded-xl px-6 font-semibold">
+              <Link href="/dashboard/inbox">
+                <Inbox className="mr-2 size-4" aria-hidden />
+                Open Berichten
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg" className="h-12 rounded-xl">
+              <Link href="/dashboard">Home</Link>
+            </Button>
+          </div>
+        </div>
       </div>
     );
   }

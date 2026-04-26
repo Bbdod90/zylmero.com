@@ -536,19 +536,12 @@ export function SettingsTabs({
           </form>
         </TabsContent>
 
-        <TabsContent value="whatsapp" className="mt-8 space-y-5 outline-none">
+        <TabsContent value="whatsapp" className="mt-8 w-full outline-none">
           <WhatsAppSettingsForm
             channel={settings.whatsapp_channel}
             auto_reply_enabled={settings.auto_reply_enabled}
             auto_reply_delay_seconds={settings.auto_reply_delay_seconds}
           />
-          <div className="cf-dashboard-panel p-5 text-sm leading-relaxed text-muted-foreground sm:p-6">
-            <p className="font-semibold text-foreground">Koppeling afronden bij je provider</p>
-            <p className="mt-2">
-              Twilio of Meta vraagt om een paar technische gegevens op hun scherm. Die staan bij hen in de handleiding —
-              niet hier. Lukt het niet, mail ons support met je bedrijfsnaam.
-            </p>
-          </div>
         </TabsContent>
 
         <TabsContent value="email" className="mt-8 outline-none">

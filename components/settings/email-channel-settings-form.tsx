@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { CopyButton } from "@/components/growth/copy-button";
 import { FormBooleanSwitch } from "@/components/settings/form-boolean-switch";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 import { Mail } from "lucide-react";
 
 const initial: SettingsFormState = {};
@@ -59,7 +60,7 @@ export function EmailChannelSettingsForm({
     <form
       action={action}
       className={cn(
-        "cf-dashboard-panel overflow-hidden rounded-[1.35rem] border-border/55 p-0 shadow-[0_24px_64px_-40px_hsl(222_47%_11%/0.18)]",
+        "cf-dashboard-panel mx-auto w-full max-w-4xl overflow-hidden rounded-[1.35rem] border-border/55 p-0 shadow-[0_24px_64px_-40px_hsl(222_47%_11%/0.18)]",
         "space-y-0",
       )}
     >
@@ -74,13 +75,31 @@ export function EmailChannelSettingsForm({
             <h2 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">E-mail binnen laten komen</h2>
             <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-[0.9375rem]">
               Klantmail verschijnt bij <strong className="font-medium text-foreground">Berichten</strong>, net als
-              WhatsApp — dezelfde chatbot, één overzicht.
+              WhatsApp — dezelfde chatbot, één overzicht. Je vult{" "}
+              <strong className="font-medium text-foreground">geen wachtwoord</strong> in bij Zylmero: mail komt
+              binnen via <strong className="font-medium text-foreground">doorsturen</strong> vanaf je huidige
+              mailhost. Contactadres: tabblad{" "}
+              <Link
+                href="/dashboard/settings?tab=business"
+                className="font-medium text-primary underline decoration-primary/35 underline-offset-2"
+              >
+                Bedrijf
+              </Link>
+              .
             </p>
           </div>
         </header>
       </div>
 
       <div className="space-y-8 px-5 py-7 sm:px-8 sm:py-9">
+        <div className="rounded-2xl border border-sky-500/30 bg-sky-500/[0.08] px-4 py-3.5 text-sm leading-relaxed text-foreground dark:border-sky-500/25 dark:bg-sky-500/10">
+          <p className="font-semibold">Zo “log” je dus niet in op mail</p>
+          <p className="mt-1.5 text-muted-foreground">
+            Kies hieronder <span className="font-medium text-foreground">Aan</span> en stuur de instructies naar je IT
+            of webhost — zij zetten doorsturen naar Zylmero. Dat is de veilige, gebruikelijke manier; Zylmero vraagt
+            nergens je Gmail- of Microsoft-wachtwoord.
+          </p>
+        </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="rounded-xl border border-border/55 bg-gradient-to-b from-card to-muted/15 p-4 shadow-sm dark:border-white/[0.08]">

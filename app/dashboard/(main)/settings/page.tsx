@@ -44,7 +44,7 @@ export default async function SettingsPage({
   return (
     <PageFrame
       title="Instellingen"
-      subtitle="Kanalen eerst (WhatsApp, mail, widget), daarna kennis en de rest — rustig per tabblad."
+      subtitle="WhatsApp, mail, widget en meer — per tabblad. Op de WhatsApp-tab staan duidelijke stappen en knoppen."
     >
       <DashboardWorkSurface>
         <SettingsTabs
