@@ -32,7 +32,6 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
     label: "AI & antwoorden",
     items: [
       { href: "/dashboard/chatbot", label: "Je chatbot", icon: Bot },
-      { href: "/dashboard/ai-koppelingen", label: "Kanalen", icon: Link2 },
       { href: "/dashboard/socials", label: "Socials", icon: Share2 },
     ],
   },
@@ -41,6 +40,7 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
     label: "Werk",
     items: [
       { href: "/dashboard", label: "Home", icon: LayoutDashboard },
+      { href: "/dashboard/ai-koppelingen", label: "Koppelingen", icon: Link2 },
       { href: "/dashboard/inbox", label: "Chat", icon: MessageCircle },
       { href: "/dashboard/quotes", label: "Offertes", icon: FileText },
       { href: "/dashboard/leads", label: "Klanten", icon: UserSearch },

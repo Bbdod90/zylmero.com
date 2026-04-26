@@ -37,25 +37,23 @@ export default async function ChatbotPage() {
       title="Je chatbot"
       subtitle={
         <>
-          Koppel je website — je bot leest je pagina&apos;s en antwoordt daarop. WhatsApp, mail en widget:{" "}
-          <Link
-            href="/dashboard/ai-koppelingen"
-            className="font-medium text-primary underline decoration-primary/35 underline-offset-2 hover:decoration-primary"
-          >
-            Kanalen
-          </Link>
-          . Socials:{" "}
+          Koppel je website — je bot leest je pagina&apos;s en antwoordt vanuit jouw inhoud. Socials:{" "}
           <Link
             href="/dashboard/socials"
             className="font-medium text-primary underline decoration-primary/35 underline-offset-2 hover:decoration-primary"
           >
             Socials
           </Link>
+          . Test gesprekken in{" "}
+          <Link
+            href="/dashboard/inbox"
+            className="font-medium text-primary underline decoration-primary/35 underline-offset-2 hover:decoration-primary"
+          >
+            Berichten
+          </Link>
           .
         </>
       }
-      dismissHref="/dashboard/ai-koppelingen"
-      dismissLabel="Kanalen"
     >
       <DashboardWorkSurface>
         <section id="kennis" className="scroll-mt-6">

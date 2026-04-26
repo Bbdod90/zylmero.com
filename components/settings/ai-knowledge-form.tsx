@@ -1,6 +1,7 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import {
   removeAiKnowledgePageSubmitAction,
@@ -85,13 +86,25 @@ export function AiKnowledgeForm({
 }) {
   const [state, action] = useFormState(updateAiKnowledgeAction, initial);
   const fileRef = useRef<HTMLInputElement>(null);
+  const nextStepRef = useRef<HTMLDivElement | null>(null);
   const [docLength, setDocLength] = useState(initialDocument.length);
   const hasExtraText = initialDocument.trim().length > 0;
   const extraDetailsRef = useRef<HTMLDetailsElement>(null);
+  const idBase = useId().replace(/:/g, "");
+  const removeFormIdFor = (i: number) => `${idBase}-rm${i}`;
+
   useLayoutEffect(() => {
     const el = extraDetailsRef.current;
     if (el && hasExtraText) el.open = true;
   }, [hasExtraText]);
+
+  useEffect(() => {
+    if (!state?.ok) return;
+    const id = window.setTimeout(() => {
+      nextStepRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 80);
+    return () => window.clearTimeout(id);
+  }, [state?.ok]);
 
   const openExtraPanel = () => {
     const el = extraDetailsRef.current;
@@ -215,7 +228,23 @@ export function AiKnowledgeForm({
     </details>
   );
 
-  const scannedPagesBlock = (
+  /** Losse formulieren + `form=""` op knoppen: voorkomt geneste &lt;form&gt; die de hoofd-submit breekt. */
+  const removeFormSlots =
+    !demoMode && scannedPages.length > 0 ? (
+      scannedPages.map((page, i) => (
+        <form
+          key={page.url}
+          id={removeFormIdFor(i)}
+          action={removeAiKnowledgePageSubmitAction}
+          className="sr-only"
+          aria-hidden
+        >
+          <input type="hidden" name="url" value={page.url} />
+        </form>
+      ))
+    ) : null;
+
+  const buildScannedPagesBlock = (getRemoveFormId: (i: number) => string) => (
     <section
       className={cn(
         "space-y-3 rounded-2xl border border-border/50 bg-gradient-to-br from-muted/25 to-transparent p-5 dark:border-white/[0.08] dark:bg-white/[0.02] sm:p-6",
@@ -288,7 +317,7 @@ export function AiKnowledgeForm({
             </p>
           )}
           <ul className="max-h-[min(70vh,28rem)] space-y-2 overflow-y-auto border-t border-border/40 px-3 py-3 dark:border-white/[0.08]">
-            {scannedPages.map((page) => (
+            {scannedPages.map((page, i) => (
               <li
                 key={page.url}
                 className="flex flex-wrap items-start justify-between gap-3 rounded-xl border border-border/55 bg-background/70 px-3.5 py-3 dark:border-white/[0.1] dark:bg-white/[0.02]"
@@ -298,18 +327,16 @@ export function AiKnowledgeForm({
                   <p className="truncate text-2xs text-muted-foreground">{page.url}</p>
                 </div>
                 {!demoMode ? (
-                  <form action={removeAiKnowledgePageSubmitAction}>
-                    <input type="hidden" name="url" value={page.url} />
-                    <Button
-                      type="submit"
-                      variant="outline"
-                      size="sm"
-                      className="h-8 rounded-lg border-border/60 px-2.5 text-2xs dark:border-white/[0.12]"
-                    >
-                      <Trash2 className="mr-1 size-3.5" aria-hidden />
-                      Verwijderen
-                    </Button>
-                  </form>
+                  <Button
+                    type="submit"
+                    form={getRemoveFormId(i)}
+                    variant="outline"
+                    size="sm"
+                    className="h-8 rounded-lg border-border/60 px-2.5 text-2xs dark:border-white/[0.12]"
+                  >
+                    <Trash2 className="mr-1 size-3.5" aria-hidden />
+                    Verwijderen
+                  </Button>
                 ) : null}
               </li>
             ))}
@@ -321,8 +348,10 @@ export function AiKnowledgeForm({
 
   if (compactHero) {
     return (
-      <form action={action} className="mx-auto max-w-lg">
-        <div className="relative overflow-hidden rounded-[1.75rem] border border-border/60 bg-card shadow-[0_24px_80px_-48px_hsl(222_47%_11%/0.45)] dark:border-white/[0.09] dark:bg-[hsl(228_28%_6%)] dark:shadow-[0_28px_90px_-40px_rgba(0,0,0,0.65)]">
+      <div className="mx-auto w-full max-w-4xl space-y-6">
+        {removeFormSlots}
+        <form action={action} className="block w-full">
+          <div className="relative w-full overflow-hidden rounded-[1.75rem] border border-border/60 bg-card shadow-[0_24px_80px_-48px_hsl(222_47%_11%/0.45)] dark:border-white/[0.09] dark:bg-[hsl(228_28%_6%)] dark:shadow-[0_28px_90px_-40px_rgba(0,0,0,0.65)]">
           <div
             className="pointer-events-none absolute inset-0 opacity-[0.45] dark:opacity-[0.2]"
             style={{
@@ -341,8 +370,8 @@ export function AiKnowledgeForm({
               <p className="flex items-start gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/[0.08] px-4 py-3 text-sm text-emerald-950 dark:border-emerald-500/25 dark:text-emerald-100/95">
                 <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-emerald-600 dark:text-emerald-400" aria-hidden />
                 <span>
-                  <span className="font-semibold">Klaar.</span> Je bot gebruikt nu deze bronnen — test gerust in
-                  Berichten zodra je kanalen staan.
+                  <span className="font-semibold">Klaar.</span> Je bot gebruikt nu deze bronnen — scroll naar de
+                  volgende stap of open Berichten om te testen.
                 </span>
               </p>
             ) : null}
@@ -357,7 +386,7 @@ export function AiKnowledgeForm({
               <h2 className="text-balance text-2xl font-bold tracking-tight text-foreground sm:text-[1.65rem]">
                 Heb je een website?
               </h2>
-              <p className="mx-auto max-w-sm text-sm leading-relaxed text-muted-foreground">
+              <p className="mx-auto max-w-2xl text-sm leading-relaxed text-muted-foreground">
                 We lezen je publieke pagina&apos;s (tot {AI_KNOWLEDGE_MAX_PAGES} op hetzelfde domein) zodat je chatbot
                 antwoordt op basis van jouw echte inhoud — één site als bron, zonder ingewikkelde stappen.
               </p>
@@ -391,7 +420,7 @@ export function AiKnowledgeForm({
               </div>
             ) : null}
 
-            {scannedPagesBlock}
+            {buildScannedPagesBlock(removeFormIdFor)}
 
             {extraTextPanel}
 
@@ -417,17 +446,44 @@ export function AiKnowledgeForm({
             <p className="flex items-start justify-center gap-2 text-center text-2xs text-muted-foreground sm:text-xs">
               <ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-primary opacity-80" aria-hidden />
               <span className="max-w-md">
-                Eén URL, één actie — daarna koppel je kanalen en test je je bot in Berichten.
+                Eén URL, één actie — daarna test je je bot in Berichten.
               </span>
             </p>
           </div>
         </div>
-      </form>
+        </form>
+
+        {state?.ok ? (
+          <div
+            ref={nextStepRef}
+            id="chatbot-volgende-stap"
+            className="scroll-mt-8 rounded-[1.75rem] border border-primary/25 bg-primary/[0.06] px-6 py-8 dark:border-primary/30 dark:bg-primary/[0.1] sm:px-10"
+          >
+            <p className="text-center text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">
+              Volgende stap
+            </p>
+            <h3 className="mt-2 text-center text-xl font-bold tracking-tight text-foreground">Test je chatbot</h3>
+            <p className="mx-auto mt-2 max-w-lg text-center text-sm text-muted-foreground">
+              Stuur een testbericht in Berichten om te zien of antwoorden kloppen met je site en extra tekst.
+            </p>
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <Button asChild size="lg" className="rounded-xl px-8 font-semibold">
+                <Link href="/dashboard/inbox">Naar Berichten</Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="rounded-xl px-6">
+                <Link href="/dashboard">Terug naar home</Link>
+              </Button>
+            </div>
+          </div>
+        ) : null}
+      </div>
     );
   }
 
   return (
-    <form action={action} className="mx-auto max-w-5xl space-y-6">
+    <>
+      {removeFormSlots}
+      <form action={action} className="mx-auto max-w-5xl space-y-6">
       <div className="cf-dashboard-panel overflow-hidden border-border/60">
         <div className="relative border-b border-border/40 bg-gradient-to-br from-primary/[0.1] via-transparent to-accent/[0.05] px-6 py-7 dark:border-white/[0.06] dark:from-primary/[0.16] sm:px-8 sm:py-8">
           <div className="pointer-events-none absolute -right-20 -top-20 size-56 rounded-full bg-primary/10 blur-3xl dark:bg-primary/15" />
@@ -479,7 +535,7 @@ export function AiKnowledgeForm({
             </p>
           </section>
 
-          {scannedPagesBlock}
+          {buildScannedPagesBlock(removeFormIdFor)}
 
           {extraTextPanel}
 
@@ -498,5 +554,6 @@ export function AiKnowledgeForm({
         </div>
       </div>
     </form>
+    </>
   );
 }
