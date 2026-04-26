@@ -167,7 +167,7 @@ export function WhatsAppSettingsForm({
                 </a>
               </Button>
               <Button variant="outline" size="sm" className="rounded-full bg-background/70" asChild>
-                <Link href="/dashboard/chatbot">Chatbot &amp; kennis</Link>
+                <Link href="/dashboard/chatbot">Je chatbot</Link>
               </Button>
             </div>
           </div>

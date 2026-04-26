@@ -357,8 +357,8 @@ export function WorkspaceHome({
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
               <RouteTile
                 href="/dashboard/chatbot"
-                title="Chatbot & kennis"
-                hint="Site, teksten, toon"
+                title="Je chatbot"
+                hint="Koppel je website"
                 icon={Bot}
               />
               <RouteTile
@@ -397,7 +397,7 @@ export function WorkspaceHome({
             href="/dashboard/chatbot"
             className="font-medium text-foreground/80 underline decoration-border/70 underline-offset-4 transition hover:text-foreground hover:decoration-primary/50"
           >
-            Chatbot & kennis
+            Je chatbot
           </Link>
           <span className="hidden text-muted-foreground/50 sm:inline" aria-hidden>
             ·

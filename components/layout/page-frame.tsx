@@ -9,7 +9,7 @@ export function PageFrame({
   dismissLabel,
 }: {
   title: string;
-  subtitle?: string;
+  subtitle?: ReactNode;
   children: ReactNode;
   dismissHref?: string;
   dismissLabel?: string;

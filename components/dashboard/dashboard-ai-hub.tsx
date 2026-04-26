@@ -16,9 +16,9 @@ export function DashboardAiHub({ demoMode }: { demoMode: boolean }) {
   const links: HubLink[] = [
     {
       href: "/dashboard/chatbot",
-      title: "Chatbot & kennis",
+      title: "Je chatbot",
       description:
-        "Site en praktische teksten — dezelfde kennis voor je chatbot op WhatsApp, site en mail.",
+        "Koppel je website; daarna weet je bot wat er op je site staat — voor WhatsApp, site en mail.",
       icon: Bot,
     },
     {

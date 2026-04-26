@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
@@ -10,7 +11,7 @@ export function TopBar({
   dismissLabel = "Terug naar dashboard",
 }: {
   title: string;
-  subtitle?: string;
+  subtitle?: ReactNode;
   /** Sluit deze pagina (bijv. Groei) en ga terug naar het dashboard */
   dismissHref?: string;
   dismissLabel?: string;
@@ -44,9 +45,9 @@ export function TopBar({
               {title}
             </h1>
             {subtitle ? (
-              <p className="line-clamp-2 max-w-2xl text-sm font-medium leading-relaxed text-foreground/70 sm:text-[0.9375rem]">
+              <div className="line-clamp-3 max-w-2xl text-sm font-medium leading-relaxed text-foreground/70 sm:text-[0.9375rem]">
                 {subtitle}
-              </p>
+              </div>
             ) : null}
           </div>
         </div>

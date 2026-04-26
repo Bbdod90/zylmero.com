@@ -31,7 +31,7 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
     id: "ai",
     label: "AI & antwoorden",
     items: [
-      { href: "/dashboard/chatbot", label: "Chatbot & kennis", icon: Bot },
+      { href: "/dashboard/chatbot", label: "Je chatbot", icon: Bot },
       { href: "/dashboard/ai-koppelingen", label: "Kanalen", icon: Link2 },
       { href: "/dashboard/socials", label: "Socials", icon: Share2 },
     ],
