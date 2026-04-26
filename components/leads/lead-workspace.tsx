@@ -359,7 +359,7 @@ export function LeadWorkspace({
         {!demoMode ? (
           <Card className="rounded-2xl border-white/[0.06]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Contact & bron</CardTitle>
+              <CardTitle className="text-sm">Contact & herkomst</CardTitle>
             </CardHeader>
             <CardContent>
               <form
@@ -434,12 +434,12 @@ export function LeadWorkspace({
                   />
                 </div>
                 <div className="space-y-2 sm:col-span-2">
-                  <Label htmlFor="edit_source">Bron</Label>
+                  <Label htmlFor="edit_source">Herkomst</Label>
                   <Input
                     id="edit_source"
                     name="source"
                     defaultValue={lead.source || ""}
-                    placeholder="Website, WhatsApp…"
+                    placeholder="Bijv. Website, WhatsApp, Aanbeveling…"
                     className="rounded-xl"
                   />
                 </div>

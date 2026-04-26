@@ -21,6 +21,7 @@ import type { WorkspaceHomeSnapshot } from "@/lib/queries/workspace-home-snapsho
 import type { CustomerReadiness } from "@/lib/dashboard/readiness";
 import { CustomerReadinessHero } from "@/components/dashboard/customer-readiness-hero";
 import { OnboardingStepsStrip } from "@/components/dashboard/onboarding-steps-strip";
+import { SetupHintBar } from "@/components/dashboard/setup-hint-bar";
 
 function nlGreeting(): string {
   const h = new Date().getHours();
@@ -214,6 +215,7 @@ export function WorkspaceHome({
         <div className="space-y-5">
           <CustomerReadinessHero readiness={readiness} demoMode={demoMode} />
           <OnboardingStepsStrip onboarding={readiness.onboarding} />
+          <SetupHintBar readiness={readiness} demoMode={demoMode} />
         </div>
 
         <section

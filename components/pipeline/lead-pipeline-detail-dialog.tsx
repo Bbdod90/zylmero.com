@@ -16,6 +16,7 @@ import { Separator } from "@/components/ui/separator";
 import { LeadStatusMenu } from "@/components/leads/lead-status-menu";
 import { AiTagBadges } from "@/components/leads/ai-tag-badges";
 import { ExternalLink, Mail, Phone, User } from "lucide-react";
+import { labelLeadSource } from "@/lib/leads/lead-source-options";
 
 function DetailField({
   label,
@@ -126,9 +127,9 @@ export function LeadPipelineDetailDialog({
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <DetailField label="Bron">
+            <DetailField label="Herkomst">
               {lead.source ? (
-                <span>{lead.source}</span>
+                <span>{labelLeadSource(lead.source)}</span>
               ) : (
                 <span className="text-muted-foreground">—</span>
               )}

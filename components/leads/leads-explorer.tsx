@@ -23,6 +23,7 @@ import {
 import { LeadPriorityMenu } from "@/components/leads/lead-priority-menu";
 import { NewLeadDialog } from "@/components/leads/new-lead-dialog";
 import { BRAND_NAME } from "@/lib/brand";
+import { labelLeadSource } from "@/lib/leads/lead-source-options";
 
 const SOURCES = [
   "all",
@@ -150,13 +151,7 @@ export function LeadsExplorer({
             >
               {SOURCES.map((s) => (
                 <option key={s} value={s}>
-                  {s === "all"
-                    ? "Alle bronnen"
-                    : s === "Referral"
-                      ? "Doorverwijzing"
-                      : s === "Cold call"
-                        ? "Koude acquisitie"
-                        : s}
+                  {s === "all" ? "Alle herkomsten" : labelLeadSource(s)}
                 </option>
               ))}
             </select>
@@ -194,7 +189,7 @@ export function LeadsExplorer({
             <TableHeader>
               <TableRow className="border-b border-border/40 dark:border-white/[0.06]">
                 <TableHead className="h-11 pl-6 text-2xs uppercase tracking-[0.13em] text-muted-foreground sm:pl-7">Naam</TableHead>
-                <TableHead className="h-11 text-2xs uppercase tracking-[0.13em] text-muted-foreground">Bron</TableHead>
+                <TableHead className="h-11 text-2xs uppercase tracking-[0.13em] text-muted-foreground">Herkomst</TableHead>
                 <TableHead className="h-11 text-2xs uppercase tracking-[0.13em] text-muted-foreground">Status</TableHead>
                 <TableHead className="h-11 text-2xs uppercase tracking-[0.13em] text-muted-foreground">Prioriteit</TableHead>
                 <TableHead className="h-11 text-2xs uppercase tracking-[0.13em] text-muted-foreground">Score</TableHead>
@@ -231,8 +226,11 @@ export function LeadsExplorer({
                         {l.full_name}
                       </span>
                     </TableCell>
-                    <TableCell className="max-w-[10rem] min-w-0 truncate py-3.5 text-muted-foreground" title={l.source || ""}>
-                      {l.source || "—"}
+                    <TableCell
+                      className="max-w-[10rem] min-w-0 truncate py-3.5 text-muted-foreground"
+                      title={labelLeadSource(l.source)}
+                    >
+                      {labelLeadSource(l.source)}
                     </TableCell>
                     <TableCell
                       className="min-w-0 max-w-[11rem] py-3.5"
