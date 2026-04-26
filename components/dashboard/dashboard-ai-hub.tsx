@@ -1,12 +1,6 @@
 import Link from "next/link";
-import {
-  ArrowUpRight,
-  Brain,
-  Inbox,
-  MessageSquare,
-  Sparkles,
-  Users,
-} from "lucide-react";
+import { ArrowUpRight, BookMarked, Inbox, Link2, Sparkles } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BRAND_NAME } from "@/lib/brand";
 
@@ -14,52 +8,39 @@ type HubLink = {
   href: string;
   title: string;
   description: string;
-  icon: typeof Brain;
+  icon: LucideIcon;
 };
 
-export function DashboardAiHub({
-  demoMode,
-  priorityLeadId,
-}: {
-  demoMode: boolean;
-  /** Beste lead voor “open in workspace” (AI-acties op de lead-pagina). */
-  priorityLeadId: string | null;
-}) {
-  const leadHref = priorityLeadId
-    ? `/dashboard/leads/${priorityLeadId}`
-    : "/dashboard/leads";
-
+/** Centrale springplank: AI-assistent, kennis en kanalen — niet een chatbot-bouwer, maar antwoorden op echte aanvragen. */
+export function DashboardAiHub({ demoMode }: { demoMode: boolean }) {
   const links: HubLink[] = [
     {
-      href: "/dashboard/ai-koppelingen",
-      title: "AI & koppelingen",
-      description: `Train ${BRAND_NAME}, koppel WhatsApp, mail en widget — alles in Berichten.`,
-      icon: Brain,
-    },
-    {
       href: "/dashboard/ai",
-      title: "Toon & antwoordstijl",
-      description: "Hoe klinkt je AI in concepten en auto-antwoorden.",
+      title: "AI-assistent",
+      description:
+        "Toon, taal en regels: zo klink je professioneel op mail en WhatsApp, ook als je druk bent.",
       icon: Sparkles,
     },
     {
-      href: "/dashboard/settings?tab=knowledge",
-      title: "Kennis voor AI",
-      description: "FAQ, prijshints en snippets die antwoorden scherper maken.",
-      icon: MessageSquare,
+      href: "/dashboard/ai-knowledge",
+      title: "AI-kennis",
+      description:
+        "Je site en praktische feiten — prijzen, uren, aanbod — zodat antwoorden bij jouw zaak passen.",
+      icon: BookMarked,
+    },
+    {
+      href: "/dashboard/ai-koppelingen",
+      title: "Kanalen",
+      description:
+        "WhatsApp, mail en site-widget op één plek. Geen gemiste appjes terwijl je op de klus zit.",
+      icon: Link2,
     },
     {
       href: "/dashboard/inbox",
       title: "Berichten",
-      description: "Open een thread en gebruik het AI-concept voor je antwoord.",
-      icon: Inbox,
-    },
-    {
-      href: leadHref,
-      title: priorityLeadId ? "Top klant (AI-acties)" : "Klanten",
       description:
-        "Samenvatting, score, AI-antwoord en slimme opvolging — per klant in het werkblad.",
-      icon: Users,
+        "Alles binnen in één wachtrij: zelf antwoorden of een AI-concept gebruiken en doorsturen.",
+      icon: Inbox,
     },
   ];
 
@@ -71,34 +52,37 @@ export function DashboardAiHub({
       <div className="flex flex-col gap-4 border-b border-border/45 pb-5 sm:flex-row sm:items-start sm:justify-between dark:border-white/[0.06]">
         <div className="min-w-0 space-y-1.5">
           <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-primary">
-            AI-assistent
+            AI & antwoorden
           </p>
           <h2
             id="dashboard-ai-hub-heading"
             className="text-lg font-semibold tracking-tight text-foreground sm:text-xl"
           >
-            Waar AI je al helpt
+            Mis geen klant omdat je het druk hebt
           </h2>
           <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            {BRAND_NAME} stuurt <strong className="font-medium text-foreground">concepten en inzichten</strong>; jij
-            blijft beslissen over verzenden, status en offertes. Gebruik deze plekken om snel naar de juiste plek te
-            springen.
+            {BRAND_NAME} is gebouwd voor zelfstandigen en kleine teams:{" "}
+            <strong className="font-medium text-foreground">
+              eerste reacties op mail en WhatsApp
+            </strong>
+            , op basis van jouw kennis — jij houdt de regie over wat er de deur uit gaat. Geen
+            eindeloos scenario-bouwen; wel sneller antwoord en minder weggelekte aanvragen.
             {demoMode ? (
               <span className="mt-1 block text-2xs text-amber-800 dark:text-amber-200/90">
-                Demo: acties gebruiken voorbeelddata waar dat zo is ingesteld.
+                Demo: voorbeelddata waar dat zo staat ingesteld.
               </span>
             ) : null}
           </p>
         </div>
         <Button variant="outline" size="sm" className="shrink-0 rounded-lg" asChild>
           <Link href="/dashboard/ai-koppelingen">
-            Volledig stappenplan
+            Kanalen koppelen
             <ArrowUpRight className="ml-1.5 size-3.5 opacity-80" aria-hidden />
           </Link>
         </Button>
       </div>
 
-      <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {links.map((item) => {
           const Icon = item.icon;
           return (

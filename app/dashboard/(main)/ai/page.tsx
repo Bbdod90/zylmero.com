@@ -23,9 +23,9 @@ export default async function AiSettingsPage() {
   return (
     <PageFrame
       title="AI-assistent"
-      subtitle="Voorbeelden links, definitieve tekst rechts. Alleen invullen wat je nodig hebt."
+      subtitle="Hoe je klinkt op mail en WhatsApp wanneer een klant iets vraagt — geen scenario-bouwer, wel jouw toon en regels."
       dismissHref="/dashboard/ai-koppelingen"
-      dismissLabel="AI & koppelingen"
+      dismissLabel="Kanalen"
     >
       <DashboardWorkSurface>
         <AiPanel

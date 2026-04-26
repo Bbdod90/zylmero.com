@@ -5,7 +5,7 @@ import {
   BookMarked,
   CalendarDays,
   FileText,
-  Kanban,
+  Link2,
   MessageCircle,
   Sparkles,
   Users,
@@ -20,6 +20,7 @@ import { cn, formatDateTime } from "@/lib/utils";
 import type { WorkspaceHomeSnapshot } from "@/lib/queries/workspace-home-snapshot";
 import type { CustomerReadiness } from "@/lib/dashboard/readiness";
 import { CustomerReadinessHero } from "@/components/dashboard/customer-readiness-hero";
+import { DashboardAiHub } from "@/components/dashboard/dashboard-ai-hub";
 import { OnboardingStepsStrip } from "@/components/dashboard/onboarding-steps-strip";
 import { SetupHintBar } from "@/components/dashboard/setup-hint-bar";
 
@@ -36,7 +37,8 @@ function PrimaryFlowDuo() {
     {
       href: "/dashboard/inbox",
       title: "Berichten",
-      description: "Hier komen vragen van klanten binnen — antwoord sneller dan je concurrent.",
+      description:
+        "Mail, WhatsApp en site in één wachtrij — zelf antwoorden of een AI-concept als start.",
       icon: MessageCircle,
     },
     {
@@ -113,11 +115,13 @@ function StatLink({
   label,
   value,
   pulse,
+  compact,
 }: {
   href: string;
   label: string;
   value: number;
   pulse?: boolean;
+  compact?: boolean;
 }) {
   return (
     <Link
@@ -137,7 +141,12 @@ function StatLink({
       <p className="text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
         {label}
       </p>
-      <p className="mt-1.5 text-xl font-semibold tabular-nums tracking-tight text-foreground sm:text-2xl">
+      <p
+        className={cn(
+          "mt-1.5 font-semibold tabular-nums tracking-tight text-foreground",
+          compact ? "text-base sm:text-lg" : "text-xl sm:text-2xl",
+        )}
+      >
         {value}
       </p>
       <p className="mt-2 text-[0.65rem] font-medium text-primary/80 opacity-0 transition-opacity group-hover:opacity-100">
@@ -209,7 +218,7 @@ export function WorkspaceHome({
   return (
     <PageFrame
       title={companyName}
-      subtitle="Jouw centrale plek voor aanvragen, berichten en vervolg — overzichtelijk en rustig gehouden."
+      subtitle="AI die mail en WhatsApp voor je opvangt als je druk bent — minder gemiste aanvragen, dezelfde persoonlijke toon."
     >
       <DashboardWorkSurface>
         <div className="space-y-5">
@@ -218,82 +227,14 @@ export function WorkspaceHome({
           <SetupHintBar readiness={readiness} demoMode={demoMode} />
         </div>
 
-        <section
-          className={cn(
-            "relative overflow-hidden rounded-[1.5rem] border border-border/55 p-5 sm:p-7",
-            "bg-gradient-to-br from-card via-card/92 to-muted/18",
-            "shadow-[0_32px_88px_-52px_hsl(222_47%_11%/0.35),0_1px_0_0_hsl(0_0%_100%/0.65)_inset] dark:border-white/[0.1] dark:from-[hsl(222_30%_13%/0.97)] dark:via-[hsl(222_28%_11%/0.95)] dark:to-[hsl(228_32%_8%/0.9)] dark:shadow-[0_36px_96px_-48px_rgb(0_0_0/0.55),0_1px_0_0_hsl(220_14%_18%/0.35)_inset]",
-          )}
-        >
-          <div
-            className="pointer-events-none absolute -right-20 -top-28 size-72 rounded-full bg-primary/[0.11] blur-3xl dark:bg-primary/[0.16]"
-            aria-hidden
-          />
-          <div
-            className="pointer-events-none absolute -bottom-24 left-1/4 size-48 rounded-full bg-primary/[0.06] blur-2xl"
-            aria-hidden
-          />
+        <div className="mt-6 sm:mt-8">
+          <DashboardAiHub demoMode={demoMode} />
+        </div>
 
-          <div className="relative flex flex-col gap-8 lg:gap-10">
-            <div className="min-w-0 space-y-3">
-              <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">Vandaag</p>
-              <h1
-                className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl"
-                title={`${greeting} — ${companyName}`}
-              >
-                <span className="block truncate">
-                  {greeting}
-                  <span className="font-normal text-muted-foreground"> — </span>
-                  <span className="text-foreground">{companyName}</span>
-                </span>
-              </h1>
-            </div>
-
-            <div className="grid gap-8 lg:grid-cols-12 lg:items-end lg:gap-10">
-              <div className="space-y-3 lg:col-span-5">
-                <p className="max-w-md text-sm font-medium leading-relaxed text-foreground/70">
-                  Hier zie je in één oogopslag wat er speelt. Spring naar{" "}
-                  <Link
-                    href="/dashboard/inbox"
-                    className="font-semibold text-foreground underline decoration-primary/40 underline-offset-[3px] hover:decoration-primary"
-                  >
-                    Berichten
-                  </Link>{" "}
-                  voor antwoorden, of naar{" "}
-                  <Link
-                    href="/dashboard/leads"
-                    className="font-semibold text-foreground underline decoration-primary/40 underline-offset-[3px] hover:decoration-primary"
-                  >
-                    Klanten
-                  </Link>{" "}
-                  om opvolging bij te houden.
-                </p>
-                <p className="text-xs font-medium capitalize text-muted-foreground/90">{today}</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2.5 sm:gap-3 lg:col-span-7 lg:grid-cols-4">
-                <StatLink href="/dashboard/leads" label="Klanten" value={snapshot.leadCount} />
-                <StatLink
-                  href="/dashboard/inbox"
-                  label="Gesprekken"
-                  value={snapshot.conversationCount}
-                />
-                <StatLink href="/dashboard/quotes" label="Offertes" value={snapshot.quoteCount} />
-                <StatLink
-                  href="/dashboard/inbox"
-                  label="Meldingen"
-                  value={snapshot.unreadNotifications}
-                  pulse={snapshot.unreadNotifications > 0}
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <div className="space-y-6 sm:space-y-7">
+        <div className="mt-6 space-y-6 sm:mt-8 sm:space-y-7">
           <div>
             <p className="mb-2.5 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              Snel aan de slag
+              Inbox & offertes
             </p>
             <PrimaryFlowDuo />
           </div>
@@ -353,34 +294,90 @@ export function WorkspaceHome({
             </div>
           </div>
 
+          <section
+            className={cn(
+              "relative overflow-hidden rounded-2xl border border-border/50 p-4 sm:p-5",
+              "bg-gradient-to-br from-card/95 via-card/90 to-muted/12",
+              "dark:border-white/[0.09] dark:from-[hsl(222_30%_13%/0.96)] dark:via-[hsl(222_28%_11%/0.94)] dark:to-[hsl(228_32%_9%/0.88)]",
+            )}
+            aria-label="Overzicht vandaag"
+          >
+            <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between lg:gap-8">
+              <div className="min-w-0 space-y-2">
+                <p className="text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  Overzicht
+                </p>
+                <h2
+                  className="text-lg font-semibold tracking-tight text-foreground sm:text-xl"
+                  title={`${greeting} — ${companyName}`}
+                >
+                  <span className="block truncate">
+                    {greeting}
+                    <span className="font-normal text-muted-foreground"> — </span>
+                    <span className="text-foreground">{companyName}</span>
+                  </span>
+                </h2>
+                <p className="max-w-md text-xs font-medium leading-relaxed text-muted-foreground sm:text-sm">
+                  Cijfers ter referentie —{" "}
+                  <Link
+                    href="/dashboard/ai"
+                    className="font-semibold text-foreground underline decoration-primary/35 underline-offset-2 hover:decoration-primary"
+                  >
+                    stel eerst je AI in
+                  </Link>{" "}
+                  zodat binnenkomende vragen niet blijven liggen.
+                </p>
+                <p className="text-[0.65rem] font-medium capitalize text-muted-foreground/85">{today}</p>
+              </div>
+
+              <div className="grid shrink-0 grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-2.5 lg:max-w-xl">
+                <StatLink href="/dashboard/leads" label="Klanten" value={snapshot.leadCount} compact />
+                <StatLink
+                  href="/dashboard/inbox"
+                  label="Gesprekken"
+                  value={snapshot.conversationCount}
+                  compact
+                />
+                <StatLink href="/dashboard/quotes" label="Offertes" value={snapshot.quoteCount} compact />
+                <StatLink
+                  href="/dashboard/inbox"
+                  label="Meldingen"
+                  value={snapshot.unreadNotifications}
+                  pulse={snapshot.unreadNotifications > 0}
+                  compact
+                />
+              </div>
+            </div>
+          </section>
+
           <div>
             <p className="mb-2.5 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              Meer
+              Snel verder
             </p>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
               <RouteTile
-                href="/dashboard/ai-koppelingen"
-                title="Koppelingen"
-                hint="WhatsApp, site, e-mail"
+                href="/dashboard/ai"
+                title="AI-assistent"
+                hint="Toon, taal, interne regels"
                 icon={Sparkles}
               />
               <RouteTile
                 href="/dashboard/ai-knowledge"
-                title="Kennis"
-                hint="Wat je assistent moet weten"
+                title="AI-kennis"
+                hint="Site + praktische teksten"
                 icon={BookMarked}
+              />
+              <RouteTile
+                href="/dashboard/ai-koppelingen"
+                title="Kanalen"
+                hint="WhatsApp, mail, widget"
+                icon={Link2}
               />
               <RouteTile
                 href="/dashboard/leads"
                 title="Klanten"
-                hint="Alle contacten en opvolging"
+                hint="Contacten en opvolging"
                 icon={Users}
-              />
-              <RouteTile
-                href="/dashboard/pipeline"
-                title="Pipeline"
-                hint="Zie waar het geld ligt"
-                icon={Kanban}
               />
             </div>
           </div>
@@ -397,10 +394,19 @@ export function WorkspaceHome({
             ·
           </span>
           <Link
+            href="/dashboard/ai"
+            className="font-medium text-foreground/80 underline decoration-border/70 underline-offset-4 transition hover:text-foreground hover:decoration-primary/50"
+          >
+            AI-assistent
+          </Link>
+          <span className="hidden text-muted-foreground/50 sm:inline" aria-hidden>
+            ·
+          </span>
+          <Link
             href="/dashboard/ai-koppelingen"
             className="font-medium text-foreground/80 underline decoration-border/70 underline-offset-4 transition hover:text-foreground hover:decoration-primary/50"
           >
-            Koppelingen
+            Kanalen
           </Link>
           <span className="hidden text-muted-foreground/50 sm:inline" aria-hidden>
             ·

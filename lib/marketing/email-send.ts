@@ -10,7 +10,15 @@ export async function sendQueuedMarketingEmail(input: {
   if (!tpl) {
     return { ok: false, error: `Onbekende template: ${input.templateKey}` };
   }
-  const subject = tpl.subject;
+  let subject = tpl.subject;
+  if (input.templateKey === "lead_broadcast") {
+    const s = input.payload?.subject;
+    if (typeof s === "string" && s.trim()) {
+      subject = s.trim().slice(0, 998);
+    } else {
+      subject = "Bericht";
+    }
+  }
   const html = tpl.html(input.payload);
 
   const key = process.env.RESEND_API_KEY;

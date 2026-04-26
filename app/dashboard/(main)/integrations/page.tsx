@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-/** Oude URL: alles staat nu onder AI & koppelingen. */
+/** Oude URL: alles staat nu onder Kanalen (AI-koppelingen). */
 export default function IntegrationsPageRedirect() {
   redirect("/dashboard/ai-koppelingen");
 }

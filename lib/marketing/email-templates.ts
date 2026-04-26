@@ -2,6 +2,14 @@
 
 import { BRAND_DEFAULT_SITE_URL, BRAND_NAME } from "@/lib/brand";
 
+export function escapeHtmlText(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
 const baseStyle = `
   body { font-family: system-ui, -apple-system, sans-serif; line-height: 1.5; color: #0f172a; }
   .wrap { max-width: 560px; margin: 0 auto; padding: 24px; }
@@ -17,6 +25,11 @@ function site() {
 
 function shell(title: string, inner: string) {
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${baseStyle}</style></head><body><div class="wrap"><h1 style="font-size:20px;">${title}</h1>${inner}<p class="muted">— Team ${BRAND_NAME}</p></div></body></html>`;
+}
+
+/** Nieuwsbrief: titel is al ge-escaped; footer is vooraf ge-escaped platte tekst (bedrijfsnaam). */
+function shellNewsletter(titleEscaped: string, innerHtml: string, footerLineHtml: string) {
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${baseStyle}</style></head><body><div class="wrap"><h1 style="font-size:20px;">${titleEscaped}</h1>${innerHtml}<p class="muted">${footerLineHtml}</p></div></body></html>`;
 }
 
 export function getTemplate(templateKey: string): {
@@ -56,6 +69,29 @@ export function getTemplate(templateKey: string): {
             <p><a class="btn" href="${s}/dashboard/upgrade">Bekijk plannen</a></p>
             <p class="muted">Later uitbreidbaar met WhatsApp-reminders.</p>`,
           ),
+      };
+    case "lead_broadcast":
+      return {
+        subject: "",
+        html: (payload: Record<string, unknown>) => {
+          const subjRaw =
+            typeof payload.subject === "string" ? payload.subject : "Bericht";
+          const title = escapeHtmlText(subjRaw.slice(0, 500));
+          const raw =
+            typeof payload.html === "string" && payload.html.trim()
+              ? payload.html
+              : "<p></p>";
+          const trimmed = raw.trim();
+          const lower = trimmed.slice(0, 10).toLowerCase();
+          const footer =
+            typeof payload.footer_line === "string" && payload.footer_line.trim()
+              ? payload.footer_line.trim()
+              : escapeHtmlText(`— ${BRAND_NAME}`);
+          if (trimmed.startsWith("<!DOCTYPE") || lower.startsWith("<html")) {
+            return trimmed;
+          }
+          return shellNewsletter(title, raw, footer);
+        },
       };
     default:
       return null;

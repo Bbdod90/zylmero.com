@@ -33,9 +33,9 @@ export default async function AiKnowledgePage() {
   return (
     <PageFrame
       title="AI-kennis"
-      subtitle="Voed je AI met site-data en praktijkkennis zodat antwoorden consistenter, professioneler en scherper worden."
+      subtitle="Wat je assistent echt moet weten — website en praktische feiten — zodat antwoorden op jouw zaak lijken, niet op een generieke bot."
       dismissHref="/dashboard/ai-koppelingen"
-      dismissLabel="AI & koppelingen"
+      dismissLabel="Kanalen"
     >
       <AiKnowledgeForm
         demoMode={demo}
