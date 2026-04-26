@@ -6,7 +6,6 @@ import {
   type SettingsFormState,
 } from "@/actions/settings";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { CopyButton } from "@/components/growth/copy-button";
 import { FormBooleanSwitch } from "@/components/settings/form-boolean-switch";
@@ -24,30 +23,6 @@ function Submit({ label }: { label: string }) {
   );
 }
 
-function ReadonlyRow({
-  label,
-  value,
-  copyText,
-  copyLabel,
-}: {
-  label: string;
-  value: string;
-  copyText: string;
-  copyLabel: string;
-}) {
-  return (
-    <div className="space-y-2">
-      <div className="flex flex-wrap items-end justify-between gap-2">
-        <Label className="text-sm font-medium text-foreground">{label}</Label>
-        <CopyButton text={copyText} label={copyLabel} />
-      </div>
-      <div className="rounded-lg border border-border/60 bg-muted/25 px-3 py-2.5 font-mono text-xs leading-relaxed text-foreground/95 shadow-inner-soft dark:border-white/[0.08]">
-        <span className="break-all">{value}</span>
-      </div>
-    </div>
-  );
-}
-
 export function EmailChannelSettingsForm({
   companyId,
   emailInboundEnabled,
@@ -61,7 +36,24 @@ export function EmailChannelSettingsForm({
 }) {
   const [state, action] = useFormState(updateEmailInboundSettingsAction, initial);
   const base = siteOrigin.replace(/\/$/, "");
-  const url = `${base}/api/webhooks/inbound-email`;
+  const inboundPath = `${base}/api/webhooks/inbound-email`;
+
+  const builderPack = [
+    "Zylmero — koppeling inkomende e-mail",
+    "",
+    "1) Zet de schakelaar hieronder aan in je Zylmero-instellingen.",
+    "2) Vul bij Bedrijf je openbare contactmail in (als die nog leeg is).",
+    "3) Laat je mailleverancier of IT inkomende mail automatisch doorsturen naar het koppel-adres hieronder.",
+    "",
+    `Koppel-adres (alleen voor technische kant):`,
+    inboundPath,
+    "",
+    `Jouw referentie in het bericht (veld company_id):`,
+    companyId,
+    "",
+    "Voorbeeldinhoud van een bericht:",
+    `{ "company_id": "${companyId}", "from": "klant@voorbeeld.nl", "from_name": "Jan", "subject": "Vraag", "body": "…" }`,
+  ].join("\n");
 
   return (
     <form action={action} className="cf-dashboard-panel space-y-8 p-6 sm:p-8 lg:p-9">
@@ -70,107 +62,68 @@ export function EmailChannelSettingsForm({
           <Mail className="size-5" aria-hidden />
         </div>
         <div className="min-w-0 space-y-2">
-          <h2 className="text-lg font-semibold tracking-tight text-foreground">Inbound e-mail</h2>
+          <h2 className="text-lg font-semibold tracking-tight text-foreground">E-mail binnen laten komen</h2>
           <p className="text-sm leading-relaxed text-muted-foreground">
-            Koppel Mailgun, Cloudflare Email Routing, Zapier of n8n: die posten JSON naar Zylmero en berichten komen in{" "}
-            <strong className="font-medium text-foreground">Berichten</strong>. Zelfde AI auto-antwoord als bij
-            WhatsApp — daar schakel je het in.
+            Klantmail verschijnt bij <strong className="font-medium text-foreground">Berichten</strong>, net als
+            WhatsApp. Zelfde assistent — één overzicht.
           </p>
         </div>
       </header>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-xl border border-border/55 bg-gradient-to-b from-card to-muted/15 p-4 shadow-sm dark:border-white/[0.08] dark:from-card/80 dark:to-card/40">
+        <div className="rounded-xl border border-border/55 bg-gradient-to-b from-card to-muted/15 p-4 shadow-sm dark:border-white/[0.08]">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Stap 1</p>
-          <p className="mt-2 text-sm font-medium text-foreground">Bedrijfsmail</p>
-          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-            Publieke contactmail staat onder <strong className="text-foreground">Bedrijf</strong>.
-          </p>
+          <p className="mt-2 text-sm font-medium text-foreground">Contactmail invullen</p>
+          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">Die staat bij Bedrijf in je instellingen.</p>
           <p
             className={cn(
               "mt-3 text-xs font-medium",
               hasContactEmail ? "text-emerald-600 dark:text-emerald-400" : "text-amber-700 dark:text-amber-400",
             )}
           >
-            {hasContactEmail ? "Contactmail is ingevuld." : "Vul eerst je contactmail in bij Bedrijf."}
+            {hasContactEmail ? "Contactmail staat erin." : "Vul eerst je contactmail in bij Bedrijf."}
           </p>
         </div>
-        <div className="rounded-xl border border-border/55 bg-gradient-to-b from-card to-muted/15 p-4 shadow-sm dark:border-white/[0.08] dark:from-card/80 dark:to-card/40">
+        <div className="rounded-xl border border-border/55 bg-gradient-to-b from-card to-muted/15 p-4 shadow-sm dark:border-white/[0.08]">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Stap 2</p>
-          <p className="mt-2 text-sm font-medium text-foreground">Webhook aanzetten</p>
+          <p className="mt-2 text-sm font-medium text-foreground">Inkomend aanzetten</p>
           <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-            Zonder schakelaar wijzen we POST&apos;s op je endpoint af.
+            Pas als dit aan staat, verwerken we automatisch doorgestuurde mail voor jouw bedrijf.
           </p>
         </div>
-        <div className="rounded-xl border border-border/55 bg-gradient-to-b from-card to-muted/15 p-4 shadow-sm dark:border-white/[0.08] dark:from-card/80 dark:to-card/40">
+        <div className="rounded-xl border border-border/55 bg-gradient-to-b from-card to-muted/15 p-4 shadow-sm dark:border-white/[0.08]">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Stap 3</p>
-          <p className="mt-2 text-sm font-medium text-foreground">Provider configureren</p>
+          <p className="mt-2 text-sm font-medium text-foreground">Leverancier laten doorsturen</p>
           <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-            Gebruik company_id, URL en headers hieronder in je automation.
+            Gebruik de knop hieronder om alles in één keer naar je webbouwer of IT te sturen.
           </p>
         </div>
       </div>
 
-      <div className="flex flex-col gap-4 rounded-xl border border-primary/22 bg-gradient-to-br from-primary/[0.06] to-muted/10 p-5 sm:flex-row sm:items-center sm:justify-between dark:border-primary/30 dark:from-primary/[0.08] dark:to-card/30">
+      <div className="flex flex-col gap-4 rounded-xl border border-primary/22 bg-gradient-to-br from-primary/[0.06] to-muted/10 p-5 sm:flex-row sm:items-center sm:justify-between dark:border-primary/30">
         <div className="min-w-0 space-y-1">
-          <p className="text-sm font-semibold text-foreground">Inbound via webhook</p>
+          <p className="text-sm font-semibold text-foreground">Inkomende e-mail verwerken</p>
           <p className="text-xs leading-relaxed text-muted-foreground">
-            Alleen als dit aan staat accepteren we POST&apos;s voor jouw{" "}
-            <code className="rounded bg-background/80 px-1 py-0.5 font-mono text-[0.65rem] ring-1 ring-border/40">
-              company_id
-            </code>
-            .
+            Uit = we negeren automatische doorstuuracties. Aan = berichten komen bij je binnen.
           </p>
         </div>
         <FormBooleanSwitch
           name="email_inbound_enabled"
           defaultChecked={emailInboundEnabled}
-          label="Actief"
+          label="Aan"
           labelClassName="text-muted-foreground"
         />
       </div>
 
-      <div className="space-y-6">
-        <ReadonlyRow
-          label="Jouw company_id (JSON-body)"
-          value={companyId}
-          copyText={companyId}
-          copyLabel="Kopieer ID"
-        />
-        <ReadonlyRow
-          label="Endpoint"
-          value={`POST ${url}`}
-          copyText={url}
-          copyLabel="Kopieer URL"
-        />
-        <p className="text-xs leading-relaxed text-muted-foreground">
-          Authenticatie: header{" "}
-          <code className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-[0.65rem]">x-inbound-email-secret</code>,{" "}
-          <code className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-[0.65rem]">x-webhook-secret</code> of{" "}
-          <code className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-[0.65rem]">Authorization: Bearer …</code>{" "}
-          met{" "}
-          <code className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-[0.65rem]">INBOUND_EMAIL_WEBHOOK_SECRET</code>{" "}
-          (fallback:{" "}
-          <code className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-[0.65rem]">WHATSAPP_WEBHOOK_SECRET</code>
-          ).
+      <div className="rounded-xl border border-border/60 bg-muted/20 p-5 dark:border-white/[0.08]">
+        <p className="text-sm font-semibold text-foreground">Voor je webbouwer of IT</p>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          Er hoeft hier niets technisch te worden afgelezen. Kopieer het blok en mail het door — daar staat alles in wat
+          zij nodig hebben.
         </p>
-      </div>
-
-      <div className="space-y-3">
-        <p className="text-sm font-medium text-foreground">Voorbeeld JSON</p>
-        <pre className="max-h-56 overflow-auto rounded-lg border border-border/60 bg-[hsl(222_47%_6%/0.04)] p-4 font-mono text-[0.7rem] leading-relaxed text-foreground/90 shadow-inner-soft dark:border-white/[0.08] dark:bg-black/25">
-{`{
-  "company_id": "${companyId}",
-  "from": "klant@voorbeeld.nl",
-  "from_name": "Jan de Vries",
-  "subject": "Vraag over afspraak",
-  "body": "Hallo, kunnen jullie volgende week…"
-}`}
-        </pre>
-        <CopyButton
-          text={`{\n  "company_id": "${companyId}",\n  "from": "klant@voorbeeld.nl",\n  "from_name": "Jan de Vries",\n  "subject": "Vraag over afspraak",\n  "body": "Hallo, kunnen jullie volgende week…"\n}`}
-          label="Kopieer JSON"
-        />
+        <div className="mt-4">
+          <CopyButton text={builderPack} label="Kopieer instructies voor je webbouwer" />
+        </div>
       </div>
 
       <Separator className="bg-border/60" />
@@ -179,7 +132,7 @@ export function EmailChannelSettingsForm({
       {state.ok ? (
         <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">Opgeslagen.</p>
       ) : null}
-      <Submit label="E-mail inbound opslaan" />
+      <Submit label="Voorkeur opslaan" />
     </form>
   );
 }

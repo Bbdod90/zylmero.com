@@ -161,15 +161,13 @@ export function SocialHub({
 
           {!metaConfigured ? (
             <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-              OAuth is nog niet geconfigureerd op deze omgeving (
-              <code className="rounded bg-muted px-1 py-0.5">META_APP_ID</code>,{" "}
-              <code className="rounded bg-muted px-1 py-0.5">META_APP_SECRET</code>
-              ). Zie <code className="rounded bg-muted px-1 py-0.5">.env.example</code>.
+              Deze koppeling is op dit account nog niet vrijgegeven. Neem contact op met support als je Facebook of
+              Instagram gekoppeld wilt hebben.
             </p>
           ) : (
             <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-              Je wordt doorgestuurd naar Meta om toestemming te geven. Voor productie is
-              Meta App Review nodig voor messaging-scopes.
+              Je gaat naar Meta om toestemming te geven. Daarna kun je berichten vanaf je pagina&apos;s laten
+              binnenlopen bij je team.
             </p>
           )}
         </CardShell>
@@ -214,23 +212,12 @@ export function SocialHub({
       <CardShell>
         <div className="flex items-center gap-2 text-sm font-medium text-foreground">
           <Share2 className="size-4 text-primary" aria-hidden />
-          Volgende stappen
+          Handig om te weten
         </div>
         <ul className="mt-3 list-inside list-disc space-y-2 text-sm text-muted-foreground">
-          <li>
-            Supabase migratie draaien zodat{" "}
-            <code className="text-foreground/80">company_social_connections</code> bestaat.
-          </li>
-          <li>
-            Meta Developer-app aanmaken, redirect-URI:{" "}
-            <code className="break-all rounded bg-muted px-1 py-0.5 text-2xs">
-              …/api/oauth/meta/callback
-            </code>
-          </li>
-          <li>
-            Webhook voor inkomende Messenger/IG DM naar dezelfde inbox als WhatsApp
-            (vervolg).
-          </li>
+          <li>Socials vullen je zichtbaarheid aan naast WhatsApp en websitechat.</li>
+          <li>Berichten komen straks bij dezelfde plek als je andere kanalen.</li>
+          <li>Vragen over rechten of pagina&apos;s? Meta helpt je stap voor stap tijdens het koppelen.</li>
         </ul>
       </CardShell>
     </div>

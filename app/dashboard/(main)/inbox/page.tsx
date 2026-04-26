@@ -4,11 +4,14 @@ import { fetchInboxThreads } from "@/lib/queries/inbox";
 import { DashboardWorkSurface } from "@/components/layout/dashboard-work-surface";
 import { PageFrame } from "@/components/layout/page-frame";
 import { InboxWorkspace } from "@/components/inbox/inbox-workspace";
-import { EmptyState } from "@/components/ui/empty-state";
-import { MessageSquare } from "lucide-react";
+import { InboxEmptyConversion } from "@/components/inbox/inbox-empty-conversion";
 import { getDemoInboxThreads, getDemoSla } from "@/lib/demo/dashboard-data";
 import { isDemoMode } from "@/lib/env";
 import { analyzeSla } from "@/lib/queries/sla";
+import { isDemoCompanyId } from "@/lib/billing/trial";
+import { hasEffectiveProductAccess } from "@/lib/platform/host-access";
+import { mapCompanySettingsRow } from "@/lib/queries/map-company-settings";
+import { buildCustomerReadiness } from "@/lib/dashboard/readiness";
 
 export default async function InboxPage() {
   const auth = await getAuth();
@@ -20,18 +23,41 @@ export default async function InboxPage() {
     : await fetchInboxThreads(supabase, auth.company.id);
   const sla = demo ? getDemoSla() : await analyzeSla(supabase, auth.company.id);
 
+  const demoCompany = isDemoCompanyId(auth.company.id);
+  const demoMode = demo || demoCompany;
+
+  const { data: settingsRow } = await supabase
+    .from("company_settings")
+    .select("*")
+    .eq("company_id", auth.company.id)
+    .maybeSingle();
+  const mapped = mapCompanySettingsRow(settingsRow as Record<string, unknown>);
+  const web = mapped?.ai_knowledge_website?.trim() ?? "";
+  const doc = mapped?.ai_knowledge_document?.trim() ?? "";
+  const knowledgeFilled = Boolean(web && doc);
+  const websiteLive =
+    hasEffectiveProductAccess(auth.company, auth.user?.id) &&
+    Boolean(auth.company.widget_embed_token);
+
+  const readiness = buildCustomerReadiness({
+    demoMode,
+    needsAiSetup: !demoMode && !settingsRow?.ai_setup_completed_at,
+    knowledgeFilled: demoMode || knowledgeFilled,
+    websiteLive: demoMode || websiteLive,
+    whatsappConnected: Boolean(mapped?.whatsapp_channel?.connected),
+    whatsappAutoReply: Boolean(mapped?.auto_reply_enabled),
+    emailInboundEnabled: Boolean(mapped?.email_inbound_enabled),
+    hasContactEmail: Boolean(auth.company.contact_email?.trim()),
+  });
+
   return (
     <PageFrame
       title="Berichten"
-      subtitle="Gesprekken die converteren — antwoord sneller dan de concurrent."
+      subtitle="Hier komen nieuwe klanten binnen — alles op één plek."
     >
       <DashboardWorkSurface>
         {threads.length === 0 ? (
-          <EmptyState
-            icon={MessageSquare}
-            title="Nog geen gesprekken"
-            description="Je AI staat klaar om nieuwe klanten op te vangen. Zodra leads binnenkomen, verschijnen ze hier. Koppel je kanalen of voeg handmatig een lead toe."
-          />
+          <InboxEmptyConversion onboarding={readiness.onboarding} />
         ) : (
           <InboxWorkspace
             threads={threads}

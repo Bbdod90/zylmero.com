@@ -16,12 +16,12 @@ export function DashboardInboxPanel({
 }) {
   return (
     <ProDashboardCard
-      eyebrow="Inbox"
-      title="Laatste activiteit"
+      eyebrow="Berichten"
+      title="Laatste berichten"
       action={
         <Button variant="ghost" size="sm" className="h-8 rounded-full px-2 text-2xs" asChild>
           <Link href="/dashboard/inbox">
-            Open inbox
+            Alles bekijken
             <ArrowRight className="ml-1 size-3.5" aria-hidden />
           </Link>
         </Button>

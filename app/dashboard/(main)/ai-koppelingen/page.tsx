@@ -4,13 +4,13 @@ import { isDemoMode } from "@/lib/env";
 import { isDemoCompanyId } from "@/lib/billing/trial";
 import { hasEffectiveProductAccess } from "@/lib/platform/host-access";
 import { mapCompanySettingsRow } from "@/lib/queries/map-company-settings";
-import { resolveSiteUrl } from "@/lib/site-url";
 import { DashboardWorkSurface } from "@/components/layout/dashboard-work-surface";
 import { PageFrame } from "@/components/layout/page-frame";
 import {
   AiKoppelcentrumView,
   type AiKoppelcentrumProps,
 } from "@/components/dashboard/ai-koppelcentrum-view";
+import { buildCustomerReadiness } from "@/lib/dashboard/readiness";
 
 export default async function AiKoppelcentrumPage() {
   const auth = await getAuth();
@@ -38,36 +38,47 @@ export default async function AiKoppelcentrumPage() {
   }
 
   const knowledgeSummary = demoMode
-    ? "In de demo zie je voorbeelden. Met een echt account vul je hier je eigen site en teksten in."
+    ? "In de demo zie je voorbeelden. Met je eigen account vul je hier je aanbod in."
     : web && doc
-      ? "Je website-URL en aanvullende tekst staan erin. Je kunt dit altijd bijwerken voor betere antwoorden."
+      ? "Je kennis staat goed — je kunt dit altijd bijwerken."
       : web
-        ? "Je hebt een website-URL. Vul nog tekst in (uren, tarieven, aanbod) voor rijkere AI-antwoorden."
+        ? "Vul nog praktische tekst in (uren, tarieven, aanbod) voor betere antwoorden."
         : doc
-          ? "Je hebt tekst toegevoegd. Vul ook je website-URL in voor consistente verwijzingen."
-          : "Voeg de URL van je publieke site toe en plak praktische info: openingstijden, tarieven, aanbod — wat bij jouw branche past.";
+          ? "Voeg ook de link naar je website toe voor consistente antwoorden."
+          : "Vertel wat je doet, waarin je uitblinkt en hoe klanten je bereiken.";
 
   const needsAiSetup =
     !isDemoCompanyId(auth.company.id) && !settingsRow?.ai_setup_completed_at;
 
-  const ch = mapped?.whatsapp_channel;
-  const whatsappProvider = ch?.provider ?? "mock";
+  const websiteLive =
+    hasEffectiveProductAccess(auth.company, auth.user?.id) &&
+    Boolean(auth.company.widget_embed_token);
+
+  const readiness = buildCustomerReadiness({
+    demoMode,
+    needsAiSetup: !demoMode && !settingsRow?.ai_setup_completed_at,
+    knowledgeFilled: demoMode || Boolean(web && doc),
+    websiteLive: demoMode || websiteLive,
+    whatsappConnected: Boolean(mapped?.whatsapp_channel?.connected),
+    whatsappAutoReply: Boolean(mapped?.auto_reply_enabled),
+    emailInboundEnabled: Boolean(mapped?.email_inbound_enabled),
+    hasContactEmail: Boolean(auth.company.contact_email?.trim()),
+  });
 
   return (
     <PageFrame
-      title="AI & koppelingen"
-      subtitle="Kennis eerst, daarna kanalen. Alles wat je nodig hebt staat in de stappen hieronder."
+      title="Koppelingen"
+      subtitle="Laat klanten je vinden — WhatsApp, website of e-mail. Alles op één plek."
     >
       <DashboardWorkSurface>
         <AiKoppelcentrumView
           demoMode={demoMode}
-          siteOrigin={resolveSiteUrl()}
+          onboarding={readiness.onboarding}
           needsAiSetup={needsAiSetup}
           knowledgeStatus={knowledgeStatus}
           knowledgeSummary={knowledgeSummary}
-          whatsappConnected={Boolean(ch?.connected)}
+          whatsappConnected={Boolean(mapped?.whatsapp_channel?.connected)}
           whatsappAutoReply={Boolean(mapped?.auto_reply_enabled)}
-          whatsappProvider={whatsappProvider}
           hasWidgetToken={Boolean(auth.company.widget_embed_token)}
           websiteWidgetActive={hasEffectiveProductAccess(auth.company, auth.user?.id)}
           hasContactEmail={Boolean(auth.company.contact_email?.trim())}

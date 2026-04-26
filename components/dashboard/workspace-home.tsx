@@ -18,6 +18,9 @@ import { ProDashboardCard } from "@/components/dashboard/pro-dashboard-card";
 import { Button } from "@/components/ui/button";
 import { cn, formatDateTime } from "@/lib/utils";
 import type { WorkspaceHomeSnapshot } from "@/lib/queries/workspace-home-snapshot";
+import type { CustomerReadiness } from "@/lib/dashboard/readiness";
+import { CustomerReadinessHero } from "@/components/dashboard/customer-readiness-hero";
+import { OnboardingStepsStrip } from "@/components/dashboard/onboarding-steps-strip";
 
 function nlGreeting(): string {
   const h = new Date().getHours();
@@ -31,14 +34,14 @@ function PrimaryFlowDuo() {
   const cells = [
     {
       href: "/dashboard/inbox",
-      title: "Chat",
-      description: "WhatsApp, e-mail en widget — één inbox.",
+      title: "Berichten",
+      description: "Hier komen vragen van klanten binnen — antwoord sneller dan je concurrent.",
       icon: MessageCircle,
     },
     {
       href: "/dashboard/quotes",
       title: "Offertes",
-      description: "Concepten versturen en deals afronden.",
+      description: "Stuur voorstellen en rond opdrachten af.",
       icon: FileText,
     },
   ] as const;
@@ -58,7 +61,7 @@ function PrimaryFlowDuo() {
             href={href}
             className={cn(
               "group relative flex min-h-[7.5rem] flex-col justify-between gap-4 p-5 sm:p-6 md:min-h-[8.25rem]",
-              "transition-colors duration-200 hover:bg-primary/[0.045] dark:hover:bg-primary/[0.07]",
+              "transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary/[0.045] hover:shadow-md dark:hover:bg-primary/[0.07]",
             )}
           >
             <div
@@ -121,7 +124,7 @@ function StatLink({
       className={cn(
         "group relative overflow-hidden rounded-2xl border px-3 py-3.5 sm:px-4 sm:py-4",
         "border-border/55 bg-gradient-to-b from-card/95 to-muted/[0.12] shadow-sm",
-        "transition-all duration-200 hover:border-primary/35 hover:shadow-md",
+        "transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-md active:scale-[0.99]",
         "dark:border-white/[0.1] dark:from-[hsl(222_28%_12%/0.92)] dark:to-[hsl(222_32%_9%/0.5)]",
         pulse && "ring-1 ring-primary/30",
       )}
@@ -161,7 +164,7 @@ function RouteTile({
       title={hint}
       className={cn(
         "group flex flex-col items-center gap-2.5 rounded-2xl border border-border/50 bg-background/70 px-3 py-4 text-center transition-all",
-        "hover:border-primary/35 hover:bg-muted/25 hover:shadow-sm",
+        "hover:-translate-y-0.5 hover:border-primary/35 hover:bg-muted/25 hover:shadow-md active:scale-[0.98]",
         "dark:border-white/[0.08] dark:bg-white/[0.03] dark:hover:bg-white/[0.06]",
       )}
     >
@@ -186,9 +189,13 @@ function RouteTile({
 export function WorkspaceHome({
   companyName,
   snapshot,
+  readiness,
+  demoMode,
 }: {
   companyName: string;
   snapshot: WorkspaceHomeSnapshot;
+  readiness: CustomerReadiness;
+  demoMode: boolean;
 }) {
   const today = new Intl.DateTimeFormat("nl-NL", {
     weekday: "long",
@@ -201,9 +208,14 @@ export function WorkspaceHome({
   return (
     <PageFrame
       title={companyName}
-      subtitle="Overzicht, activiteit en snelle routes — alles wat je vandaag nodig hebt."
+      subtitle="Zet je kanalen live — hier zie je wat er binnenkomt en wat je vandaag doet."
     >
       <DashboardWorkSurface>
+        <div className="space-y-5">
+          <CustomerReadinessHero readiness={readiness} demoMode={demoMode} />
+          <OnboardingStepsStrip onboarding={readiness.onboarding} />
+        </div>
+
         <section
           className={cn(
             "relative overflow-hidden rounded-[1.25rem] border border-border/50 p-5 sm:p-7",
@@ -240,21 +252,21 @@ export function WorkspaceHome({
             <div className="grid gap-8 lg:grid-cols-12 lg:items-end lg:gap-10">
               <div className="space-y-3 lg:col-span-5">
                 <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
-                  Hier zie je cijfers, laatste berichten en wat er op de planning staat. Start bij{" "}
+                  Cijfers en laatste beweging. Start bij{" "}
                   <Link
                     href="/dashboard/inbox"
                     className="font-medium text-foreground underline decoration-primary/35 underline-offset-2 hover:decoration-primary"
                   >
-                    Chat
+                    Berichten
                   </Link>{" "}
-                  of werk je pijplijn bij via{" "}
+                  of werk je{" "}
                   <Link
                     href="/dashboard/leads"
                     className="font-medium text-foreground underline decoration-primary/35 underline-offset-2 hover:decoration-primary"
                   >
-                    Klanten
-                  </Link>
-                  .
+                    klanten
+                  </Link>{" "}
+                  bij.
                 </p>
                 <p className="text-xs font-medium capitalize text-muted-foreground/90">{today}</p>
               </div>
@@ -281,7 +293,7 @@ export function WorkspaceHome({
         <div className="space-y-6 sm:space-y-7">
           <div>
             <p className="mb-2.5 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              Primair
+              Snel aan de slag
             </p>
             <PrimaryFlowDuo />
           </div>
@@ -289,7 +301,7 @@ export function WorkspaceHome({
           <div className="grid gap-5 lg:grid-cols-12 lg:gap-6">
             <div className="lg:col-span-8">
               <p className="mb-2.5 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                Activiteit
+                Laatste berichten
               </p>
               <DashboardInboxPanel messages={snapshot.recentMessages} />
             </div>
@@ -343,31 +355,31 @@ export function WorkspaceHome({
 
           <div>
             <p className="mb-2.5 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              Meer routes
+              Meer
             </p>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
               <RouteTile
                 href="/dashboard/ai-koppelingen"
-                title="AI & koppelingen"
-                hint="Kennis, WhatsApp, widget, e-mail"
+                title="Koppelingen"
+                hint="WhatsApp, site, e-mail"
                 icon={Sparkles}
               />
               <RouteTile
                 href="/dashboard/ai-knowledge"
-                title="AI-kennis"
-                hint="Website en vrije tekst"
+                title="Kennis"
+                hint="Wat je assistent moet weten"
                 icon={BookMarked}
               />
               <RouteTile
                 href="/dashboard/leads"
                 title="Klanten"
-                hint="Pipeline en opvolging"
+                hint="Alle contacten en opvolging"
                 icon={Users}
               />
               <RouteTile
                 href="/dashboard/pipeline"
                 title="Pipeline"
-                hint="Fases en prioriteit"
+                hint="Zie waar het geld ligt"
                 icon={Kanban}
               />
             </div>
@@ -388,14 +400,14 @@ export function WorkspaceHome({
             href="/dashboard/ai-koppelingen"
             className="font-medium text-foreground/80 underline decoration-border/70 underline-offset-4 transition hover:text-foreground hover:decoration-primary/50"
           >
-            AI-hub
+            Koppelingen
           </Link>
           <span className="hidden text-muted-foreground/50 sm:inline" aria-hidden>
             ·
           </span>
           <span className="inline-flex items-center gap-1.5">
             <Bell className="size-3.5 opacity-70" aria-hidden />
-            Meldingen volg je in de rechterbalk of via Chat
+            Meldingen volg je in de rechterbalk of bij Berichten
           </span>
         </div>
       </DashboardWorkSurface>

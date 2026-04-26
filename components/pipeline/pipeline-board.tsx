@@ -82,14 +82,14 @@ const COLUMN_THEME: Record<
     headerGlow: "from-emerald-500/25 via-transparent to-transparent",
   },
   verloren: {
-    hint: "Gearchiveerd",
+    hint: "Niet doorgegaan",
     chip:
-      "border-border/80 bg-muted/70 text-muted-foreground dark:border-white/[0.12] dark:bg-white/[0.06]",
+      "border-rose-500/35 bg-rose-500/[0.14] text-rose-950 dark:border-rose-400/30 dark:bg-rose-500/12 dark:text-rose-100",
     dropIdle:
-      "border-border/50 bg-gradient-to-b from-muted/35 to-transparent dark:border-white/[0.08] dark:from-white/[0.03]",
+      "border-rose-500/10 bg-gradient-to-b from-rose-500/[0.06] via-muted/15 to-transparent dark:from-rose-400/[0.08] dark:via-white/[0.02]",
     dropOver:
-      "border-muted-foreground/35 bg-muted/50 shadow-[0_8px_32px_-20px_rgb(0_0_0/0.35)] dark:border-white/20",
-    headerGlow: "from-muted-foreground/15 via-transparent to-transparent",
+      "border-rose-500/40 bg-rose-500/[0.1] shadow-[0_0_0_1px_hsl(350_89%_48%/0.2),0_12px_40px_-16px_hsl(350_89%_48%/0.22)] dark:border-rose-400/45",
+    headerGlow: "from-rose-500/25 via-transparent to-transparent",
   },
 };
 
@@ -105,7 +105,7 @@ function leadStatusStrip(status: LeadStatus): string {
     case "won":
       return "from-emerald-500 via-teal-400 to-emerald-500/35";
     case "lost":
-      return "from-muted-foreground/60 via-muted-foreground/35 to-transparent";
+      return "from-rose-500 via-rose-400 to-rose-500/30";
     default:
       return "from-primary via-primary/60 to-primary/25";
   }
@@ -225,16 +225,22 @@ function LeadCard({
   );
 }
 
+function sumColumnValue(leads: Lead[]): number {
+  return leads.reduce((acc, l) => acc + (typeof l.estimated_value === "number" ? l.estimated_value : 0), 0);
+}
+
 function ColumnDrop({
   id,
   label,
   children,
   count,
+  totalValue,
 }: {
   id: PipelineColumnId;
   label: string;
   children: React.ReactNode;
   count: number;
+  totalValue: number;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: `col-${id}` });
   const theme = COLUMN_THEME[id];
@@ -254,6 +260,9 @@ function ColumnDrop({
               {label}
             </h3>
             <p className="mt-0.5 text-2xs font-medium text-muted-foreground/80">{theme.hint}</p>
+            <p className="mt-1.5 text-xs font-semibold tabular-nums tracking-tight text-foreground/95">
+              {count} {count === 1 ? "lead" : "leads"} · {formatCurrency(totalValue)}
+            </p>
           </div>
           <span
             className={cn(
@@ -437,6 +446,7 @@ export function PipelineBoard({
               id={col.id}
               label={col.label}
               count={list.length}
+              totalValue={sumColumnValue(list)}
             >
               {list.map((lead) => (
                 <LeadCard

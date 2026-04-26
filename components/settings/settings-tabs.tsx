@@ -513,38 +513,11 @@ export function SettingsTabs({
             auto_reply_enabled={settings.auto_reply_enabled}
             auto_reply_delay_seconds={settings.auto_reply_delay_seconds}
           />
-          <div className="cf-dashboard-panel p-5 text-xs leading-relaxed text-muted-foreground sm:p-6">
-            <p className="text-sm font-semibold text-foreground">Webhook-endpoint</p>
-            <Separator className="my-3 bg-border/60" />
-            <p className="break-all font-mono text-[0.8125rem] text-foreground/90">
-              POST {siteOrigin.replace(/\/$/, "")}/api/webhooks/whatsapp
-            </p>
-            <p className="mt-3">
-              Header{" "}
-              <code className="rounded-md bg-background/80 px-1.5 py-0.5 font-mono text-[0.7rem] ring-1 ring-border/50">
-                x-whatsapp-signature
-              </code>{" "}
-              of{" "}
-              <code className="rounded-md bg-background/80 px-1.5 py-0.5 font-mono text-[0.7rem] ring-1 ring-border/50">
-                Authorization: Bearer …
-              </code>{" "}
-              met{" "}
-              <code className="rounded-md bg-background/80 px-1.5 py-0.5 font-mono text-[0.7rem] ring-1 ring-border/50">
-                WHATSAPP_WEBHOOK_SECRET
-              </code>
-              . JSON:{" "}
-              <code className="rounded-md bg-background/80 px-1.5 py-0.5 font-mono text-[0.7rem] ring-1 ring-border/50">
-                company_id
-              </code>
-              ,{" "}
-              <code className="rounded-md bg-background/80 px-1.5 py-0.5 font-mono text-[0.7rem] ring-1 ring-border/50">
-                from
-              </code>
-              ,{" "}
-              <code className="rounded-md bg-background/80 px-1.5 py-0.5 font-mono text-[0.7rem] ring-1 ring-border/50">
-                body
-              </code>
-              .
+          <div className="cf-dashboard-panel p-5 text-sm leading-relaxed text-muted-foreground sm:p-6">
+            <p className="font-semibold text-foreground">Koppeling afronden bij je provider</p>
+            <p className="mt-2">
+              Twilio of Meta vraagt om een paar technische gegevens op hun scherm. Die staan bij hen in de handleiding —
+              niet hier. Lukt het niet, mail ons support met je bedrijfsnaam.
             </p>
           </div>
         </TabsContent>
@@ -578,25 +551,10 @@ export function SettingsTabs({
                   <Puzzle className="size-6" aria-hidden />
                 </div>
                 <div className="min-w-0 space-y-3">
-                  <h3 className="text-lg font-semibold tracking-tight text-foreground">
-                    Website-widget is bijna klaar
-                  </h3>
+                  <h3 className="text-lg font-semibold tracking-tight text-foreground">Websitechat is bijna beschikbaar</h3>
                   <p className="text-sm leading-relaxed text-muted-foreground">
-                    Er ontbreekt nog een technische embed-sleutel voor je account. Na een database-update verschijnt die
-                    automatisch — herlaad deze pagina. Tot die tijd kun je de rest van je instellingen gewoon gebruiken.
-                  </p>
-                  <p className="rounded-lg border border-border/50 bg-muted/30 px-3 py-2 text-2xs leading-relaxed text-muted-foreground dark:border-white/[0.08]">
-                    Voor je ontwikkelaar: kolom{" "}
-                    <code className="rounded bg-muted px-1 font-mono text-[0.65rem]">widget_embed_token</code> op{" "}
-                    <code className="font-mono text-[0.65rem]">companies</code> — migraties uit deze codebase op Supabase
-                    toepassen, daarna{" "}
-                    <code className="rounded bg-muted px-1 font-mono text-[0.65rem]">
-                      {`NOTIFY pgrst, 'reload schema';`}
-                    </code>
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Support: vermeld je bedrijfs-ID{" "}
-                    <span className="font-mono text-foreground/90">{company.id}</span>
+                    Je account wordt nog voorzien van een persoonlijke chatcode. Vernieuw deze pagina over een paar
+                    minuten. Werkt het dan nog niet? Neem contact op met support — vermeld je bedrijfsnaam.
                   </p>
                 </div>
               </div>

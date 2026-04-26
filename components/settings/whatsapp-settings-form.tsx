@@ -43,8 +43,7 @@ export function WhatsAppSettingsForm({
         <div className="min-w-0 space-y-2">
           <h2 className="text-lg font-semibold tracking-tight text-foreground">WhatsApp</h2>
           <p className="text-sm leading-relaxed text-muted-foreground">
-            Provider, verbinding en optioneel AI-conceptantwoorden. API-keys voor productie zet je in omgevingsvariabelen;
-            webhooks delen het geheim uit je server-config.
+            Kies je leverancier en zet je zakelijke nummer klaar. Automatische antwoorden staan hier ook aan of uit.
           </p>
         </div>
       </header>
@@ -54,7 +53,7 @@ export function WhatsAppSettingsForm({
           <Label htmlFor="provider" className="text-sm font-medium">
             Provider
           </Label>
-          <p className="text-xs text-muted-foreground">Kies je kanaal — inbound gebruikt het webhook-geheim op de server.</p>
+          <p className="text-xs text-muted-foreground">Kies de partij die je WhatsApp Business voor je regelt.</p>
           <select
             id="provider"
             name="provider"
@@ -71,7 +70,7 @@ export function WhatsAppSettingsForm({
           <div className="min-w-0 space-y-1">
             <p className="text-sm font-semibold text-foreground">Verbonden</p>
             <p className="text-xs leading-relaxed text-muted-foreground">
-              Zet aan als je nummer inkomende webhooks kan ontvangen.
+              Zet aan zodra je provider bevestigt dat berichten binnen mogen komen.
             </p>
           </div>
           <FormBooleanSwitch

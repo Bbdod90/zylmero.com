@@ -21,12 +21,11 @@ export function WidgetSubscriptionGate({
         </div>
         <div className="min-w-0 flex-1 space-y-3">
           <div>
-            <h3 className="text-lg font-semibold text-foreground">Website-widget live zetten</h3>
+            <h3 className="text-lg font-semibold text-foreground">Websitechat activeren</h3>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Vul <strong className="text-foreground">Kennis</strong> en <strong className="text-foreground">Bedrijf</strong>{" "}
-              in de instellingen zodat antwoorden en intake kloppen. Om het embed-script op je eigen site leads te laten
-              doorsturen naar je inbox, hoort een{" "}
-              <strong className="text-foreground">actieve proefperiode of betaald abonnement</strong>.
+              Plaats binnen een paar minuten een chat op je website die automatisch bezoekers opvangt. Daarvoor hoort een{" "}
+              <strong className="text-foreground">actieve proef of betaald plan</strong> — zo weet je zeker dat elke
+              aanvraag bij je berichten terechtkomt.
             </p>
             {trialExpiredHint ? (
               <p className="mt-3 text-sm font-medium text-amber-600 dark:text-amber-400">
@@ -36,7 +35,7 @@ export function WidgetSubscriptionGate({
           </div>
           <div className="flex flex-wrap gap-3 pt-2">
             <Button asChild className="rounded-lg px-6 font-semibold shadow-sm">
-              <Link href="/dashboard/upgrade">Plannen bekijken & activeren</Link>
+              <Link href="/dashboard/upgrade">Activeer websitechat</Link>
             </Button>
             <Button asChild variant="outline" className="rounded-lg">
               <Link href="/dashboard/settings?tab=billing">Facturatie</Link>
