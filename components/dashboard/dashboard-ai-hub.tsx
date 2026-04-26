@@ -18,7 +18,7 @@ export function DashboardAiHub({ demoMode }: { demoMode: boolean }) {
       href: "/dashboard/chatbot",
       title: "Chatbot & kennis",
       description:
-        "Site, teksten, toon en regels op één plek — dezelfde chatbot op WhatsApp, site en mail.",
+        "Site en praktische teksten — dezelfde kennis voor je chatbot op WhatsApp, site en mail.",
       icon: Bot,
     },
     {

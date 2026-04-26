@@ -5,7 +5,6 @@ import { isDemoMode } from "@/lib/env";
 import { mapCompanySettingsRow } from "@/lib/queries/map-company-settings";
 import { DashboardWorkSurface } from "@/components/layout/dashboard-work-surface";
 import { PageFrame } from "@/components/layout/page-frame";
-import { AiPanel } from "@/components/settings/ai-panel";
 import { AiKnowledgeForm } from "@/components/settings/ai-knowledge-form";
 import { cn } from "@/lib/utils";
 import type { AiKnowledgePage } from "@/lib/types";
@@ -20,12 +19,6 @@ export default async function ChatbotPage() {
     .select("*")
     .eq("company_id", auth.company.id)
     .maybeSingle();
-
-  const rawPrefs = s?.automation_preferences;
-  let automationNote = "";
-  if (rawPrefs && typeof rawPrefs === "object" && rawPrefs !== null) {
-    automationNote = String((rawPrefs as { note?: string }).note || "");
-  }
 
   const mapped = mapCompanySettingsRow((s ?? {}) as Record<string, unknown>);
   const prefs = (s?.automation_preferences as Record<string, unknown> | null) || {};
@@ -43,7 +36,7 @@ export default async function ChatbotPage() {
   return (
     <PageFrame
       title="Chatbot & kennis"
-      subtitle="Deel 1: wat je chatbot moet weten. Deel 2: hoe die praat — voor WhatsApp, je site en e-mail. Instagram via Socials."
+      subtitle="Wat je chatbot moet weten — voor WhatsApp, je site en e-mail. Kanalen koppel je apart; Instagram via Socials."
       dismissHref="/dashboard/ai-koppelingen"
       dismissLabel="Kanalen"
     >
@@ -54,27 +47,28 @@ export default async function ChatbotPage() {
             "dark:border-white/[0.08] dark:bg-white/[0.03]",
           )}
         >
-          <p className="font-semibold text-foreground">Op één plek</p>
+          <p className="font-semibold text-foreground">Zo werkt het</p>
           <p className="mt-1.5">
-            Kennis en gedrag horen bij elkaar: zo klinken antwoorden naar jouw bedrijf én kloppen de feiten.{" "}
+            Vul hier je <span className="font-medium text-foreground">website</span> en{" "}
+            <span className="font-medium text-foreground">praktische teksten</span> in. Daarmee antwoordt je chatbot
+            straks in lijn met jouw zaak.{" "}
             <Link
               href="/dashboard/ai-koppelingen"
               className="font-medium text-primary underline decoration-primary/35 underline-offset-2 hover:decoration-primary"
             >
               Kanalen
             </Link>{" "}
-            koppel je apart (WhatsApp, mail, widget).
+            (WhatsApp, mail, widget) stel je elders in.
           </p>
         </div>
 
         <section id="kennis" className="scroll-mt-6 space-y-3">
           <div className="px-0.5">
-            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">Deel 1</p>
-            <h2 className="mt-1 text-lg font-semibold tracking-tight text-foreground sm:text-xl">
+            <h2 className="text-lg font-semibold tracking-tight text-foreground sm:text-xl">
               Kennis voor je chatbot
             </h2>
             <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-              Website en praktische teksten — zodat je chatbot je aanbod, uren en prijzen snapt.
+              Website en teksten — aanbod, uren, prijzen en veelgestelde vragen.
             </p>
           </div>
           <AiKnowledgeForm
@@ -85,31 +79,6 @@ export default async function ChatbotPage() {
             lastScannedAt={lastScannedAt}
             crawlCapped={crawlCapped}
             compactHero
-          />
-        </section>
-
-        <div
-          className="my-10 border-t border-border/50 dark:border-white/[0.08]"
-          role="separator"
-          aria-hidden
-        />
-
-        <section id="gedrag" className="scroll-mt-6 space-y-3">
-          <div className="px-0.5">
-            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">Deel 2</p>
-            <h2 className="mt-1 text-lg font-semibold tracking-tight text-foreground sm:text-xl">
-              Gedrag van je chatbot
-            </h2>
-            <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-              Toon, lengte van antwoorden, taal en optioneel interne teamregels.
-            </p>
-          </div>
-          <AiPanel
-            tone={s?.tone ?? null}
-            reply_style={s?.reply_style ?? null}
-            language={s?.language || "nl"}
-            automationNote={automationNote}
-            hideIntroHeader
           />
         </section>
       </DashboardWorkSurface>

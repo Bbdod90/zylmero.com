@@ -102,8 +102,8 @@ export function OnboardingStepsStrip({
       <div className="flex flex-col gap-3 lg:flex-row lg:gap-4">
         <StepBlock
           n={1}
-          title="Assistent op jouw zaak afstemmen"
-          hint="Vertel wat je doet, voor wie, en hoe je graag praat. Dan klinken antwoorden meteen vertrouwd."
+          title="Chatbot laten weten wie je bent"
+          hint="Website en praktische info — dan snapt je chatbot je aanbod en antwoordt hij in jouw context."
           href="/dashboard/chatbot#kennis"
           cta="Naar chatbot & kennis →"
           status={onboarding.ai}
