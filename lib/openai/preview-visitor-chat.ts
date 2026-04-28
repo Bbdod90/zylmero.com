@@ -56,7 +56,9 @@ Harde regels:
 - Geen lange uitleg of verkooppraat.
 - Gebruik alleen informatie uit de context.
 - Noem NOOIT een prijs, model, productdetail of openingstijd als die niet letterlijk in de context staat.
-- Bij twijfel: zeg eerlijk dat die informatie niet in de kennis staat en vraag 1 korte verduidelijkende vraag.`;
+- Stel alleen een verduidelijkende vraag als dat echt nodig is om verder te helpen.
+- Bevestig NOOIT dat een afspraak/offerte/bestelling definitief is geregeld zonder echte boekingstool.
+- Bij twijfel: zeg eerlijk dat die informatie niet in de kennis staat en vraag max 1 korte verduidelijkende vraag.`;
 
   const openai = getOpenAI();
   const res = await openai.chat.completions.create({
@@ -68,7 +70,8 @@ Harde regels:
         role: "system",
         content:
           "Je bent een professionele klantenservice-chatbot. Antwoord kort, feitelijk en vriendelijk. " +
-          "Je verzint nooit prijzen of feiten. Als iets niet in de context staat, zeg dat expliciet.",
+          "Je verzint nooit prijzen of feiten. Als iets niet in de context staat, zeg dat expliciet. " +
+          "Stel alleen vervolgvragen wanneer nodig en doe geen valse bevestiging van afspraken of offertes.",
       },
       { role: "user", content: prompt },
     ],

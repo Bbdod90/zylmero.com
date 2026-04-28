@@ -25,6 +25,10 @@ type ChatPayload = {
   };
 };
 
+type Role = "user" | "assistant";
+
+const MAX_CRAWLED_KNOWLEDGE_CHARS = 9000;
+
 function jsonError(message: string, status = 400) {
   return NextResponse.json({ error: message }, { status, headers: CORS_HEADERS });
 }
@@ -33,39 +37,107 @@ function safeString(input: unknown): string {
   return typeof input === "string" ? input.trim() : "";
 }
 
+function asRecord(input: unknown): Record<string, unknown> {
+  return input && typeof input === "object" ? (input as Record<string, unknown>) : {};
+}
+
+function asBool(input: unknown, fallback = false): boolean {
+  return typeof input === "boolean" ? input : fallback;
+}
+
+function normalizeAnswerLength(settings: Record<string, unknown>): "kort" | "normaal" | "uitgebreid" {
+  const raw = safeString(settings.antwoord_lengte).toLowerCase();
+  if (raw === "normaal" || raw === "uitgebreid") return raw;
+  return "kort";
+}
+
+function lengthInstruction(kind: "kort" | "normaal" | "uitgebreid"): string {
+  if (kind === "uitgebreid") return "Maximaal 6 zinnen, compact en scanbaar.";
+  if (kind === "normaal") return "Maximaal 4 korte zinnen.";
+  return "Maximaal 2 korte zinnen.";
+}
+
+function truncateKnowledge(raw: string): string {
+  if (!raw) return "";
+  if (raw.length <= MAX_CRAWLED_KNOWLEDGE_CHARS) return raw;
+  return `${raw.slice(0, MAX_CRAWLED_KNOWLEDGE_CHARS)}\n\n[Ingekort om binnen context te passen]`;
+}
+
 function buildSystemPrompt(data: {
   bedrijfsOmschrijving: string;
   websiteUrl: string | null;
   extraInfo: string | null;
   openingszin: string | null;
   settings: Record<string, unknown>;
+  companySettings?: Record<string, unknown> | null;
+  history: Array<{ role: Role; content: string }>;
+  kanaal: "web" | "whatsapp" | "email";
+  currentMessage: string;
 }) {
   const doelen = (data.settings?.doelen as Record<string, unknown> | undefined) || {};
+  const companySettings = asRecord(data.companySettings);
+  const companyFaq = Array.isArray(companySettings.faq)
+    ? companySettings.faq
+        .map((row) => asRecord(row))
+        .map((row) => {
+          const q = safeString(row.q);
+          const a = safeString(row.a);
+          return q && a ? `Q: ${q}\nA: ${a}` : "";
+        })
+        .filter(Boolean)
+        .join("\n")
+    : "";
+  const companySnippets = Array.isArray(companySettings.knowledge_snippets)
+    ? companySettings.knowledge_snippets
+        .map((row) => asRecord(row))
+        .map((row) => {
+          const title = safeString(row.title);
+          const body = safeString(row.body);
+          return title && body ? `${title}: ${body}` : "";
+        })
+        .filter(Boolean)
+        .join("\n")
+    : "";
+  const companyServices = Array.isArray(companySettings.services)
+    ? companySettings.services.map((s) => safeString(s)).filter(Boolean).join(", ")
+    : "";
+  const companyHoursRaw = companySettings.business_hours;
+  const companyHours = companyHoursRaw && typeof companyHoursRaw === "object"
+    ? JSON.stringify(companyHoursRaw)
+    : "";
+  const prefs = asRecord(companySettings.automation_preferences);
+  const crawledKnowledge = truncateKnowledge(safeString(prefs.ai_knowledge_crawled_document));
+  const digestNl = safeString(prefs.ai_knowledge_digest_nl);
+  const knowledgeWebsite = safeString(prefs.ai_knowledge_website);
+  const answerLen = normalizeAnswerLength(data.settings);
   const doelRegels = [
-    doelen.vragen_beantwoorden === false ? null : "- Vragen beantwoorden",
-    doelen.klanten_helpen === false ? null : "- Klanten helpen",
-    doelen.contactaanvragen_verwerken === false ? null : "- Contact aanvragen verwerken",
+    doelen.vragen_beantwoorden === false ? null : "- Vragen beantwoorden met directe, bruikbare info",
+    doelen.klanten_helpen === false ? null : "- Klanten helpen met korte, concrete vervolgstappen",
+    doelen.contactaanvragen_verwerken === false ? null : "- Contactvraag opvangen als klant dat expliciet wil",
   ]
     .filter(Boolean)
     .join("\n");
 
-  const systemBase = `Je bent een professionele klantenservice medewerker.
+  const historyBlock = data.history
+    .slice(-10)
+    .map((m) => `${m.role === "assistant" ? "BOT" : "KLANT"}: ${m.content}`)
+    .join("\n");
+
+  const systemBase = `Je bent de website-chatbot van dit specifieke bedrijf.
 
 REGELS:
-- Antwoord altijd vriendelijk en zakelijk
-- Geef eerst een direct antwoord op de vraag
-- Houd antwoorden kort en duidelijk
-- Stel daarna een logische vervolgvraag
-- Wees behulpzaam, niet opdringerig
+- Antwoord altijd vriendelijk, duidelijk en to-the-point
+- Geef eerst het directe antwoord op de vraag van de klant
+- ${lengthInstruction(answerLen)}
+- Stel alleen een vervolgvraag als die echt nodig is om verder te helpen
+- Nooit generieke branche-tekst: pas antwoord aan op dit bedrijf en deze context
 
 BELANGRIJK:
-- Bied GEEN offerte, afspraak of actie aan tenzij de gebruiker daar expliciet om vraagt
-- Als iemand alleen informatie wil -> geef alleen informatie
-- Als iemand vraagt om contact / offerte / hulp -> dan pas actie ondernemen
-
-VOORBEELD:
-Vraag: Wat kost een fatbike?
-Antwoord: Onze fatbikes kosten vanaf EUR999. Naar welk model ben je op zoek?`;
+- Gebruik ALLEEN feiten die in de context hieronder staan (website, extra info, FAQ, snippets)
+- Noem NOOIT prijzen, openingstijden, voorraad, garanties of productdetails die niet expliciet in de context staan
+- Als info ontbreekt: zeg dat eerlijk in 1 zin en stel max 1 gerichte vraag
+- Bevestig NOOIT dat een afspraak, offerte of bestelling "geregeld" is zonder echte boekingsactie/tool
+- Als klant wil boeken maar je kunt niet boeken in deze chat: verwijs naar contact/boekingslink uit context`;
 
   const context = [
     `Bedrijfsomschrijving:\n${data.bedrijfsOmschrijving || "Niet ingevuld."}`,
@@ -73,11 +145,26 @@ Antwoord: Onze fatbikes kosten vanaf EUR999. Naar welk model ben je op zoek?`;
     data.extraInfo ? `Extra info:\n${data.extraInfo}` : "",
     data.openingszin ? `Voorkeurs-openingszin:\n${data.openingszin}` : "",
     doelRegels ? `Doelen van deze chatbot:\n${doelRegels}` : "",
+    companyServices ? `Diensten (account):\n${companyServices}` : "",
+    companyHours ? `Openingstijden (account):\n${companyHours}` : "",
+    knowledgeWebsite ? `Kennis-website (account):\n${knowledgeWebsite}` : "",
+    digestNl ? `Kennis-samenvatting (account):\n${digestNl}` : "",
+    companyFaq ? `FAQ uit account:\n${companyFaq}` : "",
+    companySnippets ? `Kennis-snippets uit account:\n${companySnippets}` : "",
+    crawledKnowledge ? `Gescrapete websitekennis:\n${crawledKnowledge}` : "",
+    historyBlock ? `Recente chatgeschiedenis:\n${historyBlock}` : "",
   ]
     .filter(Boolean)
     .join("\n\n");
 
-  return `${systemBase}\n\nCONTEXT BEDRIJF:\n${context}`;
+  return `${systemBase}
+
+Kanaal: ${data.kanaal}
+Huidige klantvraag:
+${data.currentMessage}
+
+CONTEXT BEDRIJF:
+${context}`;
 }
 
 async function resolveGesprekId(input: {
@@ -133,6 +220,17 @@ export async function POST(request: NextRequest) {
     .maybeSingle();
 
   if (chatbotError || !chatbot) return jsonError("Chatbot niet gevonden.", 404);
+  const chatbotSettings = asRecord(chatbot.settings);
+  const chatbotCompanyId = safeString(chatbot.company_id);
+  let companySettingsRow: Record<string, unknown> | null = null;
+  if (chatbotCompanyId) {
+    const { data: row } = await supabase
+      .from("company_settings")
+      .select("*")
+      .eq("company_id", chatbotCompanyId)
+      .maybeSingle();
+    companySettingsRow = row && typeof row === "object" ? (row as Record<string, unknown>) : null;
+  }
 
   const preview = body.preview_context || {};
   const bedrijfsOmschrijving = safeString(preview.bedrijfs_omschrijving) || safeString(chatbot.bedrijfs_omschrijving);
@@ -148,19 +246,39 @@ export async function POST(request: NextRequest) {
         ? (chatbot.settings as Record<string, unknown>)
         : {};
 
+  const gesprekId = await resolveGesprekId({
+    supabase,
+    chatbotId,
+    gesprekId: body.gesprek_id || null,
+    kanaal,
+  });
+
+  const { data: recentMessages } = await supabase
+    .from("berichten")
+    .select("rol, inhoud")
+    .eq("gesprek_id", gesprekId)
+    .order("created_at", { ascending: false })
+    .limit(10);
+  const history: Array<{ role: Role; content: string }> = Array.isArray(recentMessages)
+    ? recentMessages
+        .map((row) => ({
+          role: row?.rol === "bot" ? "assistant" : "user",
+          content: safeString(row?.inhoud),
+        }))
+        .filter((row) => row.content.length > 0)
+        .reverse()
+    : [];
+
   const systemPrompt = buildSystemPrompt({
     bedrijfsOmschrijving,
     websiteUrl: websiteUrl || null,
     extraInfo: extraInfo || null,
     openingszin: openingszin || null,
     settings,
-  });
-
-  const gesprekId = await resolveGesprekId({
-    supabase,
-    chatbotId,
-    gesprekId: body.gesprek_id || null,
+    companySettings: companySettingsRow,
+    history,
     kanaal,
+    currentMessage: message,
   });
 
   await supabase.from("berichten").insert({
@@ -175,7 +293,7 @@ export async function POST(request: NextRequest) {
   if (!streamMode) {
     const completion = await openai.chat.completions.create({
       model: OPENAI_MODEL,
-      temperature: 0.45,
+      temperature: 0.2,
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: message },
@@ -197,7 +315,7 @@ export async function POST(request: NextRequest) {
 
   const completion = await openai.chat.completions.create({
     model: OPENAI_MODEL,
-    temperature: 0.45,
+    temperature: 0.2,
     stream: true,
     messages: [
       { role: "system", content: systemPrompt },
