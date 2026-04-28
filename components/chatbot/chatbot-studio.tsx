@@ -6,6 +6,7 @@ import { CopyButton } from "@/components/growth/copy-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import {
   previewChatbotVisitorMessageAction,
@@ -15,6 +16,38 @@ import { CheckCircle2, Loader2, MessageCircle, SendHorizontal, Sparkles } from "
 import { cn } from "@/lib/utils";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
+
+function SettingSwitchRow({
+  title,
+  description,
+  checked,
+  onCheckedChange,
+}: {
+  title: string;
+  description: string;
+  checked: boolean;
+  onCheckedChange: (next: boolean) => void;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-4 rounded-xl border border-gray-200 bg-white px-4 py-3">
+      <div className="min-w-0">
+        <p className="text-sm font-medium text-gray-900">{title}</p>
+        <p className="text-xs text-gray-500">{description}</p>
+      </div>
+      <div className="flex shrink-0 items-center gap-2">
+        <span
+          className={cn(
+            "rounded-full px-2.5 py-1 text-xs font-semibold",
+            checked ? "bg-emerald-100 text-emerald-800" : "bg-gray-100 text-gray-600",
+          )}
+        >
+          {checked ? "Aan" : "Uit"}
+        </span>
+        <Switch checked={checked} onCheckedChange={onCheckedChange} />
+      </div>
+    </div>
+  );
+}
 
 export function ChatbotStudio(props: {
   demoMode: boolean;
@@ -196,98 +229,56 @@ export function ChatbotStudio(props: {
             <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
               Wat moet je chatbot voor klanten doen?
             </h3>
-            <label className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-3 py-2.5">
-              <input
-                type="checkbox"
-                checked={goals.vragenBeantwoorden}
-                onChange={(e) => setGoals((p) => ({ ...p, vragenBeantwoorden: e.target.checked }))}
-              />
-              <span className="text-sm text-gray-800">Algemene vragen beantwoorden</span>
-            </label>
-            <label className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-3 py-2.5">
-              <input
-                type="checkbox"
-                checked={goals.klantenHelpen}
-                onChange={(e) => setGoals((p) => ({ ...p, klantenHelpen: e.target.checked }))}
-              />
-              <span className="text-sm text-gray-800">Klanten vriendelijk helpen</span>
-            </label>
-            <label className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-3 py-2.5">
-              <input
-                type="checkbox"
-                checked={goals.contactAanvragenVerwerken}
-                onChange={(e) =>
-                  setGoals((p) => ({ ...p, contactAanvragenVerwerken: e.target.checked }))
-                }
-              />
-              <span className="text-sm text-gray-800">Contactverzoeken doorgeven</span>
-            </label>
+            <SettingSwitchRow
+              title="Algemene vragen beantwoorden"
+              description="De chatbot geeft direct antwoord op veelgestelde vragen."
+              checked={goals.vragenBeantwoorden}
+              onCheckedChange={(next) => setGoals((p) => ({ ...p, vragenBeantwoorden: next }))}
+            />
+            <SettingSwitchRow
+              title="Klanten vriendelijk helpen"
+              description="De chatbot geeft duidelijke hulp bij keuze of uitleg."
+              checked={goals.klantenHelpen}
+              onCheckedChange={(next) => setGoals((p) => ({ ...p, klantenHelpen: next }))}
+            />
+            <SettingSwitchRow
+              title="Contactverzoeken doorgeven"
+              description="De chatbot stuurt klanten richting contact als dat nodig is."
+              checked={goals.contactAanvragenVerwerken}
+              onCheckedChange={(next) =>
+                setGoals((p) => ({ ...p, contactAanvragenVerwerken: next }))
+              }
+            />
           </section>
 
           <section className="space-y-3">
             <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
               Extra opties (aan/uit)
             </h3>
-            <div className="grid gap-2 sm:grid-cols-2">
-              <Button
-                type="button"
-                variant={extraGoals.productadvies ? "secondary" : "outline"}
-                className={cn(
-                  "justify-start rounded-xl border text-sm font-medium",
-                  extraGoals.productadvies
-                    ? "border-gray-300 bg-gray-900 text-white hover:bg-gray-800 hover:text-white"
-                    : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50",
-                )}
-                onClick={() =>
-                  setExtraGoals((p) => ({ ...p, productadvies: !p.productadvies }))
-                }
-              >
-                Productadvies geven
-              </Button>
-              <Button
-                type="button"
-                variant={extraGoals.faqUitleg ? "secondary" : "outline"}
-                className={cn(
-                  "justify-start rounded-xl border text-sm font-medium",
-                  extraGoals.faqUitleg
-                    ? "border-gray-300 bg-gray-900 text-white hover:bg-gray-800 hover:text-white"
-                    : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50",
-                )}
-                onClick={() => setExtraGoals((p) => ({ ...p, faqUitleg: !p.faqUitleg }))}
-              >
-                Veelgestelde vragen uitleggen
-              </Button>
-              <Button
-                type="button"
-                variant={extraGoals.contactEscalatie ? "secondary" : "outline"}
-                className={cn(
-                  "justify-start rounded-xl border text-sm font-medium",
-                  extraGoals.contactEscalatie
-                    ? "border-gray-300 bg-gray-900 text-white hover:bg-gray-800 hover:text-white"
-                    : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50",
-                )}
-                onClick={() =>
-                  setExtraGoals((p) => ({ ...p, contactEscalatie: !p.contactEscalatie }))
-                }
-              >
-                Doorsturen naar contact
-              </Button>
-              <Button
-                type="button"
-                variant={extraGoals.afspraakOpVerzoek ? "secondary" : "outline"}
-                className={cn(
-                  "justify-start rounded-xl border text-sm font-medium",
-                  extraGoals.afspraakOpVerzoek
-                    ? "border-gray-300 bg-gray-900 text-white hover:bg-gray-800 hover:text-white"
-                    : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50",
-                )}
-                onClick={() =>
-                  setExtraGoals((p) => ({ ...p, afspraakOpVerzoek: !p.afspraakOpVerzoek }))
-                }
-              >
-                Alleen actie op verzoek
-              </Button>
-            </div>
+            <SettingSwitchRow
+              title="Productadvies geven"
+              description="De chatbot helpt klanten bij productkeuze."
+              checked={extraGoals.productadvies}
+              onCheckedChange={(next) => setExtraGoals((p) => ({ ...p, productadvies: next }))}
+            />
+            <SettingSwitchRow
+              title="Veelgestelde vragen uitleggen"
+              description="De chatbot geeft korte FAQ-uitleg als iemand vastloopt."
+              checked={extraGoals.faqUitleg}
+              onCheckedChange={(next) => setExtraGoals((p) => ({ ...p, faqUitleg: next }))}
+            />
+            <SettingSwitchRow
+              title="Doorsturen naar contact"
+              description="Bij complexe vraag verwijst de chatbot door naar contact."
+              checked={extraGoals.contactEscalatie}
+              onCheckedChange={(next) => setExtraGoals((p) => ({ ...p, contactEscalatie: next }))}
+            />
+            <SettingSwitchRow
+              title="Alleen actie op verzoek"
+              description="Geen offerte of afspraak pushen zonder expliciete vraag."
+              checked={extraGoals.afspraakOpVerzoek}
+              onCheckedChange={(next) => setExtraGoals((p) => ({ ...p, afspraakOpVerzoek: next }))}
+            />
           </section>
 
           <section className="space-y-3">
