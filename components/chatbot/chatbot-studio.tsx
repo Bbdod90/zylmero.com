@@ -322,7 +322,7 @@ export function ChatbotStudio(props: {
         </div>
       </section>
 
-      <section className="flex min-h-[690px] flex-col rounded-2xl border border-gray-200/90 bg-white shadow-[0_20px_60px_-44px_rgba(15,23,42,0.45)]">
+      <section className="flex min-h-[360px] flex-col rounded-2xl border border-gray-200/90 bg-white shadow-[0_20px_60px_-44px_rgba(15,23,42,0.45)]">
         <header className="border-b border-gray-200 px-6 py-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Live preview</p>
           <h3 className="mt-1 flex items-center gap-2 text-lg font-semibold text-gray-900">
@@ -340,7 +340,7 @@ export function ChatbotStudio(props: {
           </div>
         ) : null}
 
-        <div className="flex-1 space-y-3 overflow-y-auto bg-gray-50/70 px-6 py-4">
+        <div className="h-[190px] space-y-3 overflow-y-auto bg-gray-50/70 px-6 py-4">
           {chat.map((m, i) => (
             <div
               key={`${i}-${m.role}`}
