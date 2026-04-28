@@ -14,8 +14,20 @@ import {
   AI_KNOWLEDGE_MAX_PAGES,
 } from "@/lib/ai/knowledge-crawl-config";
 import type { AiKnowledgePage, KnowledgeSnippet } from "@/lib/types";
+import { generateSiteKnowledgeDigestNl } from "@/lib/openai/site-knowledge-digest";
+import { previewVisitorChatReply } from "@/lib/openai/preview-visitor-chat";
 
-export type SettingsFormState = { ok?: boolean; error?: string };
+export type SettingsFormState = {
+  ok?: boolean;
+  error?: string;
+  /** Alleen gezet door `updateAiKnowledgeAction` bij succes — direct tonen zonder extra refresh. */
+  digest_nl?: string | null;
+  scanned_pages_count?: number;
+};
+
+export type ChatbotPreviewState =
+  | { ok: true; reply: string }
+  | { ok: false; error: string };
 
 const MAX_TEXT_PER_PAGE = 2200;
 
@@ -694,6 +706,14 @@ export async function updateAiKnowledgeAction(
     }
   }
 
+  const digestNl = await generateSiteKnowledgeDigestNl({
+    companyName: auth.company.name,
+    website: website || null,
+    extraDocument: document || null,
+    pages,
+    crawledDocument,
+  });
+
   const automation_preferences = {
     ...prevAi,
     ai_knowledge_website: website || null,
@@ -702,6 +722,7 @@ export async function updateAiKnowledgeAction(
     ai_knowledge_crawled_document: crawledDocument || null,
     ai_knowledge_last_scanned_at: new Date().toISOString(),
     ai_knowledge_crawl_capped: website ? crawlCapped : false,
+    ai_knowledge_digest_nl: digestNl,
     niche_key: auth.company.niche ?? prevAi.niche_key,
   };
 
@@ -739,7 +760,7 @@ export async function updateAiKnowledgeAction(
   revalidatePath("/dashboard/ai");
   revalidatePath("/dashboard/chatbot");
   revalidatePath("/dashboard/settings");
-  return { ok: true };
+  return { ok: true, digest_nl: digestNl, scanned_pages_count: pages.length };
 }
 
 export async function removeAiKnowledgePageAction(
@@ -773,6 +794,22 @@ export async function removeAiKnowledgePageAction(
     .map((p) => `URL: ${p.url}\nTitel: ${p.title}\nSamenvatting: ${p.excerpt}`)
     .join("\n\n---\n\n");
 
+  const siteW =
+    typeof prevAi.ai_knowledge_website === "string"
+      ? prevAi.ai_knowledge_website.trim() || null
+      : null;
+  const extraDoc =
+    typeof prevAi.ai_knowledge_document === "string"
+      ? prevAi.ai_knowledge_document.trim() || null
+      : null;
+  const digestNl = await generateSiteKnowledgeDigestNl({
+    companyName: auth.company.name,
+    website: siteW,
+    extraDocument: extraDoc,
+    pages: nextPages,
+    crawledDocument: nextCrawled,
+  });
+
   const { error } = await supabase.from("company_settings").upsert(
     {
       company_id: auth.company.id,
@@ -790,6 +827,7 @@ export async function removeAiKnowledgePageAction(
         ai_knowledge_pages: nextPages,
         ai_knowledge_crawled_document: nextCrawled || null,
         ai_knowledge_last_scanned_at: new Date().toISOString(),
+        ai_knowledge_digest_nl: digestNl,
         niche_key: auth.company.niche ?? prevAi.niche_key,
       },
       whatsapp_channel: prev?.whatsapp_channel ?? {
@@ -819,6 +857,70 @@ export async function removeAiKnowledgePageSubmitAction(
   formData: FormData,
 ): Promise<void> {
   await removeAiKnowledgePageAction(formData);
+}
+
+export async function previewChatbotVisitorMessageAction(
+  message: string,
+): Promise<ChatbotPreviewState> {
+  if (isDemoMode()) {
+    return { ok: false, error: "Preview is niet beschikbaar in demo-modus." };
+  }
+  const auth = await getAuth();
+  if (!auth.user || !auth.company) {
+    return { ok: false, error: "Niet ingelogd." };
+  }
+
+  const trimmed = message.trim();
+  if (!trimmed) return { ok: false, error: "Typ een vraag." };
+  if (trimmed.length > 600) {
+    return { ok: false, error: "Bericht is te lang (max. 600 tekens)." };
+  }
+
+  if (!process.env.OPENAI_API_KEY) {
+    return { ok: false, error: "OpenAI is niet geconfigureerd op deze omgeving." };
+  }
+
+  const supabase = await createClient();
+  const { data: settingsRow } = await supabase
+    .from("company_settings")
+    .select("*")
+    .eq("company_id", auth.company.id)
+    .maybeSingle();
+  const settings = mapCompanySettingsRow(settingsRow as Record<string, unknown>);
+  const prefs = (settingsRow?.automation_preferences as Record<string, unknown>) || {};
+  const pages = Array.isArray(prefs.ai_knowledge_pages)
+    ? (prefs.ai_knowledge_pages as AiKnowledgePage[])
+    : [];
+  const crawled =
+    typeof prefs.ai_knowledge_crawled_document === "string"
+      ? prefs.ai_knowledge_crawled_document.trim()
+      : "";
+  const doc =
+    typeof prefs.ai_knowledge_document === "string"
+      ? prefs.ai_knowledge_document.trim()
+      : "";
+
+  const hasKnowledge =
+    pages.length > 0 || Boolean(crawled) || Boolean(doc) || Boolean(settings?.ai_knowledge_document?.trim());
+  if (!hasKnowledge) {
+    return {
+      ok: false,
+      error: "Sla eerst je website of extra tekst op — dan kan de preview antwoorden.",
+    };
+  }
+
+  try {
+    const reply = await previewVisitorChatReply({
+      companyName: auth.company.name,
+      settings,
+      nicheId: auth.company.niche ?? null,
+      visitorMessage: trimmed,
+    });
+    return { ok: true, reply };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Er ging iets mis.";
+    return { ok: false, error: msg };
+  }
 }
 
 export async function updateQuoteTemplateAction(

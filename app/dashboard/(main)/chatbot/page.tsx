@@ -1,65 +1,58 @@
-import Link from "next/link";
 import { getAuth } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { isDemoMode } from "@/lib/env";
-import { mapCompanySettingsRow } from "@/lib/queries/map-company-settings";
 import { DashboardWorkSurface } from "@/components/layout/dashboard-work-surface";
 import { PageFrame } from "@/components/layout/page-frame";
-import { AiKnowledgeForm } from "@/components/settings/ai-knowledge-form";
-import type { AiKnowledgePage } from "@/lib/types";
+import { ChatbotBuilder } from "@/components/chatbot/chatbot-builder";
 
 export default async function ChatbotPage() {
   const auth = await getAuth();
-  if (!auth.company) return null;
-  const demo = isDemoMode();
+  if (!auth.user) return null;
+
   const supabase = await createClient();
-  const { data: s } = await supabase
-    .from("company_settings")
+  const { data: existing } = await supabase
+    .from("chatbots")
     .select("*")
-    .eq("company_id", auth.company.id)
+    .eq("user_id", auth.user.id)
+    .order("created_at", { ascending: false })
+    .limit(1)
     .maybeSingle();
 
-  const mapped = mapCompanySettingsRow((s ?? {}) as Record<string, unknown>);
-  const prefs = (s?.automation_preferences as Record<string, unknown> | null) || {};
-  const scannedPages = Array.isArray(prefs.ai_knowledge_pages)
-    ? (prefs.ai_knowledge_pages as AiKnowledgePage[]).filter(
-        (p) => p && typeof p.url === "string" && typeof p.title === "string",
-      )
-    : [];
-  const lastScannedAt =
-    typeof prefs.ai_knowledge_last_scanned_at === "string"
-      ? prefs.ai_knowledge_last_scanned_at
-      : null;
-  const crawlCapped = Boolean(prefs.ai_knowledge_crawl_capped);
+  let chatbot = existing;
+  if (!chatbot) {
+    const { data: created } = await supabase
+      .from("chatbots")
+      .insert({
+        user_id: auth.user.id,
+        bedrijfs_omschrijving: "",
+        website_url: null,
+        extra_info: null,
+        openingszin: "Hallo! Waarmee kan ik je helpen?",
+        settings: {
+          doelen: {
+            vragen_beantwoorden: true,
+            klanten_helpen: true,
+            contactaanvragen_verwerken: true,
+          },
+          communicatiestijl: "zakelijk",
+          antwoord_lengte: "kort",
+          automation_regels: [],
+        },
+        is_active: false,
+      })
+      .select("*")
+      .single();
+    chatbot = created;
+  }
+
+  if (!chatbot) return null;
 
   return (
     <PageFrame
       title="Je chatbot"
-      subtitle={
-        <>
-          Drie stappen op één pagina: website, daarna WhatsApp/mail, daarna testen. Socials:{" "}
-          <Link
-            href="/dashboard/socials"
-            className="font-medium text-primary underline decoration-primary/35 underline-offset-2 hover:decoration-primary"
-          >
-            Socials
-          </Link>
-          .
-        </>
-      }
+      subtitle="Invullen, direct live testen en daarna meteen koppelen aan je kanalen."
     >
-      <DashboardWorkSurface>
-        <section id="kennis" className="scroll-mt-6">
-          <AiKnowledgeForm
-            demoMode={demo}
-            initialWebsite={mapped?.ai_knowledge_website ?? ""}
-            initialDocument={mapped?.ai_knowledge_document ?? ""}
-            scannedPages={scannedPages}
-            lastScannedAt={lastScannedAt}
-            crawlCapped={crawlCapped}
-            compactHero
-          />
-        </section>
+      <DashboardWorkSurface wide>
+        <ChatbotBuilder chatbot={chatbot} />
       </DashboardWorkSurface>
     </PageFrame>
   );
