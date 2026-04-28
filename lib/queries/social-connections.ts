@@ -1,6 +1,11 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-export type SocialProvider = "meta" | "tiktok" | "linkedin";
+export type SocialProvider =
+  | "meta"
+  | "tiktok"
+  | "linkedin"
+  | "google_calendar"
+  | "apple_calendar";
 
 export type SocialConnectionStatus =
   | "disconnected"

@@ -6,7 +6,11 @@ import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import { toast } from "sonner";
-import { deleteAppointment, updateAppointmentDetails } from "@/actions/appointments";
+import {
+  deleteAppointment,
+  reviewAppointmentRequest,
+  updateAppointmentDetails,
+} from "@/actions/appointments";
 import { appointmentStatusNl } from "@/lib/i18n/nl-labels";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -52,6 +56,8 @@ export function AppointmentDetailDialog({
   const [startsLocal, setStartsLocal] = useState("");
   const [endsLocal, setEndsLocal] = useState("");
   const [notes, setNotes] = useState("");
+  const [alternativeLocal, setAlternativeLocal] = useState("");
+  const [ownerReply, setOwnerReply] = useState("");
   const [deleteStep, setDeleteStep] = useState(false);
 
   useEffect(() => {
@@ -61,6 +67,10 @@ export function AppointmentDetailDialog({
       appointment.ends_at ? toDatetimeLocalValue(appointment.ends_at) : "",
     );
     setNotes(appointment.notes ?? "");
+    setAlternativeLocal(
+      appointment.starts_at ? toDatetimeLocalValue(appointment.starts_at) : "",
+    );
+    setOwnerReply("");
     setDeleteStep(false);
   }, [appointment]);
 
@@ -220,6 +230,91 @@ export function AppointmentDetailDialog({
               {pending ? "Opslaan…" : "Wijzigingen opslaan"}
             </Button>
           </form>
+
+          {appointment.status.trim().toLowerCase() === "planned" && !demoMode ? (
+            <div className="space-y-3 rounded-xl border border-primary/20 bg-primary/[0.05] p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+                Afspraakverzoek uit chatbot
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Bevestig direct of stel een alternatief voor. De klant krijgt automatisch een chatbericht terug.
+              </p>
+              <div className="space-y-1.5">
+                <Label htmlFor="owner_reply" className="text-xs">
+                  Optioneel bericht aan klant
+                </Label>
+                <Textarea
+                  id="owner_reply"
+                  value={ownerReply}
+                  onChange={(e) => setOwnerReply(e.target.value)}
+                  placeholder="Bijv. graag 10 minuten eerder aanwezig"
+                  className="min-h-[72px] rounded-lg text-sm"
+                />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  className="rounded-lg"
+                  disabled={pending}
+                  onClick={() => {
+                    start(async () => {
+                      const res = await reviewAppointmentRequest({
+                        appointmentId: appointment.id,
+                        decision: "confirm",
+                        noteToCustomer: ownerReply.trim() || null,
+                      });
+                      if (!res.ok) {
+                        toast.error(res.error);
+                        return;
+                      }
+                      toast.success("Afspraak bevestigd en klant geïnformeerd");
+                      await router.refresh();
+                    });
+                  }}
+                >
+                  Bevestigen
+                </Button>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="alternative_starts" className="text-xs">
+                  Alternatieve tijd
+                </Label>
+                <Input
+                  id="alternative_starts"
+                  type="datetime-local"
+                  value={alternativeLocal}
+                  onChange={(e) => setAlternativeLocal(e.target.value)}
+                  className="h-10 rounded-lg text-sm"
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="rounded-lg"
+                  disabled={pending}
+                  onClick={() => {
+                    start(async () => {
+                      const res = await reviewAppointmentRequest({
+                        appointmentId: appointment.id,
+                        decision: "alternative",
+                        alternativeStartsAt: alternativeLocal,
+                        noteToCustomer: ownerReply.trim() || null,
+                      });
+                      if (!res.ok) {
+                        toast.error(res.error);
+                        return;
+                      }
+                      toast.success("Alternatief verstuurd naar klant");
+                      await router.refresh();
+                    });
+                  }}
+                >
+                  Stuur alternatief
+                </Button>
+              </div>
+            </div>
+          ) : null}
 
           <Separator className="my-1 bg-border/60 dark:bg-white/[0.08]" />
 

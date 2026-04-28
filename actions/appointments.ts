@@ -5,6 +5,7 @@ import { getAuth } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { isDemoMode } from "@/lib/env";
 import type { ActionResult } from "@/actions/ai";
+import { insertNotificationIfNew } from "@/lib/notifications/create";
 
 const VALID = [
   "scheduled",
@@ -45,6 +46,118 @@ export async function updateAppointmentStatus(
   revalidatePath("/dashboard/appointments");
   revalidatePath("/dashboard");
   return { ok: true, data: { status: s } };
+}
+
+function extractGesprekIdFromNotes(notes: string | null | undefined): string | null {
+  const text = (notes || "").trim();
+  if (!text) return null;
+  const m = text.match(/\(([a-f0-9-]{36})\)/i);
+  return m?.[1] || null;
+}
+
+function formatNlDateTime(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return new Intl.DateTimeFormat("nl-NL", {
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(d);
+}
+
+export async function reviewAppointmentRequest(input: {
+  appointmentId: string;
+  decision: "confirm" | "alternative";
+  alternativeStartsAt?: string | null;
+  noteToCustomer?: string | null;
+}): Promise<ActionResult<{ appointmentId: string; status: string }>> {
+  if (isDemoMode()) {
+    return { ok: false, error: "Niet beschikbaar in demo-modus." };
+  }
+  const auth = await getAuth();
+  if (!auth.user || !auth.company) {
+    return { ok: false, error: "Niet ingelogd." };
+  }
+
+  const supabase = await createClient();
+  const { data: appt, error: apptErr } = await supabase
+    .from("appointments")
+    .select("id, company_id, lead_id, starts_at, ends_at, status, notes")
+    .eq("id", input.appointmentId)
+    .eq("company_id", auth.company.id)
+    .maybeSingle();
+  if (apptErr || !appt) {
+    return { ok: false, error: "Afspraak niet gevonden." };
+  }
+
+  const gesprekId = extractGesprekIdFromNotes(appt.notes as string | null);
+  let nextStatus = "confirmed";
+  let startsAt = appt.starts_at as string;
+  let endsAt = appt.ends_at as string | null;
+  let customerText = "";
+  const ownerNote = (input.noteToCustomer || "").trim();
+
+  if (input.decision === "confirm") {
+    nextStatus = "confirmed";
+    customerText = `Top, je afspraak is bevestigd voor ${formatNlDateTime(startsAt)}.${ownerNote ? ` ${ownerNote}` : ""}`;
+  } else {
+    const altRaw = (input.alternativeStartsAt || "").trim();
+    const alt = new Date(altRaw);
+    if (Number.isNaN(alt.getTime())) {
+      return { ok: false, error: "Geef een geldige alternatieve datum/tijd." };
+    }
+    startsAt = alt.toISOString();
+    endsAt = new Date(alt.getTime() + 60 * 60 * 1000).toISOString();
+    nextStatus = "planned";
+    customerText = `Het gevraagde moment lukt niet. Wel mogelijk: ${formatNlDateTime(startsAt)}. Laat weten of dit past.${ownerNote ? ` ${ownerNote}` : ""}`;
+  }
+
+  const { error: updErr } = await supabase
+    .from("appointments")
+    .update({
+      status: nextStatus,
+      starts_at: startsAt,
+      ends_at: endsAt,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", input.appointmentId)
+    .eq("company_id", auth.company.id);
+  if (updErr) return { ok: false, error: updErr.message };
+
+  if (gesprekId) {
+    await supabase.from("berichten").insert({
+      gesprek_id: gesprekId,
+      rol: "bot",
+      inhoud: customerText,
+    });
+  }
+
+  await insertNotificationIfNew(supabase, {
+    company_id: auth.company.id,
+    type: "new_lead",
+    title:
+      input.decision === "confirm"
+        ? "Afspraak bevestigd"
+        : "Alternatief voorstel verstuurd",
+    body:
+      input.decision === "confirm"
+        ? `Klant is bevestigd voor ${formatNlDateTime(startsAt)}`
+        : `Alternatief gestuurd: ${formatNlDateTime(startsAt)}`,
+    dedupe_key: `appointment-review:${input.appointmentId}:${nextStatus}:${startsAt}`,
+    metadata: {
+      appointment_id: input.appointmentId,
+      decision: input.decision,
+      starts_at: startsAt,
+      gesprek_id: gesprekId,
+    },
+  });
+
+  revalidatePath("/dashboard/appointments");
+  revalidatePath("/dashboard/inbox");
+  revalidatePath("/dashboard");
+  return { ok: true, data: { appointmentId: input.appointmentId, status: nextStatus } };
 }
 
 export async function createAppointment(input: {

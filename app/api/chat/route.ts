@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getOpenAI, OPENAI_MODEL } from "@/lib/openai/client";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { insertNotificationIfNew } from "@/lib/notifications/create";
+import {
+  fetchGoogleBusyRanges,
+  refreshGoogleAccessToken,
+  type GoogleTokenPayload,
+} from "@/lib/oauth/google-calendar";
+import { sealSocialToken, unsealSocialToken } from "@/lib/crypto/social-token";
+import { fetchAppleCalendarBusyRanges } from "@/lib/integrations/apple-calendar";
 
 export const dynamic = "force-dynamic";
 
@@ -26,8 +34,14 @@ type ChatPayload = {
 };
 
 type Role = "user" | "assistant";
+type AppointmentIntent = {
+  wantsAppointment: boolean;
+  requestedStart: Date | null;
+  rawTimeText: string | null;
+};
 
 const MAX_CRAWLED_KNOWLEDGE_CHARS = 9000;
+const APPOINTMENT_DEFAULT_MINUTES = 60;
 
 function jsonError(message: string, status = 400) {
   return NextResponse.json({ error: message }, { status, headers: CORS_HEADERS });
@@ -57,6 +71,311 @@ function truncateKnowledge(raw: string): string {
   if (!raw) return "";
   if (raw.length <= MAX_CRAWLED_KNOWLEDGE_CHARS) return raw;
   return `${raw.slice(0, MAX_CRAWLED_KNOWLEDGE_CHARS)}\n\n[Ingekort om binnen context te passen]`;
+}
+
+function parseRequestedDateTime(raw: string): Date | null {
+  const text = raw.toLowerCase();
+  const now = new Date();
+  const base = new Date(now);
+  base.setSeconds(0, 0);
+
+  const timeMatch = text.match(/(\d{1,2})(?::|\.| uur)?(\d{2})?/);
+  const hour = timeMatch ? Number(timeMatch[1]) : 10;
+  const minute = timeMatch && timeMatch[2] ? Number(timeMatch[2]) : 0;
+  if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return null;
+
+  const dayMap: Record<string, number> = {
+    zondag: 0,
+    maandag: 1,
+    dinsdag: 2,
+    woensdag: 3,
+    donderdag: 4,
+    vrijdag: 5,
+    zaterdag: 6,
+  };
+  if (text.includes("vandaag")) {
+    const d = new Date(base);
+    d.setHours(hour, minute, 0, 0);
+    return d;
+  }
+  if (text.includes("morgen")) {
+    const d = new Date(base);
+    d.setDate(d.getDate() + 1);
+    d.setHours(hour, minute, 0, 0);
+    return d;
+  }
+  for (const [name, dayIdx] of Object.entries(dayMap)) {
+    if (!text.includes(name)) continue;
+    const d = new Date(base);
+    const diff = (dayIdx - d.getDay() + 7) % 7 || 7;
+    d.setDate(d.getDate() + diff);
+    d.setHours(hour, minute, 0, 0);
+    return d;
+  }
+
+  const explicit = text.match(/(\d{1,2})[-/](\d{1,2})(?:[-/](\d{2,4}))?/);
+  if (explicit) {
+    const day = Number(explicit[1]);
+    const month = Number(explicit[2]) - 1;
+    const yearRaw = explicit[3] ? Number(explicit[3]) : now.getFullYear();
+    const year = yearRaw < 100 ? 2000 + yearRaw : yearRaw;
+    const d = new Date(year, month, day, hour, minute, 0, 0);
+    if (!Number.isNaN(d.getTime())) return d;
+  }
+  return null;
+}
+
+function detectAppointmentIntent(message: string): AppointmentIntent {
+  const text = message.toLowerCase();
+  const wantsAppointment =
+    /(afspraak|inplannen|plan|boeken|boek|vrijdag|morgen|vandaag)/.test(text);
+  const requestedStart = parseRequestedDateTime(text);
+  return {
+    wantsAppointment,
+    requestedStart,
+    rawTimeText: requestedStart ? message.trim() : null,
+  };
+}
+
+function formatNlDateTime(date: Date): string {
+  return new Intl.DateTimeFormat("nl-NL", {
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+}
+
+function intersects(
+  aStart: Date,
+  aEnd: Date,
+  bStartIso: string | null | undefined,
+  bEndIso: string | null | undefined,
+): boolean {
+  if (!bStartIso) return false;
+  const bStart = new Date(bStartIso);
+  const bEnd = bEndIso ? new Date(bEndIso) : new Date(bStart.getTime() + APPOINTMENT_DEFAULT_MINUTES * 60_000);
+  if (Number.isNaN(bStart.getTime()) || Number.isNaN(bEnd.getTime())) return false;
+  return aStart < bEnd && bStart < aEnd;
+}
+
+function isTokenExpired(payload: GoogleTokenPayload): boolean {
+  if (typeof payload.expiry_date !== "number") return false;
+  return Date.now() + 30_000 >= payload.expiry_date;
+}
+
+async function fetchGoogleBusyRangesForCompany(input: {
+  supabase: ReturnType<typeof createAdminClient>;
+  companyId: string;
+  timeMinIso: string;
+  timeMaxIso: string;
+}): Promise<Array<{ start: string; end: string }>> {
+  const { data: row } = await input.supabase
+    .from("company_social_connections")
+    .select("id, encrypted_token, metadata")
+    .eq("company_id", input.companyId)
+    .eq("provider", "google_calendar")
+    .eq("status", "connected")
+    .maybeSingle();
+  if (!row?.encrypted_token || typeof row.encrypted_token !== "string") return [];
+
+  const raw = unsealSocialToken(row.encrypted_token);
+  if (!raw) return [];
+  let token: GoogleTokenPayload;
+  try {
+    token = JSON.parse(raw) as GoogleTokenPayload;
+  } catch {
+    return [];
+  }
+  if (!token.access_token) return [];
+
+  if (isTokenExpired(token) && token.refresh_token) {
+    try {
+      const refreshed = await refreshGoogleAccessToken(token.refresh_token);
+      token = refreshed;
+      await input.supabase
+        .from("company_social_connections")
+        .update({
+          encrypted_token: sealSocialToken(JSON.stringify(refreshed)),
+          token_expires_at:
+            typeof refreshed.expiry_date === "number"
+              ? new Date(refreshed.expiry_date).toISOString()
+              : null,
+          updated_at: new Date().toISOString(),
+          last_error: null,
+        })
+        .eq("id", row.id);
+    } catch (e) {
+      const errMsg = e instanceof Error ? e.message : "google_refresh_failed";
+      await input.supabase
+        .from("company_social_connections")
+        .update({
+          status: "error",
+          last_error: errMsg.slice(0, 400),
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", row.id);
+      return [];
+    }
+  }
+
+  const metadata = asRecord(row.metadata);
+  const calendarId = safeString(metadata.calendar_id) || "primary";
+  try {
+    return await fetchGoogleBusyRanges({
+      accessToken: token.access_token,
+      timeMinIso: input.timeMinIso,
+      timeMaxIso: input.timeMaxIso,
+      calendarId,
+    });
+  } catch {
+    return [];
+  }
+}
+
+async function fetchAppleBusyRangesForCompany(input: {
+  supabase: ReturnType<typeof createAdminClient>;
+  companyId: string;
+  timeMinIso: string;
+  timeMaxIso: string;
+}): Promise<Array<{ start: string; end: string }>> {
+  const { data: row } = await input.supabase
+    .from("company_social_connections")
+    .select("metadata")
+    .eq("company_id", input.companyId)
+    .eq("provider", "apple_calendar")
+    .eq("status", "connected")
+    .maybeSingle();
+  const metadata = asRecord(row?.metadata);
+  const icsUrl = safeString(metadata.ics_url);
+  if (!icsUrl) return [];
+  try {
+    return await fetchAppleCalendarBusyRanges({
+      icsUrl,
+      windowStartIso: input.timeMinIso,
+      windowEndIso: input.timeMaxIso,
+    });
+  } catch {
+    return [];
+  }
+}
+
+async function tryHandleAppointmentRequest(input: {
+  supabase: ReturnType<typeof createAdminClient>;
+  chatbot: Record<string, unknown>;
+  companyId: string | null;
+  companyName: string | null;
+  conversationId: string;
+  message: string;
+  companySettings: Record<string, unknown> | null;
+}): Promise<string | null> {
+  if (!input.companyId) return null;
+  const intent = detectAppointmentIntent(input.message);
+  if (!intent.wantsAppointment) return null;
+  if (!intent.requestedStart) {
+    return "Top, ik help je graag met een afspraak. Welke dag en tijd wil je precies (bijv. vrijdag 10:00)?";
+  }
+
+  const requestedStart = intent.requestedStart;
+  if (requestedStart.getTime() < Date.now() - 60_000) {
+    return "Dat tijdstip ligt in het verleden. Kun je een nieuwe dag en tijd sturen?";
+  }
+  const requestedEnd = new Date(requestedStart.getTime() + APPOINTMENT_DEFAULT_MINUTES * 60_000);
+
+  const [zylmeroRows, companyOwner] = await Promise.all([
+    input.supabase
+      .from("appointments")
+      .select("starts_at, ends_at, status")
+      .eq("company_id", input.companyId)
+      .in("status", ["scheduled", "planned", "confirmed"])
+      .gte("starts_at", new Date(requestedStart.getTime() - 24 * 60 * 60_000).toISOString())
+      .lte("starts_at", new Date(requestedStart.getTime() + 24 * 60 * 60_000).toISOString()),
+    input.supabase
+      .from("companies")
+      .select("id, name, contact_email")
+      .eq("id", input.companyId)
+      .maybeSingle(),
+  ]);
+
+  const zylmeroBusy = (zylmeroRows.data || []).some((row) =>
+    intersects(requestedStart, requestedEnd, row.starts_at as string | null, row.ends_at as string | null),
+  );
+
+  const prefs = asRecord(input.companySettings?.automation_preferences);
+  const googleBusy = await fetchGoogleBusyRangesForCompany({
+    supabase: input.supabase,
+    companyId: input.companyId,
+    timeMinIso: new Date(requestedStart.getTime() - 24 * 60 * 60_000).toISOString(),
+    timeMaxIso: new Date(requestedStart.getTime() + 24 * 60 * 60_000).toISOString(),
+  });
+  const googleBusyHit = googleBusy.some((row) =>
+    intersects(requestedStart, requestedEnd, row.start, row.end),
+  );
+  const appleBusy = await fetchAppleBusyRangesForCompany({
+    supabase: input.supabase,
+    companyId: input.companyId,
+    timeMinIso: new Date(requestedStart.getTime() - 24 * 60 * 60_000).toISOString(),
+    timeMaxIso: new Date(requestedStart.getTime() + 24 * 60 * 60_000).toISOString(),
+  });
+  const appleBusyHit = appleBusy.some((row) =>
+    intersects(requestedStart, requestedEnd, row.start, row.end),
+  );
+  const externalBusy = Array.isArray(prefs.calendar_busy_ranges)
+    ? prefs.calendar_busy_ranges.some((row) => {
+        const r = asRecord(row);
+        return intersects(
+          requestedStart,
+          requestedEnd,
+          safeString(r.start) || null,
+          safeString(r.end) || null,
+        );
+      })
+    : false;
+
+  if (zylmeroBusy || externalBusy || googleBusyHit || appleBusyHit) {
+    const alternatives: string[] = [];
+    for (let i = 1; i <= 4 && alternatives.length < 3; i++) {
+      const candidateStart = new Date(requestedStart.getTime() + i * 2 * 60 * 60_000);
+      const candidateEnd = new Date(candidateStart.getTime() + APPOINTMENT_DEFAULT_MINUTES * 60_000);
+      const collision = (zylmeroRows.data || []).some((row) =>
+        intersects(candidateStart, candidateEnd, row.starts_at as string | null, row.ends_at as string | null),
+      );
+      if (!collision) alternatives.push(formatNlDateTime(candidateStart));
+    }
+    const altText = alternatives.length
+      ? `Beschikbare alternatieven: ${alternatives.join(" / ")}.`
+      : "Kun je een andere dag of tijd sturen?";
+    return `Dit tijdstip lijkt al bezet in de agenda. ${altText}`;
+  }
+
+  const notes = `Chatbot afspraakverzoek (${input.conversationId}) - klant vroeg: "${intent.rawTimeText || input.message}"`;
+  const { error: createErr } = await input.supabase.from("appointments").insert({
+    company_id: input.companyId,
+    starts_at: requestedStart.toISOString(),
+    ends_at: requestedEnd.toISOString(),
+    status: "planned",
+    notes,
+  });
+  if (createErr) return null;
+
+  const companyTitle = safeString(companyOwner.data?.name) || safeString(input.companyName) || "het bedrijf";
+  await insertNotificationIfNew(input.supabase, {
+    company_id: input.companyId,
+    type: "new_lead",
+    title: "Nieuwe afspraak-aanvraag te bevestigen",
+    body: `Klant wil ${formatNlDateTime(requestedStart)}. Bevestig of stel alternatief voor.`,
+    dedupe_key: `chatbot-appointment-request:${input.conversationId}:${requestedStart.toISOString()}`,
+    metadata: {
+      kind: "appointment_request",
+      requested_start: requestedStart.toISOString(),
+      requested_end: requestedEnd.toISOString(),
+      source: "chatbot_web",
+    },
+  });
+
+  return `Top, ik heb je afspraakverzoek voor ${formatNlDateTime(requestedStart)} doorgestuurd naar ${companyTitle}. Je krijgt na bevestiging meteen reactie.`;
 }
 
 function buildSystemPrompt(data: {
@@ -216,7 +535,20 @@ export async function POST(request: NextRequest) {
     .maybeSingle();
 
   if (chatbotError || !chatbot) return jsonError("Chatbot niet gevonden.", 404);
-  const chatbotCompanyId = safeString(chatbot.company_id);
+  let chatbotCompanyId = safeString(chatbot.company_id);
+  if (!chatbotCompanyId) {
+    const ownerId = safeString(chatbot.user_id);
+    if (ownerId) {
+      const { data: ownerCompany } = await supabase
+        .from("companies")
+        .select("id, name")
+        .eq("owner_user_id", ownerId)
+        .order("created_at", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      chatbotCompanyId = safeString(ownerCompany?.id);
+    }
+  }
   let companySettingsRow: Record<string, unknown> | null = null;
   if (chatbotCompanyId) {
     const { data: row } = await supabase
@@ -283,6 +615,29 @@ export async function POST(request: NextRequest) {
     rol: "user",
     inhoud: message,
   });
+
+  const appointmentFlowReply = await tryHandleAppointmentRequest({
+    supabase,
+    chatbot: chatbot as Record<string, unknown>,
+    companyId: chatbotCompanyId || null,
+    companyName: safeString((chatbot as Record<string, unknown>).company_name) || null,
+    conversationId: gesprekId,
+    message,
+    companySettings: companySettingsRow,
+  });
+  if (appointmentFlowReply) {
+    await supabase.from("berichten").insert({
+      gesprek_id: gesprekId,
+      rol: "bot",
+      inhoud: appointmentFlowReply,
+    });
+    return NextResponse.json(
+      { reply: appointmentFlowReply, gesprek_id: gesprekId },
+      {
+        headers: CORS_HEADERS,
+      },
+    );
+  }
 
   const openai = getOpenAI();
   const streamMode = body.stream !== false;
