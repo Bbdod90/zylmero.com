@@ -11,7 +11,7 @@ import {
   previewChatbotVisitorMessageAction,
   saveChatbotStudioAction,
 } from "@/actions/settings";
-import { CheckCircle2, Loader2, MessageCircle, SendHorizontal } from "lucide-react";
+import { CheckCircle2, Loader2, MessageCircle, SendHorizontal, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
@@ -37,6 +37,12 @@ export function ChatbotStudio(props: {
   const [extraInfo, setExtraInfo] = useState(props.initialExtraInfo);
   const [openingszin, setOpeningszin] = useState(props.initialOpeningszin);
   const [goals, setGoals] = useState(props.initialGoals);
+  const [extraGoals, setExtraGoals] = useState({
+    productadvies: true,
+    faqUitleg: true,
+    contactEscalatie: true,
+    afspraakOpVerzoek: true,
+  });
   const [saved, setSaved] = useState(props.initialScannedCount > 0 || props.initialExtraInfo.trim().length > 0);
   const [error, setError] = useState<string | null>(null);
   const [digest, setDigest] = useState<string | null>(props.initialDigest);
@@ -54,6 +60,14 @@ export function ChatbotStudio(props: {
     [],
   );
 
+  const normalizePreviewError = (msg: string): string => {
+    const raw = msg.toLowerCase();
+    if (raw.includes("429") || raw.includes("quota") || raw.includes("billing")) {
+      return "OpenAI-tegoed of limiet is bereikt. Zet credits/billing aan in je OpenAI account, daarna werkt live preview direct weer.";
+    }
+    return msg;
+  };
+
   const onSave = () => {
     if (!canSave) return;
     setError(null);
@@ -64,9 +78,10 @@ export function ChatbotStudio(props: {
         extraInfo,
         openingszin,
         doelen: goals,
+        extraDoelen: extraGoals,
       });
       if (!res.ok) {
-        setError(res.error);
+        setError(normalizePreviewError(res.error));
         return;
       }
       setSaved(true);
@@ -87,22 +102,24 @@ export function ChatbotStudio(props: {
         extraInfo,
         openingszin,
         doelen: goals,
+        extraDoelen: extraGoals,
       });
       if (out.ok) {
         setChat((prev) => [...prev, { role: "assistant", content: out.reply }]);
       } else {
-        setError(out.error);
+        const friendly = normalizePreviewError(out.error);
+        setError(friendly);
         setChat((prev) => [
           ...prev,
-          { role: "assistant", content: `Dat lukte nu niet: ${out.error}` },
+          { role: "assistant", content: `Dat lukte nu niet: ${friendly}` },
         ]);
       }
     });
   };
 
   return (
-    <div className="mx-auto grid w-full max-w-[1480px] gap-8 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)]">
-      <section className="rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
+    <div className="mx-auto grid w-full max-w-[1520px] gap-8 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)]">
+      <section className="rounded-2xl border border-gray-200/90 bg-white p-8 shadow-[0_20px_60px_-44px_rgba(15,23,42,0.45)]">
         <div className="space-y-1">
           <h2 className="text-2xl font-semibold tracking-tight text-gray-900">Je chatbot instellen</h2>
           <p className="text-sm text-gray-600">
@@ -151,7 +168,7 @@ export function ChatbotStudio(props: {
             <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
               Wat moet je chatbot doen?
             </h3>
-            <label className="flex items-center gap-3 rounded-xl border border-gray-200 px-3 py-2.5">
+            <label className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-3 py-2.5 shadow-sm">
               <input
                 type="checkbox"
                 checked={goals.vragenBeantwoorden}
@@ -159,7 +176,7 @@ export function ChatbotStudio(props: {
               />
               <span className="text-sm text-gray-800">Vragen beantwoorden</span>
             </label>
-            <label className="flex items-center gap-3 rounded-xl border border-gray-200 px-3 py-2.5">
+            <label className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-3 py-2.5 shadow-sm">
               <input
                 type="checkbox"
                 checked={goals.klantenHelpen}
@@ -167,7 +184,7 @@ export function ChatbotStudio(props: {
               />
               <span className="text-sm text-gray-800">Klanten helpen</span>
             </label>
-            <label className="flex items-center gap-3 rounded-xl border border-gray-200 px-3 py-2.5">
+            <label className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-3 py-2.5 shadow-sm">
               <input
                 type="checkbox"
                 checked={goals.contactAanvragenVerwerken}
@@ -177,6 +194,52 @@ export function ChatbotStudio(props: {
               />
               <span className="text-sm text-gray-800">Contact aanvragen verwerken</span>
             </label>
+          </section>
+
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
+              Extra gedrag (aan/uit)
+            </h3>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <Button
+                type="button"
+                variant={extraGoals.productadvies ? "default" : "outline"}
+                className="justify-start rounded-xl"
+                onClick={() =>
+                  setExtraGoals((p) => ({ ...p, productadvies: !p.productadvies }))
+                }
+              >
+                Productadvies geven
+              </Button>
+              <Button
+                type="button"
+                variant={extraGoals.faqUitleg ? "default" : "outline"}
+                className="justify-start rounded-xl"
+                onClick={() => setExtraGoals((p) => ({ ...p, faqUitleg: !p.faqUitleg }))}
+              >
+                FAQ kort uitleggen
+              </Button>
+              <Button
+                type="button"
+                variant={extraGoals.contactEscalatie ? "default" : "outline"}
+                className="justify-start rounded-xl"
+                onClick={() =>
+                  setExtraGoals((p) => ({ ...p, contactEscalatie: !p.contactEscalatie }))
+                }
+              >
+                Doorzetten naar contact
+              </Button>
+              <Button
+                type="button"
+                variant={extraGoals.afspraakOpVerzoek ? "default" : "outline"}
+                className="justify-start rounded-xl"
+                onClick={() =>
+                  setExtraGoals((p) => ({ ...p, afspraakOpVerzoek: !p.afspraakOpVerzoek }))
+                }
+              >
+                Actie alleen op verzoek
+              </Button>
+            </div>
           </section>
 
           <section className="space-y-2">
@@ -231,10 +294,12 @@ export function ChatbotStudio(props: {
         </div>
       </section>
 
-      <section className="flex min-h-[760px] flex-col rounded-xl border border-gray-200 bg-white shadow-sm">
+      <section className="flex min-h-[760px] flex-col rounded-2xl border border-gray-200/90 bg-white shadow-[0_20px_60px_-44px_rgba(15,23,42,0.45)]">
         <header className="border-b border-gray-200 px-6 py-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Live preview</p>
-          <h3 className="mt-1 text-lg font-semibold text-gray-900">Praat met je chatbot</h3>
+          <h3 className="mt-1 flex items-center gap-2 text-lg font-semibold text-gray-900">
+            Praat met je chatbot <Sparkles className="size-4 text-primary" />
+          </h3>
           <p className="mt-1 text-sm text-gray-600">
             De preview gebruikt dezelfde kennis als je echte bot. {scannedCount > 0 ? `${scannedCount} pagina's geladen.` : ""}
           </p>

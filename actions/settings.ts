@@ -875,6 +875,12 @@ export async function previewChatbotVisitorMessageAction(
       klantenHelpen?: boolean;
       contactAanvragenVerwerken?: boolean;
     };
+    extraDoelen?: {
+      productadvies?: boolean;
+      faqUitleg?: boolean;
+      contactEscalatie?: boolean;
+      afspraakOpVerzoek?: boolean;
+    };
   },
 ): Promise<ChatbotPreviewState> {
   if (isDemoMode()) {
@@ -953,6 +959,15 @@ export async function previewChatbotVisitorMessageAction(
                     contactaanvragen_verwerken: draft.doelen.contactAanvragenVerwerken !== false,
                   }
                 : (prefs.chatbot_goals as Record<string, unknown> | null),
+            chatbot_capabilities:
+              draft?.extraDoelen && Object.keys(draft.extraDoelen).length > 0
+                ? [
+                    draft.extraDoelen.productadvies ? "Productadvies geven" : null,
+                    draft.extraDoelen.faqUitleg ? "FAQ kort uitleggen" : null,
+                    draft.extraDoelen.contactEscalatie ? "Doorzetten naar contact bij complexe vraag" : null,
+                    draft.extraDoelen.afspraakOpVerzoek ? "Afspraak/offerte alleen op verzoek" : null,
+                  ].filter(Boolean)
+                : (prefs.chatbot_capabilities as string[] | null),
           },
         }
       : settings;
@@ -979,6 +994,12 @@ export async function saveChatbotStudioAction(input: {
     vragenBeantwoorden: boolean;
     klantenHelpen: boolean;
     contactAanvragenVerwerken: boolean;
+  };
+  extraDoelen?: {
+    productadvies?: boolean;
+    faqUitleg?: boolean;
+    contactEscalatie?: boolean;
+    afspraakOpVerzoek?: boolean;
   };
 }): Promise<ChatbotStudioState> {
   if (isDemoMode()) {
@@ -1058,6 +1079,12 @@ export async function saveChatbotStudioAction(input: {
       klanten_helpen: input.doelen.klantenHelpen !== false,
       contactaanvragen_verwerken: input.doelen.contactAanvragenVerwerken !== false,
     },
+    chatbot_capabilities: [
+      input.extraDoelen?.productadvies ? "Productadvies geven" : null,
+      input.extraDoelen?.faqUitleg ? "FAQ kort uitleggen" : null,
+      input.extraDoelen?.contactEscalatie ? "Doorzetten naar contact bij complexe vraag" : null,
+      input.extraDoelen?.afspraakOpVerzoek ? "Afspraak/offerte alleen op verzoek" : null,
+    ].filter(Boolean),
     niche_key: auth.company.niche ?? prevAi.niche_key,
   };
 

@@ -24,6 +24,7 @@ export function businessContextBlock(
         chatbot_company_description?: string;
         chatbot_opening_line?: string;
         chatbot_extra_info?: string;
+        chatbot_capabilities?: string[];
       }
     | undefined;
   const intake =
@@ -66,6 +67,9 @@ export function businessContextBlock(
       : "",
     prefs?.chatbot_extra_info
       ? `Extra info uit chatbot builder:\n${prefs.chatbot_extra_info}`
+      : "",
+    Array.isArray(prefs?.chatbot_capabilities) && prefs.chatbot_capabilities.length > 0
+      ? `Actieve chatbot-doelen:\n${prefs.chatbot_capabilities.map((c) => `- ${c}`).join("\n")}`
       : "",
     intakeLines,
     settings?.faq?.length
