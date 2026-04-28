@@ -41,10 +41,6 @@ function asRecord(input: unknown): Record<string, unknown> {
   return input && typeof input === "object" ? (input as Record<string, unknown>) : {};
 }
 
-function asBool(input: unknown, fallback = false): boolean {
-  return typeof input === "boolean" ? input : fallback;
-}
-
 function normalizeAnswerLength(settings: Record<string, unknown>): "kort" | "normaal" | "uitgebreid" {
   const raw = safeString(settings.antwoord_lengte).toLowerCase();
   if (raw === "normaal" || raw === "uitgebreid") return raw;
@@ -220,7 +216,6 @@ export async function POST(request: NextRequest) {
     .maybeSingle();
 
   if (chatbotError || !chatbot) return jsonError("Chatbot niet gevonden.", 404);
-  const chatbotSettings = asRecord(chatbot.settings);
   const chatbotCompanyId = safeString(chatbot.company_id);
   let companySettingsRow: Record<string, unknown> | null = null;
   if (chatbotCompanyId) {
@@ -261,10 +256,12 @@ export async function POST(request: NextRequest) {
     .limit(10);
   const history: Array<{ role: Role; content: string }> = Array.isArray(recentMessages)
     ? recentMessages
-        .map((row) => ({
-          role: row?.rol === "bot" ? "assistant" : "user",
-          content: safeString(row?.inhoud),
-        }))
+        .map(
+          (row): { role: Role; content: string } => ({
+            role: row?.rol === "bot" ? "assistant" : "user",
+            content: safeString(row?.inhoud),
+          }),
+        )
         .filter((row) => row.content.length > 0)
         .reverse()
     : [];
