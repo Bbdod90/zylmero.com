@@ -80,7 +80,6 @@ export function ChatbotStudio(props: {
   const [antwoordLengte, setAntwoordLengte] = useState<"short" | "normal">(props.initialAntwoordLengte);
   const [saved, setSaved] = useState(props.initialScannedCount > 0 || props.initialExtraInfo.trim().length > 0);
   const [error, setError] = useState<string | null>(null);
-  const [digest, setDigest] = useState<string | null>(props.initialDigest);
   const [scannedCount, setScannedCount] = useState(props.initialScannedCount);
   const [chatInput, setChatInput] = useState("");
   const [chat, setChat] = useState<ChatMessage[]>([
@@ -145,7 +144,6 @@ export function ChatbotStudio(props: {
         return;
       }
       setSaved(true);
-      setDigest(res.digest_nl);
       setScannedCount(res.scanned_pages_count);
     });
   };
@@ -156,15 +154,29 @@ export function ChatbotStudio(props: {
     setError(null);
     setChat((prev) => [...prev, { role: "user", content: text }]);
     startReplying(async () => {
-      const out = await previewChatbotVisitorMessageAction(text, {
-        bedrijfsOmschrijving,
-        websiteUrl,
-        extraInfo,
-        openingszin,
-        doelen: goals,
-        extraDoelen: extraGoals,
-        antwoordLengte,
-      });
+      const historyForAi: Array<{ role: "user" | "assistant"; content: string }> = [
+        ...chat
+          .filter((m) => (m.role === "user" || m.role === "assistant") && m.content.trim())
+          .slice(-7)
+          .map((m): { role: "user" | "assistant"; content: string } => ({
+            role: m.role,
+            content: m.content,
+          })),
+        { role: "user" as const, content: text },
+      ];
+      const out = await previewChatbotVisitorMessageAction(
+        text,
+        historyForAi,
+        {
+          bedrijfsOmschrijving,
+          websiteUrl,
+          extraInfo,
+          openingszin,
+          doelen: goals,
+          extraDoelen: extraGoals,
+          antwoordLengte,
+        },
+      );
       if (out.ok) {
         setChat((prev) => [...prev, { role: "assistant", content: out.reply }]);
       } else {
@@ -379,13 +391,6 @@ export function ChatbotStudio(props: {
             Stel een vraag zoals je klant dat zou doen. {scannedCount > 0 ? `${scannedCount} pagina's ingeladen.` : ""}
           </p>
         </header>
-
-        {digest ? (
-          <div className="border-b border-gray-200 bg-gray-50 px-5 py-2.5 text-xs text-gray-600">
-            <p className="font-semibold text-gray-700">Samenvatting van je kennis</p>
-            <p className="mt-1 whitespace-pre-wrap">{digest}</p>
-          </div>
-        ) : null}
 
         <div className="space-y-2.5 overflow-y-auto bg-gray-50/70 px-5 py-3" style={{ height: chatHeight }}>
           {chat.map((m, i) => (

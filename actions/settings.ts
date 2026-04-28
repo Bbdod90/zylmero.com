@@ -865,6 +865,7 @@ export async function removeAiKnowledgePageSubmitAction(
 
 export async function previewChatbotVisitorMessageAction(
   message: string,
+  history?: Array<{ role: "user" | "assistant"; content: string }>,
   draft?: {
     bedrijfsOmschrijving?: string;
     websiteUrl?: string;
@@ -941,6 +942,17 @@ export async function previewChatbotVisitorMessageAction(
   }
 
   try {
+    const safeHistory = Array.isArray(history)
+      ? history
+          .filter(
+            (m) =>
+              m &&
+              (m.role === "user" || m.role === "assistant") &&
+              typeof m.content === "string" &&
+              m.content.trim().length > 0,
+          )
+          .slice(-10)
+      : [];
     const mergedSettings = settings
       ? {
           ...settings,
@@ -982,6 +994,7 @@ export async function previewChatbotVisitorMessageAction(
       settings: mergedSettings,
       nicheId: auth.company.niche ?? null,
       visitorMessage: trimmed,
+      history: safeHistory,
     });
     return { ok: true, reply };
   } catch (e) {

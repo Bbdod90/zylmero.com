@@ -2,12 +2,19 @@ import type { CompanySettings } from "@/lib/types";
 import { businessContextBlock } from "@/lib/openai/prompts";
 import { getOpenAI, OPENAI_MODEL } from "@/lib/openai/client";
 
+const OPENAI_CHATBOT_MODEL =
+  process.env.OPENAI_CHATBOT_MODEL?.trim() ||
+  process.env.OPENAI_MODEL_CHATBOT?.trim() ||
+  process.env.OPENAI_MODEL_PREVIEW?.trim() ||
+  OPENAI_MODEL;
+
 /** Eén testantwoord voor de chatbot-setup (zelfde kennis als productie-context). */
 export async function previewVisitorChatReply(input: {
   companyName: string;
   settings: CompanySettings | null;
   nicheId: string | null;
   visitorMessage: string;
+  history?: Array<{ role: "user" | "assistant"; content: string }>;
 }): Promise<string> {
   const rawCtx = businessContextBlock(
     input.companyName,
@@ -28,6 +35,10 @@ export async function previewVisitorChatReply(input: {
     answerLength === "short"
       ? "Maximaal 2 korte zinnen."
       : "Maximaal 4 korte zinnen.";
+  const recentHistory = (input.history || [])
+    .slice(-8)
+    .map((m) => `${m.role === "assistant" ? "BOT" : "KLANT"}: ${m.content}`)
+    .join("\n");
   const prompt = `Hieronder staat alle context die de chatbot mag gebruiken.
 
 ${ctx}
@@ -35,6 +46,9 @@ ${ctx}
 ---
 De bezoeker stelt deze vraag (in ${lang}):
 ${input.visitorMessage}
+
+Vorige berichten in dit gesprek (indien aanwezig):
+${recentHistory || "(geen eerdere berichten)"}
 
 Geef één kort antwoord als website-chatbot.
 Harde regels:
@@ -46,7 +60,7 @@ Harde regels:
 
   const openai = getOpenAI();
   const res = await openai.chat.completions.create({
-    model: OPENAI_MODEL,
+    model: OPENAI_CHATBOT_MODEL,
     temperature: 0.1,
     max_tokens: answerLength === "short" ? 120 : 220,
     messages: [
