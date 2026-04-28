@@ -59,6 +59,8 @@ export function ChatbotStudio(props: {
     () => ["Wat doen jullie?", "Wat zijn jullie openingstijden?", "Hoe kan ik contact opnemen?"],
     [],
   );
+  const textFieldClass =
+    "rounded-xl border-gray-200 bg-white shadow-[inset_0_1px_0_rgba(255,255,255,0.5)] focus-visible:ring-primary/20";
 
   const normalizePreviewError = (msg: string): string => {
     const raw = msg.toLowerCase();
@@ -137,8 +139,8 @@ export function ChatbotStudio(props: {
                 value={bedrijfsOmschrijving}
                 onChange={(e) => setBedrijfsOmschrijving(e.target.value)}
                 placeholder="Wij verkopen fatbikes en doen reparaties"
-                rows={5}
-                className="rounded-xl"
+                rows={3}
+                className={cn(textFieldClass, "min-h-[96px]")}
               />
             </div>
             <div className="space-y-2">
@@ -148,7 +150,7 @@ export function ChatbotStudio(props: {
                 value={websiteUrl}
                 onChange={(e) => setWebsiteUrl(e.target.value)}
                 placeholder="https://jouwdomein.nl"
-                className="rounded-xl"
+                className={cn(textFieldClass, "h-11")}
               />
             </div>
             <div className="space-y-2">
@@ -158,8 +160,8 @@ export function ChatbotStudio(props: {
                 value={extraInfo}
                 onChange={(e) => setExtraInfo(e.target.value)}
                 placeholder="Bijv. openingstijden, prijzen, garantie, contactgegevens."
-                rows={4}
-                className="rounded-xl"
+                rows={2}
+                className={cn(textFieldClass, "min-h-[72px]")}
               />
             </div>
           </section>
@@ -168,7 +170,7 @@ export function ChatbotStudio(props: {
             <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
               Wat moet je chatbot doen?
             </h3>
-            <label className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-3 py-2.5 shadow-sm">
+            <label className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-3 py-2.5">
               <input
                 type="checkbox"
                 checked={goals.vragenBeantwoorden}
@@ -176,7 +178,7 @@ export function ChatbotStudio(props: {
               />
               <span className="text-sm text-gray-800">Vragen beantwoorden</span>
             </label>
-            <label className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-3 py-2.5 shadow-sm">
+            <label className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-3 py-2.5">
               <input
                 type="checkbox"
                 checked={goals.klantenHelpen}
@@ -184,7 +186,7 @@ export function ChatbotStudio(props: {
               />
               <span className="text-sm text-gray-800">Klanten helpen</span>
             </label>
-            <label className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-3 py-2.5 shadow-sm">
+            <label className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-3 py-2.5">
               <input
                 type="checkbox"
                 checked={goals.contactAanvragenVerwerken}
@@ -203,8 +205,13 @@ export function ChatbotStudio(props: {
             <div className="grid gap-2 sm:grid-cols-2">
               <Button
                 type="button"
-                variant={extraGoals.productadvies ? "default" : "outline"}
-                className="justify-start rounded-xl"
+                variant={extraGoals.productadvies ? "secondary" : "outline"}
+                className={cn(
+                  "justify-start rounded-xl border text-sm font-medium",
+                  extraGoals.productadvies
+                    ? "border-gray-300 bg-gray-900 text-white hover:bg-gray-800 hover:text-white"
+                    : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50",
+                )}
                 onClick={() =>
                   setExtraGoals((p) => ({ ...p, productadvies: !p.productadvies }))
                 }
@@ -213,16 +220,26 @@ export function ChatbotStudio(props: {
               </Button>
               <Button
                 type="button"
-                variant={extraGoals.faqUitleg ? "default" : "outline"}
-                className="justify-start rounded-xl"
+                variant={extraGoals.faqUitleg ? "secondary" : "outline"}
+                className={cn(
+                  "justify-start rounded-xl border text-sm font-medium",
+                  extraGoals.faqUitleg
+                    ? "border-gray-300 bg-gray-900 text-white hover:bg-gray-800 hover:text-white"
+                    : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50",
+                )}
                 onClick={() => setExtraGoals((p) => ({ ...p, faqUitleg: !p.faqUitleg }))}
               >
                 FAQ kort uitleggen
               </Button>
               <Button
                 type="button"
-                variant={extraGoals.contactEscalatie ? "default" : "outline"}
-                className="justify-start rounded-xl"
+                variant={extraGoals.contactEscalatie ? "secondary" : "outline"}
+                className={cn(
+                  "justify-start rounded-xl border text-sm font-medium",
+                  extraGoals.contactEscalatie
+                    ? "border-gray-300 bg-gray-900 text-white hover:bg-gray-800 hover:text-white"
+                    : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50",
+                )}
                 onClick={() =>
                   setExtraGoals((p) => ({ ...p, contactEscalatie: !p.contactEscalatie }))
                 }
@@ -231,8 +248,13 @@ export function ChatbotStudio(props: {
               </Button>
               <Button
                 type="button"
-                variant={extraGoals.afspraakOpVerzoek ? "default" : "outline"}
-                className="justify-start rounded-xl"
+                variant={extraGoals.afspraakOpVerzoek ? "secondary" : "outline"}
+                className={cn(
+                  "justify-start rounded-xl border text-sm font-medium",
+                  extraGoals.afspraakOpVerzoek
+                    ? "border-gray-300 bg-gray-900 text-white hover:bg-gray-800 hover:text-white"
+                    : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50",
+                )}
                 onClick={() =>
                   setExtraGoals((p) => ({ ...p, afspraakOpVerzoek: !p.afspraakOpVerzoek }))
                 }
@@ -248,7 +270,7 @@ export function ChatbotStudio(props: {
               value={openingszin}
               onChange={(e) => setOpeningszin(e.target.value)}
               placeholder="Hallo! Waarmee kan ik je helpen?"
-              className="rounded-xl"
+              className={cn(textFieldClass, "h-11")}
             />
           </section>
 
@@ -256,7 +278,13 @@ export function ChatbotStudio(props: {
             <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
           ) : null}
 
-          <Button type="button" size="lg" onClick={onSave} disabled={!canSave || saving} className="w-full">
+          <Button
+            type="button"
+            size="lg"
+            onClick={onSave}
+            disabled={!canSave || saving}
+            className="w-full rounded-xl bg-gray-900 text-white hover:bg-gray-800"
+          >
             {saving ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
             Maak mijn chatbot
           </Button>
@@ -267,13 +295,13 @@ export function ChatbotStudio(props: {
                 <CheckCircle2 className="size-4" /> Je chatbot is klaar
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
-                <Button asChild size="sm">
+                <Button asChild size="sm" className="rounded-lg bg-gray-900 text-white hover:bg-gray-800">
                   <Link href="/dashboard/settings?tab=whatsapp">WhatsApp activeren</Link>
                 </Button>
-                <Button asChild size="sm" variant="outline">
+                <Button asChild size="sm" variant="outline" className="rounded-lg border-gray-200 bg-white text-gray-700">
                   <Link href="/dashboard/settings?tab=email">E-mail activeren</Link>
                 </Button>
-                <Button asChild size="sm" variant="secondary">
+                <Button asChild size="sm" variant="outline" className="rounded-lg border-gray-200 bg-white text-gray-700">
                   <Link href="/dashboard/settings?tab=widget">Website chat toevoegen</Link>
                 </Button>
               </div>
@@ -294,7 +322,7 @@ export function ChatbotStudio(props: {
         </div>
       </section>
 
-      <section className="flex min-h-[760px] flex-col rounded-2xl border border-gray-200/90 bg-white shadow-[0_20px_60px_-44px_rgba(15,23,42,0.45)]">
+      <section className="flex min-h-[690px] flex-col rounded-2xl border border-gray-200/90 bg-white shadow-[0_20px_60px_-44px_rgba(15,23,42,0.45)]">
         <header className="border-b border-gray-200 px-6 py-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Live preview</p>
           <h3 className="mt-1 flex items-center gap-2 text-lg font-semibold text-gray-900">
