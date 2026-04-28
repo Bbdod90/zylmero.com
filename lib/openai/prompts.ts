@@ -18,7 +18,13 @@ export function businessContextBlock(
     settings?.niche?.trim() || niche.label;
 
   const prefs = settings?.automation_preferences as
-    | { niche_intake?: Record<string, string>; ai_knowledge_crawled_document?: string }
+    | {
+        niche_intake?: Record<string, string>;
+        ai_knowledge_crawled_document?: string;
+        chatbot_company_description?: string;
+        chatbot_opening_line?: string;
+        chatbot_extra_info?: string;
+      }
     | undefined;
   const intake =
     settings?.niche_intake && Object.keys(settings.niche_intake).length > 0
@@ -52,6 +58,15 @@ export function businessContextBlock(
       : `Antwoordstijl (standaard niche): ${niche.defaultReplyStyle}`,
     `Taal output: ${settings?.language || "nl"}`,
     `Typische kwalificatievragen voor deze branche: ${q.join(" | ")}`,
+    prefs?.chatbot_company_description
+      ? `Bedrijfsomschrijving (chatbot builder): ${prefs.chatbot_company_description}`
+      : "",
+    prefs?.chatbot_opening_line
+      ? `Voorkeur openingszin chatbot: ${prefs.chatbot_opening_line}`
+      : "",
+    prefs?.chatbot_extra_info
+      ? `Extra info uit chatbot builder:\n${prefs.chatbot_extra_info}`
+      : "",
     intakeLines,
     settings?.faq?.length
       ? `FAQ:\n${settings.faq.map((f) => `Q: ${f.q}\nA: ${f.a}`).join("\n")}`

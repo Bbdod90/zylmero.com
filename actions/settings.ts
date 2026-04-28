@@ -29,6 +29,10 @@ export type ChatbotPreviewState =
   | { ok: true; reply: string }
   | { ok: false; error: string };
 
+export type ChatbotStudioState =
+  | { ok: true; digest_nl: string | null; scanned_pages_count: number }
+  | { ok: false; error: string };
+
 const MAX_TEXT_PER_PAGE = 2200;
 
 type CrawlResult = {
@@ -861,6 +865,17 @@ export async function removeAiKnowledgePageSubmitAction(
 
 export async function previewChatbotVisitorMessageAction(
   message: string,
+  draft?: {
+    bedrijfsOmschrijving?: string;
+    websiteUrl?: string;
+    extraInfo?: string;
+    openingszin?: string;
+    doelen?: {
+      vragenBeantwoorden?: boolean;
+      klantenHelpen?: boolean;
+      contactAanvragenVerwerken?: boolean;
+    };
+  },
 ): Promise<ChatbotPreviewState> {
   if (isDemoMode()) {
     return { ok: false, error: "Preview is niet beschikbaar in demo-modus." };
@@ -900,8 +915,17 @@ export async function previewChatbotVisitorMessageAction(
       ? prefs.ai_knowledge_document.trim()
       : "";
 
+  const draftWebsite = normalizeKnowledgeWebsiteUrl(draft?.websiteUrl || "");
+  const draftExtra = String(draft?.extraInfo || "").trim();
+  const draftDesc = String(draft?.bedrijfsOmschrijving || "").trim();
   const hasKnowledge =
-    pages.length > 0 || Boolean(crawled) || Boolean(doc) || Boolean(settings?.ai_knowledge_document?.trim());
+    pages.length > 0 ||
+    Boolean(crawled) ||
+    Boolean(doc) ||
+    Boolean(settings?.ai_knowledge_document?.trim()) ||
+    Boolean(draftWebsite) ||
+    Boolean(draftExtra) ||
+    Boolean(draftDesc);
   if (!hasKnowledge) {
     return {
       ok: false,
@@ -910,9 +934,32 @@ export async function previewChatbotVisitorMessageAction(
   }
 
   try {
+    const mergedSettings = settings
+      ? {
+          ...settings,
+          ai_knowledge_website: draftWebsite || settings.ai_knowledge_website,
+          ai_knowledge_document: draftExtra || settings.ai_knowledge_document,
+          automation_preferences: {
+            ...(settings.automation_preferences || {}),
+            chatbot_company_description: draftDesc || prefs.chatbot_company_description || null,
+            chatbot_opening_line:
+              String(draft?.openingszin || "").trim() || (prefs.chatbot_opening_line as string | null) || null,
+            chatbot_extra_info: draftExtra || (prefs.chatbot_extra_info as string | null) || null,
+            chatbot_goals:
+              draft?.doelen && Object.keys(draft.doelen).length > 0
+                ? {
+                    vragen_beantwoorden: draft.doelen.vragenBeantwoorden !== false,
+                    klanten_helpen: draft.doelen.klantenHelpen !== false,
+                    contactaanvragen_verwerken: draft.doelen.contactAanvragenVerwerken !== false,
+                  }
+                : (prefs.chatbot_goals as Record<string, unknown> | null),
+          },
+        }
+      : settings;
+
     const reply = await previewVisitorChatReply({
       companyName: auth.company.name,
-      settings,
+      settings: mergedSettings,
       nicheId: auth.company.niche ?? null,
       visitorMessage: trimmed,
     });
@@ -921,6 +968,131 @@ export async function previewChatbotVisitorMessageAction(
     const msg = e instanceof Error ? e.message : "Er ging iets mis.";
     return { ok: false, error: msg };
   }
+}
+
+export async function saveChatbotStudioAction(input: {
+  bedrijfsOmschrijving: string;
+  websiteUrl: string;
+  extraInfo: string;
+  openingszin: string;
+  doelen: {
+    vragenBeantwoorden: boolean;
+    klantenHelpen: boolean;
+    contactAanvragenVerwerken: boolean;
+  };
+}): Promise<ChatbotStudioState> {
+  if (isDemoMode()) {
+    return { ok: false, error: "Niet beschikbaar in demo-modus." };
+  }
+  const auth = await getAuth();
+  if (!auth.user || !auth.company) {
+    return { ok: false, error: "Niet ingelogd." };
+  }
+
+  const bedrijfsOmschrijving = String(input.bedrijfsOmschrijving || "").trim();
+  if (!bedrijfsOmschrijving) {
+    return { ok: false, error: "Bedrijfsomschrijving is verplicht." };
+  }
+  if (bedrijfsOmschrijving.length > 4000) {
+    return { ok: false, error: "Bedrijfsomschrijving is te lang (max. 4000 tekens)." };
+  }
+  const website = normalizeKnowledgeWebsiteUrl(String(input.websiteUrl || ""));
+  if (website && isNonPublicKnowledgeHost(website)) {
+    return {
+      ok: false,
+      error:
+        "Gebruik je publieke website (bijv. https://jouwdomein.nl), geen localhost. Lokaal testen kan in .env, niet in dit veld.",
+    };
+  }
+  const extraInfo = String(input.extraInfo || "").trim();
+  if (extraInfo.length > 48_000) {
+    return { ok: false, error: "Extra info is te lang (max. 48.000 tekens)." };
+  }
+  const openingszin = String(input.openingszin || "").trim().slice(0, 300);
+
+  const supabase = await createClient();
+  const { data: settingsRow } = await supabase
+    .from("company_settings")
+    .select("*")
+    .eq("company_id", auth.company.id)
+    .maybeSingle();
+  const prev = mapCompanySettingsRow(settingsRow as Record<string, unknown>);
+  const prevAi = (settingsRow?.automation_preferences as Record<string, unknown>) || {};
+
+  let pages: AiKnowledgePage[] = [];
+  let crawledDocument = "";
+  let crawlCapped = false;
+  if (website) {
+    try {
+      const crawled = await crawlKnowledgeWebsite(website);
+      pages = crawled.pages;
+      crawledDocument = crawled.crawledDocument;
+      crawlCapped = crawled.capped;
+    } catch {
+      // non-blocking
+    }
+  }
+
+  const digestNl = await generateSiteKnowledgeDigestNl({
+    companyName: auth.company.name,
+    website: website || null,
+    extraDocument: extraInfo || null,
+    pages,
+    crawledDocument,
+  });
+
+  const automation_preferences = {
+    ...prevAi,
+    ai_knowledge_website: website || null,
+    ai_knowledge_document: extraInfo || null,
+    ai_knowledge_pages: pages,
+    ai_knowledge_crawled_document: crawledDocument || null,
+    ai_knowledge_last_scanned_at: new Date().toISOString(),
+    ai_knowledge_crawl_capped: website ? crawlCapped : false,
+    ai_knowledge_digest_nl: digestNl,
+    chatbot_company_description: bedrijfsOmschrijving,
+    chatbot_opening_line: openingszin || null,
+    chatbot_extra_info: extraInfo || null,
+    chatbot_goals: {
+      vragen_beantwoorden: input.doelen.vragenBeantwoorden !== false,
+      klanten_helpen: input.doelen.klantenHelpen !== false,
+      contactaanvragen_verwerken: input.doelen.contactAanvragenVerwerken !== false,
+    },
+    niche_key: auth.company.niche ?? prevAi.niche_key,
+  };
+
+  const { error } = await supabase.from("company_settings").upsert(
+    {
+      company_id: auth.company.id,
+      niche: prev?.niche ?? null,
+      services: prev?.services ?? [],
+      faq: prev?.faq ?? [],
+      pricing_hints: prev?.pricing_hints ?? null,
+      business_hours: prev?.business_hours ?? {},
+      booking_link: prev?.booking_link ?? null,
+      tone: prev?.tone ?? null,
+      reply_style: prev?.reply_style ?? null,
+      language: prev?.language ?? "nl",
+      automation_preferences,
+      whatsapp_channel: prev?.whatsapp_channel ?? {
+        provider: "mock",
+        connected: false,
+      },
+      auto_reply_enabled: prev?.auto_reply_enabled ?? false,
+      auto_reply_delay_seconds: prev?.auto_reply_delay_seconds ?? 30,
+      ai_usage_count: prev?.ai_usage_count ?? 0,
+      ai_setup_completed_at: prev?.ai_setup_completed_at ?? null,
+      niche_intake: prev?.niche_intake ?? {},
+      knowledge_snippets: prev?.knowledge_snippets ?? [],
+      white_label_logo_url: prev?.white_label_logo_url ?? null,
+      white_label_primary: prev?.white_label_primary ?? null,
+    },
+    { onConflict: "company_id" },
+  );
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/dashboard/chatbot");
+  revalidatePath("/dashboard/settings");
+  return { ok: true, digest_nl: digestNl, scanned_pages_count: pages.length };
 }
 
 export async function updateQuoteTemplateAction(
