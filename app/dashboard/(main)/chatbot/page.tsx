@@ -61,6 +61,9 @@ export default async function ChatbotPage() {
             klantenHelpen: goals.klanten_helpen !== false,
             contactAanvragenVerwerken: goals.contactaanvragen_verwerken !== false,
           }}
+          initialAntwoordLengte={
+            prefs.chatbot_answer_length === "normal" ? "normal" : "short"
+          }
           embedSnippet={`<script src=\"${siteUrl().replace(/\/$/, "")}/widget.js\" data-id=\"${auth.company.id}\"></script>`}
         />
       </DashboardWorkSurface>

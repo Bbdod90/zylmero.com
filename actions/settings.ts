@@ -881,6 +881,7 @@ export async function previewChatbotVisitorMessageAction(
       contactEscalatie?: boolean;
       afspraakOpVerzoek?: boolean;
     };
+    antwoordLengte?: "short" | "normal";
   },
 ): Promise<ChatbotPreviewState> {
   if (isDemoMode()) {
@@ -968,6 +969,10 @@ export async function previewChatbotVisitorMessageAction(
                     draft.extraDoelen.afspraakOpVerzoek ? "Afspraak/offerte alleen op verzoek" : null,
                   ].filter(Boolean)
                 : (prefs.chatbot_capabilities as string[] | null),
+            chatbot_answer_length:
+              draft?.antwoordLengte === "normal" || draft?.antwoordLengte === "short"
+                ? draft.antwoordLengte
+                : (prefs.chatbot_answer_length as string | null) || "short",
           },
         }
       : settings;
@@ -1001,6 +1006,7 @@ export async function saveChatbotStudioAction(input: {
     contactEscalatie?: boolean;
     afspraakOpVerzoek?: boolean;
   };
+  antwoordLengte?: "short" | "normal";
 }): Promise<ChatbotStudioState> {
   if (isDemoMode()) {
     return { ok: false, error: "Niet beschikbaar in demo-modus." };
@@ -1085,6 +1091,7 @@ export async function saveChatbotStudioAction(input: {
       input.extraDoelen?.contactEscalatie ? "Doorzetten naar contact bij complexe vraag" : null,
       input.extraDoelen?.afspraakOpVerzoek ? "Afspraak/offerte alleen op verzoek" : null,
     ].filter(Boolean),
+    chatbot_answer_length: input.antwoordLengte === "normal" ? "normal" : "short",
     niche_key: auth.company.niche ?? prevAi.niche_key,
   };
 
