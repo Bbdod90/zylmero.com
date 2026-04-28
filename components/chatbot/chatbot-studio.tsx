@@ -179,8 +179,8 @@ export function ChatbotStudio(props: {
   };
 
   return (
-    <div className="mx-auto grid w-full max-w-[1520px] gap-8 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)]">
-      <section className="rounded-2xl border border-gray-200/90 bg-white p-8 shadow-[0_20px_60px_-44px_rgba(15,23,42,0.45)]">
+    <div className="mx-auto grid w-full max-w-[1500px] gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+      <section className="rounded-2xl border border-gray-200/90 bg-white p-6 shadow-[0_20px_60px_-44px_rgba(15,23,42,0.45)]">
         <div className="space-y-1">
           <h2 className="text-2xl font-semibold tracking-tight text-gray-900">Maak je chatbot in 1 minuut</h2>
           <p className="text-sm text-gray-600">
@@ -188,8 +188,8 @@ export function ChatbotStudio(props: {
           </p>
         </div>
 
-        <div className="mt-8 space-y-8">
-          <section className="space-y-4">
+        <div className="mt-6 space-y-5">
+          <section className="space-y-3">
             <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500">Over je bedrijf</h3>
             <div className="space-y-2">
               <Label htmlFor="chatbot-bedrijfsomschrijving">Wat doet je bedrijf?</Label>
@@ -198,8 +198,8 @@ export function ChatbotStudio(props: {
                 value={bedrijfsOmschrijving}
                 onChange={(e) => setBedrijfsOmschrijving(e.target.value)}
                 placeholder="Bijv. Wij verkopen fatbikes en doen reparaties."
-                rows={3}
-                className={cn(textFieldClass, "min-h-[96px]")}
+                rows={2}
+                className={cn(textFieldClass, "min-h-[72px]")}
               />
             </div>
             <div className="space-y-2">
@@ -220,12 +220,12 @@ export function ChatbotStudio(props: {
                 onChange={(e) => setExtraInfo(e.target.value)}
                 placeholder="Bijv. openingstijden, prijzen, garantie en contactgegevens."
                 rows={2}
-                className={cn(textFieldClass, "min-h-[72px]")}
+                className={cn(textFieldClass, "min-h-[64px]")}
               />
             </div>
           </section>
 
-          <section className="space-y-3">
+          <section className="space-y-2.5">
             <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
               Wat moet je chatbot voor klanten doen?
             </h3>
@@ -251,37 +251,39 @@ export function ChatbotStudio(props: {
             />
           </section>
 
-          <section className="space-y-3">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
+          <details className="rounded-xl border border-gray-200 bg-gray-50">
+            <summary className="cursor-pointer px-4 py-2.5 text-sm font-semibold text-gray-700">
               Extra opties (aan/uit)
-            </h3>
-            <SettingSwitchRow
-              title="Productadvies geven"
-              description="De chatbot helpt klanten bij productkeuze."
-              checked={extraGoals.productadvies}
-              onCheckedChange={(next) => setExtraGoals((p) => ({ ...p, productadvies: next }))}
-            />
-            <SettingSwitchRow
-              title="Veelgestelde vragen uitleggen"
-              description="De chatbot geeft korte FAQ-uitleg als iemand vastloopt."
-              checked={extraGoals.faqUitleg}
-              onCheckedChange={(next) => setExtraGoals((p) => ({ ...p, faqUitleg: next }))}
-            />
-            <SettingSwitchRow
-              title="Doorsturen naar contact"
-              description="Bij complexe vraag verwijst de chatbot door naar contact."
-              checked={extraGoals.contactEscalatie}
-              onCheckedChange={(next) => setExtraGoals((p) => ({ ...p, contactEscalatie: next }))}
-            />
-            <SettingSwitchRow
-              title="Alleen actie op verzoek"
-              description="Geen offerte of afspraak pushen zonder expliciete vraag."
-              checked={extraGoals.afspraakOpVerzoek}
-              onCheckedChange={(next) => setExtraGoals((p) => ({ ...p, afspraakOpVerzoek: next }))}
-            />
-          </section>
+            </summary>
+            <div className="space-y-2 border-t border-gray-200 px-3 py-3">
+              <SettingSwitchRow
+                title="Productadvies geven"
+                description="De chatbot helpt klanten bij productkeuze."
+                checked={extraGoals.productadvies}
+                onCheckedChange={(next) => setExtraGoals((p) => ({ ...p, productadvies: next }))}
+              />
+              <SettingSwitchRow
+                title="Veelgestelde vragen uitleggen"
+                description="De chatbot geeft korte FAQ-uitleg als iemand vastloopt."
+                checked={extraGoals.faqUitleg}
+                onCheckedChange={(next) => setExtraGoals((p) => ({ ...p, faqUitleg: next }))}
+              />
+              <SettingSwitchRow
+                title="Doorsturen naar contact"
+                description="Bij complexe vraag verwijst de chatbot door naar contact."
+                checked={extraGoals.contactEscalatie}
+                onCheckedChange={(next) => setExtraGoals((p) => ({ ...p, contactEscalatie: next }))}
+              />
+              <SettingSwitchRow
+                title="Alleen actie op verzoek"
+                description="Geen offerte of afspraak pushen zonder expliciete vraag."
+                checked={extraGoals.afspraakOpVerzoek}
+                onCheckedChange={(next) => setExtraGoals((p) => ({ ...p, afspraakOpVerzoek: next }))}
+              />
+            </div>
+          </details>
 
-          <section className="space-y-3">
+          <section className="space-y-2.5">
             <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
               Antwoordlengte
             </h3>
@@ -315,7 +317,7 @@ export function ChatbotStudio(props: {
             </div>
           </section>
 
-          <section className="space-y-2">
+          <section className="space-y-1.5">
             <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500">Eerste bericht (optioneel)</h3>
             <Input
               value={openingszin}
@@ -329,19 +331,13 @@ export function ChatbotStudio(props: {
             <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
           ) : null}
 
-          <Button
-            type="button"
-            size="lg"
-            onClick={onSave}
-            disabled={!canSave || saving}
-            className="w-full rounded-xl bg-gray-900 text-white hover:bg-gray-800"
-          >
+          <Button type="button" size="lg" onClick={onSave} disabled={!canSave || saving} className="w-full rounded-xl bg-gray-900 text-white hover:bg-gray-800">
             {saving ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
             Maak mijn chatbot
           </Button>
 
           {saved ? (
-            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3">
               <p className="flex items-center gap-2 text-sm font-semibold text-emerald-900">
                 <CheckCircle2 className="size-4" /> Klaar! Je chatbot staat aan
               </p>
@@ -374,7 +370,7 @@ export function ChatbotStudio(props: {
       </section>
 
       <section className="flex min-h-[360px] flex-col rounded-2xl border border-gray-200/90 bg-white shadow-[0_20px_60px_-44px_rgba(15,23,42,0.45)]">
-        <header className="border-b border-gray-200 px-6 py-4">
+        <header className="border-b border-gray-200 px-5 py-3">
           <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Live preview</p>
           <h3 className="mt-1 flex items-center gap-2 text-lg font-semibold text-gray-900">
             Test je chatbot <Sparkles className="size-4 text-primary" />
@@ -385,13 +381,13 @@ export function ChatbotStudio(props: {
         </header>
 
         {digest ? (
-          <div className="border-b border-gray-200 bg-gray-50 px-6 py-3 text-xs text-gray-600">
+          <div className="border-b border-gray-200 bg-gray-50 px-5 py-2.5 text-xs text-gray-600">
             <p className="font-semibold text-gray-700">Samenvatting van je kennis</p>
             <p className="mt-1 whitespace-pre-wrap">{digest}</p>
           </div>
         ) : null}
 
-        <div className="space-y-3 overflow-y-auto bg-gray-50/70 px-6 py-4" style={{ height: chatHeight }}>
+        <div className="space-y-2.5 overflow-y-auto bg-gray-50/70 px-5 py-3" style={{ height: chatHeight }}>
           {chat.map((m, i) => (
             <div
               key={`${i}-${m.role}`}
@@ -399,7 +395,7 @@ export function ChatbotStudio(props: {
             >
               <div
                 className={cn(
-                  "max-w-[88%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
+                  "max-w-[88%] rounded-2xl px-3.5 py-2 text-sm leading-relaxed",
                   m.role === "user"
                     ? "border border-gray-200 bg-white text-gray-900"
                     : "bg-gray-900 text-white",
@@ -417,7 +413,7 @@ export function ChatbotStudio(props: {
           ) : null}
         </div>
 
-        <div className="border-t border-gray-200 px-6 py-2.5">
+        <div className="border-t border-gray-200 px-5 py-2">
           <button
             type="button"
             className="group mx-auto flex h-5 w-full cursor-row-resize items-center justify-center"
@@ -431,9 +427,9 @@ export function ChatbotStudio(props: {
           >
             <span className="h-1.5 w-14 rounded-full bg-gray-300 transition-colors group-hover:bg-gray-500" />
           </button>
-          <p className="mb-2 text-center text-[11px] text-gray-500">Sleep omhoog/omlaag om meer chat te zien</p>
+          <p className="mb-1.5 text-center text-[11px] text-gray-500">Sleep omhoog/omlaag om meer chat te zien</p>
         </div>
-        <div className="space-y-3 border-t border-gray-200 px-6 py-4">
+        <div className="space-y-2.5 border-t border-gray-200 px-5 py-3">
           <div className="flex flex-wrap gap-2">
             {suggestionChips.map((q) => (
               <Button key={q} type="button" size="sm" variant="secondary" onClick={() => runPreview(q)}>
