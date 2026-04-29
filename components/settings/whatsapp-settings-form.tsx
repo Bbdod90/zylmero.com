@@ -141,6 +141,12 @@ export function WhatsAppSettingsForm({
     const el = advDetailsRef.current;
     if (el && shouldOpenAdvanced) el.open = true;
   }, [shouldOpenAdvanced]);
+  const providerLinks: Record<WaProvider, { label: string; href: string }> = {
+    meta: { label: "Open Meta WhatsApp", href: META_BUSINESS_WA },
+    twilio: { label: "Open Twilio Console", href: TWILIO_CONSOLE },
+    mock: { label: "Open Berichten in Zylmero", href: "/dashboard/inbox" },
+  };
+  const activeProviderLink = providerLinks[provider];
 
   return (
     <form
@@ -158,37 +164,17 @@ export function WhatsAppSettingsForm({
           </div>
           <div className="min-w-0 flex-1 space-y-3">
             <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary/90">WhatsApp</p>
-            <h2 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
-              In drie stappen klaar in Zylmero
-            </h2>
-            <ol className="max-w-3xl list-decimal space-y-1.5 pl-5 text-sm leading-relaxed text-muted-foreground sm:text-[0.9375rem]">
-              <li>
-                <span className="font-medium text-foreground">Kies</span> hieronder hoe je echte WhatsApp wilt
-                koppelen (of &apos;Alleen testen&apos;).
-              </li>
-              <li>
-                <span className="font-medium text-foreground">Open</span> Meta of Twilio in een nieuw venster en
-                volg hun stappen — dat kan Zylmero niet automatisch voor je inloggen.
-              </li>
-              <li>
-                <span className="font-medium text-foreground">Kom terug</span> en klik op{" "}
-                <span className="font-medium text-foreground">Opslaan in Zylmero</span>. Daarna lees je appjes in{" "}
-                <Link
-                  href="/dashboard/inbox"
-                  className="font-medium text-primary underline decoration-primary/35 underline-offset-2 hover:decoration-primary"
-                >
-                  Berichten
-                </Link>
-                .
-              </li>
-            </ol>
+            <h2 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">WhatsApp koppelen</h2>
+            <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground sm:text-[0.9375rem]">
+              Kies je provider, open de juiste omgeving en sla je keuze op. Geen stappenplan — gewoon direct koppelen.
+            </p>
           </div>
         </div>
       </div>
 
       <div className="space-y-8 px-5 py-7 sm:px-8 sm:py-9">
         <fieldset className="space-y-4">
-          <legend className="text-base font-semibold text-foreground">1. Hoe wil je koppelen?</legend>
+          <legend className="text-base font-semibold text-foreground">Welke WhatsApp-provider wil je koppelen?</legend>
           <div className="grid gap-4 sm:grid-cols-3">
             {PROVIDERS.map((p) => (
               <ProviderCard
@@ -202,22 +188,20 @@ export function WhatsAppSettingsForm({
         </fieldset>
 
         <div className="space-y-3 rounded-2xl border border-border/50 bg-muted/[0.25] p-5 dark:border-white/[0.08] dark:bg-white/[0.03] sm:p-6">
-          <p className="text-sm font-semibold text-foreground">2. Open je provider (nieuw tabblad)</p>
+          <p className="text-sm font-semibold text-foreground">Open geselecteerde provider</p>
           <p className="text-xs leading-relaxed text-muted-foreground sm:text-sm">
-            Zylmero stuurt geen echte WhatsApp voor je aan — dat doe je bij Meta of Twilio. Daarna sla je hieronder je
-            keuze op.
+            Zylmero logt niet voor je in bij Meta of Twilio. Open je gekozen provider, rond daar je setup af en klik
+            daarna op opslaan.
           </p>
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <Button asChild size="lg" className="h-12 rounded-xl font-semibold shadow-sm">
-              <a href={META_BUSINESS_WA} target="_blank" rel="noopener noreferrer">
+              <a
+                href={activeProviderLink.href}
+                target={provider === "mock" ? undefined : "_blank"}
+                rel={provider === "mock" ? undefined : "noopener noreferrer"}
+              >
                 <ExternalLink className="mr-2 size-4 opacity-90" aria-hidden />
-                WhatsApp bij Meta openen
-              </a>
-            </Button>
-            <Button asChild variant="outline" size="lg" className="h-12 rounded-xl font-semibold">
-              <a href={TWILIO_CONSOLE} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="mr-2 size-4 opacity-80" aria-hidden />
-                Twilio-console
+                {activeProviderLink.label}
               </a>
             </Button>
             <Button asChild variant="secondary" size="lg" className="h-12 rounded-xl font-semibold">
@@ -232,14 +216,6 @@ export function WhatsAppSettingsForm({
               </a>
             </Button>
           </div>
-        </div>
-
-        <div className="space-y-4">
-          <p className="text-sm font-semibold text-foreground">3. Opslaan in Zylmero</p>
-          <p className="text-xs text-muted-foreground sm:text-sm">
-            Dit zet je voorkeur vast en zet concept-antwoorden klaar. Nummer en ID vul je alleen in als je provider dat
-            vraagt — zie &apos;Optioneel&apos; hieronder.
-          </p>
         </div>
 
         <details

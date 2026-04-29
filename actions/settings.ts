@@ -608,6 +608,11 @@ export async function updateEmailInboundSettingsAction(
   }
 
   const email_inbound_enabled = formData.get("email_inbound_enabled") === "on";
+  const emailProviderRaw = String(formData.get("email_provider") || "").trim().toLowerCase();
+  const email_provider =
+    emailProviderRaw === "google" || emailProviderRaw === "microsoft" || emailProviderRaw === "other"
+      ? emailProviderRaw
+      : "other";
 
   const supabase = await createClient();
   const { data: settingsRow } = await supabase
@@ -622,6 +627,7 @@ export async function updateEmailInboundSettingsAction(
   const automation_preferences = {
     ...prevPrefs,
     email_inbound_enabled,
+    email_provider,
     niche_key: auth.company.niche ?? prevPrefs.niche_key,
   };
 

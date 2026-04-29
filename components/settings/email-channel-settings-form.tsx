@@ -1,6 +1,7 @@
 "use client";
 
 import { useFormState, useFormStatus } from "react-dom";
+import { useState } from "react";
 import {
   updateEmailInboundSettingsAction,
   type SettingsFormState,
@@ -11,9 +12,22 @@ import { CopyButton } from "@/components/growth/copy-button";
 import { FormBooleanSwitch } from "@/components/settings/form-boolean-switch";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { Mail } from "lucide-react";
+import { Building2, Mail, Server, Sparkles } from "lucide-react";
 
 const initial: SettingsFormState = {};
+
+type MailProvider = "google" | "microsoft" | "other";
+
+const MAIL_PROVIDERS: Array<{
+  value: MailProvider;
+  title: string;
+  hint: string;
+  icon: typeof Mail;
+}> = [
+  { value: "google", title: "Gmail / Google Workspace", hint: "Zakelijke of standaard Gmail inbox", icon: Mail },
+  { value: "microsoft", title: "Outlook / Microsoft 365", hint: "Exchange Online of Outlook mailbox", icon: Building2 },
+  { value: "other", title: "Andere mailprovider", hint: "IMAP/SMTP host of eigen server", icon: Server },
+];
 
 function Submit({ label }: { label: string }) {
   const { pending } = useFormStatus();
@@ -36,24 +50,19 @@ export function EmailChannelSettingsForm({
   siteOrigin: string;
 }) {
   const [state, action] = useFormState(updateEmailInboundSettingsAction, initial);
+  const [mailProvider, setMailProvider] = useState<MailProvider>("google");
   const base = siteOrigin.replace(/\/$/, "");
   const inboundPath = `${base}/api/webhooks/inbound-email`;
 
   const builderPack = [
     "Zylmero — koppeling inkomende e-mail",
     "",
-    "1) Zet de schakelaar hieronder aan in je Zylmero-instellingen.",
-    "2) Vul bij Bedrijf je openbare contactmail in (als die nog leeg is).",
-    "3) Laat je mailleverancier of IT inkomende mail automatisch doorsturen naar het koppel-adres hieronder.",
+    `Provider: ${mailProvider}`,
+    `Koppel-adres (webhook): ${inboundPath}`,
+    `Company id: ${companyId}`,
     "",
-    `Koppel-adres (alleen voor technische kant):`,
-    inboundPath,
-    "",
-    `Jouw referentie in het bericht (veld company_id):`,
-    companyId,
-    "",
-    "Voorbeeldinhoud van een bericht:",
-    `{ "company_id": "${companyId}", "from": "klant@voorbeeld.nl", "from_name": "Jan", "subject": "Vraag", "body": "…" }`,
+    "Voorbeeld payload:",
+    `{ "company_id": "${companyId}", "from": "klant@voorbeeld.nl", "from_name": "Jan", "subject": "Vraag", "body": "..." }`,
   ].join("\n");
 
   return (
@@ -72,17 +81,11 @@ export function EmailChannelSettingsForm({
           </div>
           <div className="min-w-0 space-y-2">
             <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary/90">Kanaal</p>
-            <h2 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">E-mail binnen laten komen</h2>
+            <h2 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">E-mail koppelen</h2>
             <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-[0.9375rem]">
-              Klantmail verschijnt bij <strong className="font-medium text-foreground">Berichten</strong>, net als
-              WhatsApp — dezelfde chatbot, één overzicht. Je vult{" "}
-              <strong className="font-medium text-foreground">geen wachtwoord</strong> in bij Zylmero: mail komt
-              binnen via <strong className="font-medium text-foreground">doorsturen</strong> vanaf je huidige
-              mailhost. Contactadres: tabblad{" "}
-              <Link
-                href="/dashboard/settings?tab=business"
-                className="font-medium text-primary underline decoration-primary/35 underline-offset-2"
-              >
+              Kies je mailtype, zet inkomende mail aan, en klaar. Klantmail komt daarna in{" "}
+              <strong className="font-medium text-foreground">Berichten</strong>. Contactadres beheer je in tabblad{" "}
+              <Link href="/dashboard/settings?tab=business" className="font-medium text-primary underline decoration-primary/35 underline-offset-2">
                 Bedrijf
               </Link>
               .
@@ -92,78 +95,68 @@ export function EmailChannelSettingsForm({
       </div>
 
       <div className="space-y-8 px-5 py-7 sm:px-8 sm:py-9">
-        <div className="rounded-2xl border border-sky-500/30 bg-sky-500/[0.08] px-4 py-3.5 text-sm leading-relaxed text-foreground dark:border-sky-500/25 dark:bg-sky-500/10">
-          <p className="font-semibold">Zo “log” je dus niet in op mail</p>
-          <p className="mt-1.5 text-muted-foreground">
-            Kies hieronder <span className="font-medium text-foreground">Aan</span> en stuur de instructies naar je IT
-            of webhost — zij zetten doorsturen naar Zylmero. Dat is de veilige, gebruikelijke manier; Zylmero vraagt
-            nergens je Gmail- of Microsoft-wachtwoord.
-          </p>
+        <div className="space-y-3">
+          <p className="text-sm font-semibold text-foreground">Wat voor e-mail wil je koppelen?</p>
+          <input type="hidden" name="email_provider" value={mailProvider} />
+          <div className="grid gap-3 sm:grid-cols-3">
+            {MAIL_PROVIDERS.map((provider) => {
+              const Icon = provider.icon;
+              const selected = mailProvider === provider.value;
+              return (
+                <label
+                  key={provider.value}
+                  className={cn(
+                    "cursor-pointer rounded-xl border p-4 transition-all",
+                    selected ? "border-primary bg-primary/[0.08]" : "border-border/55 bg-gradient-to-b from-card to-muted/15",
+                  )}
+                >
+                  <input
+                    type="radio"
+                    name="email_provider_ui"
+                    className="sr-only"
+                    checked={selected}
+                    onChange={() => setMailProvider(provider.value)}
+                  />
+                  <div className="mb-2 flex size-9 items-center justify-center rounded-lg bg-background/80 text-primary">
+                    <Icon className="size-4" aria-hidden />
+                  </div>
+                  <p className="text-sm font-medium text-foreground">{provider.title}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{provider.hint}</p>
+                </label>
+              );
+            })}
+          </div>
         </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-xl border border-border/55 bg-gradient-to-b from-card to-muted/15 p-4 shadow-sm dark:border-white/[0.08]">
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Stap 1</p>
-          <p className="mt-2 text-sm font-medium text-foreground">Contactmail invullen</p>
-          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">Die staat bij Bedrijf in je instellingen.</p>
-          <p
-            className={cn(
-              "mt-3 text-xs font-medium",
-              hasContactEmail ? "text-emerald-600 dark:text-emerald-400" : "text-amber-700 dark:text-amber-400",
-            )}
-          >
-            {hasContactEmail ? "Contactmail staat erin." : "Vul eerst je contactmail in bij Bedrijf."}
-          </p>
+        <div className="flex flex-col gap-4 rounded-xl border border-primary/22 bg-gradient-to-br from-primary/[0.06] to-muted/10 p-5 sm:flex-row sm:items-center sm:justify-between dark:border-primary/30">
+          <div className="min-w-0 space-y-1">
+            <p className="text-sm font-semibold text-foreground">Inkomende e-mail verwerken</p>
+            <p className="text-xs leading-relaxed text-muted-foreground">Aan = doorgestuurde mail komt direct in Berichten.</p>
+            <p className={cn("text-xs font-medium", hasContactEmail ? "text-emerald-600 dark:text-emerald-400" : "text-amber-700 dark:text-amber-400")}>
+              {hasContactEmail ? "Contactmail staat goed." : "Tip: vul ook contactmail in bij Bedrijf."}
+            </p>
+          </div>
+          <FormBooleanSwitch name="email_inbound_enabled" defaultChecked={emailInboundEnabled} label="Aan" labelClassName="text-muted-foreground" />
         </div>
-        <div className="rounded-xl border border-border/55 bg-gradient-to-b from-card to-muted/15 p-4 shadow-sm dark:border-white/[0.08]">
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Stap 2</p>
-          <p className="mt-2 text-sm font-medium text-foreground">Inkomend aanzetten</p>
-          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-            Pas als dit aan staat, verwerken we automatisch doorgestuurde mail voor jouw bedrijf.
-          </p>
-        </div>
-        <div className="rounded-xl border border-border/55 bg-gradient-to-b from-card to-muted/15 p-4 shadow-sm dark:border-white/[0.08]">
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Stap 3</p>
-          <p className="mt-2 text-sm font-medium text-foreground">Leverancier laten doorsturen</p>
-          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-            Gebruik de knop hieronder om alles in één keer naar je webbouwer of IT te sturen.
-          </p>
-        </div>
-      </div>
 
-      <div className="flex flex-col gap-4 rounded-xl border border-primary/22 bg-gradient-to-br from-primary/[0.06] to-muted/10 p-5 sm:flex-row sm:items-center sm:justify-between dark:border-primary/30">
-        <div className="min-w-0 space-y-1">
-          <p className="text-sm font-semibold text-foreground">Inkomende e-mail verwerken</p>
-          <p className="text-xs leading-relaxed text-muted-foreground">
-            Uit = we negeren automatische doorstuuracties. Aan = berichten komen bij je binnen.
-          </p>
+        <div className="rounded-xl border border-border/60 bg-muted/20 p-5 dark:border-white/[0.08]">
+          <p className="text-sm font-semibold text-foreground">Optioneel: stuur setup-info naar je IT</p>
+          <div className="mt-3 flex flex-wrap gap-3">
+            <CopyButton text={builderPack} label="Kopieer setup-instructies" />
+            <Button asChild variant="secondary">
+              <Link href="/dashboard/inbox">
+                <Sparkles className="mr-2 size-4" />
+                Test in Berichten
+              </Link>
+            </Button>
+          </div>
         </div>
-        <FormBooleanSwitch
-          name="email_inbound_enabled"
-          defaultChecked={emailInboundEnabled}
-          label="Aan"
-          labelClassName="text-muted-foreground"
-        />
-      </div>
 
-      <div className="rounded-xl border border-border/60 bg-muted/20 p-5 dark:border-white/[0.08]">
-        <p className="text-sm font-semibold text-foreground">Voor je webbouwer of IT</p>
-        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          Er hoeft hier niets technisch te worden afgelezen. Kopieer het blok en mail het door — daar staat alles in wat
-          zij nodig hebben.
-        </p>
-        <div className="mt-4">
-          <CopyButton text={builderPack} label="Kopieer instructies voor je webbouwer" />
-        </div>
-      </div>
+        <Separator className="bg-border/60" />
 
-      <Separator className="bg-border/60" />
-
-      {state.error ? <p className="text-sm font-medium text-destructive">{state.error}</p> : null}
-      {state.ok ? (
-        <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">Opgeslagen.</p>
-      ) : null}
-      <Submit label="Voorkeur opslaan" />
+        {state.error ? <p className="text-sm font-medium text-destructive">{state.error}</p> : null}
+        {state.ok ? <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">Opgeslagen.</p> : null}
+        <Submit label="E-mail koppeling opslaan" />
       </div>
     </form>
   );
