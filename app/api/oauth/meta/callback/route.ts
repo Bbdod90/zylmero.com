@@ -14,10 +14,10 @@ const COOKIE_PREFIX = "meta_oauth_";
 export async function GET(request: Request) {
   const site = resolveSiteUrl().replace(/\/$/, "");
   const ok = () =>
-    NextResponse.redirect(new URL("/dashboard/socials?meta=connected", site));
+    NextResponse.redirect(new URL("/dashboard/settings?tab=whatsapp&wa=connected", site));
   const fail = (msg: string) =>
     NextResponse.redirect(
-      new URL(`/dashboard/socials?error=${encodeURIComponent(msg)}`, site),
+      new URL(`/dashboard/settings?tab=whatsapp&error=${encodeURIComponent(msg)}`, site),
     );
 
   const { searchParams } = new URL(request.url);
@@ -103,6 +103,32 @@ export async function GET(request: Request) {
       console.error("[meta callback]", error);
       return fail("db_write");
     }
+
+    const { data: currentSettings } = await supabase
+      .from("company_settings")
+      .select("whatsapp_channel")
+      .eq("company_id", payload.companyId)
+      .maybeSingle();
+    const currentChannel =
+      currentSettings?.whatsapp_channel &&
+      typeof currentSettings.whatsapp_channel === "object"
+        ? (currentSettings.whatsapp_channel as Record<string, unknown>)
+        : {};
+    await supabase
+      .from("company_settings")
+      .upsert(
+        {
+          company_id: payload.companyId,
+          whatsapp_channel: {
+            ...currentChannel,
+            provider: "meta",
+            connected: true,
+            external_id: primary?.id ?? null,
+            last_sync_at: new Date().toISOString(),
+          },
+        },
+        { onConflict: "company_id" },
+      );
   } catch (e) {
     const msg = e instanceof Error ? e.message : "exchange_failed";
     await supabase.from("company_social_connections").upsert(

@@ -542,8 +542,6 @@ export function SettingsTabs({
         <TabsContent value="whatsapp" className="mt-8 w-full outline-none">
           <WhatsAppSettingsForm
             channel={settings.whatsapp_channel}
-            auto_reply_enabled={settings.auto_reply_enabled}
-            auto_reply_delay_seconds={settings.auto_reply_delay_seconds}
             socialConnections={socialConnections}
           />
         </TabsContent>
