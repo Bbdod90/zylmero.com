@@ -5,7 +5,9 @@ export type SocialProvider =
   | "tiktok"
   | "linkedin"
   | "google_calendar"
-  | "apple_calendar";
+  | "apple_calendar"
+  | "google_email"
+  | "microsoft_email";
 
 export type SocialConnectionStatus =
   | "disconnected"

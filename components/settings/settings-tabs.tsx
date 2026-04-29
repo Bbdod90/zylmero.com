@@ -28,6 +28,7 @@ import { WidgetSubscriptionGate } from "@/components/settings/widget-subscriptio
 import { FormBooleanSwitch } from "@/components/settings/form-boolean-switch";
 import { cn } from "@/lib/utils";
 import type { Company, WhatsAppChannelSettings } from "@/lib/types";
+import type { CompanySocialConnection } from "@/lib/queries/social-connections";
 import {
   BookOpen,
   Briefcase,
@@ -112,6 +113,7 @@ export function SettingsTabs({
   widgetEmbedToken,
   websiteWidgetActive,
   defaultTab = "business",
+  socialConnections,
 }: {
   company: Company;
   widgetEmbedToken: string | null;
@@ -140,6 +142,7 @@ export function SettingsTabs({
   leadCap: number;
   siteOrigin: string;
   defaultTab?: string;
+  socialConnections: CompanySocialConnection[];
 }) {
   const [s1, a1] = useFormState(updateBusinessProfileAction, initial);
   const [s2, a2] = useFormState(updateKnowledgeAction, initial);
@@ -541,6 +544,7 @@ export function SettingsTabs({
             channel={settings.whatsapp_channel}
             auto_reply_enabled={settings.auto_reply_enabled}
             auto_reply_delay_seconds={settings.auto_reply_delay_seconds}
+            socialConnections={socialConnections}
           />
         </TabsContent>
 
@@ -550,6 +554,7 @@ export function SettingsTabs({
             emailInboundEnabled={settings.email_inbound_enabled}
             hasContactEmail={Boolean(company.contact_email?.trim())}
             siteOrigin={siteOrigin}
+            socialConnections={socialConnections}
           />
         </TabsContent>
 

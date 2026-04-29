@@ -12,6 +12,7 @@ import { CopyButton } from "@/components/growth/copy-button";
 import { FormBooleanSwitch } from "@/components/settings/form-boolean-switch";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import type { CompanySocialConnection } from "@/lib/queries/social-connections";
 import { Building2, Mail, Server, Sparkles } from "lucide-react";
 
 const initial: SettingsFormState = {};
@@ -43,14 +44,18 @@ export function EmailChannelSettingsForm({
   emailInboundEnabled,
   hasContactEmail,
   siteOrigin,
+  socialConnections,
 }: {
   companyId: string;
   emailInboundEnabled: boolean;
   hasContactEmail: boolean;
   siteOrigin: string;
+  socialConnections: CompanySocialConnection[];
 }) {
   const [state, action] = useFormState(updateEmailInboundSettingsAction, initial);
   const [mailProvider, setMailProvider] = useState<MailProvider>("google");
+  const googleEmailConnection = socialConnections.find((c) => c.provider === "google_email");
+  const microsoftEmailConnection = socialConnections.find((c) => c.provider === "microsoft_email");
   const base = siteOrigin.replace(/\/$/, "");
   const inboundPath = `${base}/api/webhooks/inbound-email`;
 
@@ -125,6 +130,51 @@ export function EmailChannelSettingsForm({
                 </label>
               );
             })}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {mailProvider === "google" ? (
+              <Button asChild size="sm">
+                <a href="/api/oauth/google-email">Nu verbinden met Google</a>
+              </Button>
+            ) : null}
+            {mailProvider === "microsoft" ? (
+              <Button asChild size="sm">
+                <a href="/api/oauth/microsoft-email">Nu verbinden met Microsoft</a>
+              </Button>
+            ) : null}
+            {mailProvider === "other" ? (
+              <p className="text-xs text-muted-foreground">
+                Voor andere providers: zet e-mail doorsturen aan naar je webhook.
+              </p>
+            ) : null}
+            {mailProvider === "google" ? (
+              <p
+                className={cn(
+                  "text-xs font-medium",
+                  googleEmailConnection?.status === "connected"
+                    ? "text-emerald-600 dark:text-emerald-400"
+                    : "text-amber-700 dark:text-amber-400",
+                )}
+              >
+                {googleEmailConnection?.status === "connected"
+                  ? `Google gekoppeld (${googleEmailConnection.display_name || "account"})`
+                  : "Google nog niet gekoppeld"}
+              </p>
+            ) : null}
+            {mailProvider === "microsoft" ? (
+              <p
+                className={cn(
+                  "text-xs font-medium",
+                  microsoftEmailConnection?.status === "connected"
+                    ? "text-emerald-600 dark:text-emerald-400"
+                    : "text-amber-700 dark:text-amber-400",
+                )}
+              >
+                {microsoftEmailConnection?.status === "connected"
+                  ? `Microsoft gekoppeld (${microsoftEmailConnection.display_name || "account"})`
+                  : "Microsoft nog niet gekoppeld"}
+              </p>
+            ) : null}
           </div>
         </div>
 

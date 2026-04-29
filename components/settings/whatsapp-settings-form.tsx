@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FormBooleanSwitch } from "@/components/settings/form-boolean-switch";
 import type { WhatsAppChannelSettings } from "@/lib/types";
+import type { CompanySocialConnection } from "@/lib/queries/social-connections";
 import { cn } from "@/lib/utils";
 import {
   ArrowRight,
@@ -40,7 +41,7 @@ const initial: SettingsFormState = {};
 
 type WaProvider = "meta" | "twilio" | "mock";
 
-const META_BUSINESS_WA = "https://business.facebook.com/latest/whatsapp";
+const META_OAUTH_CONNECT = "/api/oauth/meta";
 const META_DEV_DOCS = "https://developers.facebook.com/docs/whatsapp/cloud-api/get-started";
 const TWILIO_CONSOLE = "https://console.twilio.com/";
 
@@ -124,10 +125,12 @@ export function WhatsAppSettingsForm({
   channel,
   auto_reply_enabled,
   auto_reply_delay_seconds,
+  socialConnections,
 }: {
   channel: WhatsAppChannelSettings;
   auto_reply_enabled: boolean;
   auto_reply_delay_seconds: number;
+  socialConnections: CompanySocialConnection[];
 }) {
   const [state, action] = useFormState(updateWhatsAppSettingsAction, initial);
   const [provider, setProvider] = useState<WaProvider>(() => {
@@ -141,8 +144,15 @@ export function WhatsAppSettingsForm({
     const el = advDetailsRef.current;
     if (el && shouldOpenAdvanced) el.open = true;
   }, [shouldOpenAdvanced]);
+  const metaConnection = socialConnections.find((c) => c.provider === "meta");
+  const metaPages = Array.isArray(metaConnection?.metadata?.pages)
+    ? (metaConnection.metadata.pages as Array<Record<string, unknown>>)
+    : [];
   const providerLinks: Record<WaProvider, { label: string; href: string }> = {
-    meta: { label: "Open Meta WhatsApp", href: META_BUSINESS_WA },
+    meta: {
+      label: metaConnection?.status === "connected" ? "Meta is gekoppeld" : "Nu verbinden met Meta",
+      href: META_OAUTH_CONNECT,
+    },
     twilio: { label: "Open Twilio Console", href: TWILIO_CONSOLE },
     mock: { label: "Open Berichten in Zylmero", href: "/dashboard/inbox" },
   };
@@ -190,15 +200,14 @@ export function WhatsAppSettingsForm({
         <div className="space-y-3 rounded-2xl border border-border/50 bg-muted/[0.25] p-5 dark:border-white/[0.08] dark:bg-white/[0.03] sm:p-6">
           <p className="text-sm font-semibold text-foreground">Open geselecteerde provider</p>
           <p className="text-xs leading-relaxed text-muted-foreground sm:text-sm">
-            Zylmero logt niet voor je in bij Meta of Twilio. Open je gekozen provider, rond daar je setup af en klik
-            daarna op opslaan.
+            Gebruik de knop hieronder om echt te verbinden. Na koppelen kun je direct een profiel/nummer kiezen.
           </p>
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <Button asChild size="lg" className="h-12 rounded-xl font-semibold shadow-sm">
               <a
                 href={activeProviderLink.href}
-                target={provider === "mock" ? undefined : "_blank"}
-                rel={provider === "mock" ? undefined : "noopener noreferrer"}
+                target={provider === "twilio" ? "_blank" : undefined}
+                rel={provider === "twilio" ? "noopener noreferrer" : undefined}
               >
                 <ExternalLink className="mr-2 size-4 opacity-90" aria-hidden />
                 {activeProviderLink.label}
@@ -216,6 +225,20 @@ export function WhatsAppSettingsForm({
               </a>
             </Button>
           </div>
+          {provider === "meta" ? (
+            <p className="text-xs text-muted-foreground">
+              Status:{" "}
+              <span
+                className={cn(
+                  metaConnection?.status === "connected"
+                    ? "text-emerald-600 dark:text-emerald-400"
+                    : "text-amber-700 dark:text-amber-400",
+                )}
+              >
+                {metaConnection?.status === "connected" ? "verbonden" : "nog niet verbonden"}
+              </span>
+            </p>
+          ) : null}
         </div>
 
         <details
@@ -227,6 +250,29 @@ export function WhatsAppSettingsForm({
             <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" />
           </summary>
           <div className="space-y-6 border-t border-border/40 px-4 pb-5 pt-4 dark:border-white/[0.08] sm:px-5 sm:pb-6">
+            {provider === "meta" && metaPages.length > 0 ? (
+              <div className="space-y-2">
+                <Label htmlFor="meta_profile_pick" className="text-sm font-semibold text-foreground">
+                  Kies Meta-profiel / nummer
+                </Label>
+                <select
+                  id="meta_profile_pick"
+                  name="external_id"
+                  defaultValue={channel.external_id ?? String(metaPages[0]?.id ?? "")}
+                  className="h-11 w-full rounded-xl border border-border/60 bg-background px-3 text-sm dark:border-white/[0.1]"
+                >
+                  {metaPages.map((p) => {
+                    const id = String(p.id ?? "");
+                    const name = String(p.name ?? id);
+                    return (
+                      <option key={id} value={id}>
+                        {name}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+            ) : null}
             <div
               className={cn(
                 "flex flex-col gap-4 rounded-2xl border border-border/55 bg-muted/[0.2] p-4 sm:flex-row sm:items-center sm:justify-between",
@@ -270,13 +316,19 @@ export function WhatsAppSettingsForm({
                   <span className="font-mono text-[0.7rem]">phone_number_id</span> of Twilio{" "}
                   <span className="font-mono text-[0.7rem]">From</span>.
                 </p>
-                <Input
-                  id="external_id"
-                  name="external_id"
-                  placeholder="Plak ID uit provider-dashboard"
-                  defaultValue={channel.external_id ?? ""}
-                  className="h-11 rounded-xl border-border/60 bg-background/90 shadow-inner-soft dark:border-white/[0.1]"
-                />
+                {provider === "meta" && metaPages.length > 0 ? (
+                  <p className="text-xs text-muted-foreground">
+                    Je hebt hierboven een profiel/nummer gekozen.
+                  </p>
+                ) : (
+                  <Input
+                    id="external_id"
+                    name="external_id"
+                    placeholder="Plak ID uit provider-dashboard"
+                    defaultValue={channel.external_id ?? ""}
+                    className="h-11 rounded-xl border-border/60 bg-background/90 shadow-inner-soft dark:border-white/[0.1]"
+                  />
+                )}
               </div>
             </div>
 

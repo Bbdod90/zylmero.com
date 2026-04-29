@@ -4,6 +4,7 @@ import { DashboardWorkSurface } from "@/components/layout/dashboard-work-surface
 import { PageFrame } from "@/components/layout/page-frame";
 import { SettingsTabs } from "@/components/settings/settings-tabs";
 import { mapCompanySettingsRow } from "@/lib/queries/map-company-settings";
+import { fetchSocialConnections } from "@/lib/queries/social-connections";
 import {
   countLeadsThisMonth,
   maxLeadsPerMonth,
@@ -26,6 +27,7 @@ export default async function SettingsPage({
     .maybeSingle();
 
   const mapped = mapCompanySettingsRow(settingsRow as Record<string, unknown>);
+  const socialConnections = await fetchSocialConnections(supabase, auth.company.id);
   const leadsThisMonth = await countLeadsThisMonth(supabase, auth.company.id);
   const leadCap = maxLeadsPerMonth(auth.company);
 
@@ -44,7 +46,7 @@ export default async function SettingsPage({
   return (
     <PageFrame
       title="Instellingen"
-      subtitle="WhatsApp, mail, widget en meer — per tabblad. Op de WhatsApp-tab staan duidelijke stappen en knoppen."
+      subtitle="WhatsApp, mail, widget en meer — per tabblad."
     >
       <DashboardWorkSurface>
         <SettingsTabs
@@ -78,6 +80,7 @@ export default async function SettingsPage({
             quote_include_pricing_hints: mapped?.quote_include_pricing_hints ?? false,
             quote_include_zylmero_notice: mapped?.quote_include_zylmero_notice !== false,
           }}
+          socialConnections={socialConnections}
         />
       </DashboardWorkSurface>
     </PageFrame>
