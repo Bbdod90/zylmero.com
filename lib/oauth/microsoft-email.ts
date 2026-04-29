@@ -40,6 +40,8 @@ export function buildMicrosoftEmailOAuthUrl(state: string): string | null {
   url.searchParams.set("response_type", "code");
   url.searchParams.set("response_mode", "query");
   url.searchParams.set("scope", MS_SCOPE);
+  /** Expliciet account kiezen (zakelijke/persoonlijke Microsoft-login). */
+  url.searchParams.set("prompt", "select_account");
   url.searchParams.set("state", state);
   return url.toString();
 }

@@ -116,6 +116,7 @@ export function SettingsTabs({
   socialConnections,
   metaConfigured,
   metaAppId,
+  metaHasStoredSecret,
 }: {
   company: Company;
   widgetEmbedToken: string | null;
@@ -132,6 +133,8 @@ export function SettingsTabs({
     auto_reply_enabled: boolean;
     auto_reply_delay_seconds: number;
     email_inbound_enabled: boolean;
+    email_provider: "google" | "microsoft" | "other";
+    email_provider_detail: string;
     knowledge_snippets: { title: string; body: string }[];
     white_label_logo_url: string | null;
     white_label_primary: string | null;
@@ -147,6 +150,7 @@ export function SettingsTabs({
   socialConnections: CompanySocialConnection[];
   metaConfigured: boolean;
   metaAppId: string;
+  metaHasStoredSecret: boolean;
 }) {
   const [s1, a1] = useFormState(updateBusinessProfileAction, initial);
   const [s2, a2] = useFormState(updateKnowledgeAction, initial);
@@ -549,6 +553,7 @@ export function SettingsTabs({
             socialConnections={socialConnections}
             metaConfigured={metaConfigured}
             metaAppId={metaAppId}
+            metaHasStoredSecret={metaHasStoredSecret}
           />
         </TabsContent>
 
@@ -556,6 +561,8 @@ export function SettingsTabs({
           <EmailChannelSettingsForm
             companyId={company.id}
             emailInboundEnabled={settings.email_inbound_enabled}
+            emailProvider={settings.email_provider}
+            emailProviderDetail={settings.email_provider_detail}
             hasContactEmail={Boolean(company.contact_email?.trim())}
             siteOrigin={siteOrigin}
             socialConnections={socialConnections}

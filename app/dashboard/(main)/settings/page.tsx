@@ -37,7 +37,18 @@ export default async function SettingsPage({
   const companyMeta = getMetaCredentialsFromAutomationPreferences(prefs);
   const companyMetaAppId =
     typeof prefs.meta_app_id === "string" ? prefs.meta_app_id.trim() : "";
+  const metaHasStoredSecret = Boolean(
+    typeof prefs.meta_app_secret_encrypted === "string" &&
+      prefs.meta_app_secret_encrypted.trim(),
+  );
   const metaConfigured = metaAppConfigured(companyMeta ?? undefined);
+  const rawEmailProvider = String(prefs.email_provider ?? "").toLowerCase();
+  const savedEmailProvider =
+    rawEmailProvider === "google" || rawEmailProvider === "microsoft" || rawEmailProvider === "other"
+      ? rawEmailProvider
+      : "other";
+  const savedEmailProviderDetail =
+    typeof prefs.email_provider_detail === "string" ? prefs.email_provider_detail.trim() : "";
   const leadsThisMonth = await countLeadsThisMonth(supabase, auth.company.id);
   const leadCap = maxLeadsPerMonth(auth.company);
 
@@ -82,6 +93,8 @@ export default async function SettingsPage({
             auto_reply_enabled: mapped?.auto_reply_enabled ?? false,
             auto_reply_delay_seconds: mapped?.auto_reply_delay_seconds ?? 30,
             email_inbound_enabled: mapped?.email_inbound_enabled ?? false,
+            email_provider: savedEmailProvider,
+            email_provider_detail: savedEmailProviderDetail,
             knowledge_snippets: mapped?.knowledge_snippets ?? [],
             white_label_logo_url: mapped?.white_label_logo_url ?? null,
             white_label_primary: mapped?.white_label_primary ?? null,
@@ -93,6 +106,7 @@ export default async function SettingsPage({
           socialConnections={socialConnections}
           metaConfigured={metaConfigured}
           metaAppId={companyMetaAppId}
+          metaHasStoredSecret={metaHasStoredSecret}
         />
       </DashboardWorkSurface>
     </PageFrame>

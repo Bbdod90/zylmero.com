@@ -525,6 +525,89 @@ export async function updateAiSettingsAction(
   return { ok: true };
 }
 
+export async function saveMetaWhatsAppCredentialsAction(
+  _prev: SettingsFormState,
+  formData: FormData,
+): Promise<SettingsFormState> {
+  const auth = await getAuth();
+  if (!auth.user || !auth.company) {
+    return { error: "Niet ingelogd." };
+  }
+
+  const meta_app_id = String(formData.get("meta_app_id") || "").trim();
+  const meta_app_secret = String(formData.get("meta_app_secret") || "").trim();
+
+  const supabase = await createClient();
+  const { data: settingsRow } = await supabase
+    .from("company_settings")
+    .select("*")
+    .eq("company_id", auth.company.id)
+    .maybeSingle();
+  const prev = mapCompanySettingsRow(settingsRow as Record<string, unknown>);
+  const prevPrefs =
+    (settingsRow?.automation_preferences as Record<string, unknown>) || {};
+
+  const previousMetaAppId =
+    typeof prevPrefs.meta_app_id === "string" ? prevPrefs.meta_app_id.trim() : "";
+  const previousMetaSecretEncrypted =
+    typeof prevPrefs.meta_app_secret_encrypted === "string"
+      ? prevPrefs.meta_app_secret_encrypted.trim()
+      : "";
+
+  if (!meta_app_id) {
+    return { error: "Vul je Meta App ID in." };
+  }
+  if (
+    !meta_app_secret &&
+    (!previousMetaSecretEncrypted || previousMetaAppId !== meta_app_id)
+  ) {
+    return {
+      error:
+        "Vul je Meta App Secret in. Bij een gewijzigde App ID moet je het secret opnieuw plakken.",
+    };
+  }
+
+  const nextPrefs: Record<string, unknown> = { ...prevPrefs };
+  nextPrefs.meta_app_id = meta_app_id;
+  if (meta_app_secret) {
+    nextPrefs.meta_app_secret_encrypted = sealSocialToken(meta_app_secret);
+  }
+
+  const { error } = await supabase.from("company_settings").upsert(
+    {
+      company_id: auth.company.id,
+      niche: prev?.niche ?? null,
+      services: prev?.services ?? [],
+      faq: prev?.faq ?? [],
+      pricing_hints: prev?.pricing_hints ?? null,
+      business_hours: prev?.business_hours ?? {},
+      booking_link: prev?.booking_link ?? null,
+      tone: prev?.tone ?? null,
+      reply_style: prev?.reply_style ?? null,
+      language: prev?.language ?? "nl",
+      automation_preferences: nextPrefs,
+      whatsapp_channel: prev?.whatsapp_channel ?? {
+        provider: "mock",
+        connected: false,
+      },
+      auto_reply_enabled: prev?.auto_reply_enabled ?? false,
+      auto_reply_delay_seconds: prev?.auto_reply_delay_seconds ?? 30,
+      ai_usage_count: prev?.ai_usage_count ?? 0,
+      ai_setup_completed_at: prev?.ai_setup_completed_at ?? null,
+      niche_intake: prev?.niche_intake ?? {},
+      knowledge_snippets: prev?.knowledge_snippets ?? [],
+      white_label_logo_url: prev?.white_label_logo_url ?? null,
+      white_label_primary: prev?.white_label_primary ?? null,
+    },
+    { onConflict: "company_id" },
+  );
+
+  if (error) return { error: error.message };
+  revalidatePath("/dashboard/settings");
+  revalidatePath("/dashboard/ai-koppelingen");
+  return { ok: true };
+}
+
 export async function updateWhatsAppSettingsAction(
   _prev: SettingsFormState,
   formData: FormData,
@@ -555,32 +638,6 @@ export async function updateWhatsAppSettingsAction(
   const prevCh = (settingsRow?.whatsapp_channel as Record<string, unknown>) || {};
   const prevPrefs =
     (settingsRow?.automation_preferences as Record<string, unknown>) || {};
-  const meta_app_id = String(formData.get("meta_app_id") || "").trim();
-  const meta_app_secret = String(formData.get("meta_app_secret") || "").trim();
-  const previousMetaAppId =
-    typeof prevPrefs.meta_app_id === "string" ? prevPrefs.meta_app_id.trim() : "";
-  const previousMetaSecretEncrypted =
-    typeof prevPrefs.meta_app_secret_encrypted === "string"
-      ? prevPrefs.meta_app_secret_encrypted.trim()
-      : "";
-  if (
-    meta_app_id &&
-    !meta_app_secret &&
-    (!previousMetaSecretEncrypted || previousMetaAppId !== meta_app_id)
-  ) {
-    return { error: "Vul ook je Meta App Secret in bij een nieuwe of gewijzigde App ID." };
-  }
-  const nextPrefs: Record<string, unknown> = { ...prevPrefs };
-  if (meta_app_id) {
-    nextPrefs.meta_app_id = meta_app_id;
-    if (meta_app_secret) {
-      nextPrefs.meta_app_secret_encrypted = sealSocialToken(meta_app_secret);
-    }
-  } else {
-    delete nextPrefs.meta_app_id;
-    delete nextPrefs.meta_app_secret;
-    delete nextPrefs.meta_app_secret_encrypted;
-  }
 
   const { error } = await supabase.from("company_settings").upsert(
     {
@@ -594,7 +651,7 @@ export async function updateWhatsAppSettingsAction(
       tone: prev?.tone ?? null,
       reply_style: prev?.reply_style ?? null,
       language: prev?.language ?? "nl",
-      automation_preferences: nextPrefs,
+      automation_preferences: prevPrefs,
       whatsapp_channel: {
         provider,
         connected,
@@ -643,6 +700,11 @@ export async function updateEmailInboundSettingsAction(
       ? emailProviderRaw
       : "other";
 
+  const detailRaw = String(formData.get("email_provider_detail") || "").trim().toLowerCase();
+  const allowedDetail = new Set(["", "zoho", "icloud", "hosting", "forward"]);
+  const email_provider_detail =
+    email_provider === "other" && allowedDetail.has(detailRaw) ? detailRaw : "";
+
   const supabase = await createClient();
   const { data: settingsRow } = await supabase
     .from("company_settings")
@@ -657,6 +719,7 @@ export async function updateEmailInboundSettingsAction(
     ...prevPrefs,
     email_inbound_enabled,
     email_provider,
+    email_provider_detail,
     niche_key: auth.company.niche ?? prevPrefs.niche_key,
   };
 

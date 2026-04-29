@@ -40,7 +40,8 @@ export function buildGoogleEmailOAuthUrl(state: string): string | null {
   url.searchParams.set("response_type", "code");
   url.searchParams.set("scope", GOOGLE_SCOPE);
   url.searchParams.set("access_type", "offline");
-  url.searchParams.set("prompt", "consent");
+  /** Accountkiezer + consent waar nodig (refresh token). */
+  url.searchParams.set("prompt", "select_account consent");
   url.searchParams.set("state", state);
   return url.toString();
 }
