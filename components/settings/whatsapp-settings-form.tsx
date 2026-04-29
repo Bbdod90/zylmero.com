@@ -141,7 +141,7 @@ export function WhatsAppSettingsForm({
           </div>
           {!metaConfigured ? (
             <p className="text-xs text-destructive">
-              Vul eerst je Meta App ID en App Secret in en klik daarna op "Gebruik deze WhatsApp koppeling".
+              Vul eerst je Meta App ID en App Secret in en klik daarna op &quot;Gebruik deze WhatsApp koppeling&quot;.
             </p>
           ) : null}
         </div>
