@@ -1,16 +1,56 @@
 import { resolveSiteUrl } from "@/lib/site-url";
+import { unsealSocialToken } from "@/lib/crypto/social-token";
 
 const FB_VERSION = "v21.0";
 
-export function metaAppConfigured(): boolean {
-  return Boolean(
-    process.env.META_APP_ID?.trim() && process.env.META_APP_SECRET?.trim(),
-  );
+export type MetaOAuthCredentials = {
+  appId: string;
+  appSecret: string;
+};
+
+export function getMetaCredentialsFromAutomationPreferences(
+  prefs: Record<string, unknown> | null | undefined,
+): MetaOAuthCredentials | null {
+  if (!prefs || typeof prefs !== "object") return null;
+  const appId =
+    typeof prefs.meta_app_id === "string" ? prefs.meta_app_id.trim() : "";
+  const encryptedSecret =
+    typeof prefs.meta_app_secret_encrypted === "string"
+      ? prefs.meta_app_secret_encrypted.trim()
+      : "";
+  const plainSecret =
+    typeof prefs.meta_app_secret === "string" ? prefs.meta_app_secret.trim() : "";
+  const appSecret = encryptedSecret
+    ? (unsealSocialToken(encryptedSecret)?.trim() ?? "")
+    : plainSecret;
+  if (!appId || !appSecret) return null;
+  return { appId, appSecret };
 }
 
-export function buildMetaOAuthUrl(state: string): string | null {
-  const appId = process.env.META_APP_ID?.trim();
-  if (!appId) return null;
+export function resolveMetaOAuthCredentials(
+  preferred?: Partial<MetaOAuthCredentials> | null,
+): MetaOAuthCredentials | null {
+  const appId = preferred?.appId?.trim();
+  const appSecret = preferred?.appSecret?.trim();
+  if (appId && appSecret) return { appId, appSecret };
+  const envId = process.env.META_APP_ID?.trim();
+  const envSecret = process.env.META_APP_SECRET?.trim();
+  if (!envId || !envSecret) return null;
+  return { appId: envId, appSecret: envSecret };
+}
+
+export function metaAppConfigured(
+  preferred?: Partial<MetaOAuthCredentials> | null,
+): boolean {
+  return Boolean(resolveMetaOAuthCredentials(preferred));
+}
+
+export function buildMetaOAuthUrl(
+  state: string,
+  preferred?: Partial<MetaOAuthCredentials> | null,
+): string | null {
+  const creds = resolveMetaOAuthCredentials(preferred);
+  if (!creds?.appId) return null;
   const redirect = `${resolveSiteUrl().replace(/\/$/, "")}/api/oauth/meta/callback`;
   const scope = [
     "pages_show_list",
@@ -20,7 +60,7 @@ export function buildMetaOAuthUrl(state: string): string | null {
     "business_management",
   ].join(",");
   const params = new URLSearchParams({
-    client_id: appId,
+    client_id: creds.appId,
     redirect_uri: redirect,
     state,
     response_type: "code",
@@ -31,17 +71,17 @@ export function buildMetaOAuthUrl(state: string): string | null {
 
 export async function exchangeMetaOAuthCode(
   code: string,
+  preferred?: Partial<MetaOAuthCredentials> | null,
 ): Promise<{ access_token: string; expires_in?: number }> {
-  const appId = process.env.META_APP_ID?.trim();
-  const secret = process.env.META_APP_SECRET?.trim();
-  if (!appId || !secret) {
+  const creds = resolveMetaOAuthCredentials(preferred);
+  if (!creds) {
     throw new Error("META_APP_ID / META_APP_SECRET ontbreken");
   }
   const redirect = `${resolveSiteUrl().replace(/\/$/, "")}/api/oauth/meta/callback`;
   const url = new URL(`https://graph.facebook.com/${FB_VERSION}/oauth/access_token`);
-  url.searchParams.set("client_id", appId);
+  url.searchParams.set("client_id", creds.appId);
   url.searchParams.set("redirect_uri", redirect);
-  url.searchParams.set("client_secret", secret);
+  url.searchParams.set("client_secret", creds.appSecret);
   url.searchParams.set("code", code);
   const res = await fetch(url.toString(), { method: "GET", cache: "no-store" });
   const json = (await res.json()) as {

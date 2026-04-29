@@ -23,7 +23,7 @@ function Submit({ label }: { label: string }) {
     <Button
       type="submit"
       disabled={pending}
-      className="h-14 min-h-[3.5rem] w-full rounded-xl bg-gradient-to-r from-primary to-primary/88 px-8 text-base font-semibold shadow-md transition hover:brightness-[1.03] active:scale-[0.99] sm:w-auto sm:min-w-[18rem]"
+      className="h-14 min-h-[3.5rem] w-full rounded-xl bg-primary text-primary-foreground px-8 text-base font-semibold shadow-sm transition active:scale-[0.99] sm:w-auto sm:min-w-[18rem]"
     >
       {pending ? "Bezig met opslaan…" : label}
     </Button>
@@ -37,9 +37,13 @@ const META_OAUTH_CONNECT = "/api/oauth/meta";
 export function WhatsAppSettingsForm({
   channel,
   socialConnections,
+  metaConfigured,
+  metaAppId,
 }: {
   channel: WhatsAppChannelSettings;
   socialConnections: CompanySocialConnection[];
+  metaConfigured: boolean;
+  metaAppId: string;
 }) {
   const [state, action] = useFormState(updateWhatsAppSettingsAction, initial);
   const metaConnection = socialConnections.find((c) => c.provider === "meta");
@@ -77,16 +81,55 @@ export function WhatsAppSettingsForm({
 
       <div className="space-y-8 px-5 py-7 sm:px-8 sm:py-9">
         <div className="space-y-3 rounded-2xl border border-border/50 bg-muted/[0.25] p-5 dark:border-white/[0.08] dark:bg-white/[0.03] sm:p-6">
+          <p className="text-sm font-semibold text-foreground">Meta app per gebruiker</p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="meta_app_id" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Meta App ID
+              </Label>
+              <input
+                id="meta_app_id"
+                name="meta_app_id"
+                defaultValue={metaAppId}
+                className="h-11 w-full rounded-xl border border-border/60 bg-background px-3 text-sm dark:border-white/[0.1]"
+                placeholder="123456789012345"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="meta_app_secret" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Meta App Secret
+              </Label>
+              <input
+                id="meta_app_secret"
+                name="meta_app_secret"
+                type="password"
+                autoComplete="off"
+                className="h-11 w-full rounded-xl border border-border/60 bg-background px-3 text-sm dark:border-white/[0.1]"
+                placeholder={metaAppId ? "Laat leeg om bestaande secret te behouden" : "••••••••••"}
+              />
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Deze waarden worden per account opgeslagen en gebruikt voor de WhatsApp OAuth-flow van dit bedrijf.
+          </p>
+        </div>
+
+        <div className="space-y-3 rounded-2xl border border-border/50 bg-muted/[0.25] p-5 dark:border-white/[0.08] dark:bg-white/[0.03] sm:p-6">
           <p className="text-sm font-semibold text-foreground">Verbind direct met WhatsApp (Meta)</p>
           <div className="flex flex-wrap items-center gap-3">
-            <Button asChild size="lg" className="h-12 rounded-xl font-semibold shadow-sm">
-              <a
-                href={META_OAUTH_CONNECT}
-              >
+            {metaConfigured ? (
+              <Button asChild size="lg" className="h-12 rounded-xl font-semibold shadow-sm">
+                <a href={META_OAUTH_CONNECT}>
+                  <ExternalLink className="mr-2 size-4 opacity-90" aria-hidden />
+                  {metaConnected ? "Opnieuw verbinden met Meta" : "Nu verbinden met WhatsApp"}
+                </a>
+              </Button>
+            ) : (
+              <Button size="lg" className="h-12 rounded-xl font-semibold shadow-sm" disabled>
                 <ExternalLink className="mr-2 size-4 opacity-90" aria-hidden />
-                {metaConnected ? "Opnieuw verbinden met Meta" : "Nu verbinden met WhatsApp"}
-              </a>
-            </Button>
+                Nu verbinden met WhatsApp
+              </Button>
+            )}
             {metaConnected ? (
               <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
                 <CheckCircle2 className="size-3.5" />
@@ -96,6 +139,11 @@ export function WhatsAppSettingsForm({
               <span className="text-xs font-medium text-amber-700 dark:text-amber-400">Nog niet gekoppeld</span>
             )}
           </div>
+          {!metaConfigured ? (
+            <p className="text-xs text-destructive">
+              Vul eerst je Meta App ID en App Secret in en klik daarna op "Gebruik deze WhatsApp koppeling".
+            </p>
+          ) : null}
         </div>
 
         {metaConnected && metaPages.length > 0 ? (

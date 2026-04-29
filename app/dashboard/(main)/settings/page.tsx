@@ -11,6 +11,10 @@ import {
 } from "@/lib/billing/entitlements";
 import { hasEffectiveProductAccess } from "@/lib/platform/host-access";
 import { siteUrl } from "@/lib/stripe/server";
+import {
+  getMetaCredentialsFromAutomationPreferences,
+  metaAppConfigured,
+} from "@/lib/oauth/meta";
 
 export default async function SettingsPage({
   searchParams,
@@ -28,6 +32,12 @@ export default async function SettingsPage({
 
   const mapped = mapCompanySettingsRow(settingsRow as Record<string, unknown>);
   const socialConnections = await fetchSocialConnections(supabase, auth.company.id);
+  const prefs =
+    (settingsRow?.automation_preferences as Record<string, unknown>) || {};
+  const companyMeta = getMetaCredentialsFromAutomationPreferences(prefs);
+  const companyMetaAppId =
+    typeof prefs.meta_app_id === "string" ? prefs.meta_app_id.trim() : "";
+  const metaConfigured = metaAppConfigured(companyMeta ?? undefined);
   const leadsThisMonth = await countLeadsThisMonth(supabase, auth.company.id);
   const leadCap = maxLeadsPerMonth(auth.company);
 
@@ -81,6 +91,8 @@ export default async function SettingsPage({
             quote_include_zylmero_notice: mapped?.quote_include_zylmero_notice !== false,
           }}
           socialConnections={socialConnections}
+          metaConfigured={metaConfigured}
+          metaAppId={companyMetaAppId}
         />
       </DashboardWorkSurface>
     </PageFrame>

@@ -2,7 +2,11 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { randomBytes } from "crypto";
 import { createClient } from "@/lib/supabase/server";
-import { buildMetaOAuthUrl, metaAppConfigured } from "@/lib/oauth/meta";
+import {
+  buildMetaOAuthUrl,
+  getMetaCredentialsFromAutomationPreferences,
+  metaAppConfigured,
+} from "@/lib/oauth/meta";
 import { resolveSiteUrl } from "@/lib/site-url";
 
 const COOKIE_PREFIX = "meta_oauth_";
@@ -11,12 +15,8 @@ export async function GET() {
   const site = resolveSiteUrl().replace(/\/$/, "");
   const fail = (msg: string) =>
     NextResponse.redirect(
-      new URL(`/dashboard/socials?error=${encodeURIComponent(msg)}`, site),
+      new URL(`/dashboard/settings?tab=whatsapp&error=${encodeURIComponent(msg)}`, site),
     );
-
-  if (!metaAppConfigured()) {
-    return fail("meta_not_configured");
-  }
 
   const supabase = await createClient();
   const {
@@ -36,6 +36,20 @@ export async function GET() {
     return fail("no_company");
   }
 
+  const { data: settingsRow } = await supabase
+    .from("company_settings")
+    .select("automation_preferences")
+    .eq("company_id", company.id)
+    .maybeSingle();
+  const companyMeta = getMetaCredentialsFromAutomationPreferences(
+    (settingsRow?.automation_preferences as Record<string, unknown> | null) ??
+      null,
+  );
+
+  if (!metaAppConfigured(companyMeta ?? undefined)) {
+    return fail("meta_not_configured");
+  }
+
   const stateId = randomBytes(12).toString("hex");
   const payload = JSON.stringify({
     companyId: company.id as string,
@@ -52,7 +66,7 @@ export async function GET() {
     path: "/",
   });
 
-  const url = buildMetaOAuthUrl(stateId);
+  const url = buildMetaOAuthUrl(stateId, companyMeta ?? undefined);
   if (!url) return fail("meta_not_configured");
 
   return NextResponse.redirect(url);

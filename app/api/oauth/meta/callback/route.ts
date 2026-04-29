@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import {
   exchangeMetaOAuthCode,
   fetchMetaManagedPages,
+  getMetaCredentialsFromAutomationPreferences,
   metaAppConfigured,
 } from "@/lib/oauth/meta";
 import { sealSocialToken } from "@/lib/crypto/social-token";
@@ -30,10 +31,6 @@ export async function GET(request: Request) {
   }
   if (!code || !stateId) {
     return fail("missing_code");
-  }
-
-  if (!metaAppConfigured()) {
-    return fail("meta_not_configured");
   }
 
   const jar = await cookies();
@@ -73,8 +70,25 @@ export async function GET(request: Request) {
     return fail("no_company");
   }
 
+  const { data: settingsRow } = await supabase
+    .from("company_settings")
+    .select("automation_preferences")
+    .eq("company_id", payload.companyId)
+    .maybeSingle();
+  const companyMeta = getMetaCredentialsFromAutomationPreferences(
+    (settingsRow?.automation_preferences as Record<string, unknown> | null) ??
+      null,
+  );
+
+  if (!metaAppConfigured(companyMeta ?? undefined)) {
+    return fail("meta_not_configured");
+  }
+
   try {
-    const { access_token, expires_in } = await exchangeMetaOAuthCode(code);
+    const { access_token, expires_in } = await exchangeMetaOAuthCode(
+      code,
+      companyMeta ?? undefined,
+    );
     const pages = await fetchMetaManagedPages(access_token);
     const primary = pages[0];
     const sealed = sealSocialToken(access_token);

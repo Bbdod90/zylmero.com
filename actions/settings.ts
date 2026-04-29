@@ -16,6 +16,7 @@ import {
 import type { AiKnowledgePage, KnowledgeSnippet } from "@/lib/types";
 import { generateSiteKnowledgeDigestNl } from "@/lib/openai/site-knowledge-digest";
 import { previewVisitorChatReply } from "@/lib/openai/preview-visitor-chat";
+import { sealSocialToken } from "@/lib/crypto/social-token";
 
 export type SettingsFormState = {
   ok?: boolean;
@@ -552,6 +553,34 @@ export async function updateWhatsAppSettingsAction(
     .maybeSingle();
   const prev = mapCompanySettingsRow(settingsRow as Record<string, unknown>);
   const prevCh = (settingsRow?.whatsapp_channel as Record<string, unknown>) || {};
+  const prevPrefs =
+    (settingsRow?.automation_preferences as Record<string, unknown>) || {};
+  const meta_app_id = String(formData.get("meta_app_id") || "").trim();
+  const meta_app_secret = String(formData.get("meta_app_secret") || "").trim();
+  const previousMetaAppId =
+    typeof prevPrefs.meta_app_id === "string" ? prevPrefs.meta_app_id.trim() : "";
+  const previousMetaSecretEncrypted =
+    typeof prevPrefs.meta_app_secret_encrypted === "string"
+      ? prevPrefs.meta_app_secret_encrypted.trim()
+      : "";
+  if (
+    meta_app_id &&
+    !meta_app_secret &&
+    (!previousMetaSecretEncrypted || previousMetaAppId !== meta_app_id)
+  ) {
+    return { error: "Vul ook je Meta App Secret in bij een nieuwe of gewijzigde App ID." };
+  }
+  const nextPrefs: Record<string, unknown> = { ...prevPrefs };
+  if (meta_app_id) {
+    nextPrefs.meta_app_id = meta_app_id;
+    if (meta_app_secret) {
+      nextPrefs.meta_app_secret_encrypted = sealSocialToken(meta_app_secret);
+    }
+  } else {
+    delete nextPrefs.meta_app_id;
+    delete nextPrefs.meta_app_secret;
+    delete nextPrefs.meta_app_secret_encrypted;
+  }
 
   const { error } = await supabase.from("company_settings").upsert(
     {
@@ -565,7 +594,7 @@ export async function updateWhatsAppSettingsAction(
       tone: prev?.tone ?? null,
       reply_style: prev?.reply_style ?? null,
       language: prev?.language ?? "nl",
-      automation_preferences: prev?.automation_preferences ?? {},
+      automation_preferences: nextPrefs,
       whatsapp_channel: {
         provider,
         connected,

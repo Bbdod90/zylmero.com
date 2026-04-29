@@ -114,6 +114,8 @@ export function SettingsTabs({
   websiteWidgetActive,
   defaultTab = "business",
   socialConnections,
+  metaConfigured,
+  metaAppId,
 }: {
   company: Company;
   widgetEmbedToken: string | null;
@@ -143,6 +145,8 @@ export function SettingsTabs({
   siteOrigin: string;
   defaultTab?: string;
   socialConnections: CompanySocialConnection[];
+  metaConfigured: boolean;
+  metaAppId: string;
 }) {
   const [s1, a1] = useFormState(updateBusinessProfileAction, initial);
   const [s2, a2] = useFormState(updateKnowledgeAction, initial);
@@ -543,6 +547,8 @@ export function SettingsTabs({
           <WhatsAppSettingsForm
             channel={settings.whatsapp_channel}
             socialConnections={socialConnections}
+            metaConfigured={metaConfigured}
+            metaAppId={metaAppId}
           />
         </TabsContent>
 
