@@ -162,12 +162,13 @@ export function EmailChannelSettingsForm({
                 </select>
               </label>
               <Button
-                type="submit"
-                formAction="/api/oauth/email"
-                formMethod="get"
+                type="button"
+                asChild
                 className="h-11 rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground"
               >
-                E-mail koppelen
+                <a href={`/api/oauth/email?oauth_provider=${mailChoice}`}>
+                  E-mail koppelen
+                </a>
               </Button>
             </div>
             <p className="text-xs leading-relaxed text-muted-foreground">
