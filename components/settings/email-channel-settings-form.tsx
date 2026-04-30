@@ -76,30 +76,24 @@ function Submit({ label }: { label: string }) {
 export function EmailChannelSettingsForm({
   emailInboundEnabled,
   emailProvider,
-  emailProviderDetail: _emailProviderDetail,
-  linkedEmailAddress: _linkedEmailAddress,
+  emailProviderDetail,
   hasContactEmail,
   socialConnections,
-  flashError: _flashError,
-  googleEmailConfigured: _googleEmailConfigured,
-  microsoftEmailConfigured: _microsoftEmailConfigured,
 }: {
   emailInboundEnabled: boolean;
   emailProvider: StoredEmailProvider;
   emailProviderDetail: string;
-  linkedEmailAddress: string;
   hasContactEmail: boolean;
   socialConnections: CompanySocialConnection[];
-  flashError: string | null;
-  googleEmailConfigured: boolean;
-  microsoftEmailConfigured: boolean;
 }) {
   const [state, action] = useFormState(updateEmailInboundSettingsAction, initial);
-  const [mailChoice, setMailChoice] = useState<MailChoiceId>(() => savedToChoice(emailProvider, ""));
+  const [mailChoice, setMailChoice] = useState<MailChoiceId>(() =>
+    savedToChoice(emailProvider, emailProviderDetail),
+  );
 
   useEffect(() => {
-    setMailChoice(savedToChoice(emailProvider, ""));
-  }, [emailProvider]);
+    setMailChoice(savedToChoice(emailProvider, emailProviderDetail));
+  }, [emailProvider, emailProviderDetail]);
 
   const hidden = useMemo(() => choiceToHiddenFields(mailChoice), [mailChoice]);
 

@@ -115,9 +115,6 @@ export function SettingsTabs({
   defaultTab = "business",
   socialConnections,
   metaConfigured,
-  emailFlashError,
-  googleEmailConfigured,
-  microsoftEmailConfigured,
 }: {
   company: Company;
   widgetEmbedToken: string | null;
@@ -151,9 +148,6 @@ export function SettingsTabs({
   defaultTab?: string;
   socialConnections: CompanySocialConnection[];
   metaConfigured: boolean;
-  emailFlashError: string | null;
-  googleEmailConfigured: boolean;
-  microsoftEmailConfigured: boolean;
 }) {
   const [s1, a1] = useFormState(updateBusinessProfileAction, initial);
   const [s2, a2] = useFormState(updateKnowledgeAction, initial);
@@ -563,12 +557,8 @@ export function SettingsTabs({
             emailInboundEnabled={settings.email_inbound_enabled}
             emailProvider={settings.email_provider}
             emailProviderDetail={settings.email_provider_detail}
-            linkedEmailAddress={settings.email_linked_address}
             hasContactEmail={Boolean(company.contact_email?.trim())}
             socialConnections={socialConnections}
-            flashError={emailFlashError}
-            googleEmailConfigured={googleEmailConfigured}
-            microsoftEmailConfigured={microsoftEmailConfigured}
           />
         </TabsContent>
 
