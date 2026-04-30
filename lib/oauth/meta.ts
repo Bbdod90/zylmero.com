@@ -33,8 +33,22 @@ export function resolveMetaOAuthCredentials(
   const appId = preferred?.appId?.trim();
   const appSecret = preferred?.appSecret?.trim();
   if (appId && appSecret) return { appId, appSecret };
-  const envId = process.env.META_APP_ID?.trim();
-  const envSecret = process.env.META_APP_SECRET?.trim();
+
+  // Accept common naming variants used across hosting setups.
+  const envId =
+    process.env.META_APP_ID?.trim() ||
+    process.env.FACEBOOK_APP_ID?.trim() ||
+    process.env.META_CLIENT_ID?.trim() ||
+    process.env.META_OAUTH_CLIENT_ID?.trim() ||
+    process.env.WHATSAPP_META_APP_ID?.trim() ||
+    "";
+  const envSecret =
+    process.env.META_APP_SECRET?.trim() ||
+    process.env.FACEBOOK_APP_SECRET?.trim() ||
+    process.env.META_CLIENT_SECRET?.trim() ||
+    process.env.META_OAUTH_CLIENT_SECRET?.trim() ||
+    process.env.WHATSAPP_META_APP_SECRET?.trim() ||
+    "";
   if (!envId || !envSecret) return null;
   return { appId: envId, appSecret: envSecret };
 }
