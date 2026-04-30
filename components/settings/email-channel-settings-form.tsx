@@ -107,16 +107,11 @@ export function EmailChannelSettingsForm({
   const selectedChoice = MAIL_CHOICES.find((choice) => choice.id === mailChoice);
 
   return (
-    <form
-      action={action}
+    <div
       className={cn(
         "cf-dashboard-panel mx-auto w-full max-w-4xl overflow-hidden rounded-[1.35rem] border border-border/60 bg-card p-0 shadow-[0_26px_74px_-44px_hsl(222_47%_11%/0.24)]",
-        "space-y-0",
       )}
     >
-      <input type="hidden" name="email_provider" value={hidden.email_provider} />
-      <input type="hidden" name="email_provider_detail" value={hidden.email_provider_detail} />
-
       <div className="relative border-b border-border/50 bg-gradient-to-br from-sky-500/[0.09] via-card to-muted/20 px-5 py-6 sm:px-8 sm:py-7 dark:border-white/[0.08] dark:from-sky-500/[0.14]">
         <div className="pointer-events-none absolute -left-10 -top-16 size-48 rounded-full bg-sky-400/12 blur-3xl" />
         <header className="relative flex gap-4">
@@ -149,7 +144,6 @@ export function EmailChannelSettingsForm({
               <label className="space-y-2">
                 <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Provider</span>
                 <select
-                  name="oauth_provider"
                   value={mailChoice}
                   onChange={(e) => {
                     setMailChoice(e.target.value as MailChoiceId);
@@ -168,7 +162,7 @@ export function EmailChannelSettingsForm({
                 asChild
                 className="h-11 rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground"
               >
-                <a href={`/api/oauth/email?oauth_provider=${mailChoice}`}>
+                <a href={`/api/oauth/email?oauth_provider=${mailChoice}`} target="_top" rel="noopener noreferrer">
                   E-mail koppelen
                 </a>
               </Button>
@@ -198,6 +192,10 @@ export function EmailChannelSettingsForm({
             ) : null}
           </div>
         </div>
+
+      <form action={action} className="space-y-5">
+        <input type="hidden" name="email_provider" value={hidden.email_provider} />
+        <input type="hidden" name="email_provider_detail" value={hidden.email_provider_detail} />
 
         <div className="flex flex-col gap-4 rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/[0.07] to-muted/10 p-5 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0 space-y-1">
@@ -241,7 +239,8 @@ export function EmailChannelSettingsForm({
             <Link href="/dashboard/inbox">Test in Berichten</Link>
           </Button>
         </div>
+      </form>
       </div>
-    </form>
+    </div>
   );
 }
