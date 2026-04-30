@@ -20,12 +20,16 @@ function oauthConfig() {
       process.env.GOOGLE_OAUTH_CLIENT_ID?.trim() ||
       process.env.GOOGLE_CLIENT_ID?.trim() ||
       process.env.GOOGLE_EMAIL_CLIENT_ID?.trim() ||
+      process.env.GOOGLE_WORKSPACE_CLIENT_ID?.trim() ||
+      process.env.GMAIL_CLIENT_ID?.trim() ||
       process.env.GOOGLE_OAUTH_CLIENTID?.trim() ||
       "",
     clientSecret:
       process.env.GOOGLE_OAUTH_CLIENT_SECRET?.trim() ||
       process.env.GOOGLE_CLIENT_SECRET?.trim() ||
       process.env.GOOGLE_EMAIL_CLIENT_SECRET?.trim() ||
+      process.env.GOOGLE_WORKSPACE_CLIENT_SECRET?.trim() ||
+      process.env.GMAIL_CLIENT_SECRET?.trim() ||
       process.env.GOOGLE_OAUTH_CLIENTSECRET?.trim() ||
       "",
   };

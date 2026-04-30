@@ -16,8 +16,18 @@ export type MicrosoftEmailToken = {
 
 function oauthConfig() {
   return {
-    clientId: process.env.MICROSOFT_OAUTH_CLIENT_ID?.trim() || "",
-    clientSecret: process.env.MICROSOFT_OAUTH_CLIENT_SECRET?.trim() || "",
+    clientId:
+      process.env.MICROSOFT_OAUTH_CLIENT_ID?.trim() ||
+      process.env.MICROSOFT_CLIENT_ID?.trim() ||
+      process.env.AZURE_CLIENT_ID?.trim() ||
+      process.env.MS_OAUTH_CLIENT_ID?.trim() ||
+      "",
+    clientSecret:
+      process.env.MICROSOFT_OAUTH_CLIENT_SECRET?.trim() ||
+      process.env.MICROSOFT_CLIENT_SECRET?.trim() ||
+      process.env.AZURE_CLIENT_SECRET?.trim() ||
+      process.env.MS_OAUTH_CLIENT_SECRET?.trim() ||
+      "",
   };
 }
 

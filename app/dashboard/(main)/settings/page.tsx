@@ -15,6 +15,8 @@ import {
   getMetaCredentialsFromAutomationPreferences,
   metaAppConfigured,
 } from "@/lib/oauth/meta";
+import { googleEmailConfigured } from "@/lib/oauth/google-email";
+import { microsoftEmailConfigured } from "@/lib/oauth/microsoft-email";
 
 export default async function SettingsPage({
   searchParams,
@@ -51,6 +53,8 @@ export default async function SettingsPage({
     searchParams?.tab === "email" && typeof searchParams?.error === "string"
       ? searchParams.error
       : null;
+  const googleEmailReady = googleEmailConfigured();
+  const microsoftEmailReady = microsoftEmailConfigured();
   const leadsThisMonth = await countLeadsThisMonth(supabase, auth.company.id);
   const leadCap = maxLeadsPerMonth(auth.company);
 
@@ -109,6 +113,8 @@ export default async function SettingsPage({
           socialConnections={socialConnections}
           metaConfigured={metaConfigured}
           emailFlashError={emailFlashError}
+          googleEmailConfigured={googleEmailReady}
+          microsoftEmailConfigured={microsoftEmailReady}
         />
       </DashboardWorkSurface>
     </PageFrame>
