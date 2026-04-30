@@ -49,10 +49,15 @@ export default async function SettingsPage({
     typeof prefs.email_linked_address === "string"
       ? prefs.email_linked_address.trim()
       : auth.company.contact_email?.trim() || "";
-  const emailFlashError =
+  const rawEmailFlashError =
     searchParams?.tab === "email" && typeof searchParams?.error === "string"
       ? searchParams.error
       : null;
+  const emailFlashError =
+    rawEmailFlashError === "google_email_not_configured" ||
+    rawEmailFlashError === "microsoft_email_not_configured"
+      ? null
+      : rawEmailFlashError;
   const googleEmailReady = googleEmailConfigured();
   const microsoftEmailReady = microsoftEmailConfigured();
   const leadsThisMonth = await countLeadsThisMonth(supabase, auth.company.id);

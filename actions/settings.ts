@@ -763,6 +763,68 @@ export async function updateEmailInboundSettingsAction(
   );
 
   if (error) return { error: error.message };
+
+  const selectedProvider =
+    email_provider === "google"
+      ? "google_email"
+      : email_provider === "microsoft"
+        ? "microsoft_email"
+        : null;
+
+  if (selectedProvider) {
+    const { data: existingConnection } = await supabase
+      .from("company_social_connections")
+      .select("id, encrypted_token, metadata")
+      .eq("company_id", auth.company.id)
+      .eq("provider", selectedProvider)
+      .maybeSingle();
+
+    const hasOAuthToken =
+      typeof existingConnection?.encrypted_token === "string" &&
+      existingConnection.encrypted_token.trim().length > 0;
+
+    if (email_linked_address) {
+      if (!hasOAuthToken) {
+        const metadata =
+          existingConnection?.metadata &&
+          typeof existingConnection.metadata === "object"
+            ? (existingConnection.metadata as Record<string, unknown>)
+            : {};
+        await supabase.from("company_social_connections").upsert(
+          {
+            company_id: auth.company.id,
+            provider: selectedProvider,
+            status: "connected",
+            display_name: email_linked_address,
+            external_page_id: email_linked_address,
+            metadata: {
+              ...metadata,
+              email: email_linked_address,
+              connection_mode: "manual_address",
+            },
+            encrypted_token: null,
+            token_expires_at: null,
+            last_error: null,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: "company_id,provider" },
+        );
+      }
+    } else if (!hasOAuthToken && existingConnection?.id) {
+      await supabase
+        .from("company_social_connections")
+        .update({
+          status: "disconnected",
+          display_name: null,
+          external_page_id: null,
+          metadata: {},
+          last_error: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", existingConnection.id);
+    }
+  }
+
   if (email_linked_address) {
     await supabase
       .from("companies")
