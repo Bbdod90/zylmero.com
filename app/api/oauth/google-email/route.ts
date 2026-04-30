@@ -2,7 +2,10 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { randomBytes } from "crypto";
 import { createClient } from "@/lib/supabase/server";
-import { buildGoogleEmailOAuthUrl, googleEmailConfigured } from "@/lib/oauth/google-email";
+import {
+  buildGoogleEmailOAuthUrl,
+  googleEmailConnectConfigured,
+} from "@/lib/oauth/google-email";
 import { resolveSiteUrl } from "@/lib/site-url";
 
 const COOKIE_PREFIX = "google_email_oauth_";
@@ -12,7 +15,7 @@ export async function GET() {
   const fail = (msg: string) =>
     NextResponse.redirect(new URL(`/dashboard/settings?tab=email&error=${encodeURIComponent(msg)}`, site));
 
-  if (!googleEmailConfigured()) return fail("google_email_not_configured");
+  if (!googleEmailConnectConfigured()) return fail("google_email_not_configured");
   const supabase = await createClient();
   const {
     data: { user },

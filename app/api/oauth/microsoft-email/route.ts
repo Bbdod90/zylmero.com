@@ -2,7 +2,10 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { randomBytes } from "crypto";
 import { createClient } from "@/lib/supabase/server";
-import { buildMicrosoftEmailOAuthUrl, microsoftEmailConfigured } from "@/lib/oauth/microsoft-email";
+import {
+  buildMicrosoftEmailOAuthUrl,
+  microsoftEmailConnectConfigured,
+} from "@/lib/oauth/microsoft-email";
 import { resolveSiteUrl } from "@/lib/site-url";
 
 const COOKIE_PREFIX = "microsoft_email_oauth_";
@@ -11,7 +14,7 @@ export async function GET() {
   const site = resolveSiteUrl().replace(/\/$/, "");
   const fail = (msg: string) =>
     NextResponse.redirect(new URL(`/dashboard/settings?tab=email&error=${encodeURIComponent(msg)}`, site));
-  if (!microsoftEmailConfigured()) return fail("microsoft_email_not_configured");
+  if (!microsoftEmailConnectConfigured()) return fail("microsoft_email_not_configured");
 
   const supabase = await createClient();
   const {

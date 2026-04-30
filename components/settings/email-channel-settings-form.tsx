@@ -79,12 +79,14 @@ export function EmailChannelSettingsForm({
   emailProviderDetail,
   hasContactEmail,
   socialConnections,
+  flashError,
 }: {
   emailInboundEnabled: boolean;
   emailProvider: StoredEmailProvider;
   emailProviderDetail: string;
   hasContactEmail: boolean;
   socialConnections: CompanySocialConnection[];
+  flashError: string | null;
 }) {
   const [state, action] = useFormState(updateEmailInboundSettingsAction, initial);
   const [mailChoice, setMailChoice] = useState<MailChoiceId>(() =>
@@ -214,6 +216,15 @@ export function EmailChannelSettingsForm({
         </div>
 
         <Separator className="bg-border/60" />
+        {flashError ? (
+          <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive shadow-sm">
+            {flashError === "google_email_not_configured"
+              ? "Google koppeling staat nog niet goed ingesteld op de server."
+              : flashError === "microsoft_email_not_configured"
+                ? "Microsoft koppeling staat nog niet goed ingesteld op de server."
+                : "E-mail koppeling is niet gelukt. Probeer opnieuw."}
+          </p>
+        ) : null}
         {state.error ? (
           <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive shadow-sm">
             {state.error}

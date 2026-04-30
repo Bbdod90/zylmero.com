@@ -41,9 +41,14 @@ export function microsoftEmailConfigured(): boolean {
   return Boolean(cfg.clientId && cfg.clientSecret);
 }
 
+export function microsoftEmailConnectConfigured(): boolean {
+  const cfg = oauthConfig();
+  return Boolean(cfg.clientId);
+}
+
 export function buildMicrosoftEmailOAuthUrl(state: string): string | null {
   const cfg = oauthConfig();
-  if (!cfg.clientId || !cfg.clientSecret) return null;
+  if (!cfg.clientId) return null;
   const url = new URL(MS_AUTH_BASE);
   url.searchParams.set("client_id", cfg.clientId);
   url.searchParams.set("redirect_uri", redirectUri());
