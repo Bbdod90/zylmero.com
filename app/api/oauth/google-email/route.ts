@@ -8,6 +8,8 @@ import {
 } from "@/lib/oauth/google-email";
 import { resolveSiteUrl } from "@/lib/site-url";
 
+export const dynamic = "force-dynamic";
+
 const COOKIE_PREFIX = "google_email_oauth_";
 
 export async function GET() {
