@@ -14,12 +14,18 @@ const COOKIE_PREFIX = "meta_oauth_";
 
 export async function GET(request: Request) {
   const site = resolveSiteUrl().replace(/\/$/, "");
-  const ok = () =>
+  const socialsOk = () =>
+    NextResponse.redirect(new URL("/dashboard/socials?meta=connected", site));
+  const settingsOk = () =>
     NextResponse.redirect(new URL("/dashboard/settings?tab=whatsapp&wa=connected", site));
-  const fail = (msg: string) =>
-    NextResponse.redirect(
-      new URL(`/dashboard/settings?tab=whatsapp&error=${encodeURIComponent(msg)}`, site),
-    );
+  const toErrorPath = (msg: string, nextTarget?: string) =>
+    nextTarget === "socials"
+      ? `/dashboard/socials?error=${encodeURIComponent(msg)}`
+      : `/dashboard/settings?tab=whatsapp&error=${encodeURIComponent(msg)}`;
+  const ok = () =>
+    settingsOk();
+  const fail = (msg: string, nextTarget?: string) =>
+    NextResponse.redirect(new URL(toErrorPath(msg, nextTarget), site));
 
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
@@ -41,14 +47,14 @@ export async function GET(request: Request) {
     return fail("state_expired");
   }
 
-  let payload: { companyId: string; userId: string; exp: number };
+  let payload: { companyId: string; userId: string; exp: number; next?: string };
   try {
     payload = JSON.parse(raw) as typeof payload;
   } catch {
     return fail("invalid_state");
   }
   if (payload.exp < Date.now()) {
-    return fail("state_expired");
+    return fail("state_expired", payload.next);
   }
 
   const supabase = await createClient();
@@ -56,7 +62,7 @@ export async function GET(request: Request) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user || user.id !== payload.userId) {
-    return fail("session_mismatch");
+    return fail("session_mismatch", payload.next);
   }
 
   const { data: company } = await supabase
@@ -67,7 +73,7 @@ export async function GET(request: Request) {
     .maybeSingle();
 
   if (!company?.id) {
-    return fail("no_company");
+    return fail("no_company", payload.next);
   }
 
   const { data: settingsRow } = await supabase
@@ -81,7 +87,7 @@ export async function GET(request: Request) {
   );
 
   if (!metaAppConfigured(companyMeta ?? undefined)) {
-    return fail("meta_not_configured");
+    return fail("meta_not_configured", payload.next);
   }
 
   try {
@@ -115,7 +121,7 @@ export async function GET(request: Request) {
 
     if (error) {
       console.error("[meta callback]", error);
-      return fail("db_write");
+      return fail("db_write", payload.next);
     }
 
     const { data: currentSettings } = await supabase
@@ -155,8 +161,11 @@ export async function GET(request: Request) {
       },
       { onConflict: "company_id,provider" },
     );
-    return fail(msg);
+    return fail(msg, payload.next);
   }
 
+  if (payload.next === "socials") {
+    return socialsOk();
+  }
   return ok();
 }

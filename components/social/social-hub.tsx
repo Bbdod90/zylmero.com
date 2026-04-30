@@ -171,7 +171,7 @@ export function SocialHub({
               </>
             ) : isOwner ? (
               <Button asChild size="sm" className="rounded-lg" disabled={!metaConfigured}>
-                <a href="/api/oauth/meta">Verbinden met Meta</a>
+                <a href="/api/oauth/meta?next=socials">Verbinden met Meta</a>
               </Button>
             ) : (
               <span className="text-sm text-muted-foreground">Nog niet gekoppeld.</span>

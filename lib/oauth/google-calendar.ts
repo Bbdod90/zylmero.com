@@ -18,8 +18,18 @@ export type GoogleTokenPayload = {
 
 function oauthConfig() {
   return {
-    clientId: process.env.GOOGLE_OAUTH_CLIENT_ID?.trim() || "",
-    clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET?.trim() || "",
+    clientId:
+      process.env.GOOGLE_OAUTH_CLIENT_ID?.trim() ||
+      process.env.GOOGLE_CLIENT_ID?.trim() ||
+      process.env.GOOGLE_CALENDAR_CLIENT_ID?.trim() ||
+      process.env.GOOGLE_OAUTH_CLIENTID?.trim() ||
+      "",
+    clientSecret:
+      process.env.GOOGLE_OAUTH_CLIENT_SECRET?.trim() ||
+      process.env.GOOGLE_CLIENT_SECRET?.trim() ||
+      process.env.GOOGLE_CALENDAR_CLIENT_SECRET?.trim() ||
+      process.env.GOOGLE_OAUTH_CLIENTSECRET?.trim() ||
+      "",
   };
 }
 

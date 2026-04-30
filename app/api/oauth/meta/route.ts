@@ -11,11 +11,18 @@ import { resolveSiteUrl } from "@/lib/site-url";
 
 const COOKIE_PREFIX = "meta_oauth_";
 
-export async function GET() {
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const nextTarget = searchParams.get("next") === "socials" ? "socials" : "settings";
   const site = resolveSiteUrl().replace(/\/$/, "");
   const fail = (msg: string) =>
     NextResponse.redirect(
-      new URL(`/dashboard/settings?tab=whatsapp&error=${encodeURIComponent(msg)}`, site),
+      new URL(
+        nextTarget === "socials"
+          ? `/dashboard/socials?error=${encodeURIComponent(msg)}`
+          : `/dashboard/settings?tab=whatsapp&error=${encodeURIComponent(msg)}`,
+        site,
+      ),
     );
 
   const supabase = await createClient();
@@ -54,6 +61,7 @@ export async function GET() {
   const payload = JSON.stringify({
     companyId: company.id as string,
     userId: user.id,
+    next: nextTarget,
     exp: Date.now() + 10 * 60 * 1000,
   });
 

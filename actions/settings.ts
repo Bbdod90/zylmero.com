@@ -701,9 +701,18 @@ export async function updateEmailInboundSettingsAction(
       : "other";
 
   const detailRaw = String(formData.get("email_provider_detail") || "").trim().toLowerCase();
-  const allowedDetail = new Set(["", "zoho", "icloud", "hosting", "forward"]);
+  const allowedDetail = new Set(["", "zoho", "hosting", "forward"]);
   const email_provider_detail =
     email_provider === "other" && allowedDetail.has(detailRaw) ? detailRaw : "";
+  const email_linked_address = String(
+    formData.get("email_linked_address") || "",
+  ).trim().toLowerCase();
+  if (
+    email_linked_address &&
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email_linked_address)
+  ) {
+    return { error: "Vul een geldig e-mailadres in (bijv. info@bedrijf.nl)." };
+  }
 
   const supabase = await createClient();
   const { data: settingsRow } = await supabase
@@ -720,6 +729,7 @@ export async function updateEmailInboundSettingsAction(
     email_inbound_enabled,
     email_provider,
     email_provider_detail,
+    email_linked_address: email_linked_address || null,
     niche_key: auth.company.niche ?? prevPrefs.niche_key,
   };
 
@@ -753,6 +763,12 @@ export async function updateEmailInboundSettingsAction(
   );
 
   if (error) return { error: error.message };
+  if (email_linked_address) {
+    await supabase
+      .from("companies")
+      .update({ contact_email: email_linked_address })
+      .eq("id", auth.company.id);
+  }
   revalidatePath("/dashboard/settings");
   revalidatePath("/dashboard/ai-koppelingen");
   return { ok: true };

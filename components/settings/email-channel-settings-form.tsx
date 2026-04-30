@@ -8,12 +8,11 @@ import {
 } from "@/actions/settings";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { CopyButton } from "@/components/growth/copy-button";
 import { FormBooleanSwitch } from "@/components/settings/form-boolean-switch";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import type { CompanySocialConnection } from "@/lib/queries/social-connections";
-import { Apple, Building2, Cloud, Globe2, Mail, MailPlus } from "lucide-react";
+import { Building2, Cloud, Globe2, Mail, MailPlus } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 const initial: SettingsFormState = {};
@@ -21,7 +20,7 @@ const initial: SettingsFormState = {};
 type StoredEmailProvider = "google" | "microsoft" | "other";
 
 /** UI-keuze; wordt omgezet naar oauth-provider + detail voor overige aanbieders. */
-type MailChoiceId = "google" | "microsoft" | "zoho" | "icloud" | "hosting" | "forward";
+type MailChoiceId = "google" | "microsoft" | "zoho" | "hosting" | "forward";
 
 const MAIL_CHOICES: Array<{
   id: MailChoiceId;
@@ -48,12 +47,6 @@ const MAIL_CHOICES: Array<{
     icon: Cloud,
   },
   {
-    id: "icloud",
-    title: "Apple iCloud Mail",
-    hint: "@icloud.com / eigen domein via Apple.",
-    icon: Apple,
-  },
-  {
     id: "hosting",
     title: "Hosting / eigen domein",
     hint: "o.a. TransIP, Vimexx, Strato, one.com — mail forward.",
@@ -72,7 +65,6 @@ function savedToChoice(provider: StoredEmailProvider, detail: string): MailChoic
   if (provider === "microsoft") return "microsoft";
   const d = detail.trim().toLowerCase();
   if (d === "zoho") return "zoho";
-  if (d === "icloud") return "icloud";
   if (d === "hosting") return "hosting";
   if (d === "forward") return "forward";
   return "forward";
@@ -89,8 +81,6 @@ function choiceToHiddenFields(choice: MailChoiceId): {
       return { email_provider: "microsoft", email_provider_detail: "" };
     case "zoho":
       return { email_provider: "other", email_provider_detail: "zoho" };
-    case "icloud":
-      return { email_provider: "other", email_provider_detail: "icloud" };
     case "hosting":
       return { email_provider: "other", email_provider_detail: "hosting" };
     case "forward":
@@ -116,34 +106,32 @@ function Submit({ label }: { label: string }) {
 function otherChoiceHint(choice: MailChoiceId): string | null {
   switch (choice) {
     case "zoho":
-      return "Zoho: stel in je Zoho Mail een doorstuurregel in naar het webhook-adres onderaan (Stap 3), of gebruik POP/IMAP-forwarding bij je IT.";
-    case "icloud":
-      return "iCloud: zet doorsturen aan in Mail-instellingen (of laat je domein door Apple beheren) naar het Zylmero-adres uit Stap 3.";
+      return "Zoho: vul je mailbox-adres in en klik op opslaan. Daarna verwerkt Zylmero mail op dat adres in je inboxflow.";
     case "hosting":
-      return "Hostingprovider: maak een doorstuurregel van bijv. info@jouwdomein.nl naar het adres uit Stap 3. Werkt bij de meeste NL-hosters.";
+      return "Hostingprovider: vul je adres in (bijv. info@jouwdomein.nl) en sla op. Werkt voor de meeste NL-hosters.";
     case "forward":
-      return "Elke provider met inkomende forward: plak het unieke adres uit Stap 3 als bestemming.";
+      return "Elke andere provider: vul je gewenste mailbox-adres in en sla op.";
     default:
       return null;
   }
 }
 
 export function EmailChannelSettingsForm({
-  companyId,
   emailInboundEnabled,
   emailProvider,
   emailProviderDetail,
+  linkedEmailAddress,
   hasContactEmail,
-  siteOrigin,
   socialConnections,
+  flashError,
 }: {
-  companyId: string;
   emailInboundEnabled: boolean;
   emailProvider: StoredEmailProvider;
   emailProviderDetail: string;
+  linkedEmailAddress: string;
   hasContactEmail: boolean;
-  siteOrigin: string;
   socialConnections: CompanySocialConnection[];
+  flashError: string | null;
 }) {
   const [state, action] = useFormState(updateEmailInboundSettingsAction, initial);
   const [mailChoice, setMailChoice] = useState<MailChoiceId>(() =>
@@ -158,21 +146,6 @@ export function EmailChannelSettingsForm({
 
   const googleEmailConnection = socialConnections.find((c) => c.provider === "google_email");
   const microsoftEmailConnection = socialConnections.find((c) => c.provider === "microsoft_email");
-  const base = siteOrigin.replace(/\/$/, "");
-  const inboundPath = `${base}/api/webhooks/inbound-email`;
-
-  const providerLabel = MAIL_CHOICES.find((c) => c.id === mailChoice)?.title ?? mailChoice;
-
-  const builderPack = [
-    "Zylmero — koppeling inkomende e-mail",
-    "",
-    `Provider-keuze: ${providerLabel}`,
-    `Koppel-adres (webhook): ${inboundPath}`,
-    `Company id: ${companyId}`,
-    "",
-    "Voorbeeld payload:",
-    `{ "company_id": "${companyId}", "from": "klant@voorbeeld.nl", "from_name": "Jan", "subject": "Vraag", "body": "..." }`,
-  ].join("\n");
 
   const showGoogleConnect = mailChoice === "google";
   const showMicrosoftConnect = mailChoice === "microsoft";
@@ -200,7 +173,7 @@ export function EmailChannelSettingsForm({
             <h2 className="text-xl font-semibold tracking-tight text-foreground sm:text-[1.65rem]">E-mail koppelen</h2>
             <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
               Kies je soort mail. Bij Google en Microsoft log je in en kies je het account op het scherm van de
-              provider. Andere mail: meestal een doorstuurregel naar Zylmero (zie Stap 3). Contactadres staat bij{" "}
+              provider. Voor andere providers koppel je direct het e-mailadres hieronder. Contactadres staat bij{" "}
               <Link
                 href="/dashboard/settings?tab=business"
                 className="font-medium text-primary underline decoration-primary/35 underline-offset-2"
@@ -252,11 +225,14 @@ export function EmailChannelSettingsForm({
               <>
                 <div className="flex flex-wrap items-center gap-2.5">
                   <Button
-                    asChild
+                    type="button"
                     size="sm"
                     className="h-10 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground"
+                    onClick={() => {
+                      window.location.href = "/api/oauth/google-email";
+                    }}
                   >
-                    <a href="/api/oauth/google-email">Verbind met Google</a>
+                    Verbind met Google
                   </Button>
                   <p
                     className={cn(
@@ -282,11 +258,14 @@ export function EmailChannelSettingsForm({
               <>
                 <div className="flex flex-wrap items-center gap-2.5">
                   <Button
-                    asChild
+                    type="button"
                     size="sm"
                     className="h-10 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground"
+                    onClick={() => {
+                      window.location.href = "/api/oauth/microsoft-email";
+                    }}
                   >
-                    <a href="/api/oauth/microsoft-email">Verbind met Microsoft</a>
+                    Verbind met Microsoft
                   </Button>
                   <p
                     className={cn(
@@ -312,6 +291,22 @@ export function EmailChannelSettingsForm({
                 {showOtherHint}
               </p>
             ) : null}
+
+            <div className="space-y-2 rounded-xl border border-border/55 bg-background/75 p-4 dark:border-white/[0.08]">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Koppel e-mailadres
+              </p>
+              <input
+                type="email"
+                name="email_linked_address"
+                defaultValue={linkedEmailAddress}
+                placeholder="info@jouwdomein.nl"
+                className="h-11 w-full rounded-xl border border-border/60 bg-background px-3 text-sm shadow-inner-soft transition focus:border-primary/45 focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-white/[0.1]"
+              />
+              <p className="text-xs text-muted-foreground">
+                Dit wordt het gekoppelde adres voor dit kanaal. Werkt voor alle providers.
+              </p>
+            </div>
           </div>
         </div>
 
@@ -331,28 +326,16 @@ export function EmailChannelSettingsForm({
           <FormBooleanSwitch name="email_inbound_enabled" defaultChecked={emailInboundEnabled} label="Aan" labelClassName="text-muted-foreground" />
         </div>
 
-        <div className="rounded-2xl border border-border/60 bg-muted/[0.18] p-5 dark:border-white/[0.08]">
-          <p className="text-[0.95rem] font-semibold text-foreground">Stap 3 · Technisch adres (doorstuur / IT)</p>
-          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-            Inkomende mail voor Zylmero gaat idealiter via Google of Microsoft hierboven. Voor doorstuur naar een eigen
-            endpoint gebruikt IT dit adres met een POST en JSON-body (zie instructies). Dit is geen gewoon
-            &quot;e-mailadres&quot;.
-          </p>
-          <code className="mt-3 block break-all rounded-lg border border-border/60 bg-background/80 px-3 py-2 font-mono text-[0.7rem] text-foreground sm:text-xs">
-            POST {inboundPath}
-          </code>
-          <div className="mt-3 flex flex-wrap gap-3">
-            <CopyButton text={inboundPath} label="Kopieer endpoint-URL" />
-            <CopyButton text={builderPack} label="Kopieer setup-instructies" />
-            <Button asChild variant="secondary" className="h-10 rounded-lg">
-              <Link href="/dashboard/inbox">
-                Test in Berichten
-              </Link>
-            </Button>
-          </div>
-        </div>
-
         <Separator className="bg-border/60" />
+        {flashError ? (
+          <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive shadow-sm">
+            {flashError === "google_email_not_configured"
+              ? "Google koppeling staat nog niet goed ingesteld op de server."
+              : flashError === "microsoft_email_not_configured"
+                ? "Microsoft koppeling staat nog niet goed ingesteld op de server."
+                : "Koppelen is niet gelukt. Probeer opnieuw of controleer de instellingen."}
+          </p>
+        ) : null}
 
         {state.error ? (
           <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive shadow-sm">
@@ -364,7 +347,12 @@ export function EmailChannelSettingsForm({
             Opgeslagen.
           </p>
         ) : null}
-        <Submit label="E-mail koppeling opslaan" />
+        <div className="flex flex-wrap items-center gap-3">
+          <Submit label="E-mail koppeling opslaan" />
+          <Button type="button" asChild variant="secondary" className="h-10 rounded-lg">
+            <Link href="/dashboard/inbox">Test in Berichten</Link>
+          </Button>
+        </div>
       </div>
     </form>
   );

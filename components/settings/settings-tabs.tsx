@@ -115,6 +115,7 @@ export function SettingsTabs({
   defaultTab = "business",
   socialConnections,
   metaConfigured,
+  emailFlashError,
 }: {
   company: Company;
   widgetEmbedToken: string | null;
@@ -133,6 +134,7 @@ export function SettingsTabs({
     email_inbound_enabled: boolean;
     email_provider: "google" | "microsoft" | "other";
     email_provider_detail: string;
+    email_linked_address: string;
     knowledge_snippets: { title: string; body: string }[];
     white_label_logo_url: string | null;
     white_label_primary: string | null;
@@ -147,6 +149,7 @@ export function SettingsTabs({
   defaultTab?: string;
   socialConnections: CompanySocialConnection[];
   metaConfigured: boolean;
+  emailFlashError: string | null;
 }) {
   const [s1, a1] = useFormState(updateBusinessProfileAction, initial);
   const [s2, a2] = useFormState(updateKnowledgeAction, initial);
@@ -553,13 +556,13 @@ export function SettingsTabs({
 
         <TabsContent value="email" className="mt-8 outline-none">
           <EmailChannelSettingsForm
-            companyId={company.id}
             emailInboundEnabled={settings.email_inbound_enabled}
             emailProvider={settings.email_provider}
             emailProviderDetail={settings.email_provider_detail}
+            linkedEmailAddress={settings.email_linked_address}
             hasContactEmail={Boolean(company.contact_email?.trim())}
-            siteOrigin={siteOrigin}
             socialConnections={socialConnections}
+            flashError={emailFlashError}
           />
         </TabsContent>
 

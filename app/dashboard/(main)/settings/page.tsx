@@ -19,7 +19,7 @@ import {
 export default async function SettingsPage({
   searchParams,
 }: {
-  searchParams?: { tab?: string; checkout?: string };
+  searchParams?: { tab?: string; checkout?: string; error?: string };
 }) {
   const auth = await getAuth();
   if (!auth.company) return null;
@@ -43,6 +43,14 @@ export default async function SettingsPage({
       : "other";
   const savedEmailProviderDetail =
     typeof prefs.email_provider_detail === "string" ? prefs.email_provider_detail.trim() : "";
+  const savedEmailLinkedAddress =
+    typeof prefs.email_linked_address === "string"
+      ? prefs.email_linked_address.trim()
+      : auth.company.contact_email?.trim() || "";
+  const emailFlashError =
+    searchParams?.tab === "email" && typeof searchParams?.error === "string"
+      ? searchParams.error
+      : null;
   const leadsThisMonth = await countLeadsThisMonth(supabase, auth.company.id);
   const leadCap = maxLeadsPerMonth(auth.company);
 
@@ -89,6 +97,7 @@ export default async function SettingsPage({
             email_inbound_enabled: mapped?.email_inbound_enabled ?? false,
             email_provider: savedEmailProvider,
             email_provider_detail: savedEmailProviderDetail,
+            email_linked_address: savedEmailLinkedAddress,
             knowledge_snippets: mapped?.knowledge_snippets ?? [],
             white_label_logo_url: mapped?.white_label_logo_url ?? null,
             white_label_primary: mapped?.white_label_primary ?? null,
@@ -99,6 +108,7 @@ export default async function SettingsPage({
           }}
           socialConnections={socialConnections}
           metaConfigured={metaConfigured}
+          emailFlashError={emailFlashError}
         />
       </DashboardWorkSurface>
     </PageFrame>

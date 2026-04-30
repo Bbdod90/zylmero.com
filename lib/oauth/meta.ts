@@ -37,14 +37,18 @@ export function resolveMetaOAuthCredentials(
   // Accept common naming variants used across hosting setups.
   const envId =
     process.env.META_APP_ID?.trim() ||
+    process.env.META_APPID?.trim() ||
     process.env.FACEBOOK_APP_ID?.trim() ||
+    process.env.FACEBOOK_CLIENT_ID?.trim() ||
     process.env.META_CLIENT_ID?.trim() ||
     process.env.META_OAUTH_CLIENT_ID?.trim() ||
     process.env.WHATSAPP_META_APP_ID?.trim() ||
     "";
   const envSecret =
     process.env.META_APP_SECRET?.trim() ||
+    process.env.META_APPSECRET?.trim() ||
     process.env.FACEBOOK_APP_SECRET?.trim() ||
+    process.env.FACEBOOK_CLIENT_SECRET?.trim() ||
     process.env.META_CLIENT_SECRET?.trim() ||
     process.env.META_OAUTH_CLIENT_SECRET?.trim() ||
     process.env.WHATSAPP_META_APP_SECRET?.trim() ||
