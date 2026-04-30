@@ -35,12 +35,6 @@ export default async function SettingsPage({
   const prefs =
     (settingsRow?.automation_preferences as Record<string, unknown>) || {};
   const companyMeta = getMetaCredentialsFromAutomationPreferences(prefs);
-  const companyMetaAppId =
-    typeof prefs.meta_app_id === "string" ? prefs.meta_app_id.trim() : "";
-  const metaHasStoredSecret = Boolean(
-    typeof prefs.meta_app_secret_encrypted === "string" &&
-      prefs.meta_app_secret_encrypted.trim(),
-  );
   const metaConfigured = metaAppConfigured(companyMeta ?? undefined);
   const rawEmailProvider = String(prefs.email_provider ?? "").toLowerCase();
   const savedEmailProvider =
@@ -105,8 +99,6 @@ export default async function SettingsPage({
           }}
           socialConnections={socialConnections}
           metaConfigured={metaConfigured}
-          metaAppId={companyMetaAppId}
-          metaHasStoredSecret={metaHasStoredSecret}
         />
       </DashboardWorkSurface>
     </PageFrame>
