@@ -147,7 +147,7 @@ export function EmailChannelSettingsForm({
               <label className="space-y-2">
                 <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Provider</span>
                 <select
-                  name="email_choice_ui"
+                  name="oauth_provider"
                   value={mailChoice}
                   onChange={(e) => {
                     setMailChoice(e.target.value as MailChoiceId);
@@ -162,15 +162,10 @@ export function EmailChannelSettingsForm({
                 </select>
               </label>
               <Button
-                type="button"
+                type="submit"
+                formAction="/api/oauth/email"
+                formMethod="get"
                 className="h-11 rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground"
-                onClick={() => {
-                  if (mailChoice === "google") {
-                    window.location.href = "/api/oauth/google-email";
-                    return;
-                  }
-                  window.location.href = "/api/oauth/microsoft-email";
-                }}
               >
                 E-mail koppelen
               </Button>
