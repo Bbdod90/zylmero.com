@@ -8,6 +8,10 @@ import { DashboardWorkSurface } from "@/components/layout/dashboard-work-surface
 import { PageFrame } from "@/components/layout/page-frame";
 import { ChatbotStudio } from "@/components/chatbot/chatbot-studio";
 import { WIDGET_STARTER_WELCOME_DEFAULT } from "@/lib/chatbot/widget-starters";
+import {
+  normalizeStartersFromPrefs,
+  WIDGET_DEFAULT_PRIMARY,
+} from "@/lib/chatbot/widget-public-config";
 
 function extraGoalsFromCapabilities(caps: unknown): {
   productadvies: boolean;
@@ -67,10 +71,44 @@ export default async function ChatbotPage() {
       : null;
   const goals = (prefs.chatbot_goals as Record<string, unknown> | null) || {};
 
+  const { data: chatbotRow } = await supabase
+    .from("chatbots")
+    .select("id")
+    .eq("user_id", auth.user.id)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const embedChatbotId = typeof chatbotRow?.id === "string" ? chatbotRow.id : auth.company.id;
+
+  const widgetPrimaryRaw =
+    typeof prefs.chatbot_widget_primary === "string" ? prefs.chatbot_widget_primary.trim() : "";
+  const wlPrimary = mapped?.white_label_primary?.trim() ?? "";
+  const initialWidgetPrimary =
+    /^#[0-9A-Fa-f]{6}$/.test(widgetPrimaryRaw)
+      ? widgetPrimaryRaw
+      : /^#[0-9A-Fa-f]{6}$/.test(wlPrimary)
+        ? wlPrimary
+        : WIDGET_DEFAULT_PRIMARY;
+
+  const widgetLogoRaw =
+    typeof prefs.chatbot_widget_logo_url === "string" ? prefs.chatbot_widget_logo_url.trim() : "";
+  const initialWidgetLogoUrl =
+    widgetLogoRaw || mapped?.white_label_logo_url?.trim() || null;
+
+  const initialWidgetTitle =
+    typeof prefs.chatbot_widget_title === "string" && prefs.chatbot_widget_title.trim()
+      ? prefs.chatbot_widget_title.trim().slice(0, 48)
+      : "Chat";
+
+  const initialWidgetShowStarters = prefs.chatbot_widget_show_starters !== false;
+
+  const initialWidgetStarters = normalizeStartersFromPrefs(prefs.chatbot_widget_starters);
+
   return (
     <PageFrame
       title="Je chatbot"
-      subtitle="Invullen, preview testen, klaar en koppelen — Botpress-achtig maar simpel."
+      subtitle="Studio: kleuren, logo, openingszin en snelle keuzes. Daarna kennis trainen en embed plakken."
     >
       <DashboardWorkSurface wide>
         <ChatbotStudio
@@ -104,7 +142,13 @@ export default async function ChatbotPage() {
             prefs.chatbot_answer_length === "normal" ? "normal" : "short"
           }
           initialExtraGoals={extraGoalsFromCapabilities(prefs.chatbot_capabilities)}
-          embedSnippet={`<script src=\"${siteUrl().replace(/\/$/, "")}/widget.js\" data-id=\"${auth.company.id}\"></script>`}
+          embedChatbotId={embedChatbotId}
+          initialWidgetPrimary={initialWidgetPrimary}
+          initialWidgetLogoUrl={initialWidgetLogoUrl}
+          initialWidgetTitle={initialWidgetTitle}
+          initialWidgetShowStarters={initialWidgetShowStarters}
+          initialWidgetStarters={initialWidgetStarters}
+          embedSnippet={`<script src=\"${siteUrl().replace(/\/$/, "")}/widget.js\" data-id=\"${embedChatbotId}\"></script>`}
         />
       </DashboardWorkSurface>
     </PageFrame>

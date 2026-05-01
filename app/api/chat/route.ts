@@ -582,7 +582,13 @@ export async function POST(request: NextRequest) {
 
   const websiteUrl = safeString(preview.website_url) || safeString(chatbot.website_url);
   const extraInfo = safeString(preview.extra_info) || safeString(chatbot.extra_info);
-  const openingszin = safeString(preview.openingszin) || safeString(chatbot.openingszin);
+  const apRaw = companySettingsRow?.automation_preferences;
+  const prefsOpening =
+    apRaw && typeof apRaw === "object"
+      ? safeString((apRaw as Record<string, unknown>).chatbot_opening_line)
+      : "";
+  const openingszin =
+    safeString(preview.openingszin) || prefsOpening || safeString(chatbot.openingszin);
   const settings =
     preview.settings && typeof preview.settings === "object"
       ? preview.settings

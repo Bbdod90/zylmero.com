@@ -1412,6 +1412,123 @@ export async function saveChatbotStudioAction(input: {
   };
 }
 
+export type SaveChatbotWidgetStudioInput = {
+  openingLine: string;
+  widgetTitle: string;
+  primaryColor: string;
+  logoUrl: string;
+  showStarters: boolean;
+  starters: { label: string; prompt: string }[];
+};
+
+export type SaveChatbotWidgetStudioResult =
+  | { ok: true }
+  | { ok: false; error: string };
+
+/** Widget-thema, openingszin en snelle keuzes — zonder site-crawl (snel opslaan). */
+export async function saveChatbotWidgetStudioAction(
+  input: SaveChatbotWidgetStudioInput,
+): Promise<SaveChatbotWidgetStudioResult> {
+  if (isDemoMode()) {
+    return { ok: false, error: "Niet beschikbaar in demo-modus." };
+  }
+  const auth = await getAuth();
+  if (!auth.user || !auth.company) {
+    return { ok: false, error: "Niet ingelogd." };
+  }
+
+  const openingLine = String(input.openingLine || "").trim().slice(0, 600);
+  const widgetTitle = String(input.widgetTitle || "").trim().slice(0, 48) || "Chat";
+  let primaryColor = String(input.primaryColor || "").trim();
+  if (!/^#[0-9A-Fa-f]{6}$/.test(primaryColor)) {
+    primaryColor = "#c9a227";
+  }
+  const logoUrl = String(input.logoUrl || "").trim();
+  if (logoUrl.length > 2000) {
+    return { ok: false, error: "Logo-URL is te lang." };
+  }
+  if (logoUrl) {
+    try {
+      const u = new URL(logoUrl);
+      if (!["http:", "https:"].includes(u.protocol)) {
+        throw new Error("protocol");
+      }
+    } catch {
+      return { ok: false, error: "Logo-URL is ongeldig (gebruik https://…)." };
+    }
+  }
+
+  const showStarters = Boolean(input.showStarters);
+  const starters: { label: string; prompt: string }[] = [];
+  if (Array.isArray(input.starters)) {
+    for (const row of input.starters.slice(0, 5)) {
+      if (!row || typeof row !== "object") continue;
+      const label = String((row as Record<string, unknown>).label ?? "").trim().slice(0, 120);
+      const prompt = String((row as Record<string, unknown>).prompt ?? "").trim().slice(0, 2000);
+      if (label && prompt) starters.push({ label, prompt });
+    }
+  }
+  if (showStarters && starters.length === 0) {
+    return {
+      ok: false,
+      error: "Voeg minstens één snelle keuze toe, of zet ‘Snelle keuzes’ uit.",
+    };
+  }
+
+  const supabase = await createClient();
+  const { data: settingsRow } = await supabase
+    .from("company_settings")
+    .select("*")
+    .eq("company_id", auth.company.id)
+    .maybeSingle();
+  const prev = mapCompanySettingsRow(settingsRow as Record<string, unknown>);
+  const prevAi = (settingsRow?.automation_preferences as Record<string, unknown>) || {};
+
+  const automation_preferences = {
+    ...prevAi,
+    chatbot_opening_line: openingLine || null,
+    chatbot_widget_title: widgetTitle,
+    chatbot_widget_primary: primaryColor,
+    chatbot_widget_logo_url: logoUrl || null,
+    chatbot_widget_show_starters: showStarters,
+    chatbot_widget_starters: starters.length > 0 ? starters : prevAi.chatbot_widget_starters ?? [],
+  };
+
+  const { error } = await supabase.from("company_settings").upsert(
+    {
+      company_id: auth.company.id,
+      niche: prev?.niche ?? null,
+      services: prev?.services ?? [],
+      faq: prev?.faq ?? [],
+      pricing_hints: prev?.pricing_hints ?? null,
+      business_hours: prev?.business_hours ?? {},
+      booking_link: prev?.booking_link ?? null,
+      tone: prev?.tone ?? null,
+      reply_style: prev?.reply_style ?? null,
+      language: prev?.language ?? "nl",
+      automation_preferences,
+      whatsapp_channel: prev?.whatsapp_channel ?? {
+        provider: "mock",
+        connected: false,
+      },
+      auto_reply_enabled: prev?.auto_reply_enabled ?? false,
+      auto_reply_delay_seconds: prev?.auto_reply_delay_seconds ?? 30,
+      ai_usage_count: prev?.ai_usage_count ?? 0,
+      ai_setup_completed_at: prev?.ai_setup_completed_at ?? null,
+      niche_intake: prev?.niche_intake ?? {},
+      knowledge_snippets: prev?.knowledge_snippets ?? [],
+      white_label_logo_url: prev?.white_label_logo_url ?? null,
+      white_label_primary: prev?.white_label_primary ?? null,
+    },
+    { onConflict: "company_id" },
+  );
+
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/dashboard/chatbot");
+  revalidatePath("/dashboard/settings");
+  return { ok: true };
+}
+
 export async function updateQuoteTemplateAction(
   _prev: SettingsFormState,
   formData: FormData,

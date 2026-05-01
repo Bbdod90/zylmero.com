@@ -11,12 +11,43 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   previewChatbotVisitorMessageAction,
   saveChatbotStudioAction,
+  saveChatbotWidgetStudioAction,
 } from "@/actions/settings";
-import { CheckCircle2, Loader2, MessageCircle, SendHorizontal, Sparkles } from "lucide-react";
+import { CheckCircle2, Loader2, MessageCircle, Palette, SendHorizontal, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { WIDGET_STARTER_WELCOME_DEFAULT, WIDGET_STARTERS } from "@/lib/chatbot/widget-starters";
+import { WIDGET_DEFAULT_PRIMARY } from "@/lib/chatbot/widget-public-config";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
+
+function shadeHex(hex: string, factor: number): string {
+  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex.trim());
+  if (!m) return hex;
+  const c = (x: string) =>
+    Math.round(Math.min(255, Math.max(0, parseInt(x, 16) * factor)))
+      .toString(16)
+      .padStart(2, "0");
+  return `#${c(m[1])}${c(m[2])}${c(m[3])}`;
+}
+
+function hexToRgbCss(hex: string): string {
+  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex.trim());
+  if (!m) return "201, 162, 39";
+  return `${parseInt(m[1], 16)}, ${parseInt(m[2], 16)}, ${parseInt(m[3], 16)}`;
+}
+
+function padStarterRows(rows: { label: string; prompt: string }[]): { label: string; prompt: string }[] {
+  const base = WIDGET_STARTERS.map((s) => ({ label: s.label, prompt: s.prompt }));
+  const clean = rows.filter((r) => r.label.trim() && r.prompt.trim());
+  if (clean.length >= 3) return clean.slice(0, 5);
+  const out = [...clean];
+  let i = 0;
+  while (out.length < 3 && i < base.length) {
+    if (!out.some((o) => o.label === base[i].label)) out.push(base[i]);
+    i += 1;
+  }
+  return out.slice(0, 5);
+}
 
 function SettingSwitchRow({
   title,
@@ -72,6 +103,12 @@ export function ChatbotStudio(props: {
     contactEscalatie: boolean;
     afspraakOpVerzoek: boolean;
   };
+  embedChatbotId: string;
+  initialWidgetPrimary: string;
+  initialWidgetLogoUrl: string | null;
+  initialWidgetTitle: string;
+  initialWidgetShowStarters: boolean;
+  initialWidgetStarters: { label: string; prompt: string }[];
   embedSnippet: string;
 }) {
   const [bedrijfsOmschrijving, setBedrijfsOmschrijving] = useState(props.initialBedrijfsOmschrijving);
@@ -103,6 +140,18 @@ export function ChatbotStudio(props: {
   const dragStartYRef = useRef(0);
   const dragStartHeightRef = useRef(190);
 
+  const [widgetPrimary, setWidgetPrimary] = useState(
+    /^#[0-9A-Fa-f]{6}$/.test(props.initialWidgetPrimary)
+      ? props.initialWidgetPrimary
+      : WIDGET_DEFAULT_PRIMARY,
+  );
+  const [widgetLogoUrl, setWidgetLogoUrl] = useState(props.initialWidgetLogoUrl ?? "");
+  const [widgetTitle, setWidgetTitle] = useState(props.initialWidgetTitle || "Chat");
+  const [showStarterChoices, setShowStarterChoices] = useState(props.initialWidgetShowStarters);
+  const [starterRows, setStarterRows] = useState(() => padStarterRows(props.initialWidgetStarters));
+  const [widgetSavePending, startWidgetSave] = useTransition();
+  const [widgetSaveMessage, setWidgetSaveMessage] = useState<string | null>(null);
+
   const canSave = bedrijfsOmschrijving.trim().length > 0 && !props.demoMode;
   const textFieldClass =
     "rounded-xl border-gray-200 bg-white shadow-[inset_0_1px_0_rgba(255,255,255,0.5)] focus-visible:ring-primary/20";
@@ -132,6 +181,43 @@ export function ChatbotStudio(props: {
       window.removeEventListener("mouseup", onUp);
     };
   }, []);
+
+  useEffect(() => {
+    setChat((prev) => {
+      if (prev.length === 1 && prev[0].role === "assistant") {
+        return [
+          {
+            role: "assistant",
+            content: openingszin.trim() || WIDGET_STARTER_WELCOME_DEFAULT,
+          },
+        ];
+      }
+      return prev;
+    });
+  }, [openingszin]);
+
+  const onSaveWidget = () => {
+    if (props.demoMode) return;
+    setWidgetSaveMessage(null);
+    setError(null);
+    startWidgetSave(async () => {
+      const res = await saveChatbotWidgetStudioAction({
+        openingLine: openingszin,
+        widgetTitle,
+        primaryColor: widgetPrimary,
+        logoUrl: widgetLogoUrl,
+        showStarters: showStarterChoices,
+        starters: starterRows.filter((r) => r.label.trim() && r.prompt.trim()),
+      });
+      if (!res.ok) {
+        setError(res.error);
+        return;
+      }
+      setWidgetSaveMessage(
+        "Widget opgeslagen. Je embed op de website toont dit na een minuut (browsercache).",
+      );
+    });
+  };
 
   const onSave = () => {
     if (!canSave) return;
@@ -206,13 +292,166 @@ export function ChatbotStudio(props: {
     <div className="mx-auto grid w-full max-w-[1500px] gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
       <section className="rounded-2xl border border-gray-200/90 bg-white p-6 shadow-[0_20px_60px_-44px_rgba(15,23,42,0.45)]">
         <div className="space-y-1">
-          <h2 className="text-2xl font-semibold tracking-tight text-gray-900">Maak je chatbot in 1 minuut</h2>
+          <h2 className="text-2xl font-semibold tracking-tight text-gray-900">Chatbot studio</h2>
           <p className="text-sm text-gray-600">
-            Vul hieronder kort je bedrijfsinfo in. Daarna kun je direct testen en koppelen.
+            Personaliseer uiterlijk, openingszin en snelle keuzes. Train je kennis hieronder; rechts zie je live
+            wat je bezoekers krijgen.
           </p>
         </div>
 
         <div className="mt-6 space-y-5">
+          <section className="space-y-4 rounded-2xl border border-stone-200/90 bg-gradient-to-b from-stone-50/80 to-white p-5 shadow-sm">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-stone-900 text-white">
+                  <Palette className="size-4" aria-hidden />
+                </span>
+                <div>
+                  <h3 className="text-base font-semibold text-gray-900">Widget & merk</h3>
+                  <p className="text-xs text-gray-500">Zelfde look als op je site na embedden.</p>
+                </div>
+              </div>
+              <Button
+                type="button"
+                size="sm"
+                className="rounded-xl bg-stone-900 text-white hover:bg-stone-800"
+                disabled={props.demoMode || widgetSavePending}
+                onClick={onSaveWidget}
+              >
+                {widgetSavePending ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
+                Widget opslaan
+              </Button>
+            </div>
+            {widgetSaveMessage ? (
+              <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-900">
+                {widgetSaveMessage}
+              </p>
+            ) : null}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="widget-primary">Accentkleur</Label>
+                <div className="flex items-center gap-2">
+                  <input
+                    id="widget-primary"
+                    type="color"
+                    value={/^#[0-9A-Fa-f]{6}$/.test(widgetPrimary) ? widgetPrimary : WIDGET_DEFAULT_PRIMARY}
+                    onChange={(e) => setWidgetPrimary(e.target.value)}
+                    className="h-11 w-14 cursor-pointer rounded-lg border border-gray-200 bg-white p-1"
+                    aria-label="Accentkleur"
+                  />
+                  <Input
+                    value={widgetPrimary}
+                    onChange={(e) => setWidgetPrimary(e.target.value)}
+                    placeholder="#c9a227"
+                    className={cn(textFieldClass, "h-11 flex-1 font-mono text-sm")}
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="widget-title">Titel in chatkop</Label>
+                <Input
+                  id="widget-title"
+                  value={widgetTitle}
+                  onChange={(e) => setWidgetTitle(e.target.value.slice(0, 48))}
+                  placeholder="Chat"
+                  className={cn(textFieldClass, "h-11")}
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="widget-logo">Logo (URL, https)</Label>
+              <Input
+                id="widget-logo"
+                value={widgetLogoUrl}
+                onChange={(e) => setWidgetLogoUrl(e.target.value)}
+                placeholder="https://…"
+                className={cn(textFieldClass, "h-11")}
+              />
+              <p className="text-xs text-gray-500">
+                Publieke URL naar PNG/SVG/WebP. Verschijnt klein naast de titel op je widget.
+              </p>
+            </div>
+            <SettingSwitchRow
+              title="Snelle keuzes tonen"
+              description="Knoppen onder het eerste bericht — ideaal voor reparatie, prijzen, retour."
+              checked={showStarterChoices}
+              onCheckedChange={setShowStarterChoices}
+            />
+            {showStarterChoices ? (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <Label className="text-sm font-semibold text-gray-800">Snelle keuzes (max. 5)</Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="rounded-lg"
+                    disabled={starterRows.length >= 5}
+                    onClick={() =>
+                      setStarterRows((r) => [...r, { label: "", prompt: "" }].slice(0, 5))
+                    }
+                  >
+                    Rij toevoegen
+                  </Button>
+                </div>
+                <div className="space-y-3">
+                  {starterRows.map((row, idx) => (
+                    <div
+                      key={`starter-${idx}-${row.label.slice(0, 8)}`}
+                      className="rounded-xl border border-gray-200 bg-white p-3 shadow-sm"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                          Keuze {idx + 1}
+                        </span>
+                        {starterRows.length > 1 ? (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 text-xs text-red-600 hover:text-red-700"
+                            onClick={() => setStarterRows((r) => r.filter((_, i) => i !== idx))}
+                          >
+                            Verwijderen
+                          </Button>
+                        ) : null}
+                      </div>
+                      <div className="mt-2 space-y-2">
+                        <Input
+                          value={row.label}
+                          onChange={(e) =>
+                            setStarterRows((r) =>
+                              r.map((x, i) => (i === idx ? { ...x, label: e.target.value } : x)),
+                            )
+                          }
+                          placeholder="Label op de knop"
+                          className={cn(textFieldClass, "h-9")}
+                        />
+                        <Textarea
+                          value={row.prompt}
+                          onChange={(e) =>
+                            setStarterRows((r) =>
+                              r.map((x, i) => (i === idx ? { ...x, prompt: e.target.value } : x)),
+                            )
+                          }
+                          placeholder="Wat de AI precies moet weten (wordt naar de chat gestuurd)"
+                          rows={2}
+                          className={cn(textFieldClass, "min-h-[64px] text-sm")}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+            <p className="text-xs text-gray-500">
+              Chat-ID voor je script:{" "}
+              <code className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[11px]">
+                {props.embedChatbotId}
+              </code>
+            </p>
+          </section>
+
           <section className="space-y-3">
             <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500">Over je bedrijf</h3>
             <div className="space-y-2">
@@ -441,15 +680,47 @@ export function ChatbotStudio(props: {
         </div>
       </section>
 
-      <section className="flex min-h-[360px] flex-col overflow-hidden rounded-2xl border border-stone-200/90 bg-white shadow-[0_28px_80px_rgba(15,15,20,0.12)]">
-        <header className="border-b border-amber-900/25 bg-gradient-to-b from-[#161618] to-[#0e0e10] px-5 py-3 text-zinc-100">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">Live preview</p>
-          <h3 className="mt-1 flex items-center gap-2 text-lg font-semibold tracking-tight">
-            Test je chatbot <Sparkles className="size-4 text-amber-200/90" />
-          </h3>
-          <p className="mt-1 text-sm text-zinc-400">
-            Kies een optie of typ zelf. {scannedCount > 0 ? `${scannedCount} pagina's ingeladen.` : ""}
-          </p>
+      <div className="flex flex-col gap-3 lg:sticky lg:top-6">
+        <div className="flex flex-col items-end gap-1.5 px-1">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-stone-400">
+            Zo op je website (knop rechtsonder)
+          </span>
+          <div
+            className="rounded-full px-5 py-3 text-xs font-semibold uppercase tracking-wide text-white shadow-lg"
+            style={{
+              background: `linear-gradient(145deg, ${widgetPrimary}, ${shadeHex(widgetPrimary, 0.38)})`,
+              boxShadow: `0 12px 40px rgba(0,0,0,.35), 0 0 0 1px rgba(${hexToRgbCss(widgetPrimary)}, 0.35)`,
+            }}
+          >
+            {(widgetTitle || "Chat").trim().slice(0, 18).toUpperCase() || "CHAT"}
+          </div>
+        </div>
+
+        <section className="flex min-h-[360px] flex-col overflow-hidden rounded-2xl border border-stone-200/90 bg-white shadow-[0_28px_80px_rgba(15,15,20,0.12)]">
+        <header
+          className="border-b bg-gradient-to-b from-[#161618] to-[#0e0e10] px-5 py-3 text-zinc-100"
+          style={{ borderBottomColor: `rgba(${hexToRgbCss(widgetPrimary)}, 0.35)` }}
+        >
+          <div className="flex items-start gap-3">
+            {widgetLogoUrl.trim() && /^https?:\/\//i.test(widgetLogoUrl.trim()) ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={widgetLogoUrl.trim()}
+                alt=""
+                className="mt-0.5 h-9 w-9 shrink-0 rounded-lg bg-white object-contain p-0.5"
+              />
+            ) : null}
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">Live preview</p>
+              <h3 className="mt-1 flex flex-wrap items-center gap-2 text-lg font-semibold tracking-tight">
+                <span className="truncate">{widgetTitle || "Chat"}</span>
+                <Sparkles className="size-4 shrink-0 text-amber-200/90" aria-hidden />
+              </h3>
+              <p className="mt-1 text-sm text-zinc-400">
+                Zelfde thema als je widget. {scannedCount > 0 ? `${scannedCount} pagina's ingeladen.` : ""}
+              </p>
+            </div>
+          </div>
         </header>
 
         <div
@@ -498,23 +769,40 @@ export function ChatbotStudio(props: {
           <p className="mb-1.5 text-center text-[11px] text-gray-500">Sleep omhoog/omlaag om meer chat te zien</p>
         </div>
         <div className="space-y-2.5 border-t border-stone-200/80 bg-white/95 px-5 py-3 backdrop-blur-sm">
-          <p className="text-right text-[10px] font-semibold uppercase tracking-[0.14em] text-stone-500">
-            Kies een optie
-          </p>
-          <div className="flex flex-col gap-2">
-            {WIDGET_STARTERS.map((s) => (
-              <button
-                key={s.id}
-                type="button"
-                disabled={replying}
-                onClick={() => runPreview(s.prompt, s.label)}
-                className="flex w-full flex-col items-start gap-0.5 rounded-2xl border border-stone-300/60 bg-white/90 px-3.5 py-2.5 text-left shadow-sm transition hover:border-amber-600/45 hover:bg-white hover:shadow-md disabled:opacity-50"
-              >
-                <span className="text-[13px] font-semibold text-stone-900">{s.label}</span>
-                <span className="text-[11px] font-medium text-stone-400">Meer informatie</span>
-              </button>
-            ))}
-          </div>
+          {showStarterChoices ? (
+            <>
+              <p className="text-right text-[10px] font-semibold uppercase tracking-[0.14em] text-stone-500">
+                Kies een optie
+              </p>
+              <div className="flex flex-col gap-2">
+                {starterRows
+                  .filter((s) => s.label.trim() && s.prompt.trim())
+                  .map((s, idx) => (
+                    <button
+                      key={`pv-${idx}-${s.label.slice(0, 24)}`}
+                      type="button"
+                      disabled={replying}
+                      onClick={() => runPreview(s.prompt, s.label)}
+                      className="flex w-full flex-col items-start gap-0.5 rounded-2xl border border-stone-300/60 bg-white/90 px-3.5 py-2.5 text-left shadow-sm transition hover:bg-white hover:shadow-md disabled:opacity-50"
+                      style={{
+                        borderColor: "rgba(120, 113, 108, 0.35)",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = `rgba(${hexToRgbCss(widgetPrimary)}, 0.55)`;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = "rgba(120, 113, 108, 0.35)";
+                      }}
+                    >
+                      <span className="text-[13px] font-semibold text-stone-900">{s.label}</span>
+                      <span className="text-[11px] font-medium text-stone-400">Meer informatie</span>
+                    </button>
+                  ))}
+              </div>
+            </>
+          ) : (
+            <p className="text-center text-xs text-stone-500">Snelle keuzes staan uit — alleen vrije invoer.</p>
+          )}
           <div className="flex items-center gap-2 pt-1">
             <Input
               value={chatInput}
@@ -540,6 +828,11 @@ export function ChatbotStudio(props: {
                 runPreview(text);
               }}
               disabled={replying}
+              className="shrink-0 border text-white shadow-sm hover:opacity-95"
+              style={{
+                background: `linear-gradient(165deg, ${shadeHex(widgetPrimary, 0.72)}, ${shadeHex(widgetPrimary, 0.38)})`,
+                borderColor: `rgba(${hexToRgbCss(widgetPrimary)}, 0.35)`,
+              }}
             >
               {replying ? <Loader2 className="size-4 animate-spin" /> : <SendHorizontal className="size-4" />}
             </Button>
@@ -550,6 +843,7 @@ export function ChatbotStudio(props: {
           </p>
         </div>
       </section>
+      </div>
     </div>
   );
 }

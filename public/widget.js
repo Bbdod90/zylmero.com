@@ -12,11 +12,12 @@
     return;
   }
   var apiUrl = apiOrigin + "/api/chat";
+  var configUrl = apiOrigin + "/api/widget/config?chatbot_id=" + encodeURIComponent(chatbotId);
 
-  /** Sync met lib/chatbot/widget-starters.ts */
+  /** Fallback — sync met lib/chatbot/widget-starters.ts / widget-public-config.ts */
   var DEFAULT_WELCOME =
     "Welkom. Waarmee kunnen we je helpen? Kies hieronder een onderwerp — of stel je eigen vraag.";
-  var STARTERS = [
+  var FALLBACK_STARTERS = [
     {
       label: "Plan een reparatie",
       prompt:
@@ -34,9 +35,27 @@
     },
   ];
 
+  function defaultConfig() {
+    return {
+      opening_line: DEFAULT_WELCOME,
+      widget_title: "Chat",
+      primary_color: "#c9a227",
+      logo_url: null,
+      show_starters: true,
+      starters: FALLBACK_STARTERS,
+    };
+  }
+
   var conversationId = null;
   var isOpen = false;
   var isBusy = false;
+  var body;
+  var input;
+  var sendBtn;
+  var bubble;
+  var titleEl;
+  var headLeft;
+  var styleNode;
 
   function el(tag, className, text) {
     var node = document.createElement(tag);
@@ -45,15 +64,97 @@
     return node;
   }
 
+  function hexToRgb(hex) {
+    var m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex || "");
+    return m
+      ? { r: parseInt(m[1], 16), g: parseInt(m[2], 16), b: parseInt(m[3], 16) }
+      : { r: 201, g: 162, b: 39 };
+  }
+
+  function shadeHex(hex, factor) {
+    var rgb = hexToRgb(hex);
+    function c(n) {
+      return Math.round(Math.min(255, Math.max(0, n * factor)));
+    }
+    return (
+      "#" +
+      ("0" + c(rgb.r).toString(16)).slice(-2) +
+      ("0" + c(rgb.g).toString(16)).slice(-2) +
+      ("0" + c(rgb.b).toString(16)).slice(-2)
+    );
+  }
+
+  function buildCss(primary) {
+    var p = /^#[0-9A-Fa-f]{6}$/.test(primary) ? primary : "#c9a227";
+    var rgb = hexToRgb(p);
+    var rgba = function (a) {
+      return "rgba(" + rgb.r + "," + rgb.g + "," + rgb.b + "," + a + ")";
+    };
+    var pDark = shadeHex(p, 0.38);
+    var pMid = shadeHex(p, 0.65);
+    return (
+      ".zl-bubble-btn{position:fixed;right:22px;bottom:22px;z-index:2147483000;min-height:56px;padding:0 22px;border:none;border-radius:999px;background:linear-gradient(145deg," +
+      p +
+      " 0%," +
+      pDark +
+      " 100%);color:#fafafa;font:600 12px system-ui,-apple-system,BlinkMacSystemFont,sans-serif;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;box-shadow:0 12px 40px rgba(0,0,0,.35),0 0 0 1px " +
+      rgba(0.4) +
+      ";transition:transform .2s ease,box-shadow .2s ease}" +
+      ".zl-bubble-btn:hover{transform:translateY(-1px);box-shadow:0 16px 44px rgba(0,0,0,.4),0 0 0 1px " +
+      rgba(0.55) +
+      "}" +
+      ".zl-panel{display:none;position:fixed;right:22px;bottom:92px;z-index:2147483000;width:min(380px,calc(100vw - 24px));height:min(580px,72vh);background:#fff;border-radius:20px;overflow:hidden;flex-direction:column;border:1px solid rgba(0,0,0,.06);box-shadow:0 28px 80px rgba(15,15,20,.45),0 0 0 1px rgba(255,255,255,.04)}" +
+      ".zl-head{flex-shrink:0;height:56px;padding:0 14px 0 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;background:linear-gradient(180deg,#161618 0%,#0e0e10 100%);border-bottom:1px solid " +
+      rgba(0.35) +
+      ";font:600 14px system-ui,-apple-system,sans-serif;color:#f4f4f5;letter-spacing:.02em}" +
+      ".zl-head-left{display:flex;min-width:0;flex:1;align-items:center;gap:10px}" +
+      ".zl-logo{height:28px;width:28px;object-fit:contain;border-radius:8px;background:#fff;flex-shrink:0}" +
+      ".zl-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}" +
+      ".zl-body{flex:1;overflow:auto;padding:16px 14px;background:linear-gradient(180deg,#f9f7f4 0%,#f3f0eb 100%)}" +
+      ".zl-welcome-col{display:flex;max-width:100%;flex-direction:column;align-items:flex-end;gap:12px}" +
+      ".zl-row{display:flex;margin-bottom:14px}" +
+      ".zl-row-user{justify-content:flex-start}" +
+      ".zl-row-bot{justify-content:flex-end}" +
+      ".zl-bubble{max-width:92%;padding:12px 14px;border-radius:16px;font:14px/1.55 system-ui,-apple-system,sans-serif;white-space:pre-wrap;word-break:break-word}" +
+      ".zl-user{background:#fff;color:#18181b;border:1px solid rgba(0,0,0,.06);box-shadow:0 4px 18px rgba(0,0,0,.06)}" +
+      ".zl-bot{background:linear-gradient(165deg,#2a2a2e,#1f1f23);color:#fafafa;border:1px solid rgba(255,255,255,.06);box-shadow:0 8px 28px rgba(0,0,0,.18)}" +
+      ".zl-starter{width:100%;max-width:100%;display:flex;flex-direction:column;gap:8px;padding-top:2px}" +
+      ".zl-starter-hint{font:600 10px system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#78716c;text-align:right;padding-right:4px}" +
+      ".zl-choice{display:flex;width:100%;flex-direction:column;align-items:flex-start;gap:2px;padding:12px 14px;border-radius:14px;border:1px solid rgba(28,25,23,.12);background:rgba(255,255,255,.82);backdrop-filter:blur(8px);cursor:pointer;text-align:left;transition:border-color .2s ease,box-shadow .2s ease,background .2s ease}" +
+      ".zl-choice:hover{border-color:" +
+      rgba(0.55) +
+      ";background:#fff;box-shadow:0 8px 28px rgba(0,0,0,.07)}" +
+      ".zl-choice-title{font:600 13px system-ui,sans-serif;color:#1c1917;letter-spacing:.01em}" +
+      ".zl-choice-sub{font:500 11px system-ui,sans-serif;color:#a8a29e;letter-spacing:.02em}" +
+      ".zl-foot{border-top:1px solid rgba(0,0,0,.06);padding:12px;display:flex;gap:10px;background:rgba(255,255,255,.95);backdrop-filter:blur(12px)}" +
+      ".zl-input{flex:1;height:42px;border:1px solid rgba(0,0,0,.1);border-radius:12px;padding:0 14px;font:14px system-ui,-apple-system,sans-serif;outline:none;background:#fafaf9}" +
+      ".zl-input:focus{border-color:" +
+      rgba(0.45) +
+      ";box-shadow:0 0 0 3px " +
+      rgba(0.15) +
+      "}" +
+      ".zl-send{height:42px;padding:0 18px;border:none;border-radius:12px;background:linear-gradient(165deg," +
+      pMid +
+      "," +
+      pDark +
+      ");color:#fafafa;font:600 13px system-ui,sans-serif;letter-spacing:.03em;cursor:pointer;border:1px solid " +
+      rgba(0.35) +
+      "}" +
+      ".zl-send:disabled{opacity:.55;cursor:not-allowed}" +
+      ".zl-close{flex-shrink:0;height:32px;width:32px;border:none;border-radius:10px;background:rgba(255,255,255,.06);color:#d6d3d1;cursor:pointer;font:300 20px/1 system-ui,sans-serif;line-height:32px}"
+    );
+  }
+
   function removeStarter() {
+    if (!body) return;
     var st = body.querySelector(".zl-starter");
     if (st) st.remove();
   }
 
   function addMessage(role, content) {
     var wrap = el("div", role === "user" ? "zl-row zl-row-user" : "zl-row zl-row-bot");
-    var bubble = el("div", role === "user" ? "zl-bubble zl-user" : "zl-bubble zl-bot", content);
-    wrap.appendChild(bubble);
+    var bubbleN = el("div", role === "user" ? "zl-bubble zl-user" : "zl-bubble zl-bot", content);
+    wrap.appendChild(bubbleN);
     body.appendChild(wrap);
     body.scrollTop = body.scrollHeight;
   }
@@ -116,85 +217,88 @@
     sendWithText(text, text);
   }
 
-  function renderWelcome() {
+  function renderWelcome(cfg) {
     var openingAttr = script.getAttribute("data-opening");
     var welcomeText =
-      openingAttr && String(openingAttr).trim() ? String(openingAttr).trim() : DEFAULT_WELCOME;
+      openingAttr && String(openingAttr).trim()
+        ? String(openingAttr).trim()
+        : cfg.opening_line || DEFAULT_WELCOME;
 
     var row = el("div", "zl-row zl-row-bot");
     var col = el("div", "zl-welcome-col");
     col.appendChild(el("div", "zl-bubble zl-bot", welcomeText));
 
-    var starter = el("div", "zl-starter");
-    starter.appendChild(el("div", "zl-starter-hint", "Kies een optie"));
-    for (var i = 0; i < STARTERS.length; i++) {
-      (function (item) {
-        var btn = el("button", "zl-choice");
-        btn.type = "button";
-        var t1 = el("span", "zl-choice-title", item.label);
-        var t2 = el("span", "zl-choice-sub", "Meer informatie");
-        btn.appendChild(t1);
-        btn.appendChild(t2);
-        btn.addEventListener("click", function () {
-          sendWithText(item.label, item.prompt);
-        });
-        starter.appendChild(btn);
-      })(STARTERS[i]);
+    if (cfg.show_starters !== false && cfg.starters && cfg.starters.length > 0) {
+      var starter = el("div", "zl-starter");
+      starter.appendChild(el("div", "zl-starter-hint", "Kies een optie"));
+      for (var i = 0; i < cfg.starters.length; i++) {
+        (function (item) {
+          var btn = el("button", "zl-choice");
+          btn.type = "button";
+          var t1 = el("span", "zl-choice-title", item.label);
+          var t2 = el("span", "zl-choice-sub", "Meer informatie");
+          btn.appendChild(t1);
+          btn.appendChild(t2);
+          btn.addEventListener("click", function () {
+            sendWithText(item.label, item.prompt);
+          });
+          starter.appendChild(btn);
+        })(cfg.starters[i]);
+      }
+      col.appendChild(starter);
     }
-    col.appendChild(starter);
     row.appendChild(col);
     body.appendChild(row);
     body.scrollTop = body.scrollHeight;
   }
 
-  var style = el("style");
-  style.textContent =
-    ".zl-bubble-btn{position:fixed;right:22px;bottom:22px;z-index:2147483000;min-height:56px;padding:0 22px;border:none;border-radius:999px;background:linear-gradient(145deg,#1a1a1d 0%,#0c0c0e 100%);color:#fafafa;font:600 13px system-ui,-apple-system,BlinkMacSystemFont,sans-serif;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;box-shadow:0 12px 40px rgba(0,0,0,.35),0 0 0 1px rgba(201,162,39,.35);transition:transform .2s ease,box-shadow .2s ease}" +
-    ".zl-bubble-btn:hover{transform:translateY(-1px);box-shadow:0 16px 44px rgba(0,0,0,.4),0 0 0 1px rgba(212,175,55,.5)}" +
-    ".zl-panel{display:none;position:fixed;right:22px;bottom:92px;z-index:2147483000;width:min(380px,calc(100vw - 24px));height:min(580px,72vh);background:#fff;border-radius:20px;overflow:hidden;flex-direction:column;border:1px solid rgba(0,0,0,.06);box-shadow:0 28px 80px rgba(15,15,20,.45),0 0 0 1px rgba(255,255,255,.04)}" +
-    ".zl-head{flex-shrink:0;height:56px;padding:0 18px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(180deg,#161618 0%,#0e0e10 100%);border-bottom:1px solid rgba(201,162,39,.28);font:600 14px system-ui,-apple-system,sans-serif;color:#f4f4f5;letter-spacing:.02em}" +
-    ".zl-body{flex:1;overflow:auto;padding:16px 14px;background:linear-gradient(180deg,#f9f7f4 0%,#f3f0eb 100%)}" +
-    ".zl-welcome-col{display:flex;max-width:100%;flex-direction:column;align-items:flex-end;gap:12px}" +
-    ".zl-row{display:flex;margin-bottom:14px}" +
-    ".zl-row-user{justify-content:flex-start}" +
-    ".zl-row-bot{justify-content:flex-end}" +
-    ".zl-bubble{max-width:92%;padding:12px 14px;border-radius:16px;font:14px/1.55 system-ui,-apple-system,sans-serif;white-space:pre-wrap;word-break:break-word}" +
-    ".zl-user{background:#fff;color:#18181b;border:1px solid rgba(0,0,0,.06);box-shadow:0 4px 18px rgba(0,0,0,.06)}" +
-    ".zl-bot{background:linear-gradient(165deg,#2a2a2e,#1f1f23);color:#fafafa;border:1px solid rgba(255,255,255,.06);box-shadow:0 8px 28px rgba(0,0,0,.18)}" +
-    ".zl-starter{width:100%;max-width:100%;display:flex;flex-direction:column;gap:8px;padding-top:2px}" +
-    ".zl-starter-hint{font:600 10px system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#78716c;text-align:right;padding-right:4px}" +
-    ".zl-choice{display:flex;width:100%;flex-direction:column;align-items:flex-start;gap:2px;padding:12px 14px;border-radius:14px;border:1px solid rgba(28,25,23,.12);background:rgba(255,255,255,.82);backdrop-filter:blur(8px);cursor:pointer;text-align:left;transition:border-color .2s ease,box-shadow .2s ease,background .2s ease}" +
-    ".zl-choice:hover{border-color:rgba(201,162,39,.55);background:#fff;box-shadow:0 8px 28px rgba(0,0,0,.07)}" +
-    ".zl-choice-title{font:600 13px system-ui,sans-serif;color:#1c1917;letter-spacing:.01em}" +
-    ".zl-choice-sub{font:500 11px system-ui,sans-serif;color:#a8a29e;letter-spacing:.02em}" +
-    ".zl-foot{border-top:1px solid rgba(0,0,0,.06);padding:12px;display:flex;gap:10px;background:rgba(255,255,255,.95);backdrop-filter:blur(12px)}" +
-    ".zl-input{flex:1;height:42px;border:1px solid rgba(0,0,0,.1);border-radius:12px;padding:0 14px;font:14px system-ui,-apple-system,sans-serif;outline:none;background:#fafaf9}" +
-    ".zl-input:focus{border-color:rgba(201,162,39,.45);box-shadow:0 0 0 3px rgba(201,162,39,.12)}" +
-    ".zl-send{height:42px;padding:0 18px;border:none;border-radius:12px;background:linear-gradient(165deg,#27272a,#18181b);color:#fafafa;font:600 13px system-ui,sans-serif;letter-spacing:.03em;cursor:pointer;border:1px solid rgba(201,162,39,.25)}" +
-    ".zl-send:disabled{opacity:.55;cursor:not-allowed}" +
-    ".zl-close{height:32px;width:32px;border:none;border-radius:10px;background:rgba(255,255,255,.06);color:#d6d3d1;cursor:pointer;font:300 20px/1 system-ui,sans-serif;line-height:32px}";
-  document.head.appendChild(style);
+  function applyHead(cfg) {
+    headLeft.innerHTML = "";
+    if (cfg.logo_url && /^https?:\/\//i.test(String(cfg.logo_url))) {
+      var img = el("img", "zl-logo");
+      img.src = String(cfg.logo_url);
+      img.alt = "";
+      img.referrerPolicy = "no-referrer-when-downgrade";
+      headLeft.appendChild(img);
+    }
+    titleEl = el("span", "zl-title", cfg.widget_title || "Chat");
+    headLeft.appendChild(titleEl);
+    var label = (cfg.widget_title || "Chat").trim().slice(0, 20) || "Chat";
+    bubble.textContent = label.toUpperCase();
+  }
 
-  var bubble = el("button", "zl-bubble-btn", "Chat");
+  function applyConfig(cfg) {
+    styleNode.textContent = buildCss(cfg.primary_color || "#c9a227");
+    applyHead(cfg);
+    body.innerHTML = "";
+    renderWelcome(cfg);
+  }
+
+  styleNode = el("style");
+  document.head.appendChild(styleNode);
+
+  bubble = el("button", "zl-bubble-btn", "CHAT");
   var panel = el("div", "zl-panel");
   var head = el("div", "zl-head");
-  var title = el("span", "", "Assistent");
+  headLeft = el("div", "zl-head-left");
   var closeBtn = el("button", "zl-close", "×");
   closeBtn.type = "button";
   closeBtn.addEventListener("click", function () {
     toggle(false);
   });
-  head.appendChild(title);
+  head.appendChild(headLeft);
   head.appendChild(closeBtn);
 
-  var body = el("div", "zl-body");
-  renderWelcome();
+  body = el("div", "zl-body");
+  var loadRow = el("div", "zl-row zl-row-bot");
+  loadRow.appendChild(el("div", "zl-bubble zl-bot", "Widget laden…"));
+  body.appendChild(loadRow);
 
   var foot = el("form", "zl-foot");
-  var input = el("input", "zl-input");
+  input = el("input", "zl-input");
   input.type = "text";
   input.placeholder = "Of typ je eigen vraag…";
-  var sendBtn = el("button", "zl-send", "Verstuur");
+  sendBtn = el("button", "zl-send", "Verstuur");
   sendBtn.type = "submit";
   foot.appendChild(input);
   foot.appendChild(sendBtn);
@@ -213,4 +317,29 @@
 
   document.body.appendChild(bubble);
   document.body.appendChild(panel);
+
+  fetch(configUrl)
+    .then(function (r) {
+      if (!r.ok) throw new Error("config");
+      return r.json();
+    })
+    .then(function (j) {
+      if (!j || typeof j !== "object") throw new Error("bad");
+      return {
+        opening_line: String(j.opening_line || DEFAULT_WELCOME),
+        widget_title: String(j.widget_title || "Chat").slice(0, 48),
+        primary_color: /^#[0-9A-Fa-f]{6}$/.test(String(j.primary_color || ""))
+          ? String(j.primary_color)
+          : "#c9a227",
+        logo_url: j.logo_url ? String(j.logo_url) : null,
+        show_starters: j.show_starters !== false,
+        starters: Array.isArray(j.starters) && j.starters.length ? j.starters : FALLBACK_STARTERS,
+      };
+    })
+    .catch(function () {
+      return defaultConfig();
+    })
+    .then(function (cfg) {
+      applyConfig(cfg);
+    });
 })();
