@@ -118,7 +118,19 @@
       ".zl-bubble{max-width:92%;padding:12px 14px;border-radius:16px;font:14px/1.55 system-ui,-apple-system,sans-serif;white-space:pre-wrap;word-break:break-word}" +
       ".zl-user{background:#fff;color:#18181b;border:1px solid rgba(0,0,0,.06);box-shadow:0 4px 18px rgba(0,0,0,.06)}" +
       ".zl-bot{background:linear-gradient(165deg,#2a2a2e,#1f1f23);color:#fafafa;border:1px solid rgba(255,255,255,.06);box-shadow:0 8px 28px rgba(0,0,0,.18)}" +
-      ".zl-starter{width:100%;max-width:100%;display:flex;flex-direction:column;gap:8px;padding-top:2px}" +
+      ".zl-starter-wrap{width:100%;max-width:100%;display:flex;flex-direction:column;gap:8px;padding-top:2px}" +
+      ".zl-starter-toggle{width:100%;display:flex;flex-direction:column;align-items:stretch;gap:4px;padding:11px 13px;border-radius:14px;border:1px solid rgba(28,25,23,.14);background:rgba(255,255,255,.92);cursor:pointer;text-align:left;transition:border-color .2s ease,box-shadow .2s ease,background .2s ease}" +
+      ".zl-starter-toggle:hover{border-color:" +
+      rgba(0.45) +
+      ";background:#fff;box-shadow:0 6px 22px rgba(0,0,0,.06)}" +
+      ".zl-starter-toggle-line{display:flex;align-items:center;justify-content:space-between;gap:10px}" +
+      ".zl-starter-toggle-title{font:600 13px system-ui,sans-serif;color:#1c1917}" +
+      ".zl-starter-toggle-chev{font:600 12px system-ui,sans-serif;color:" +
+      p +
+      ";flex-shrink:0}" +
+      ".zl-starter-toggle-sub{font:500 11px system-ui,sans-serif;line-height:1.35;color:#78716c}" +
+      ".zl-starter-panel{width:100%;display:flex;flex-direction:column;gap:8px}" +
+      ".zl-starter-panel.zl-collapsed{display:none}" +
       ".zl-starter-hint{font:600 10px system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#78716c;text-align:right;padding-right:4px}" +
       ".zl-choice{display:flex;width:100%;flex-direction:column;align-items:flex-start;gap:2px;padding:12px 14px;border-radius:14px;border:1px solid rgba(28,25,23,.12);background:rgba(255,255,255,.82);backdrop-filter:blur(8px);cursor:pointer;text-align:left;transition:border-color .2s ease,box-shadow .2s ease,background .2s ease}" +
       ".zl-choice:hover{border-color:" +
@@ -147,7 +159,7 @@
 
   function removeStarter() {
     if (!body) return;
-    var st = body.querySelector(".zl-starter");
+    var st = body.querySelector(".zl-starter-wrap");
     if (st) st.remove();
   }
 
@@ -229,9 +241,25 @@
     col.appendChild(el("div", "zl-bubble zl-bot", welcomeText));
 
     if (cfg.show_starters !== false && cfg.starters && cfg.starters.length > 0) {
-      var starter = el("div", "zl-starter");
-      starter.appendChild(el("div", "zl-starter-hint", "Kies een optie"));
-      for (var i = 0; i < cfg.starters.length; i++) {
+      var starters = cfg.starters;
+      var n = starters.length;
+      var wrap = el("div", "zl-starter-wrap");
+      var storageKey = "cf-zl-opt-" + chatbotId;
+      var expanded = false;
+      try {
+        var stored = sessionStorage.getItem(storageKey);
+        if (stored === "1") expanded = true;
+        else if (stored === "0") expanded = false;
+        else expanded = false;
+      } catch (e1) {
+        expanded = false;
+      }
+
+      var panel = el("div", "zl-starter-panel");
+      if (!expanded) panel.className = "zl-starter-panel zl-collapsed";
+
+      panel.appendChild(el("div", "zl-starter-hint", "Kies een optie"));
+      for (var j = 0; j < starters.length; j++) {
         (function (item) {
           var btn = el("button", "zl-choice");
           btn.type = "button";
@@ -242,10 +270,57 @@
           btn.addEventListener("click", function () {
             sendWithText(item.label, item.prompt);
           });
-          starter.appendChild(btn);
-        })(cfg.starters[i]);
+          panel.appendChild(btn);
+        })(starters[j]);
       }
-      col.appendChild(starter);
+
+      var previewTxt = starters
+        .slice(0, 2)
+        .map(function (s) {
+          return String(s.label || "").trim();
+        })
+        .filter(Boolean)
+        .join(", ");
+      if (n > 2) previewTxt += "…";
+
+      var toggleBtn = el("button", "zl-starter-toggle");
+      toggleBtn.type = "button";
+      toggleBtn.setAttribute("aria-expanded", expanded ? "true" : "false");
+
+      function syncToggleVisual() {
+        toggleBtn.innerHTML = "";
+        var line = el("div", "zl-starter-toggle-line");
+        var tit = el("span", "zl-starter-toggle-title");
+        tit.textContent = expanded
+          ? "Opties verbergen"
+          : (n === 1 ? "1 snelle optie beschikbaar" : n + " snelle opties beschikbaar");
+        var chev = el("span", "zl-starter-toggle-chev");
+        chev.textContent = expanded ? "\u25B2" : "\u25BC";
+        line.appendChild(tit);
+        line.appendChild(chev);
+        toggleBtn.appendChild(line);
+        var sub = el("span", "zl-starter-toggle-sub");
+        sub.textContent = expanded
+          ? "Tik om de lijst kleiner te maken"
+          : (previewTxt ? "o.a. " + previewTxt + " — tik om te openen" : "Tik om opties te tonen");
+        toggleBtn.appendChild(sub);
+        toggleBtn.setAttribute("aria-expanded", expanded ? "true" : "false");
+        panel.className = expanded ? "zl-starter-panel" : "zl-starter-panel zl-collapsed";
+      }
+
+      syncToggleVisual();
+
+      toggleBtn.addEventListener("click", function () {
+        expanded = !expanded;
+        try {
+          sessionStorage.setItem(storageKey, expanded ? "1" : "0");
+        } catch (e2) {}
+        syncToggleVisual();
+      });
+
+      wrap.appendChild(toggleBtn);
+      wrap.appendChild(panel);
+      col.appendChild(wrap);
     }
     row.appendChild(col);
     body.appendChild(row);

@@ -13,7 +13,16 @@ import {
   saveChatbotStudioAction,
   saveChatbotWidgetStudioAction,
 } from "@/actions/settings";
-import { CheckCircle2, Loader2, MessageCircle, Palette, SendHorizontal, Sparkles } from "lucide-react";
+import {
+  CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  Loader2,
+  MessageCircle,
+  Palette,
+  SendHorizontal,
+  Sparkles,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { WIDGET_STARTER_WELCOME_DEFAULT, WIDGET_STARTERS } from "@/lib/chatbot/widget-starters";
 import { WIDGET_DEFAULT_PRIMARY } from "@/lib/chatbot/widget-public-config";
@@ -151,8 +160,20 @@ export function ChatbotStudio(props: {
   const [starterRows, setStarterRows] = useState(() => padStarterRows(props.initialWidgetStarters));
   const [widgetSavePending, startWidgetSave] = useTransition();
   const [widgetSaveMessage, setWidgetSaveMessage] = useState<string | null>(null);
+  /** Preview: snelle opties inklapbaar (zelfde idee als de echte widget). */
+  const [quickOptionsOpen, setQuickOptionsOpen] = useState(false);
 
   const canSave = bedrijfsOmschrijving.trim().length > 0 && !props.demoMode;
+
+  const validPreviewStarters = starterRows.filter((s) => s.label.trim() && s.prompt.trim());
+  const starterPreviewHint =
+    validPreviewStarters.length > 0
+      ? validPreviewStarters
+          .slice(0, 2)
+          .map((s) => s.label)
+          .join(", ") + (validPreviewStarters.length > 2 ? "…" : "")
+      : "";
+
   const textFieldClass =
     "rounded-xl border-gray-200 bg-white shadow-[inset_0_1px_0_rgba(255,255,255,0.5)] focus-visible:ring-primary/20";
 
@@ -771,34 +792,73 @@ export function ChatbotStudio(props: {
         <div className="space-y-2.5 border-t border-stone-200/80 bg-white/95 px-5 py-3 backdrop-blur-sm">
           {showStarterChoices ? (
             <>
-              <p className="text-right text-[10px] font-semibold uppercase tracking-[0.14em] text-stone-500">
-                Kies een optie
-              </p>
-              <div className="flex flex-col gap-2">
-                {starterRows
-                  .filter((s) => s.label.trim() && s.prompt.trim())
-                  .map((s, idx) => (
-                    <button
-                      key={`pv-${idx}-${s.label.slice(0, 24)}`}
-                      type="button"
-                      disabled={replying}
-                      onClick={() => runPreview(s.prompt, s.label)}
-                      className="flex w-full flex-col items-start gap-0.5 rounded-2xl border border-stone-300/60 bg-white/90 px-3.5 py-2.5 text-left shadow-sm transition hover:bg-white hover:shadow-md disabled:opacity-50"
-                      style={{
-                        borderColor: "rgba(120, 113, 108, 0.35)",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.borderColor = `rgba(${hexToRgbCss(widgetPrimary)}, 0.55)`;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.borderColor = "rgba(120, 113, 108, 0.35)";
-                      }}
-                    >
-                      <span className="text-[13px] font-semibold text-stone-900">{s.label}</span>
-                      <span className="text-[11px] font-medium text-stone-400">Meer informatie</span>
-                    </button>
-                  ))}
-              </div>
+              {validPreviewStarters.length === 0 ? (
+                <p className="text-center text-xs text-amber-800">
+                  Vul labels en uitleg in bij snelle keuzes — of zet de schakelaar uit.
+                </p>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    aria-expanded={quickOptionsOpen}
+                    onClick={() => setQuickOptionsOpen((o) => !o)}
+                    className="flex w-full flex-col gap-1 rounded-2xl border border-stone-300/80 bg-white px-3.5 py-2.5 text-left shadow-sm transition hover:border-stone-400 hover:bg-stone-50"
+                    style={{
+                      borderColor: `rgba(${hexToRgbCss(widgetPrimary)}, 0.22)`,
+                    }}
+                  >
+                    <span className="flex w-full items-center justify-between gap-2">
+                      <span className="text-[13px] font-semibold text-stone-900">
+                        {quickOptionsOpen
+                          ? "Opties verbergen"
+                          : validPreviewStarters.length === 1
+                            ? "1 snelle optie beschikbaar"
+                            : `${validPreviewStarters.length} snelle opties beschikbaar`}
+                      </span>
+                      {quickOptionsOpen ? (
+                        <ChevronUp className="size-4 shrink-0 text-stone-600" aria-hidden />
+                      ) : (
+                        <ChevronDown className="size-4 shrink-0 text-stone-600" aria-hidden />
+                      )}
+                    </span>
+                    <span className="text-[11px] leading-snug text-stone-500">
+                      {quickOptionsOpen
+                        ? "Tik om de lijst kleiner te maken"
+                        : starterPreviewHint
+                          ? `o.a. ${starterPreviewHint} — tik om te openen`
+                          : "Tik om opties te tonen"}
+                    </span>
+                  </button>
+                  {quickOptionsOpen ? (
+                    <div className="flex flex-col gap-2 pt-1">
+                      <p className="text-right text-[10px] font-semibold uppercase tracking-[0.14em] text-stone-500">
+                        Kies een optie
+                      </p>
+                      {validPreviewStarters.map((s, idx) => (
+                        <button
+                          key={`pv-${idx}-${s.label.slice(0, 24)}`}
+                          type="button"
+                          disabled={replying}
+                          onClick={() => runPreview(s.prompt, s.label)}
+                          className="flex w-full flex-col items-start gap-0.5 rounded-2xl border border-stone-300/60 bg-white/90 px-3.5 py-2.5 text-left shadow-sm transition hover:bg-white hover:shadow-md disabled:opacity-50"
+                          style={{
+                            borderColor: "rgba(120, 113, 108, 0.35)",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.borderColor = `rgba(${hexToRgbCss(widgetPrimary)}, 0.55)`;
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.borderColor = "rgba(120, 113, 108, 0.35)";
+                          }}
+                        >
+                          <span className="text-[13px] font-semibold text-stone-900">{s.label}</span>
+                          <span className="text-[11px] font-medium text-stone-400">Meer informatie</span>
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
+                </>
+              )}
             </>
           ) : (
             <p className="text-center text-xs text-stone-500">Snelle keuzes staan uit — alleen vrije invoer.</p>

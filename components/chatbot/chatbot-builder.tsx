@@ -2,7 +2,7 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import Link from "next/link";
-import { Loader2, MessageCircle, Send, Sparkles } from "lucide-react";
+import { ChevronDown, ChevronUp, Loader2, MessageCircle, Send, Sparkles } from "lucide-react";
 import { saveChatbotBuilderAction } from "@/actions/chatbot-builder";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -60,6 +60,7 @@ export function ChatbotBuilder({ chatbot }: { chatbot: ChatbotRecord }) {
   const [isReplying, setIsReplying] = useState(false);
   const [gesprekId, setGesprekId] = useState<string | null>(null);
   const [startersDismissed, setStartersDismissed] = useState(false);
+  const [quickOptionsOpen, setQuickOptionsOpen] = useState(false);
 
   const widgetSnippet = useMemo(
     () => `<script src="https://zylmero.com/widget.js" data-id="${chatbot.id}"></script>`,
@@ -326,23 +327,53 @@ export function ChatbotBuilder({ chatbot }: { chatbot: ChatbotRecord }) {
           ))}
           {!startersDismissed && messages.length === 1 && messages[0]?.role === "bot" ? (
             <div className="mt-2 space-y-2">
-              <p className="text-right text-[10px] font-semibold uppercase tracking-[0.14em] text-stone-500">
-                Kies een optie
-              </p>
-              <div className="flex flex-col gap-2">
-                {WIDGET_STARTERS.map((s) => (
-                  <button
-                    key={s.id}
-                    type="button"
-                    disabled={isReplying}
-                    onClick={() => void sendPreviewPayload(s.label, s.prompt)}
-                    className="group flex w-full flex-col items-start gap-0.5 rounded-2xl border border-stone-300/60 bg-white/90 px-4 py-3 text-left shadow-sm backdrop-blur-sm transition hover:border-amber-600/45 hover:bg-white hover:shadow-md disabled:opacity-50"
-                  >
-                    <span className="text-[13px] font-semibold text-stone-900">{s.label}</span>
-                    <span className="text-[11px] font-medium text-stone-400">Meer informatie</span>
-                  </button>
-                ))}
-              </div>
+              <button
+                type="button"
+                aria-expanded={quickOptionsOpen}
+                onClick={() => setQuickOptionsOpen((o) => !o)}
+                className="flex w-full flex-col gap-1 rounded-2xl border border-stone-300/80 bg-white px-4 py-3 text-left shadow-sm transition hover:border-stone-400 hover:bg-stone-50"
+              >
+                <span className="flex w-full items-center justify-between gap-2">
+                  <span className="text-[13px] font-semibold text-stone-900">
+                    {quickOptionsOpen
+                      ? "Opties verbergen"
+                      : WIDGET_STARTERS.length === 1
+                        ? "1 snelle optie beschikbaar"
+                        : `${WIDGET_STARTERS.length} snelle opties beschikbaar`}
+                  </span>
+                  {quickOptionsOpen ? (
+                    <ChevronUp className="size-4 shrink-0 text-stone-600" aria-hidden />
+                  ) : (
+                    <ChevronDown className="size-4 shrink-0 text-stone-600" aria-hidden />
+                  )}
+                </span>
+                <span className="text-[11px] leading-snug text-stone-500">
+                  {quickOptionsOpen
+                    ? "Tik om de lijst kleiner te maken"
+                    : `o.a. ${WIDGET_STARTERS.slice(0, 2)
+                        .map((s) => s.label)
+                        .join(", ")}${WIDGET_STARTERS.length > 2 ? "…" : ""} — tik om te openen`}
+                </span>
+              </button>
+              {quickOptionsOpen ? (
+                <div className="flex flex-col gap-2 pt-1">
+                  <p className="text-right text-[10px] font-semibold uppercase tracking-[0.14em] text-stone-500">
+                    Kies een optie
+                  </p>
+                  {WIDGET_STARTERS.map((s) => (
+                    <button
+                      key={s.id}
+                      type="button"
+                      disabled={isReplying}
+                      onClick={() => void sendPreviewPayload(s.label, s.prompt)}
+                      className="group flex w-full flex-col items-start gap-0.5 rounded-2xl border border-stone-300/60 bg-white/90 px-4 py-3 text-left shadow-sm backdrop-blur-sm transition hover:border-amber-600/45 hover:bg-white hover:shadow-md disabled:opacity-50"
+                    >
+                      <span className="text-[13px] font-semibold text-stone-900">{s.label}</span>
+                      <span className="text-[11px] font-medium text-stone-400">Meer informatie</span>
+                    </button>
+                  ))}
+                </div>
+              ) : null}
             </div>
           ) : null}
         </div>
