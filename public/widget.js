@@ -43,6 +43,7 @@
       logo_url: null,
       show_starters: true,
       starters: FALLBACK_STARTERS,
+      contact: { tel_href: null, whatsapp_href: null, phone_display: null },
     };
   }
 
@@ -56,6 +57,7 @@
   var titleEl;
   var headLeft;
   var styleNode;
+  var contactBar;
 
   function el(tag, className, text) {
     var node = document.createElement(tag);
@@ -138,7 +140,22 @@
       ";background:#fff;box-shadow:0 8px 28px rgba(0,0,0,.07)}" +
       ".zl-choice-title{font:600 13px system-ui,sans-serif;color:#1c1917;letter-spacing:.01em}" +
       ".zl-choice-sub{font:500 11px system-ui,sans-serif;color:#a8a29e;letter-spacing:.02em}" +
-      ".zl-foot{border-top:1px solid rgba(0,0,0,.06);padding:12px;display:flex;gap:10px;background:rgba(255,255,255,.95);backdrop-filter:blur(12px)}" +
+      ".zl-foot-outer{flex-shrink:0;display:flex;flex-direction:column;min-width:0;border-top:1px solid rgba(0,0,0,.08);background:rgba(255,255,255,.98);backdrop-filter:blur(12px)}" +
+      ".zl-contact-bar{display:none;flex-direction:row;flex-wrap:wrap;gap:8px;padding:10px 12px 8px}" +
+      ".zl-contact-bar.zl-contact-visible{display:flex}" +
+      ".zl-contact-btn{flex:1;min-width:min(140px,calc(50% - 4px));display:flex;align-items:center;gap:8px;padding:10px 11px;border-radius:13px;border:1px solid rgba(28,25,23,.1);background:#fff;text-decoration:none;color:#1c1917;transition:border-color .2s ease,box-shadow .2s ease;box-shadow:0 1px 3px rgba(0,0,0,.05)}" +
+      ".zl-contact-btn:hover{border-color:" +
+      rgba(0.42) +
+      ";box-shadow:0 4px 14px rgba(0,0,0,.09)}" +
+      ".zl-c-tel:focus-visible,.zl-c-wa:focus-visible{outline:2px solid " +
+      rgba(0.55) +
+      ";outline-offset:2px}" +
+      ".zl-c-ic{font-size:17px;line-height:1;flex-shrink:0;width:22px;text-align:center}" +
+      ".zl-c-stack{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0;text-align:left}" +
+      ".zl-c-l1{font:600 12px system-ui,-apple-system,sans-serif;letter-spacing:.01em}" +
+      ".zl-c-l2{font:500 10px system-ui,sans-serif;color:#78716c;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}" +
+      ".zl-c-wa .zl-c-l2{color:#059669}" +
+      ".zl-foot{padding:12px;display:flex;gap:10px;border-top:none}" +
       ".zl-input{flex:1;height:42px;border:1px solid rgba(0,0,0,.1);border-radius:12px;padding:0 14px;font:14px system-ui,-apple-system,sans-serif;outline:none;background:#fafaf9}" +
       ".zl-input:focus{border-color:" +
       rgba(0.45) +
@@ -327,6 +344,45 @@
     body.scrollTop = body.scrollHeight;
   }
 
+  function applyContactBar(cfg) {
+    if (!contactBar) return;
+    contactBar.innerHTML = "";
+    var c = cfg.contact || {};
+    var tel = c.tel_href;
+    var wa = c.whatsapp_href;
+    if (!tel && !wa) {
+      contactBar.className = "zl-contact-bar";
+      return;
+    }
+    contactBar.className = "zl-contact-bar zl-contact-visible";
+
+    function stack(line1, line2) {
+      var st = el("div", "zl-c-stack");
+      st.appendChild(el("span", "zl-c-l1", line1));
+      st.appendChild(el("span", "zl-c-l2", line2));
+      return st;
+    }
+
+    if (tel) {
+      var aTel = el("a", "zl-contact-btn zl-c-tel");
+      aTel.href = tel;
+      aTel.appendChild(el("span", "zl-c-ic", "\u260E"));
+      aTel.appendChild(stack("Bellen", c.phone_display || "Start gesprek"));
+      aTel.setAttribute("aria-label", "Bellen: " + (c.phone_display || "telefoon"));
+      contactBar.appendChild(aTel);
+    }
+    if (wa) {
+      var aWa = el("a", "zl-contact-btn zl-c-wa");
+      aWa.href = wa;
+      aWa.target = "_blank";
+      aWa.rel = "noopener noreferrer";
+      aWa.appendChild(el("span", "zl-c-ic", "\uD83D\uDCAC"));
+      aWa.appendChild(stack("WhatsApp", "Chat in de app"));
+      aWa.setAttribute("aria-label", "WhatsApp openen");
+      contactBar.appendChild(aWa);
+    }
+  }
+
   function applyHead(cfg) {
     headLeft.innerHTML = "";
     if (cfg.logo_url && /^https?:\/\//i.test(String(cfg.logo_url))) {
@@ -347,6 +403,7 @@
     applyHead(cfg);
     body.innerHTML = "";
     renderWelcome(cfg);
+    applyContactBar(cfg);
   }
 
   styleNode = el("style");
@@ -369,6 +426,8 @@
   loadRow.appendChild(el("div", "zl-bubble zl-bot", "Widget laden…"));
   body.appendChild(loadRow);
 
+  var footOuter = el("div", "zl-foot-outer");
+  contactBar = el("div", "zl-contact-bar");
   var foot = el("form", "zl-foot");
   input = el("input", "zl-input");
   input.type = "text";
@@ -381,10 +440,12 @@
     event.preventDefault();
     sendMessage();
   });
+  footOuter.appendChild(contactBar);
+  footOuter.appendChild(foot);
 
   panel.appendChild(head);
   panel.appendChild(body);
-  panel.appendChild(foot);
+  panel.appendChild(footOuter);
 
   bubble.addEventListener("click", function () {
     toggle(!isOpen);
@@ -400,6 +461,7 @@
     })
     .then(function (j) {
       if (!j || typeof j !== "object") throw new Error("bad");
+      var jc = j.contact && typeof j.contact === "object" ? j.contact : {};
       return {
         opening_line: String(j.opening_line || DEFAULT_WELCOME),
         widget_title: String(j.widget_title || "Chat").slice(0, 48),
@@ -409,6 +471,11 @@
         logo_url: j.logo_url ? String(j.logo_url) : null,
         show_starters: j.show_starters !== false,
         starters: Array.isArray(j.starters) && j.starters.length ? j.starters : FALLBACK_STARTERS,
+        contact: {
+          tel_href: jc.tel_href ? String(jc.tel_href) : null,
+          whatsapp_href: jc.whatsapp_href ? String(jc.whatsapp_href) : null,
+          phone_display: jc.phone_display ? String(jc.phone_display) : null,
+        },
       };
     })
     .catch(function () {

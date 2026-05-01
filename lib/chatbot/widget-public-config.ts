@@ -5,6 +5,13 @@ export const WIDGET_DEFAULT_PRIMARY = "#c9a227";
 
 export type PublicWidgetStarter = { label: string; prompt: string };
 
+/** Bellen + WhatsApp voor de widget-footer (publiek veilig). */
+export type PublicWidgetContactJson = {
+  tel_href: string | null;
+  whatsapp_href: string | null;
+  phone_display: string | null;
+};
+
 export type PublicWidgetConfigJson = {
   opening_line: string;
   widget_title: string;
@@ -12,6 +19,7 @@ export type PublicWidgetConfigJson = {
   logo_url: string | null;
   show_starters: boolean;
   starters: PublicWidgetStarter[];
+  contact: PublicWidgetContactJson;
 };
 
 export function defaultPublicWidgetConfig(): PublicWidgetConfigJson {
@@ -22,6 +30,7 @@ export function defaultPublicWidgetConfig(): PublicWidgetConfigJson {
     logo_url: null,
     show_starters: true,
     starters: WIDGET_STARTERS.map(({ label, prompt }) => ({ label, prompt })),
+    contact: { tel_href: null, whatsapp_href: null, phone_display: null },
   };
 }
 
@@ -85,5 +94,6 @@ export function buildPublicWidgetConfig(params: {
     logo_url,
     show_starters,
     starters,
+    contact: { tel_href: null, whatsapp_href: null, phone_display: null },
   };
 }

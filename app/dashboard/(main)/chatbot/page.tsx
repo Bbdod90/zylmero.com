@@ -12,6 +12,7 @@ import {
   normalizeStartersFromPrefs,
   WIDGET_DEFAULT_PRIMARY,
 } from "@/lib/chatbot/widget-public-config";
+import { buildWidgetContactLinks } from "@/lib/phone/widget-contact";
 
 function extraGoalsFromCapabilities(caps: unknown): {
   productadvies: boolean;
@@ -57,6 +58,20 @@ export default async function ChatbotPage() {
     .eq("company_id", auth.company.id)
     .maybeSingle();
   const mapped = mapCompanySettingsRow((settingsRow ?? {}) as Record<string, unknown>);
+
+  const { data: companyContactRow } = await supabase
+    .from("companies")
+    .select("contact_phone")
+    .eq("id", auth.company.id)
+    .maybeSingle();
+
+  const contactPreview = buildWidgetContactLinks({
+    contactPhoneRaw:
+      typeof companyContactRow?.contact_phone === "string"
+        ? companyContactRow.contact_phone.trim() || null
+        : null,
+    whatsappPhoneRaw: mapped?.whatsapp_channel?.phone_number ?? null,
+  });
   const prefs = (settingsRow?.automation_preferences as Record<string, unknown> | null) || {};
   const scannedPages = Array.isArray(prefs.ai_knowledge_pages)
     ? (prefs.ai_knowledge_pages as AiKnowledgePage[]).filter((p) => p && typeof p.url === "string")
@@ -148,6 +163,7 @@ export default async function ChatbotPage() {
           initialWidgetTitle={initialWidgetTitle}
           initialWidgetShowStarters={initialWidgetShowStarters}
           initialWidgetStarters={initialWidgetStarters}
+          contactPreview={contactPreview}
           embedSnippet={`<script src=\"${siteUrl().replace(/\/$/, "")}/widget.js\" data-id=\"${embedChatbotId}\"></script>`}
         />
       </DashboardWorkSurface>

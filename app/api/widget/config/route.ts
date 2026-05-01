@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { buildPublicWidgetConfig } from "@/lib/chatbot/widget-public-config";
+import { buildWidgetContactLinks } from "@/lib/phone/widget-contact";
 
 export const dynamic = "force-dynamic";
 
@@ -50,13 +51,23 @@ export async function GET(request: NextRequest) {
   let automationPrefs: Record<string, unknown> = {};
   let whiteLabelPrimary: string | null = null;
   let whiteLabelLogoUrl: string | null = null;
+  let contactPhoneRaw: string | null = null;
+  let whatsappPhoneRaw: string | null = null;
 
   if (companyId) {
-    const { data: settingsRow } = await supabase
-      .from("company_settings")
-      .select("automation_preferences, white_label_primary, white_label_logo_url")
-      .eq("company_id", companyId)
-      .maybeSingle();
+    const [{ data: companyRow }, { data: settingsRow }] = await Promise.all([
+      supabase.from("companies").select("contact_phone").eq("id", companyId).maybeSingle(),
+      supabase
+        .from("company_settings")
+        .select("automation_preferences, white_label_primary, white_label_logo_url, whatsapp_channel")
+        .eq("company_id", companyId)
+        .maybeSingle(),
+    ]);
+
+    contactPhoneRaw =
+      companyRow && typeof (companyRow as Record<string, unknown>).contact_phone === "string"
+        ? String((companyRow as Record<string, unknown>).contact_phone).trim() || null
+        : null;
 
     if (settingsRow && typeof settingsRow === "object") {
       const row = settingsRow as Record<string, unknown>;
@@ -70,10 +81,15 @@ export async function GET(request: NextRequest) {
         typeof row.white_label_logo_url === "string" && row.white_label_logo_url.trim()
           ? row.white_label_logo_url.trim()
           : null;
+      const wa = row.whatsapp_channel;
+      if (wa && typeof wa === "object") {
+        const num = (wa as Record<string, unknown>).phone_number;
+        whatsappPhoneRaw = typeof num === "string" && num.trim() ? num.trim() : null;
+      }
     }
   }
 
-  const cfg = buildPublicWidgetConfig({
+  const base = buildPublicWidgetConfig({
     automationPreferences: automationPrefs,
     chatbotOpeningszin:
       typeof (chatbot as Record<string, unknown>).openingszin === "string"
@@ -82,6 +98,14 @@ export async function GET(request: NextRequest) {
     whiteLabelPrimary,
     whiteLabelLogoUrl,
   });
+
+  const cfg = {
+    ...base,
+    contact: buildWidgetContactLinks({
+      contactPhoneRaw,
+      whatsappPhoneRaw,
+    }),
+  };
 
   return NextResponse.json(cfg, {
     headers: {

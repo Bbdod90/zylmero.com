@@ -26,6 +26,7 @@ import {
 import { cn } from "@/lib/utils";
 import { WIDGET_STARTER_WELCOME_DEFAULT, WIDGET_STARTERS } from "@/lib/chatbot/widget-starters";
 import { WIDGET_DEFAULT_PRIMARY } from "@/lib/chatbot/widget-public-config";
+import type { WidgetContactPublic } from "@/lib/phone/widget-contact";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
 
@@ -118,6 +119,7 @@ export function ChatbotStudio(props: {
   initialWidgetTitle: string;
   initialWidgetShowStarters: boolean;
   initialWidgetStarters: { label: string; prompt: string }[];
+  contactPreview: WidgetContactPublic;
   embedSnippet: string;
 }) {
   const [bedrijfsOmschrijving, setBedrijfsOmschrijving] = useState(props.initialBedrijfsOmschrijving);
@@ -390,6 +392,18 @@ export function ChatbotStudio(props: {
               />
               <p className="text-xs text-gray-500">
                 Publieke URL naar PNG/SVG/WebP. Verschijnt klein naast de titel op je widget.
+              </p>
+              <p className="text-xs text-stone-500">
+                <span className="font-medium text-stone-700">Bellen & WhatsApp</span> onderin de widget komen uit
+                je{" "}
+                <Link href="/dashboard/settings?tab=business" className="font-medium text-primary underline-offset-2 hover:underline">
+                  bedrijfstelefoon
+                </Link>{" "}
+                en je gekoppelde{" "}
+                <Link href="/dashboard/settings?tab=whatsapp" className="font-medium text-primary underline-offset-2 hover:underline">
+                  WhatsApp-nummer
+                </Link>
+                .
               </p>
             </div>
             <SettingSwitchRow
@@ -790,6 +804,53 @@ export function ChatbotStudio(props: {
           <p className="mb-1.5 text-center text-[11px] text-gray-500">Sleep omhoog/omlaag om meer chat te zien</p>
         </div>
         <div className="space-y-2.5 border-t border-stone-200/80 bg-white/95 px-5 py-3 backdrop-blur-sm">
+          {props.contactPreview.tel_href || props.contactPreview.whatsapp_href ? (
+            <div className="flex flex-wrap gap-2 border-b border-stone-100 pb-3">
+              {props.contactPreview.tel_href ? (
+                <a
+                  href={props.contactPreview.tel_href}
+                  className="flex min-h-[52px] min-w-[min(100%,160px)] flex-1 items-center gap-2.5 rounded-xl border bg-white px-3 py-2 text-left shadow-sm transition hover:bg-stone-50 hover:shadow-md"
+                  style={{
+                    borderColor: `rgba(${hexToRgbCss(widgetPrimary)}, 0.28)`,
+                  }}
+                >
+                  <span className="text-lg leading-none text-stone-700" aria-hidden>
+                    ☎
+                  </span>
+                  <span className="flex min-w-0 flex-col gap-0.5">
+                    <span className="text-[12px] font-semibold text-stone-900">Bellen</span>
+                    <span className="truncate text-[10px] font-medium text-stone-500">
+                      {props.contactPreview.phone_display || "Direct bellen"}
+                    </span>
+                  </span>
+                </a>
+              ) : null}
+              {props.contactPreview.whatsapp_href ? (
+                <a
+                  href={props.contactPreview.whatsapp_href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex min-h-[52px] min-w-[min(100%,160px)] flex-1 items-center gap-2.5 rounded-xl border border-emerald-600/25 bg-emerald-50/60 px-3 py-2 text-left shadow-sm transition hover:border-emerald-600/40 hover:bg-emerald-50"
+                >
+                  <span className="text-lg leading-none" aria-hidden>
+                    💬
+                  </span>
+                  <span className="flex min-w-0 flex-col gap-0.5">
+                    <span className="text-[12px] font-semibold text-emerald-900">WhatsApp</span>
+                    <span className="text-[10px] font-medium text-emerald-800/90">Opent de app</span>
+                  </span>
+                </a>
+              ) : null}
+            </div>
+          ) : (
+            <p className="border-b border-stone-100 pb-3 text-[11px] leading-relaxed text-stone-500">
+              Nummers voor bellen/WhatsApp komen uit je{" "}
+              <Link href="/dashboard/settings?tab=business" className="font-medium text-primary underline-offset-2 hover:underline">
+                bedrijfsinstellingen
+              </Link>
+              .
+            </p>
+          )}
           {showStarterChoices ? (
             <>
               {validPreviewStarters.length === 0 ? (
