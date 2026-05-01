@@ -1,5 +1,6 @@
 import type { CompanySettings } from "@/lib/types";
 import {
+  dutchLanguageQualityNl,
   lengthInstructionNl,
   maxTokensForAnswerKind,
   pricingAndStockAccuracyNl,
@@ -81,6 +82,9 @@ ${capsBlock}
 ${pricingAndStockAccuracyNl()}
 
 ---
+${dutchLanguageQualityNl()}
+
+---
 De bezoeker stelt deze vraag (in ${lang}):
 ${input.visitorMessage}
 
@@ -105,7 +109,8 @@ ${antiQuestionBlock}
       {
         role: "system",
         content:
-          "Je bent een professionele klantenservice-chatbot. Antwoord feitelijk en vriendelijk. " +
+          "Je bent een professionele klantenservice-chatbot. Schrijf altijd in correct, natuurlijk Nederlands (behalve merknamen). " +
+          "Antwoord feitelijk en vriendelijk; geen tegenstrijdige prijszinnen (geen ‘begint bij’-bedrag dat hoger is dan andere prijzen die je in hetzelfde antwoord noemt). " +
           "Als prijzen, modellen of voorraad in de context staan (ook in samenvatting of gescande tekst), noem ze alleen wanneer dat bij de vraag past. " +
           "Verzin geen prijzen of productdetails die niet in de context staan. " +
           (vragenTerugStellen

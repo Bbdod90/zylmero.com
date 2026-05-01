@@ -89,14 +89,28 @@ export function maxTokensForAnswerKind(kind: AnswerLengthKind): number {
   return 380;
 }
 
-/** Voorkomt verkeerde “vanaf”-prijs en voorraad-hallucinaties (webshops / Shopify). */
+/** Voorkomt verkeerde “vanaf”-prijs, tegenstrijdige zinnen en voorraad-hallucinaties. */
 export function pricingAndStockAccuracyNl(): string {
   return [
-    "PRIJZEN (strikt):",
-    '- Bij vragen naar startprijs, “hoe duur”, “vanaf”, of algemene fatbike-prijs: noem het **laagste** concrete bedrag dat in de context staat voor dat type product — niet alleen een duur voorbeeld (bijv. niet €1399 als “begint bij” als er ook €749, €799 of €899 in de kennis staat).',
-    "- Je mag daarna 1–2 andere prijspunten noemen als voorbeeld, maar het **eerste** antwoord op “vanaf” moet het minimum uit de context zijn.",
+    "PRIJZEN (strikt — één logische lijn):",
+    '- Bij “vanaf”, “hoe duur”, “wat kost een …”, startprijs: het bedrag dat je als **eerste** noemt als instapprijs moet het **laagste** relevante prijsbedrag uit de context zijn voor dat producttype (fatbike, slot, enz.).',
+    '- **Verboden:** in hetzelfde antwoord eerst schrijven dat het “begint bij” of “vanaf” €X en daarna gokopere prijzen noemen — dat is tegenstrijdig en mag niet. Als €899 en €1399 allebei in de context staan: noem nooit €1399 als enige “begint bij”; begin met het laagste (bijv. “Vanaf circa €899 …”) en noem daarna duurdere modellen als extra voorbeeld.',
+    '- Optie: noem prijzen **van laag naar hoog**, of zeg: “Er zijn modellen vanaf €899; andere uitvoeringen liggen richting €1.399.” — nooit de omgekeerde volgorde suggereren.',
+    "- Als je geen betrouwbaar minimum ziet in de context: geef geen harde “vanaf”-belofte; noem dan een paar voorbeelden met prijs uit de context.",
     "VOORRAAD (strikt):",
     '- Zeg **niet** dat iets niet op voorraad is tenzij de context dat expliciet vermeldt (bijv. schema “out of stock”, “uitverkocht”, “niet leverbaar”).',
-    "- Bij twijfel over voorraad: geef geen harde ontkenning; verwijs kort naar de productpagina of “actuele voorraad op de website”.",
+    "- Bij twijfel over voorraad: geen harde ontkenning; verwijs kort naar de productpagina of actuele voorraad op de website.",
+  ].join("\n");
+}
+
+/** Eén consistente, correcte Nederlandse stijl voor elk bedrijfsprofiel. */
+export function dutchLanguageQualityNl(): string {
+  return [
+    "TAAL (Nederlands — altijd):",
+    "- Schrijf in **correct, natuurlijk Nederlands** (nl-NL): geen tegenstrijdige zinnen, geen dubbelzinnige prijsclaims.",
+    "- Geen mengeling met Engels in doorlopende tekst (uitzondering: officiële merk- of productnamen).",
+    "- Korte, duidelijke zinnen; bij prijzen: één heldere kern en eventueel één vervolgzin met voorbeelden.",
+    "- Toon: professioneel en vriendelijk, zoals een goede webshop-chat — niet schreeuwerig, niet juridisch.",
+    "- Als de klant in het Nederlands schrijft: antwoord in het Nederlands. (Andere taal alleen als de klant overduidelijk in die taal schrijft.)",
   ].join("\n");
 }

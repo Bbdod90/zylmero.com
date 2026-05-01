@@ -11,6 +11,7 @@ import { sealSocialToken, unsealSocialToken } from "@/lib/crypto/social-token";
 import { fetchAppleCalendarBusyRanges } from "@/lib/integrations/apple-calendar";
 import { truncateCrawledDocForPrompt } from "@/lib/ai/knowledge-document";
 import {
+  dutchLanguageQualityNl,
   lengthInstructionNl,
   maxTokensForAnswerKind,
   pricingAndStockAccuracyNl,
@@ -459,6 +460,8 @@ ${klantgerichtBlock}
 ${capsBlock}
 
 ${pricingAndStockAccuracyNl()}
+
+${dutchLanguageQualityNl()}
 
 BELANGRIJK:
 - Gebruik ALLEEN feiten die in de context hieronder staan (website, extra info, FAQ, snippets)
