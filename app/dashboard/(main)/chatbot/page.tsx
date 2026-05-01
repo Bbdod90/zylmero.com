@@ -7,6 +7,7 @@ import { siteUrl } from "@/lib/stripe/server";
 import { DashboardWorkSurface } from "@/components/layout/dashboard-work-surface";
 import { PageFrame } from "@/components/layout/page-frame";
 import { ChatbotStudio } from "@/components/chatbot/chatbot-studio";
+import { WIDGET_STARTER_WELCOME_DEFAULT } from "@/lib/chatbot/widget-starters";
 
 function extraGoalsFromCapabilities(caps: unknown): {
   productadvies: boolean;
@@ -89,7 +90,7 @@ export default async function ChatbotPage() {
           initialOpeningszin={
             typeof prefs.chatbot_opening_line === "string"
               ? prefs.chatbot_opening_line
-              : "Hallo! Waarmee kan ik je helpen?"
+              : WIDGET_STARTER_WELCOME_DEFAULT
           }
           initialDigest={digestNl}
           initialScannedCount={scannedPages.length}

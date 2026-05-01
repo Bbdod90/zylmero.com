@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { CopyButton } from "@/components/growth/copy-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ import {
 } from "@/actions/settings";
 import { CheckCircle2, Loader2, MessageCircle, SendHorizontal, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { WIDGET_STARTER_WELCOME_DEFAULT, WIDGET_STARTERS } from "@/lib/chatbot/widget-starters";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
 
@@ -90,7 +91,10 @@ export function ChatbotStudio(props: {
   const [crawlCapped, setCrawlCapped] = useState(props.initialCrawlCapped);
   const [chatInput, setChatInput] = useState("");
   const [chat, setChat] = useState<ChatMessage[]>([
-    { role: "assistant", content: props.initialOpeningszin || "Hallo! Waarmee kan ik je helpen?" },
+    {
+      role: "assistant",
+      content: props.initialOpeningszin?.trim() || WIDGET_STARTER_WELCOME_DEFAULT,
+    },
   ]);
   const [saving, startSaving] = useTransition();
   const [replying, startReplying] = useTransition();
@@ -100,10 +104,6 @@ export function ChatbotStudio(props: {
   const dragStartHeightRef = useRef(190);
 
   const canSave = bedrijfsOmschrijving.trim().length > 0 && !props.demoMode;
-  const suggestionChips = useMemo(
-    () => ["Wat doen jullie?", "Wat zijn jullie openingstijden?", "Hoe kan ik contact opnemen?"],
-    [],
-  );
   const textFieldClass =
     "rounded-xl border-gray-200 bg-white shadow-[inset_0_1px_0_rgba(255,255,255,0.5)] focus-visible:ring-primary/20";
 
@@ -158,11 +158,12 @@ export function ChatbotStudio(props: {
     });
   };
 
-  const runPreview = (raw: string) => {
-    const text = raw.trim();
+  const runPreview = (apiMessage: string, displayForUser?: string) => {
+    const text = apiMessage.trim();
+    const display = (displayForUser ?? apiMessage).trim();
     if (!text || replying) return;
     setError(null);
-    setChat((prev) => [...prev, { role: "user", content: text }]);
+    setChat((prev) => [...prev, { role: "user", content: display }]);
     startReplying(async () => {
       const historyForAi: Array<{ role: "user" | "assistant"; content: string }> = [
         ...chat
@@ -393,7 +394,7 @@ export function ChatbotStudio(props: {
             <Input
               value={openingszin}
               onChange={(e) => setOpeningszin(e.target.value)}
-              placeholder="Bijv. Hallo! Waarmee kan ik je helpen?"
+              placeholder={WIDGET_STARTER_WELCOME_DEFAULT}
               className={cn(textFieldClass, "h-11")}
             />
           </section>
@@ -440,18 +441,21 @@ export function ChatbotStudio(props: {
         </div>
       </section>
 
-      <section className="flex min-h-[360px] flex-col rounded-2xl border border-gray-200/90 bg-white shadow-[0_20px_60px_-44px_rgba(15,23,42,0.45)]">
-        <header className="border-b border-gray-200 px-5 py-3">
-          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Live preview</p>
-          <h3 className="mt-1 flex items-center gap-2 text-lg font-semibold text-gray-900">
-            Test je chatbot <Sparkles className="size-4 text-primary" />
+      <section className="flex min-h-[360px] flex-col overflow-hidden rounded-2xl border border-stone-200/90 bg-white shadow-[0_28px_80px_rgba(15,15,20,0.12)]">
+        <header className="border-b border-amber-900/25 bg-gradient-to-b from-[#161618] to-[#0e0e10] px-5 py-3 text-zinc-100">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">Live preview</p>
+          <h3 className="mt-1 flex items-center gap-2 text-lg font-semibold tracking-tight">
+            Test je chatbot <Sparkles className="size-4 text-amber-200/90" />
           </h3>
-          <p className="mt-1 text-sm text-gray-600">
-            Stel een vraag zoals je klant dat zou doen. {scannedCount > 0 ? `${scannedCount} pagina's ingeladen.` : ""}
+          <p className="mt-1 text-sm text-zinc-400">
+            Kies een optie of typ zelf. {scannedCount > 0 ? `${scannedCount} pagina's ingeladen.` : ""}
           </p>
         </header>
 
-        <div className="space-y-2.5 overflow-y-auto bg-gray-50/70 px-5 py-3" style={{ height: chatHeight }}>
+        <div
+          className="space-y-2.5 overflow-y-auto bg-gradient-to-b from-[#f9f7f4] to-[#f3f0eb] px-5 py-3"
+          style={{ height: chatHeight }}
+        >
           {chat.map((m, i) => (
             <div
               key={`${i}-${m.role}`}
@@ -461,8 +465,8 @@ export function ChatbotStudio(props: {
                 className={cn(
                   "max-w-[88%] rounded-2xl px-3.5 py-2 text-sm leading-relaxed",
                   m.role === "user"
-                    ? "border border-gray-200 bg-white text-gray-900"
-                    : "bg-gray-900 text-white",
+                    ? "border border-stone-200/80 bg-white text-stone-900 shadow-sm"
+                    : "border border-white/10 bg-gradient-to-br from-zinc-700 to-zinc-900 text-white shadow-lg",
                 )}
               >
                 {m.content}
@@ -493,19 +497,29 @@ export function ChatbotStudio(props: {
           </button>
           <p className="mb-1.5 text-center text-[11px] text-gray-500">Sleep omhoog/omlaag om meer chat te zien</p>
         </div>
-        <div className="space-y-2.5 border-t border-gray-200 px-5 py-3">
-          <div className="flex flex-wrap gap-2">
-            {suggestionChips.map((q) => (
-              <Button key={q} type="button" size="sm" variant="secondary" onClick={() => runPreview(q)}>
-                {q}
-              </Button>
+        <div className="space-y-2.5 border-t border-stone-200/80 bg-white/95 px-5 py-3 backdrop-blur-sm">
+          <p className="text-right text-[10px] font-semibold uppercase tracking-[0.14em] text-stone-500">
+            Kies een optie
+          </p>
+          <div className="flex flex-col gap-2">
+            {WIDGET_STARTERS.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                disabled={replying}
+                onClick={() => runPreview(s.prompt, s.label)}
+                className="flex w-full flex-col items-start gap-0.5 rounded-2xl border border-stone-300/60 bg-white/90 px-3.5 py-2.5 text-left shadow-sm transition hover:border-amber-600/45 hover:bg-white hover:shadow-md disabled:opacity-50"
+              >
+                <span className="text-[13px] font-semibold text-stone-900">{s.label}</span>
+                <span className="text-[11px] font-medium text-stone-400">Meer informatie</span>
+              </button>
             ))}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 pt-1">
             <Input
               value={chatInput}
               onChange={(e) => setChatInput(e.target.value)}
-              placeholder="Typ hier een klantvraag..."
+              placeholder="Of typ je eigen vraag…"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
