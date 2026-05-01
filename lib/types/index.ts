@@ -77,7 +77,10 @@ export interface KnowledgeSnippet {
 export interface AiKnowledgePage {
   url: string;
   title: string;
+  /** Korte preview voor UI-lijsten */
   excerpt: string;
+  /** Volledige geëxtraheerde tekst voor AI (incl. JSON-LD waar beschikbaar). */
+  content?: string;
   saved_at: string;
 }
 

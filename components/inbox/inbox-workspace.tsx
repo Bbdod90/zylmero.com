@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
+import { format, isToday, isYesterday } from "date-fns";
+import { nl } from "date-fns/locale";
 import { toast } from "sonner";
 import Link from "next/link";
 import type { InboxThread } from "@/lib/queries/inbox";
@@ -14,6 +16,22 @@ import { cn, formatCurrency, formatDateTime } from "@/lib/utils";
 import { LeadStatusMenu } from "@/components/leads/lead-status-menu";
 import { Search } from "lucide-react";
 import { sendInboxMessage, generateInboxReply } from "@/actions/inbox";
+
+function nameInitials(fullName: string): string {
+  const parts = fullName.trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return "?";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  const a = parts[0][0] ?? "?";
+  const b = parts[parts.length - 1]?.[0] ?? "";
+  return `${a}${b}`.toUpperCase();
+}
+
+function threadListTime(lastAt: string): string {
+  const d = new Date(lastAt);
+  if (isToday(d)) return format(d, "HH:mm");
+  if (isYesterday(d)) return "Gisteren";
+  return format(d, "d MMM", { locale: nl });
+}
 import { useRouter } from "next/navigation";
 import type { LeadTemperature } from "@/lib/sales/scoring";
 import { LeadPriorityMenu } from "@/components/leads/lead-priority-menu";
@@ -86,19 +104,31 @@ export function InboxWorkspace({
   };
 
   return (
-    <div className="grid min-h-[min(680px,90dvh)] gap-6 pb-24 md:min-h-[620px] md:pb-6 lg:grid-cols-[minmax(0,400px)_minmax(0,1fr)] lg:gap-8">
-      <Card className="glass flex flex-col overflow-hidden rounded-3xl shadow-premium">
-        <div className="relative border-b border-white/[0.06] p-4">
-          <Search className="absolute left-7 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+    <div className="grid min-h-[min(680px,90dvh)] gap-6 pb-24 md:min-h-[620px] md:pb-6 lg:grid-cols-[minmax(0,400px)_minmax(0,1fr)] lg:gap-6">
+      <div className="flex min-h-0 flex-col overflow-hidden rounded-2xl border border-border/50 bg-[hsl(215_20%_97%)] shadow-[0_28px_70px_-48px_rgb(0_0_0/0.35)] dark:border-white/[0.08] dark:bg-[hsl(217_28%_10%)] dark:shadow-[0_32px_80px_-52px_rgb(0_0_0/0.55)]">
+        <header className="flex h-[3.35rem] shrink-0 items-center border-b border-border/35 px-5 dark:border-white/[0.07] dark:bg-[hsl(217_30%_8%)]">
+          <div>
+            <h2 className="text-[1.0625rem] font-semibold leading-none tracking-tight text-foreground">
+              Chats
+            </h2>
+            <p className="mt-1 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground/75">
+              {filtered.length === threads.length
+                ? `${threads.length} gesprek${threads.length === 1 ? "" : "ken"}`
+                : `${filtered.length} van ${threads.length}`}
+            </p>
+          </div>
+        </header>
+        <div className="relative shrink-0 border-b border-border/30 px-4 py-2.5 dark:border-white/[0.06]">
+          <Search className="absolute left-7 top-1/2 size-4 -translate-y-1/2 text-muted-foreground/70" />
           <Input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-                placeholder="Zoek op naam of onderwerp…"
-            className="h-12 border-white/[0.06] bg-background/40 pl-11 transition-shadow focus-visible:ring-2 focus-visible:ring-primary/30"
+            placeholder="Zoek op naam …"
+            className="h-10 rounded-xl border-border/45 bg-background/95 pl-10 text-[0.9375rem] placeholder:text-muted-foreground/55 dark:border-white/[0.07] dark:bg-white/[0.04]"
           />
         </div>
-        <ScrollArea className="flex-1">
-          <div className="space-y-2 p-3">
+        <ScrollArea className="min-h-[280px] flex-1">
+          <div className="divide-y divide-border/30 dark:divide-white/[0.05]">
             {filtered.map((t) => {
               const on = t.conversation.id === active?.conversation.id;
               const rowLead = augmentLead(t.lead);
@@ -106,79 +136,89 @@ export function InboxWorkspace({
                 <div
                   key={t.conversation.id}
                   className={cn(
-                    "rounded-2xl border p-4 transition-all duration-200",
+                    "flex gap-2 px-3 py-2.5 transition-colors",
                     on
-                      ? "border-primary/30 bg-primary/[0.07] shadow-inner-soft"
-                      : "border-border/40 bg-card/20 hover:border-border hover:bg-muted/30 dark:border-transparent dark:bg-transparent dark:hover:border-white/[0.08] dark:hover:bg-white/[0.04]",
+                      ? "bg-primary/[0.07]"
+                      : "hover:bg-muted/35 dark:hover:bg-white/[0.03]",
                   )}
                 >
-                  <div className="flex gap-2">
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    className="flex min-w-0 flex-1 cursor-pointer items-start gap-3 rounded-lg py-0.5 text-left outline-none ring-offset-2 ring-offset-background focus-visible:ring-2 focus-visible:ring-primary/35"
+                    onClick={() => setSelected(t.conversation.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setSelected(t.conversation.id);
+                      }
+                    }}
+                  >
                     <div
-                      role="button"
-                      tabIndex={0}
-                      className="min-w-0 flex-1 cursor-pointer rounded-lg text-left outline-none ring-offset-2 ring-offset-background focus-visible:ring-2 focus-visible:ring-primary/40"
-                      onClick={() => setSelected(t.conversation.id)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          setSelected(t.conversation.id);
-                        }
-                      }}
+                      className={cn(
+                        "flex size-12 shrink-0 items-center justify-center rounded-full text-sm font-semibold tabular-nums",
+                        on
+                          ? "bg-primary text-primary-foreground shadow-[0_4px_14px_-6px_hsl(var(--primary))]"
+                          : "bg-muted text-foreground dark:bg-white/[0.08]",
+                      )}
                     >
-                      <p className="text-sm font-semibold tracking-tight text-primary underline-offset-2 hover:underline">
-                        {t.lead.full_name}
-                      </p>
-                      <div className="mt-2">
-                        <span className="inline-flex rounded-full border border-border/60 bg-background/60 px-2 py-0.5 text-2xs font-medium text-muted-foreground dark:border-white/[0.08]">
-                          {channelLabelNl(t.conversation.channel)}
+                      {nameInitials(t.lead.full_name)}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-baseline justify-between gap-2">
+                        <span className="truncate text-[0.9375rem] font-semibold leading-tight tracking-tight text-foreground">
+                          {t.lead.full_name}
+                        </span>
+                        <span className="shrink-0 text-[0.7rem] font-medium tabular-nums text-muted-foreground">
+                          {threadListTime(t.lastAt)}
                         </span>
                       </div>
-                      <div className="mt-2">
-                        <AiTagBadges tags={t.lead.ai_tags} size="xs" />
-                      </div>
-                      <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+                      <p className="mt-1 line-clamp-1 text-[0.8125rem] leading-snug text-muted-foreground">
                         {t.preview}
                       </p>
-                      <p className="mt-2 text-2xs tabular-nums text-muted-foreground">
-                        {formatDateTime(t.lastAt)}
-                      </p>
-                    </div>
-                    <div
-                      className="flex shrink-0 flex-col items-end gap-2 self-start"
-                      onClick={(e) => e.stopPropagation()}
-                      onPointerDown={(e) => e.stopPropagation()}
-                    >
-                      <LeadStatusMenu
-                        leadId={t.lead.id}
-                        status={t.lead.status}
-                        demoMode={demoMode}
-                        compact
-                        stopPropagation
-                        className="max-w-[min(100%,9rem)]"
-                      />
-                      <LeadPriorityMenu
-                        lead={rowLead}
-                        demoMode={demoMode}
-                        staleReply={stale.has(t.lead.id)}
-                        compact
-                        stopPropagation
-                        onDemoPriorityChange={(next) =>
-                          setDemoPriority((m) => ({ ...m, [t.lead.id]: next }))
-                        }
-                      />
-                      {stale.has(t.lead.id) ? (
-                        <span className="rounded-full border border-destructive/25 bg-destructive/10 px-2 py-0.5 text-2xs font-semibold uppercase text-destructive">
-                          Te laat
+                      <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <span className="text-[0.65rem] font-semibold uppercase tracking-[0.1em] text-muted-foreground/65">
+                          {channelLabelNl(t.conversation.channel)}
                         </span>
-                      ) : null}
+                        <AiTagBadges tags={t.lead.ai_tags} size="xs" />
+                      </div>
                     </div>
+                  </div>
+                  <div
+                    className="flex shrink-0 flex-col items-end gap-1.5 self-start pt-1"
+                    onClick={(e) => e.stopPropagation()}
+                    onPointerDown={(e) => e.stopPropagation()}
+                  >
+                    <LeadStatusMenu
+                      leadId={t.lead.id}
+                      status={t.lead.status}
+                      demoMode={demoMode}
+                      compact
+                      stopPropagation
+                      className="max-w-[min(100%,9rem)]"
+                    />
+                    <LeadPriorityMenu
+                      lead={rowLead}
+                      demoMode={demoMode}
+                      staleReply={stale.has(t.lead.id)}
+                      compact
+                      stopPropagation
+                      onDemoPriorityChange={(next) =>
+                        setDemoPriority((m) => ({ ...m, [t.lead.id]: next }))
+                      }
+                    />
+                    {stale.has(t.lead.id) ? (
+                      <span className="rounded-full border border-destructive/20 bg-destructive/10 px-1.5 py-0.5 text-[0.6rem] font-semibold uppercase text-destructive">
+                        Te laat
+                      </span>
+                    ) : null}
                   </div>
                 </div>
               );
             })}
           </div>
         </ScrollArea>
-      </Card>
+      </div>
 
       <Card className="glass flex min-h-[520px] flex-col overflow-hidden rounded-3xl shadow-premium lg:min-h-0">
         {!active ? (

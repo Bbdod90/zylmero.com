@@ -23,7 +23,6 @@ import {
   ChevronRight,
   Clock,
   Filter,
-  Sparkles,
 } from "lucide-react";
 import { appointmentStatusNl } from "@/lib/i18n/nl-labels";
 import type { AgendaAppointment } from "@/components/appointments/agenda-types";
@@ -300,7 +299,7 @@ export function AppointmentsCalendar({
         initial={reduceMotion ? false : { opacity: 0.92, y: 4 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-        className="flex flex-col gap-4 rounded-2xl border border-border/45 bg-gradient-to-br from-card/85 via-card/60 to-muted/20 p-3 shadow-sm backdrop-blur-md dark:border-white/[0.08] dark:from-white/[0.04] dark:via-transparent dark:to-transparent sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-3"
+        className="flex flex-col gap-3 rounded-[1rem] border border-border/40 bg-card/95 p-3.5 shadow-[0_14px_40px_-32px_rgb(0_0_0/0.25)] backdrop-blur-md dark:border-white/[0.07] dark:bg-[hsl(228_22%_10%/0.92)] dark:shadow-[0_18px_48px_-36px_rgb(0_0_0/0.55)] sm:flex-row sm:flex-wrap sm:items-center sm:justify-between"
       >
         <div className="flex flex-wrap items-center gap-2">
           <Button
@@ -429,11 +428,11 @@ export function AppointmentsCalendar({
                   ease: [0.22, 1, 0.36, 1],
                 }}
                 className={cn(
-                  "group flex min-h-[340px] w-[min(90vw,300px)] min-w-[240px] shrink-0 flex-col overflow-hidden rounded-2xl border bg-card/95 shadow-sm transition-colors duration-200 dark:bg-[hsl(228_22%_10%/0.94)] dark:shadow-[0_10px_36px_-26px_rgb(0_0_0/0.55)]",
-                  "border-border/60 dark:border-white/[0.09]",
-                  weekend && "opacity-[0.9]",
+                  "group flex min-h-[380px] w-[min(90vw,300px)] min-w-[246px] shrink-0 flex-col overflow-hidden rounded-2xl border bg-card/[0.98] shadow-[0_16px_48px_-32px_rgb(0_0_0/0.28)] backdrop-blur-sm transition-colors duration-200 dark:bg-[hsl(228_20%_9%/0.97)] dark:shadow-[0_20px_56px_-36px_rgb(0_0_0/0.6)]",
+                  "border-border/45 dark:border-white/[0.085]",
+                  weekend && "opacity-[0.88]",
                   isTodayDay &&
-                    "border-primary/22 bg-primary/[0.03] shadow-[0_1px_0_0_hsl(var(--primary)/0.1)] dark:border-primary/26 dark:bg-primary/[0.045]",
+                    "border-primary/28 bg-[linear-gradient(180deg,hsl(var(--primary)/0.06)_0%,transparent_44%)] shadow-[0_1px_0_0_hsl(var(--primary)/0.14)] dark:border-primary/35 dark:bg-[linear-gradient(180deg,hsl(var(--primary)/0.085)_0%,transparent_50%)]",
                 )}
               >
                 <div
@@ -473,11 +472,24 @@ export function AppointmentsCalendar({
                   )}
                 >
                   {list.length === 0 ? (
-                    <div className="flex flex-1 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border/35 bg-muted/5 px-3 py-12 text-center dark:border-white/[0.07] dark:bg-white/[0.02]">
-                      <Sparkles className="size-5 text-muted-foreground/35" aria-hidden />
-                      <p className="text-xs font-medium text-muted-foreground">
-                        Geen afspraken
-                      </p>
+                    <div className="relative flex flex-1 flex-col items-center justify-center overflow-hidden rounded-xl px-4 py-16">
+                      <div
+                        className="pointer-events-none absolute inset-0 opacity-[0.28] dark:opacity-[0.22]"
+                        style={{
+                          backgroundImage: `linear-gradient(hsl(var(--border) / 0.55) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--border) / 0.55) 1px, transparent 1px)`,
+                          backgroundSize: "20px 20px",
+                        }}
+                        aria-hidden
+                      />
+                      <div className="pointer-events-none absolute inset-x-6 top-[42%] h-px bg-gradient-to-r from-transparent via-border/50 to-transparent dark:via-white/[0.1]" aria-hidden />
+                      <div className="relative text-center">
+                        <p className="text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-muted-foreground/45">
+                          Vrij
+                        </p>
+                        <p className="mx-auto mt-3 max-w-[11rem] text-xs font-medium leading-relaxed text-muted-foreground/72">
+                          Geen blokken gepland.
+                        </p>
+                      </div>
                     </div>
                   ) : (
                     list.map((a) => (

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  Bell,
   Bot,
   CalendarDays,
   FileText,
@@ -18,11 +17,6 @@ import { ProDashboardCard } from "@/components/dashboard/pro-dashboard-card";
 import { Button } from "@/components/ui/button";
 import { cn, formatDateTime } from "@/lib/utils";
 import type { WorkspaceHomeSnapshot } from "@/lib/queries/workspace-home-snapshot";
-import type { CustomerReadiness } from "@/lib/dashboard/readiness";
-import { CustomerReadinessHero } from "@/components/dashboard/customer-readiness-hero";
-import { DashboardAiHub } from "@/components/dashboard/dashboard-ai-hub";
-import { OnboardingStepsStrip } from "@/components/dashboard/onboarding-steps-strip";
-import { SetupHintBar } from "@/components/dashboard/setup-hint-bar";
 
 function nlGreeting(): string {
   const h = new Date().getHours();
@@ -37,14 +31,11 @@ function PrimaryFlowDuo() {
     {
       href: "/dashboard/inbox",
       title: "Berichten",
-      description:
-        "Mail, WhatsApp en site in één wachtrij — zelf antwoorden of een AI-concept als start.",
       icon: MessageCircle,
     },
     {
       href: "/dashboard/quotes",
       title: "Offertes",
-      description: "Stuur voorstellen en rond opdrachten af.",
       icon: FileText,
     },
   ] as const;
@@ -58,12 +49,13 @@ function PrimaryFlowDuo() {
       )}
     >
       <div className="grid divide-y divide-border/55 md:grid-cols-2 md:divide-x md:divide-y-0 dark:divide-white/[0.08]">
-        {cells.map(({ href, title, description, icon: Icon }) => (
+        {cells.map(({ href, title, icon: Icon }) => (
           <Link
             key={href}
             href={href}
+            aria-label={title}
             className={cn(
-              "group relative flex min-h-[7.5rem] flex-col justify-between gap-4 p-5 sm:p-6 md:min-h-[8.25rem]",
+              "group relative flex min-h-[5.5rem] flex-col justify-between gap-4 p-5 sm:p-6 md:min-h-[6rem]",
               "transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary/[0.045] hover:shadow-md dark:hover:bg-primary/[0.07]",
             )}
           >
@@ -89,7 +81,6 @@ function PrimaryFlowDuo() {
                   <h2 className="text-lg font-semibold tracking-tight text-foreground sm:text-xl">
                     {title}
                   </h2>
-                  <p className="text-sm leading-relaxed text-muted-foreground">{description}</p>
                 </div>
               </div>
               <span
@@ -156,22 +147,20 @@ function StatLink({
   );
 }
 
-/** Compacte route-tegel voor de onderste rij (4 kolommen). */
+/** Compacte route-tegel (4 kolommen), zonder marketingtekst. */
 function RouteTile({
   href,
   title,
-  hint,
   icon: Icon,
 }: {
   href: string;
   title: string;
-  hint: string;
   icon: LucideIcon;
 }) {
   return (
     <Link
       href={href}
-      title={hint}
+      aria-label={title}
       className={cn(
         "group flex flex-col items-center gap-2.5 rounded-2xl border border-border/50 bg-background/70 px-3 py-4 text-center transition-all",
         "hover:-translate-y-0.5 hover:border-primary/35 hover:bg-muted/25 hover:shadow-md active:scale-[0.98]",
@@ -191,7 +180,6 @@ function RouteTile({
       <span className="text-xs font-semibold leading-tight tracking-tight text-foreground sm:text-[0.8125rem]">
         {title}
       </span>
-      <span className="line-clamp-2 text-[0.65rem] leading-snug text-muted-foreground">{hint}</span>
     </Link>
   );
 }
@@ -199,13 +187,9 @@ function RouteTile({
 export function WorkspaceHome({
   companyName,
   snapshot,
-  readiness,
-  demoMode,
 }: {
   companyName: string;
   snapshot: WorkspaceHomeSnapshot;
-  readiness: CustomerReadiness;
-  demoMode: boolean;
 }) {
   const today = new Intl.DateTimeFormat("nl-NL", {
     weekday: "long",
@@ -216,22 +200,9 @@ export function WorkspaceHome({
   const greeting = nlGreeting();
 
   return (
-    <PageFrame
-      title={companyName}
-      subtitle="AI die mail en WhatsApp voor je opvangt als je druk bent — minder gemiste aanvragen, dezelfde persoonlijke toon."
-    >
+    <PageFrame title={companyName}>
       <DashboardWorkSurface>
-        <div className="space-y-5">
-          <CustomerReadinessHero readiness={readiness} demoMode={demoMode} />
-          <OnboardingStepsStrip onboarding={readiness.onboarding} />
-          <SetupHintBar readiness={readiness} demoMode={demoMode} />
-        </div>
-
-        <div className="mt-6 sm:mt-8">
-          <DashboardAiHub demoMode={demoMode} />
-        </div>
-
-        <div className="mt-6 space-y-6 sm:mt-8 sm:space-y-7">
+        <div className="space-y-6 sm:space-y-7">
           <div>
             <p className="mb-2.5 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               Inbox & offertes
@@ -317,16 +288,6 @@ export function WorkspaceHome({
                     <span className="text-foreground">{companyName}</span>
                   </span>
                 </h2>
-                <p className="max-w-md text-xs font-medium leading-relaxed text-muted-foreground sm:text-sm">
-                  Cijfers ter referentie —{" "}
-                  <Link
-                    href="/dashboard/chatbot"
-                    className="font-semibold text-foreground underline decoration-primary/35 underline-offset-2 hover:decoration-primary"
-                  >
-                    stel eerst je chatbot in
-                  </Link>{" "}
-                  zodat binnenkomende vragen niet blijven liggen.
-                </p>
                 <p className="text-[0.65rem] font-medium capitalize text-muted-foreground/85">{today}</p>
               </div>
 
@@ -355,30 +316,10 @@ export function WorkspaceHome({
               Snel verder
             </p>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
-              <RouteTile
-                href="/dashboard/chatbot"
-                title="Je chatbot"
-                hint="Koppel je website"
-                icon={Bot}
-              />
-              <RouteTile
-                href="/dashboard/pipeline"
-                title="Pipeline"
-                hint="Zie waar het geld ligt"
-                icon={Kanban}
-              />
-              <RouteTile
-                href="/dashboard/ai-koppelingen"
-                title="Kanalen"
-                hint="WhatsApp, mail, widget"
-                icon={Link2}
-              />
-              <RouteTile
-                href="/dashboard/leads"
-                title="Klanten"
-                hint="Contacten en opvolging"
-                icon={Users}
-              />
+              <RouteTile href="/dashboard/chatbot" title="Chatbot" icon={Bot} />
+              <RouteTile href="/dashboard/pipeline" title="Pipeline" icon={Kanban} />
+              <RouteTile href="/dashboard/ai-koppelingen" title="Kanalen" icon={Link2} />
+              <RouteTile href="/dashboard/leads" title="Klanten" icon={Users} />
             </div>
           </div>
         </div>
@@ -397,7 +338,7 @@ export function WorkspaceHome({
             href="/dashboard/chatbot"
             className="font-medium text-foreground/80 underline decoration-border/70 underline-offset-4 transition hover:text-foreground hover:decoration-primary/50"
           >
-            Je chatbot
+            Chatbot
           </Link>
           <span className="hidden text-muted-foreground/50 sm:inline" aria-hidden>
             ·
@@ -408,13 +349,6 @@ export function WorkspaceHome({
           >
             Kanalen
           </Link>
-          <span className="hidden text-muted-foreground/50 sm:inline" aria-hidden>
-            ·
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <Bell className="size-3.5 opacity-70" aria-hidden />
-            Meldingen volg je in de rechterbalk of bij Berichten
-          </span>
         </div>
       </DashboardWorkSurface>
     </PageFrame>

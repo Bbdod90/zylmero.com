@@ -10,8 +10,6 @@ import {
   AiKoppelcentrumView,
   type AiKoppelcentrumProps,
 } from "@/components/dashboard/ai-koppelcentrum-view";
-import { buildCustomerReadiness } from "@/lib/dashboard/readiness";
-
 export default async function AiKoppelcentrumPage() {
   const auth = await getAuth();
   if (!auth.company) return null;
@@ -50,30 +48,14 @@ export default async function AiKoppelcentrumPage() {
   const needsAiSetup =
     !isDemoCompanyId(auth.company.id) && !settingsRow?.ai_setup_completed_at;
 
-  const websiteLive =
-    hasEffectiveProductAccess(auth.company, auth.user?.id) &&
-    Boolean(auth.company.widget_embed_token);
-
-  const readiness = buildCustomerReadiness({
-    demoMode,
-    needsAiSetup: !demoMode && !settingsRow?.ai_setup_completed_at,
-    knowledgeFilled: demoMode || Boolean(web && doc),
-    websiteLive: demoMode || websiteLive,
-    whatsappConnected: Boolean(mapped?.whatsapp_channel?.connected),
-    whatsappAutoReply: Boolean(mapped?.auto_reply_enabled),
-    emailInboundEnabled: Boolean(mapped?.email_inbound_enabled),
-    hasContactEmail: Boolean(auth.company.contact_email?.trim()),
-  });
-
   return (
     <PageFrame
       title="Kanalen"
-      subtitle="Kies waar jouw klanten je het liefst spreken. Alles komt netjes samen bij je berichten."
+      subtitle="WhatsApp, website en e-mail — alles in één inbox."
     >
       <DashboardWorkSurface>
         <AiKoppelcentrumView
           demoMode={demoMode}
-          onboarding={readiness.onboarding}
           needsAiSetup={needsAiSetup}
           knowledgeStatus={knowledgeStatus}
           knowledgeSummary={knowledgeSummary}

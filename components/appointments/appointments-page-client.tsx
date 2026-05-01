@@ -42,9 +42,9 @@ export function AppointmentsPageClient({
           }}
         />
       </div>
-      <div className="relative overflow-hidden rounded-3xl border border-border/50 bg-gradient-to-b from-card/80 to-muted/15 p-5 shadow-[0_12px_48px_-28px_rgb(0_0_0/0.2)] dark:border-white/[0.09] dark:from-white/[0.04] dark:to-transparent dark:shadow-[0_16px_56px_-32px_rgb(0_0_0/0.55)] sm:p-8">
+      <div className="relative overflow-hidden rounded-[1.375rem] border border-border/45 bg-[linear-gradient(165deg,hsl(var(--card))_0%,hsl(var(--muted)/0.35)_52%,transparent_100%)] p-5 shadow-[0_20px_60px_-40px_rgb(0_0_0/0.32)] dark:border-white/[0.08] dark:bg-[linear-gradient(165deg,hsl(228_22%_11%/0.96)_0%,hsl(228_26%_7%/0.5)_58%,transparent_100%)] dark:shadow-[0_28px_72px_-44px_rgb(0_0_0/0.58)] sm:p-8">
         <div
-          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/25 to-transparent"
+          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/[0.18] to-transparent"
           aria-hidden
         />
         <AppointmentsCalendar

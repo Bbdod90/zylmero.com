@@ -13,6 +13,11 @@ import {
   AI_KNOWLEDGE_MAX_DEPTH,
   AI_KNOWLEDGE_MAX_PAGES,
 } from "@/lib/ai/knowledge-crawl-config";
+import {
+  AI_KNOWLEDGE_TEXT_PER_PAGE,
+  buildCrawledKnowledgeDocument,
+  extractJsonLdPlainLines,
+} from "@/lib/ai/knowledge-document";
 import type { AiKnowledgePage, KnowledgeSnippet } from "@/lib/types";
 import { generateSiteKnowledgeDigestNl } from "@/lib/openai/site-knowledge-digest";
 import { previewVisitorChatReply } from "@/lib/openai/preview-visitor-chat";
@@ -31,10 +36,14 @@ export type ChatbotPreviewState =
   | { ok: false; error: string };
 
 export type ChatbotStudioState =
-  | { ok: true; digest_nl: string | null; scanned_pages_count: number }
+  | {
+      ok: true;
+      digest_nl: string | null;
+      scanned_pages_count: number;
+      knowledge_urls: { url: string; title: string }[];
+      crawl_capped: boolean;
+    }
   | { ok: false; error: string };
-
-const MAX_TEXT_PER_PAGE = 2200;
 
 type CrawlResult = {
   pages: AiKnowledgePage[];
@@ -219,12 +228,17 @@ async function crawlKnowledgeWebsite(startWebsite: string): Promise<CrawlResult>
       if (!contentType.includes("text/html")) continue;
       const html = await res.text();
       const title = extractTitle(html) || next.url.pathname || next.url.host;
-      const text = stripHtml(html).slice(0, MAX_TEXT_PER_PAGE);
-      if (text.length < 80) continue;
+      const jsonLd = extractJsonLdPlainLines(html);
+      const stripped = stripHtml(html);
+      const combined = [jsonLd, stripped].filter(Boolean).join("\n\n");
+      const normalized = combined.replace(/\s+/g, " ").trim();
+      const content = normalized.slice(0, AI_KNOWLEDGE_TEXT_PER_PAGE);
+      if (content.length < 80) continue;
       pages.push({
         url: key,
         title: title.slice(0, 140),
-        excerpt: text.slice(0, 320),
+        excerpt: stripped.slice(0, 520),
+        content,
         saved_at: new Date().toISOString(),
       });
 
@@ -245,9 +259,7 @@ async function crawlKnowledgeWebsite(startWebsite: string): Promise<CrawlResult>
   const capped =
     pages.length >= AI_KNOWLEDGE_MAX_PAGES && queue.length > 0;
 
-  const crawledDocument = pages
-    .map((p) => `URL: ${p.url}\nTitel: ${p.title}\nSamenvatting: ${p.excerpt}`)
-    .join("\n\n---\n\n");
+  const crawledDocument = buildCrawledKnowledgeDocument(pages);
   return { pages, crawledDocument, capped };
 }
 
@@ -970,9 +982,7 @@ export async function removeAiKnowledgePageAction(
     ? (prevAi.ai_knowledge_pages as AiKnowledgePage[])
     : [];
   const nextPages = rawPages.filter((p) => p && typeof p.url === "string" && p.url !== targetUrl);
-  const nextCrawled = nextPages
-    .map((p) => `URL: ${p.url}\nTitel: ${p.title}\nSamenvatting: ${p.excerpt}`)
-    .join("\n\n---\n\n");
+  const nextCrawled = buildCrawledKnowledgeDocument(nextPages);
 
   const siteW =
     typeof prevAi.ai_knowledge_website === "string"
@@ -1048,10 +1058,9 @@ export async function previewChatbotVisitorMessageAction(
     extraInfo?: string;
     openingszin?: string;
     doelen?: {
-      vragenBeantwoorden?: boolean;
-      klantenHelpen?: boolean;
       contactAanvragenVerwerken?: boolean;
     };
+    vragenTerugStellen?: boolean;
     extraDoelen?: {
       productadvies?: boolean;
       faqUitleg?: boolean;
@@ -1143,11 +1152,17 @@ export async function previewChatbotVisitorMessageAction(
             chatbot_goals:
               draft?.doelen && Object.keys(draft.doelen).length > 0
                 ? {
-                    vragen_beantwoorden: draft.doelen.vragenBeantwoorden !== false,
-                    klanten_helpen: draft.doelen.klantenHelpen !== false,
+                    vragen_beantwoorden: true,
+                    klanten_helpen: true,
                     contactaanvragen_verwerken: draft.doelen.contactAanvragenVerwerken !== false,
                   }
                 : (prefs.chatbot_goals as Record<string, unknown> | null),
+            chatbot_vragen_terug_stellen:
+              typeof draft?.vragenTerugStellen === "boolean"
+                ? draft.vragenTerugStellen
+                : typeof prefs.chatbot_vragen_terug_stellen === "boolean"
+                  ? prefs.chatbot_vragen_terug_stellen
+                  : false,
             chatbot_capabilities:
               draft?.extraDoelen && Object.keys(draft.extraDoelen).length > 0
                 ? [
@@ -1185,10 +1200,9 @@ export async function saveChatbotStudioAction(input: {
   extraInfo: string;
   openingszin: string;
   doelen: {
-    vragenBeantwoorden: boolean;
-    klantenHelpen: boolean;
     contactAanvragenVerwerken: boolean;
   };
+  vragenTerugStellen: boolean;
   extraDoelen?: {
     productadvies?: boolean;
     faqUitleg?: boolean;
@@ -1270,10 +1284,11 @@ export async function saveChatbotStudioAction(input: {
     chatbot_opening_line: openingszin || null,
     chatbot_extra_info: extraInfo || null,
     chatbot_goals: {
-      vragen_beantwoorden: input.doelen.vragenBeantwoorden !== false,
-      klanten_helpen: input.doelen.klantenHelpen !== false,
+      vragen_beantwoorden: true,
+      klanten_helpen: true,
       contactaanvragen_verwerken: input.doelen.contactAanvragenVerwerken !== false,
     },
+    chatbot_vragen_terug_stellen: input.vragenTerugStellen === true,
     chatbot_capabilities: [
       input.extraDoelen?.productadvies ? "Productadvies geven" : null,
       input.extraDoelen?.faqUitleg ? "FAQ kort uitleggen" : null,
@@ -1315,7 +1330,13 @@ export async function saveChatbotStudioAction(input: {
   if (error) return { ok: false, error: error.message };
   revalidatePath("/dashboard/chatbot");
   revalidatePath("/dashboard/settings");
-  return { ok: true, digest_nl: digestNl, scanned_pages_count: pages.length };
+  return {
+    ok: true,
+    digest_nl: digestNl,
+    scanned_pages_count: pages.length,
+    knowledge_urls: pages.map((p) => ({ url: p.url, title: p.title })),
+    crawl_capped: Boolean(website && crawlCapped),
+  };
 }
 
 export async function updateQuoteTemplateAction(

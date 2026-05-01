@@ -58,11 +58,12 @@ export function ChatbotStudio(props: {
   initialOpeningszin: string;
   initialDigest: string | null;
   initialScannedCount: number;
+  initialKnowledgeUrls: { url: string; title: string }[];
+  initialCrawlCapped: boolean;
   initialGoals: {
-    vragenBeantwoorden: boolean;
-    klantenHelpen: boolean;
     contactAanvragenVerwerken: boolean;
   };
+  initialVragenTerugStellen: boolean;
   initialAntwoordLengte: "short" | "normal";
   embedSnippet: string;
 }) {
@@ -71,6 +72,9 @@ export function ChatbotStudio(props: {
   const [extraInfo, setExtraInfo] = useState(props.initialExtraInfo);
   const [openingszin, setOpeningszin] = useState(props.initialOpeningszin);
   const [goals, setGoals] = useState(props.initialGoals);
+  const [vragenTerugStellen, setVragenTerugStellen] = useState(
+    props.initialVragenTerugStellen,
+  );
   const [extraGoals, setExtraGoals] = useState({
     productadvies: true,
     faqUitleg: true,
@@ -81,6 +85,8 @@ export function ChatbotStudio(props: {
   const [saved, setSaved] = useState(props.initialScannedCount > 0 || props.initialExtraInfo.trim().length > 0);
   const [error, setError] = useState<string | null>(null);
   const [scannedCount, setScannedCount] = useState(props.initialScannedCount);
+  const [scrapedUrls, setScrapedUrls] = useState(props.initialKnowledgeUrls);
+  const [crawlCapped, setCrawlCapped] = useState(props.initialCrawlCapped);
   const [chatInput, setChatInput] = useState("");
   const [chat, setChat] = useState<ChatMessage[]>([
     { role: "assistant", content: props.initialOpeningszin || "Hallo! Waarmee kan ik je helpen?" },
@@ -136,6 +142,7 @@ export function ChatbotStudio(props: {
         extraInfo,
         openingszin,
         doelen: goals,
+        vragenTerugStellen,
         extraDoelen: extraGoals,
         antwoordLengte,
       });
@@ -145,6 +152,8 @@ export function ChatbotStudio(props: {
       }
       setSaved(true);
       setScannedCount(res.scanned_pages_count);
+      setScrapedUrls(res.knowledge_urls);
+      setCrawlCapped(res.crawl_capped);
     });
   };
 
@@ -173,6 +182,7 @@ export function ChatbotStudio(props: {
           extraInfo,
           openingszin,
           doelen: goals,
+          vragenTerugStellen,
           extraDoelen: extraGoals,
           antwoordLengte,
         },
@@ -223,6 +233,56 @@ export function ChatbotStudio(props: {
                 placeholder="Bijv. https://jouwbedrijf.nl"
                 className={cn(textFieldClass, "h-11")}
               />
+              {websiteUrl.trim().length > 0 ? (
+                <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-700">
+                  {scrapedUrls.length > 0 ? (
+                    <>
+                      <p className="font-semibold text-gray-900">
+                        {scrapedUrls.length} pagina&apos;s meegenomen voor je kennis
+                      </p>
+                      <p className="mt-1 text-xs text-gray-600">
+                        Bij opslaan crawlen we dit domein (sitemap + interne links) en slaan alle
+                        gevonden pagina&apos;s gekoppeld aan je chatbot op.
+                      </p>
+                      {crawlCapped ? (
+                        <p className="mt-2 text-xs font-medium text-amber-800">
+                          Maximum pagina&apos;s bereikt — nog meer URL&apos;s bestaan op het domein.
+                          Product- en collectiepagina&apos;s worden het eerst gebruikt voor antwoorden.
+                        </p>
+                      ) : null}
+                      <details className="mt-2 rounded-lg border border-gray-200/80 bg-white px-2 py-1">
+                        <summary className="cursor-pointer text-xs font-semibold text-gray-800">
+                          Bekijk URL&apos;s ({scrapedUrls.length})
+                        </summary>
+                        <ul className="mt-2 max-h-52 space-y-2 overflow-y-auto border-t border-gray-100 pt-2 text-[0.72rem] leading-snug">
+                          {scrapedUrls.map((row) => (
+                            <li key={row.url} className="break-all">
+                              <span className="font-medium text-gray-900">{row.title || "—"}</span>
+                              <div>
+                                <a
+                                  href={row.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-700 underline decoration-blue-700/35 underline-offset-2"
+                                >
+                                  {row.url}
+                                </a>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      </details>
+                    </>
+                  ) : (
+                    <p className="text-xs text-gray-600">
+                      Nog geen pagina&apos;s ingelezen voor deze sessie. Klik op{" "}
+                      <span className="font-semibold text-gray-800">Maak mijn chatbot</span> — dan
+                      worden automatisch alle bereikbare URL&apos;s van dit domein gescand en hier
+                      getoond.
+                    </p>
+                  )}
+                </div>
+              ) : null}
             </div>
             <div className="space-y-2">
               <Label htmlFor="chatbot-extra">Extra informatie (optioneel)</Label>
@@ -242,24 +302,18 @@ export function ChatbotStudio(props: {
               Wat moet je chatbot voor klanten doen?
             </h3>
             <SettingSwitchRow
-              title="Algemene vragen beantwoorden"
-              description="De chatbot geeft direct antwoord op veelgestelde vragen."
-              checked={goals.vragenBeantwoorden}
-              onCheckedChange={(next) => setGoals((p) => ({ ...p, vragenBeantwoorden: next }))}
-            />
-            <SettingSwitchRow
-              title="Klanten vriendelijk helpen"
-              description="De chatbot geeft duidelijke hulp bij keuze of uitleg."
-              checked={goals.klantenHelpen}
-              onCheckedChange={(next) => setGoals((p) => ({ ...p, klantenHelpen: next }))}
-            />
-            <SettingSwitchRow
               title="Contactverzoeken doorgeven"
               description="De chatbot stuurt klanten richting contact als dat nodig is."
               checked={goals.contactAanvragenVerwerken}
               onCheckedChange={(next) =>
                 setGoals((p) => ({ ...p, contactAanvragenVerwerken: next }))
               }
+            />
+            <SettingSwitchRow
+              title="Vragen terug stellen"
+              description="Aan = de bot mag verduidelijkende vragen stellen. Uit (aanbevolen) = alleen antwoord geven, geen onnodige doorvragen — bijvoorbeeld bij prijs/product meteen modellen en prijzen uit je kennis noemen."
+              checked={vragenTerugStellen}
+              onCheckedChange={setVragenTerugStellen}
             />
           </section>
 

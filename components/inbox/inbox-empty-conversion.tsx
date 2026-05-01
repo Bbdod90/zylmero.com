@@ -1,106 +1,80 @@
-import type { ReactNode } from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { MessageCircle } from "lucide-react";
-import { OnboardingStepsStrip } from "@/components/dashboard/onboarding-steps-strip";
-import type { OnboardingStepUi } from "@/lib/dashboard/readiness";
-import { cn } from "@/lib/utils";
 
-function Bubble({
-  side,
-  label,
-  children,
-}: {
-  side: "left" | "right";
-  label: string;
-  children: ReactNode;
-}) {
+export function InboxEmptyConversion() {
   return (
-    <div
-      className={cn(
-        "max-w-[min(100%,26rem)] rounded-2xl px-4 py-3.5 text-sm leading-relaxed shadow-sm",
-        side === "left" &&
-          "border border-border/50 bg-background/95 text-foreground ring-1 ring-black/[0.03] dark:border-white/[0.1] dark:bg-[hsl(222_28%_11%/0.92)] dark:ring-white/[0.04]",
-        side === "right" &&
-          "ml-auto border border-primary/20 bg-gradient-to-br from-primary/[0.14] to-primary/[0.06] text-foreground ring-1 ring-primary/10 dark:from-primary/[0.22] dark:to-primary/[0.08]",
-      )}
-    >
-      <p
-        className={cn(
-          "text-[0.65rem] font-semibold uppercase tracking-[0.18em]",
-          side === "left" ? "text-muted-foreground" : "text-primary",
-        )}
-      >
-        {label}
-      </p>
-      <div className="mt-1.5 font-medium leading-snug text-foreground/95">{children}</div>
-    </div>
-  );
-}
-
-export function InboxEmptyConversion({
-  onboarding,
-}: {
-  onboarding: {
-    ai: OnboardingStepUi;
-    channel: OnboardingStepUi;
-    live: OnboardingStepUi;
-  };
-}) {
-  return (
-    <div className="space-y-10">
-      <OnboardingStepsStrip onboarding={onboarding} />
-
-      <div
-        className={cn(
-          "relative overflow-hidden rounded-[1.5rem] border border-border/50 bg-card p-6 shadow-[0_28px_80px_-48px_hsl(222_47%_11%/0.28)] sm:p-9",
-          "dark:border-white/[0.1] dark:bg-[linear-gradient(180deg,hsl(222_30%_12%/0.97)_0%,hsl(225_32%_9%/0.99)_100%)] dark:shadow-[0_32px_90px_-44px_rgb(0_0_0/0.55)]",
-        )}
-      >
-        <div
-          className="pointer-events-none absolute -right-16 top-0 h-48 w-48 rounded-full bg-primary/[0.07] blur-3xl"
-          aria-hidden
-        />
-
-        <div className="relative flex items-center gap-2.5">
-          <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
-            <MessageCircle className="size-[1.125rem]" strokeWidth={2} aria-hidden />
-          </span>
-          <div>
-            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-primary">Voorbeeld</p>
-            <h2 className="mt-0.5 text-lg font-semibold tracking-[-0.02em] text-foreground sm:text-xl">
-              Zo voelt het als de eerste klant reageert
+    <div className="grid min-h-[min(720px,92dvh)] gap-0 overflow-hidden rounded-2xl border border-border/50 bg-card shadow-[0_40px_100px_-56px_rgb(0_0_0/0.38)] dark:border-white/[0.08] dark:bg-[hsl(222_24%_9%/0.96)] dark:shadow-[0_48px_120px_-56px_rgb(0_0_0/0.55)] md:grid-cols-[minmax(0,400px)_minmax(0,1fr)]">
+      {/* Chat‑lijst (WhatsApp‑achtig overzicht) */}
+      <div className="flex min-h-[320px] flex-col border-b border-border/45 bg-[hsl(215_20%_97%)] dark:border-white/[0.06] dark:bg-[hsl(217_28%_10%)] md:min-h-0 md:border-b-0 md:border-r">
+        <header className="flex h-[3.35rem] shrink-0 items-center border-b border-border/35 px-5 dark:border-white/[0.07] dark:bg-[hsl(217_30%_8%)]">
+          <div className="min-w-0">
+            <h2 className="text-[1.0625rem] font-semibold leading-none tracking-tight text-foreground">
+              Chats
             </h2>
+            <p className="mt-1 text-[0.7rem] font-medium uppercase tracking-[0.16em] text-muted-foreground/75">
+              Inbox
+            </p>
+          </div>
+        </header>
+
+        <div className="shrink-0 border-b border-border/30 px-4 py-2.5 dark:border-white/[0.06]">
+          <div
+            className="flex h-9 items-center rounded-xl border border-border/40 bg-background/90 px-3.5 text-sm text-muted-foreground dark:border-white/[0.07] dark:bg-white/[0.04]"
+            role="search"
+          >
+            <span className="select-none opacity-55">Zoeken …</span>
           </div>
         </div>
-        <p className="relative mt-3 max-w-2xl text-sm font-medium leading-relaxed text-foreground/65">
-          Nog even geduld: zodra je een kanaal koppelt, zie je hier echte gesprekken. Onderstaand zie je hoe strak en
-          professioneel een eerste uitwisseling kan lopen.
-        </p>
 
-        <div className="relative mt-8 space-y-4 rounded-2xl border border-border/40 bg-muted/25 p-5 sm:p-6 dark:border-white/[0.08] dark:bg-white/[0.03]">
-          <Bubble side="left" label="Klant">
-            Wat kost schilderwerk bij jullie ongeveer?
-          </Bubble>
-          <Bubble side="right" label="Jouw assistent">
-            Goede vraag — dat hangt af van de oppervlakte en het werk. Zal ik een offerte voor je voorbereiden op basis
-            van je situatie?
-          </Bubble>
+        <div className="relative flex flex-1 flex-col">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="flex items-center gap-3 border-b border-border/25 px-4 py-3 dark:border-white/[0.04]"
+              aria-hidden
+            >
+              <div className="size-12 shrink-0 rounded-full bg-muted/50 dark:bg-white/[0.06]" />
+              <div className="min-w-0 flex-1 space-y-2">
+                <div className="h-2.5 w-[40%] max-w-[9rem] rounded-full bg-muted/45 dark:bg-white/[0.07]" />
+                <div className="h-2 w-[72%] rounded-full bg-muted/30 dark:bg-white/[0.05]" />
+              </div>
+              <div className="h-2 w-9 shrink-0 rounded-full bg-muted/25 dark:bg-white/[0.05]" />
+            </div>
+          ))}
+
+          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-transparent via-background/25 to-background/80 px-6 pb-8 pt-16 dark:via-[hsl(217_28%_10%/0.25)] dark:to-[hsl(217_28%_10%/0.92)]">
+            <p className="pointer-events-auto text-center text-sm font-semibold tracking-tight text-foreground">
+              Nog geen gesprekken
+            </p>
+            <p className="pointer-events-auto mt-2 max-w-[15rem] text-center text-xs leading-relaxed text-muted-foreground">
+              Koppel een kanaal — dan verschijnen klanten hier in één strak overzicht.
+            </p>
+            <Link
+              href="/dashboard/ai-koppelingen"
+              className="pointer-events-auto mt-6 text-sm font-semibold text-primary underline-offset-4 hover:underline"
+            >
+              Kanalen instellen
+            </Link>
+          </div>
         </div>
+      </div>
 
-        <div className="relative mt-8 rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/[0.08] to-transparent p-6 text-center dark:border-primary/30 dark:from-primary/[0.12]">
-          <p className="text-base font-semibold tracking-tight text-foreground">Klaar voor echte gesprekken?</p>
-          <p className="mx-auto mt-2 max-w-md text-sm font-medium leading-relaxed text-foreground/65">
-            Koppel WhatsApp, zet je websitechat live, of laat mail binnenlopen — dan hoeft niemand meer buiten de boot
-            te vallen.
+      {/* Leeg scherm / geen selectie */}
+      <div className="relative flex min-h-[280px] flex-col items-center justify-center overflow-hidden bg-muted/[0.22] px-8 py-16 dark:bg-[hsl(222_22%_7%/0.85)]">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.35] dark:opacity-[0.2]"
+          style={{
+            backgroundImage: `radial-gradient(circle at 1px 1px, hsl(var(--border) / 0.45) 1px, transparent 0)`,
+            backgroundSize: "22px 22px",
+          }}
+          aria-hidden
+        />
+        <div className="relative text-center">
+          <p className="text-sm font-medium text-muted-foreground">
+            Geen gesprek geselecteerd
           </p>
-          <Button
-            asChild
-            size="lg"
-            className="mt-6 h-12 rounded-2xl px-10 text-[0.9375rem] font-semibold shadow-[0_14px_36px_-18px_hsl(var(--primary)/0.5)] transition-all hover:-translate-y-0.5 active:translate-y-0"
-          >
-            <Link href="/dashboard/ai-koppelingen">Kanalen instellen</Link>
-          </Button>
+          <p className="mx-auto mt-2 max-w-[18rem] text-xs leading-relaxed text-muted-foreground/80">
+            Zodra er berichten binnenkomen, tik je een chat aan om te antwoorden.
+          </p>
         </div>
       </div>
     </div>

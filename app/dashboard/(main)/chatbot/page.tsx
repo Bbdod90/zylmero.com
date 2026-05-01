@@ -23,6 +23,10 @@ export default async function ChatbotPage() {
   const scannedPages = Array.isArray(prefs.ai_knowledge_pages)
     ? (prefs.ai_knowledge_pages as AiKnowledgePage[]).filter((p) => p && typeof p.url === "string")
     : [];
+  const initialKnowledgeUrls = scannedPages.map((p) => ({
+    url: p.url,
+    title: typeof p.title === "string" ? p.title : "",
+  }));
   const digestNl =
     typeof prefs.ai_knowledge_digest_nl === "string" && prefs.ai_knowledge_digest_nl.trim()
       ? prefs.ai_knowledge_digest_nl.trim()
@@ -56,11 +60,12 @@ export default async function ChatbotPage() {
           }
           initialDigest={digestNl}
           initialScannedCount={scannedPages.length}
+          initialKnowledgeUrls={initialKnowledgeUrls}
+          initialCrawlCapped={prefs.ai_knowledge_crawl_capped === true}
           initialGoals={{
-            vragenBeantwoorden: goals.vragen_beantwoorden !== false,
-            klantenHelpen: goals.klanten_helpen !== false,
             contactAanvragenVerwerken: goals.contactaanvragen_verwerken !== false,
           }}
+          initialVragenTerugStellen={prefs.chatbot_vragen_terug_stellen === true}
           initialAntwoordLengte={
             prefs.chatbot_answer_length === "normal" ? "normal" : "short"
           }

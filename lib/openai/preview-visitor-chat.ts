@@ -27,18 +27,41 @@ export async function previewVisitorChatReply(input: {
       : rawCtx.replace(/^Prijsrichting \(intern\):.*\n?/m, "");
   const lang = input.settings?.language || "nl";
   const prefs = (input.settings?.automation_preferences as Record<string, unknown> | undefined) || {};
+  const vragenTerugStellen = prefs.chatbot_vragen_terug_stellen === true;
   const answerLength =
     typeof prefs.chatbot_answer_length === "string" && prefs.chatbot_answer_length === "normal"
       ? "normal"
       : "short";
-  const lengthInstruction =
-    answerLength === "short"
+
+  const lengthInstruction = vragenTerugStellen
+    ? answerLength === "short"
       ? "Maximaal 2 korte zinnen."
-      : "Maximaal 4 korte zinnen.";
+      : "Maximaal 4 korte zinnen."
+    : answerLength === "short"
+      ? "Compact: bij voorkeur 2–5 zinnen; als de klant om prijzen, modellen of assortiment vraagt mag je een korte opsomming (alle items uit de context met prijs waar die genoemd zijn)."
+      : "Ruim genoeg om alle relevante modellen/prijzen uit de context te noemen indien van toepassing (max. ~8 zinnen).";
+
+  const maxOutTokens =
+    !vragenTerugStellen && answerLength === "short"
+      ? 380
+      : !vragenTerugStellen && answerLength === "normal"
+        ? 520
+        : answerLength === "short"
+          ? 120
+          : 220;
+
   const recentHistory = (input.history || [])
     .slice(-8)
     .map((m) => `${m.role === "assistant" ? "BOT" : "KLANT"}: ${m.content}`)
     .join("\n");
+
+  const antiQuestionBlock = vragenTerugStellen
+    ? `- Stel alleen een verduidelijkende vraag als dat echt nodig is om verder te helpen.
+- Bij twijfel: zeg eerlijk dat die informatie niet in de kennis staat en vraag max 1 korte verduidelijkende vraag.`
+    : `- Stel GEEN vervolgvragen en eindig niet met een vraag naar de klant (geen "welk model?", "heb je een voorkeur?", tenzij de context écht leeg is voor die vraag — dan max. 1 zin).
+- Bij vragen over kosten, modellen of assortiment: antwoord eerst volledig uit de context — noem alle modellen/producten die in de kennis staan met bijbehorende prijs als die er staat. Ga niet doorvragen voordat je dit hebt gegeven.
+- Als de gevraagde prijs/informatie niet in de context staat: zeg dat kort in één zin, zonder een lange stroom aan extra vragen.`;
+
   const prompt = `Hieronder staat alle context die de chatbot mag gebruiken.
 
 ${ctx}
@@ -50,28 +73,29 @@ ${input.visitorMessage}
 Vorige berichten in dit gesprek (indien aanwezig):
 ${recentHistory || "(geen eerdere berichten)"}
 
-Geef één kort antwoord als website-chatbot.
+Geef één antwoord als website-chatbot.
 Harde regels:
 - ${lengthInstruction}
-- Geen lange uitleg of verkooppraat.
+- Geen lange verkooppraat.
 - Gebruik alleen informatie uit de context.
 - Noem NOOIT een prijs, model, productdetail of openingstijd als die niet letterlijk in de context staat.
-- Stel alleen een verduidelijkende vraag als dat echt nodig is om verder te helpen.
-- Bevestig NOOIT dat een afspraak/offerte/bestelling definitief is geregeld zonder echte boekingstool.
-- Bij twijfel: zeg eerlijk dat die informatie niet in de kennis staat en vraag max 1 korte verduidelijkende vraag.`;
+${antiQuestionBlock}
+- Bevestig NOOIT dat een afspraak/offerte/bestelling definitief is geregeld zonder echte boekingstool.`;
 
   const openai = getOpenAI();
   const res = await openai.chat.completions.create({
     model: OPENAI_CHATBOT_MODEL,
-    temperature: 0.1,
-    max_tokens: answerLength === "short" ? 120 : 220,
+    temperature: 0.15,
+    max_tokens: maxOutTokens,
     messages: [
       {
         role: "system",
         content:
-          "Je bent een professionele klantenservice-chatbot. Antwoord kort, feitelijk en vriendelijk. " +
-          "Je verzint nooit prijzen of feiten. Als iets niet in de context staat, zeg dat expliciet. " +
-          "Stel alleen vervolgvragen wanneer nodig en doe geen valse bevestiging van afspraken of offertes.",
+          "Je bent een professionele klantenservice-chatbot. Antwoord feitelijk en vriendelijk. " +
+          "Je verzint nooit prijzen of feiten. " +
+          (vragenTerugStellen
+            ? "Stel alleen vervolgvragen wanneer nodig en doe geen valse bevestiging van afspraken of offertes."
+            : "Je prioriteit is het direct beantwoorden van de klantvraag uit de context; stel geen onnodige vervolgvragen."),
       },
       { role: "user", content: prompt },
     ],

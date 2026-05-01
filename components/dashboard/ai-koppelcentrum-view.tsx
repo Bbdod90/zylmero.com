@@ -1,60 +1,44 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import {
-  ArrowRight,
-  Brain,
-  CheckCircle2,
-  CircleDashed,
+  ArrowUpRight,
+  ChevronRight,
   Globe,
-  Inbox,
   Mail,
   MessageCircle,
-  Settings2,
-  Sparkles,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { OnboardingStepsStrip } from "@/components/dashboard/onboarding-steps-strip";
-import type { OnboardingStepUi } from "@/lib/dashboard/readiness";
 
 type StepStatus = "ok" | "partial" | "todo" | "demo";
 
-function StatusBadge({ status, label }: { status: StepStatus; label: string }) {
+function StatusDot({
+  status,
+  label,
+}: {
+  status: StepStatus;
+  label: string;
+}) {
   return (
-    <Badge
-      variant="secondary"
-      className={cn(
-        "shrink-0 font-semibold",
-        status === "ok" && "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
-        status === "partial" && "border-amber-500/30 bg-amber-500/10 text-amber-800 dark:text-amber-300",
-        status === "todo" && "border-border bg-muted/50 text-muted-foreground",
-        status === "demo" && "border-primary/30 bg-primary/10 text-primary",
-      )}
-    >
-      {status === "ok" ? <CheckCircle2 className="mr-1 size-3.5" /> : null}
-      {status === "partial" ? <CircleDashed className="mr-1 size-3.5" /> : null}
-      {label}
-    </Badge>
+    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+      <span
+        className={cn(
+          "size-2 shrink-0 rounded-full",
+          status === "ok" && "bg-emerald-500 shadow-[0_0_8px_-2px_hsl(142_76%_36%)]",
+          status === "partial" &&
+            "bg-amber-500 shadow-[0_0_8px_-2px_hsl(38_92%_50%)]",
+          status === "todo" && "bg-muted-foreground/35",
+          status === "demo" && "bg-primary shadow-[0_0_8px_-2px_hsl(var(--primary)/0.5)]",
+        )}
+        aria-hidden
+      />
+      <span>{label}</span>
+    </span>
   );
 }
 
-const cardLift =
-  "transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/28 hover:shadow-[0_24px_56px_-36px_hsl(222_47%_11%/0.2)] active:scale-[0.99]";
-
 export type AiKoppelcentrumProps = {
   demoMode: boolean;
-  onboarding: {
-    ai: OnboardingStepUi;
-    channel: OnboardingStepUi;
-    live: OnboardingStepUi;
-  };
   needsAiSetup: boolean;
   knowledgeStatus: StepStatus;
   knowledgeSummary: string;
@@ -66,9 +50,58 @@ export type AiKoppelcentrumProps = {
   emailInboundEnabled: boolean;
 };
 
+function ChannelRow({
+  href,
+  icon,
+  title,
+  description,
+  status,
+  statusLabel,
+}: {
+  href: string;
+  icon: ReactNode;
+  title: string;
+  description: string;
+  status: StepStatus;
+  statusLabel: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className={cn(
+        "group flex items-center gap-4 px-5 py-4 transition-colors",
+        "hover:bg-muted/[0.45] dark:hover:bg-white/[0.04]",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2",
+      )}
+    >
+      <span
+        className={cn(
+          "flex size-11 shrink-0 items-center justify-center rounded-2xl border border-border/50 bg-muted/25 text-primary",
+          "shadow-[0_8px_24px_-20px_rgb(0_0_0/0.35)] dark:border-white/[0.07] dark:bg-white/[0.04]",
+          "transition-transform duration-200 group-hover:scale-[1.02]",
+        )}
+      >
+        {icon}
+      </span>
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+          <span className="text-[0.95rem] font-semibold tracking-tight text-foreground">
+            {title}
+          </span>
+          <StatusDot status={status} label={statusLabel} />
+        </div>
+        <p className="mt-0.5 text-sm leading-snug text-muted-foreground">{description}</p>
+      </div>
+      <ChevronRight
+        className="size-5 shrink-0 text-muted-foreground/40 transition-colors group-hover:text-primary/70"
+        aria-hidden
+      />
+    </Link>
+  );
+}
+
 export function AiKoppelcentrumView({
   demoMode,
-  onboarding,
   needsAiSetup,
   knowledgeStatus,
   knowledgeSummary,
@@ -104,212 +137,135 @@ export function AiKoppelcentrumView({
         ? "partial"
         : "todo";
 
-  const assistantFeelsReady =
-    !needsAiSetup && (knowledgeStatus === "ok" || knowledgeStatus === "partial");
+  const ks: StepStatus = demoMode
+    ? "demo"
+    : knowledgeStatus === "ok"
+      ? "ok"
+      : knowledgeStatus === "partial"
+        ? "partial"
+        : "todo";
+  const kLabel = demoMode
+    ? "Demo"
+    : knowledgeStatus === "ok"
+      ? "Compleet"
+      : knowledgeStatus === "partial"
+        ? "Uitbreiden"
+        : "Open";
 
   return (
-    <div className="space-y-8 sm:space-y-10">
-      <OnboardingStepsStrip onboarding={onboarding} />
-
+    <div className="mx-auto max-w-xl space-y-5">
       {demoMode ? (
-        <p className="rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-500/[0.12] to-amber-500/[0.05] px-5 py-4 text-sm font-medium leading-relaxed text-amber-950 shadow-sm dark:text-amber-50">
-          <span className="font-semibold">Demomodus.</span> Zo ziet alles eruit als je straks met echte klanten werkt —
-          koppelingen zijn alleen ter illustratie.
+        <p className="text-center text-xs font-medium uppercase tracking-[0.12em] text-amber-800/90 dark:text-amber-200/85">
+          Demomodus — koppelingen zijn ter illustratie
         </p>
       ) : null}
 
       {needsAiSetup ? (
-        <Card className={cn("rounded-[1.35rem] border-primary/25 bg-primary/[0.05] shadow-md dark:border-primary/30", cardLift)}>
-          <CardHeader className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-start gap-3">
-              <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary ring-1 ring-primary/20">
-                <Sparkles className="size-5" />
-              </div>
-              <div>
-                <CardTitle className="text-lg tracking-tight">Start: je assistent laten meedenken</CardTitle>
-                <CardDescription className="text-sm font-medium leading-relaxed text-foreground/70">
-                  In een paar minuten vul je je diensten en veelgestelde vragen in. Daarna kan je meteen professioneel
-                  antwoorden — ook buiten kantooruren.
-                </CardDescription>
-              </div>
-            </div>
-            <Button asChild className="w-full shrink-0 rounded-xl sm:w-auto">
-              <Link href="/dashboard/ai-setup">
-                Starten
-                <ArrowRight className="ml-2 size-4" />
-              </Link>
-            </Button>
-          </CardHeader>
-        </Card>
+        <p className="text-center text-sm text-muted-foreground">
+          Nog niet klaar met de eerste setup?{" "}
+          <Link
+            href="/dashboard/ai-setup"
+            className="font-semibold text-primary underline-offset-4 hover:underline"
+          >
+            Afronden
+          </Link>
+        </p>
       ) : null}
 
-      <div className="grid gap-5 lg:grid-cols-2">
-        <Card className={cn("cf-dashboard-panel rounded-[1.35rem] border-border/60 shadow-[0_20px_50px_-40px_hsl(222_47%_11%/0.18)] dark:border-white/[0.1]", cardLift)}>
-          <CardHeader className="space-y-3 p-5 sm:p-6">
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-center gap-2 text-primary">
-                <Brain className="size-5 shrink-0" />
-                <CardTitle className="text-lg tracking-tight sm:text-xl">Je assistent staat voor je klaar</CardTitle>
+      <div className="overflow-hidden rounded-[1.125rem] border border-border/50 bg-card/90 shadow-[0_32px_64px_-48px_rgb(0_0_0/0.35)] backdrop-blur-sm dark:border-white/[0.09] dark:bg-[hsl(228_22%_11%/0.88)] dark:shadow-[0_36px_80px_-52px_rgb(0_0_0/0.65)]">
+        <div className="border-b border-border/45 px-5 py-4 dark:border-white/[0.06]">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                  Kennis
+                </span>
+                <StatusDot status={ks} label={kLabel} />
               </div>
-              <StatusBadge
-                status={knowledgeStatus === "ok" ? "ok" : knowledgeStatus === "partial" ? "partial" : "todo"}
-                label={
-                  demoMode
-                    ? "Demo"
-                    : knowledgeStatus === "ok"
-                      ? "Kennis compleet"
-                      : knowledgeStatus === "partial"
-                        ? "Nog aanvullen"
-                        : "Start hier"
-                }
-              />
+              <p className="mt-2 text-sm leading-relaxed text-foreground/80">
+                {knowledgeSummary}
+              </p>
             </div>
-            <CardDescription className="text-sm leading-relaxed text-muted-foreground">{knowledgeSummary}</CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-wrap gap-2 px-5 pb-5 pt-0 sm:px-6 sm:pb-6">
-            <Button asChild size="sm" className="rounded-xl shadow-sm">
-              <Link href="/dashboard/chatbot#kennis">
-                Kennis bewerken
-                <ArrowRight className="ml-1.5 size-3.5" />
+            <Button asChild variant="outline" size="sm" className="h-9 shrink-0 rounded-full px-5">
+              <Link href="/dashboard/chatbot#kennis" className="gap-1.5 font-semibold">
+                Bewerken
+                <ArrowUpRight className="size-3.5 opacity-70" aria-hidden />
               </Link>
             </Button>
-            <Button asChild variant="outline" size="sm" className="rounded-xl">
-              <Link href="/dashboard/chatbot">Chatbot</Link>
-            </Button>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card className={cn("cf-dashboard-panel rounded-[1.35rem] border-border/60 shadow-[0_20px_50px_-40px_hsl(222_47%_11%/0.18)] dark:border-white/[0.1]", cardLift)}>
-          <CardHeader className="space-y-2 p-5 sm:p-6">
-            <CardTitle className="text-lg tracking-tight sm:text-xl">Waar mogen klanten je bereiken?</CardTitle>
-            <CardDescription className="text-sm font-medium leading-relaxed text-foreground/70">
-              Je kiest wat bij je past. Alles wat binnenkomt, zie je rustig bij elkaar onder Berichten — zonder
-              heen-en-weer tussen apps.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-3 px-5 pb-5 pt-0 sm:px-6 sm:pb-6">
-            <Button
-              asChild
-              variant="outline"
-              className="h-auto justify-between rounded-2xl border-border/55 py-4 text-left shadow-sm ring-1 ring-transparent transition-all hover:border-primary/25 hover:bg-muted/35 hover:ring-primary/10"
-            >
-              <Link href="/dashboard/settings?tab=whatsapp" className="flex w-full items-center gap-3">
-                <MessageCircle className="size-5 shrink-0 text-primary" aria-hidden />
-                <span className="min-w-0 flex-1">
-                  <span className="block font-semibold">WhatsApp</span>
-                  <span className="mt-0.5 block text-xs font-normal text-muted-foreground">
-                    {demoMode
-                      ? "Demo"
-                      : waStatus === "ok"
-                        ? "Zelfde nummer als WhatsApp Business — chatbot actief"
-                        : waStatus === "partial"
-                          ? "Rond af onder Instellingen → WhatsApp"
-                          : "Koppel je zakelijke WhatsApp (Meta of Twilio)"}
-                  </span>
-                </span>
-                <StatusBadge
-                  status={waStatus}
-                  label={
-                    demoMode ? "Demo" : waStatus === "ok" ? "Actief" : waStatus === "partial" ? "Bijna klaar" : "Te doen"
-                  }
-                />
-              </Link>
-            </Button>
+        <div className="divide-y divide-border/40 dark:divide-white/[0.06]">
+          <ChannelRow
+            href="/dashboard/settings?tab=whatsapp"
+            icon={<MessageCircle className="size-[1.15rem]" strokeWidth={2} aria-hidden />}
+            title="WhatsApp"
+            description={
+              demoMode
+                ? "Zo gaat zakelijk chat aan."
+                : waStatus === "ok"
+                  ? "Inkomende berichten in je inbox."
+                  : waStatus === "partial"
+                    ? "Rond WhatsApp af in Instellingen."
+                    : "Koppel zakelijk WhatsApp."
+            }
+            status={waStatus}
+            statusLabel={
+              demoMode ? "Demo" : waStatus === "ok" ? "Actief" : waStatus === "partial" ? "Bijna" : "Te doen"
+            }
+          />
 
-            <Button
-              asChild
-              variant="outline"
-              className="h-auto justify-between rounded-2xl border-border/55 py-4 text-left shadow-sm ring-1 ring-transparent transition-all hover:border-primary/25 hover:bg-muted/35 hover:ring-primary/10"
-            >
-              <Link href="/dashboard/settings?tab=widget" className="flex w-full items-center gap-3">
-                <Globe className="size-5 shrink-0 text-primary" aria-hidden />
-                <span className="min-w-0 flex-1">
-                  <span className="block font-semibold">Websitechat</span>
-                  <span className="mt-0.5 block text-xs font-normal text-muted-foreground">
-                    {demoMode
-                      ? "Demo"
-                      : widgetLive
-                        ? "Staat op je site"
-                        : !websiteWidgetActive
-                          ? "Plan nodig om live te gaan"
-                          : "Code nog niet geplaatst"}
-                  </span>
-                </span>
-                <StatusBadge
-                  status={widgetStatus}
-                  label={
-                    demoMode
-                      ? "Demo"
-                      : widgetLive
-                        ? "Actief"
-                        : widgetStatus === "partial"
-                          ? "Bijna klaar"
-                          : "Te doen"
-                  }
-                />
-              </Link>
-            </Button>
+          <ChannelRow
+            href="/dashboard/settings?tab=widget"
+            icon={<Globe className="size-[1.15rem]" strokeWidth={2} aria-hidden />}
+            title="Website"
+            description={
+              demoMode
+                ? "Chat op je eigen site."
+                : widgetLive
+                  ? "Widget staat live."
+                  : !websiteWidgetActive
+                    ? "Plan nodig voor livegang."
+                    : "Plak de snippet op je site."
+            }
+            status={widgetStatus}
+            statusLabel={
+              demoMode
+                ? "Demo"
+                : widgetLive
+                  ? "Live"
+                  : widgetStatus === "partial"
+                    ? "Bijna"
+                    : "Te doen"
+            }
+          />
 
-            <Button
-              asChild
-              variant="outline"
-              className="h-auto justify-between rounded-2xl border-border/55 py-4 text-left shadow-sm ring-1 ring-transparent transition-all hover:border-primary/25 hover:bg-muted/35 hover:ring-primary/10"
-            >
-              <Link href="/dashboard/settings?tab=email" className="flex w-full items-center gap-3">
-                <Mail className="size-5 shrink-0 text-primary" aria-hidden />
-                <span className="min-w-0 flex-1">
-                  <span className="block font-semibold">E-mail</span>
-                  <span className="mt-0.5 block text-xs font-normal text-muted-foreground">
-                    {demoMode
-                      ? "Demo"
-                      : mailStatus === "ok"
-                        ? "Inkomend staat aan"
-                        : mailStatus === "partial"
-                          ? "Nog een instelling open"
-                          : "Nog niet gekoppeld"}
-                  </span>
-                </span>
-                <StatusBadge
-                  status={mailStatus}
-                  label={
-                    demoMode
-                      ? "Demo"
-                      : mailStatus === "ok"
-                        ? "Actief"
-                        : mailStatus === "partial"
-                          ? "Bijna klaar"
-                          : "Te doen"
-                  }
-                />
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+          <ChannelRow
+            href="/dashboard/settings?tab=email"
+            icon={<Mail className="size-[1.15rem]" strokeWidth={2} aria-hidden />}
+            title="E-mail"
+            description={
+              demoMode
+                ? "Mail in één inbox."
+                : mailStatus === "ok"
+                  ? "Inkomend staat aan."
+                  : mailStatus === "partial"
+                    ? "Nog één stap in Instellingen."
+                    : "Koppel je mailbox."
+            }
+            status={mailStatus}
+            statusLabel={
+              demoMode ? "Demo" : mailStatus === "ok" ? "Actief" : mailStatus === "partial" ? "Bijna" : "Te doen"
+            }
+          />
+        </div>
 
-      <div className="flex flex-col gap-4 rounded-[1.35rem] border border-border/55 bg-gradient-to-r from-muted/30 to-transparent p-5 sm:flex-row sm:items-center sm:justify-between dark:border-white/[0.1] dark:from-white/[0.04]">
-        <p className="text-sm font-medium leading-relaxed text-foreground/75">
-          {assistantFeelsReady
-            ? "Tip: stuur jezelf een testbericht of vraag iemand van het team — zo weet je zeker dat alles soepel aanvoelt voor echte klanten."
-            : "Begin met je kennis en kies daarna minstens één kanaal. Dan staat je vangnet echt open — en hoef je minder zelf achter aanvragen aan te bellen."}
-        </p>
-        <div className="flex flex-wrap gap-2">
-          <Button
-            asChild
-            variant="outline"
-            size="sm"
-            className="rounded-full border-border/70 shadow-sm"
-          >
-            <Link href="/dashboard/inbox">
-              <Inbox className="size-3.5 opacity-80" aria-hidden />
-              Berichten
-            </Link>
+        <div className="flex flex-wrap items-center justify-end gap-2 border-t border-border/40 bg-muted/[0.2] px-4 py-3 dark:border-white/[0.06] dark:bg-black/[0.12]">
+          <Button asChild variant="ghost" size="sm" className="h-9 rounded-full text-muted-foreground">
+            <Link href="/dashboard/inbox">Naar inbox</Link>
           </Button>
-          <Button asChild size="sm" className="rounded-full shadow-sm">
-            <Link href="/dashboard/settings">
-              <Settings2 className="size-3.5 opacity-90" aria-hidden />
-              Instellingen
-            </Link>
+          <Button asChild size="sm" className="h-9 rounded-full px-5 font-semibold">
+            <Link href="/dashboard/settings">Instellingen</Link>
           </Button>
         </div>
       </div>

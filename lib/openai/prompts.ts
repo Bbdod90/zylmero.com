@@ -1,5 +1,6 @@
 import type { CompanySettings } from "@/lib/types";
 import { getNicheConfig } from "@/lib/niches";
+import { truncateCrawledDocForPrompt } from "@/lib/ai/knowledge-document";
 
 export function businessContextBlock(
   companyName: string,
@@ -87,7 +88,7 @@ export function businessContextBlock(
       ? `Document / vrije kennis voor AI:\n${settings.ai_knowledge_document}`
       : "",
     prefs?.ai_knowledge_crawled_document
-      ? `Automatisch gescande website-pagina's:\n${prefs.ai_knowledge_crawled_document}`
+      ? `Automatisch gescande website-pagina's:\n${truncateCrawledDocForPrompt(String(prefs.ai_knowledge_crawled_document))}`
       : "",
   ]
     .filter(Boolean)

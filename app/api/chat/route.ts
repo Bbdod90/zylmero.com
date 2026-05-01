@@ -9,6 +9,7 @@ import {
 } from "@/lib/oauth/google-calendar";
 import { sealSocialToken, unsealSocialToken } from "@/lib/crypto/social-token";
 import { fetchAppleCalendarBusyRanges } from "@/lib/integrations/apple-calendar";
+import { truncateCrawledDocForPrompt } from "@/lib/ai/knowledge-document";
 
 export const dynamic = "force-dynamic";
 
@@ -40,7 +41,6 @@ type AppointmentIntent = {
   rawTimeText: string | null;
 };
 
-const MAX_CRAWLED_KNOWLEDGE_CHARS = 9000;
 const APPOINTMENT_DEFAULT_MINUTES = 60;
 
 function jsonError(message: string, status = 400) {
@@ -65,12 +65,6 @@ function lengthInstruction(kind: "kort" | "normaal" | "uitgebreid"): string {
   if (kind === "uitgebreid") return "Maximaal 6 zinnen, compact en scanbaar.";
   if (kind === "normaal") return "Maximaal 4 korte zinnen.";
   return "Maximaal 2 korte zinnen.";
-}
-
-function truncateKnowledge(raw: string): string {
-  if (!raw) return "";
-  if (raw.length <= MAX_CRAWLED_KNOWLEDGE_CHARS) return raw;
-  return `${raw.slice(0, MAX_CRAWLED_KNOWLEDGE_CHARS)}\n\n[Ingekort om binnen context te passen]`;
 }
 
 function parseRequestedDateTime(raw: string): Date | null {
@@ -389,7 +383,7 @@ function buildSystemPrompt(data: {
   kanaal: "web" | "whatsapp" | "email";
   currentMessage: string;
 }) {
-  const doelen = (data.settings?.doelen as Record<string, unknown> | undefined) || {};
+  const widgetDoelen = (data.settings?.doelen as Record<string, unknown> | undefined) || {};
   const companySettings = asRecord(data.companySettings);
   const companyFaq = Array.isArray(companySettings.faq)
     ? companySettings.faq
@@ -421,17 +415,31 @@ function buildSystemPrompt(data: {
     ? JSON.stringify(companyHoursRaw)
     : "";
   const prefs = asRecord(companySettings.automation_preferences);
-  const crawledKnowledge = truncateKnowledge(safeString(prefs.ai_knowledge_crawled_document));
+  const storedGoals = asRecord(prefs.chatbot_goals);
+  const vragenTerugStellen = prefs.chatbot_vragen_terug_stellen === true;
+  const contactOk =
+    storedGoals.contactaanvragen_verwerken === false ||
+    widgetDoelen.contactaanvragen_verwerken === false
+      ? false
+      : true;
+  const crawledKnowledge = truncateCrawledDocForPrompt(
+    safeString(prefs.ai_knowledge_crawled_document),
+  );
   const digestNl = safeString(prefs.ai_knowledge_digest_nl);
   const knowledgeWebsite = safeString(prefs.ai_knowledge_website);
   const answerLen = normalizeAnswerLength(data.settings);
   const doelRegels = [
-    doelen.vragen_beantwoorden === false ? null : "- Vragen beantwoorden met directe, bruikbare info",
-    doelen.klanten_helpen === false ? null : "- Klanten helpen met korte, concrete vervolgstappen",
-    doelen.contactaanvragen_verwerken === false ? null : "- Contactvraag opvangen als klant dat expliciet wil",
+    "- Vragen beantwoorden met directe, bruikbare info",
+    "- Klanten helpen met korte, concrete vervolgstappen",
+    contactOk ? "- Contactvraag opvangen als klant dat expliciet wil" : null,
   ]
     .filter(Boolean)
     .join("\n");
+
+  const klantgerichtBlock = vragenTerugStellen
+    ? `- Stel alleen een vervolgvraag als die echt nodig is om verder te helpen`
+    : `- Stel GEEN onnodige vervolgvragen en eindig niet met retorische vragen naar de klant
+- Bij prijs-, model- of assortimentvragen: geef eerst een volledig antwoord uit de context (alle modellen met prijs als die in de context staan); vraag niet eerst om een specifiek model`;
 
   const historyBlock = data.history
     .slice(-10)
@@ -444,13 +452,13 @@ REGELS:
 - Antwoord altijd vriendelijk, duidelijk en to-the-point
 - Geef eerst het directe antwoord op de vraag van de klant
 - ${lengthInstruction(answerLen)}
-- Stel alleen een vervolgvraag als die echt nodig is om verder te helpen
+${klantgerichtBlock}
 - Nooit generieke branche-tekst: pas antwoord aan op dit bedrijf en deze context
 
 BELANGRIJK:
 - Gebruik ALLEEN feiten die in de context hieronder staan (website, extra info, FAQ, snippets)
 - Noem NOOIT prijzen, openingstijden, voorraad, garanties of productdetails die niet expliciet in de context staan
-- Als info ontbreekt: zeg dat eerlijk in 1 zin en stel max 1 gerichte vraag
+- Als info ontbreekt: zeg dat eerlijk kort${vragenTerugStellen ? " en stel max 1 gerichte vraag" : "; stel geen lange reeks vervolgvragen"}
 - Bevestig NOOIT dat een afspraak, offerte of bestelling "geregeld" is zonder echte boekingsactie/tool
 - Als klant wil boeken maar je kunt niet boeken in deze chat: verwijs naar contact/boekingslink uit context`;
 
