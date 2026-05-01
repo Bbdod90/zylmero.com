@@ -2,6 +2,7 @@ import type { CompanySettings } from "@/lib/types";
 import {
   lengthInstructionNl,
   maxTokensForAnswerKind,
+  pricingAndStockAccuracyNl,
   relevanceAndCapabilityRulesNl,
   resolveAnswerLengthKind,
 } from "@/lib/chatbot/answer-style";
@@ -75,6 +76,9 @@ ${ctx}
 
 ---
 ${capsBlock}
+
+---
+${pricingAndStockAccuracyNl()}
 
 ---
 De bezoeker stelt deze vraag (in ${lang}):

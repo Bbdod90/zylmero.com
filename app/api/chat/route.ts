@@ -13,6 +13,7 @@ import { truncateCrawledDocForPrompt } from "@/lib/ai/knowledge-document";
 import {
   lengthInstructionNl,
   maxTokensForAnswerKind,
+  pricingAndStockAccuracyNl,
   relevanceAndCapabilityRulesNl,
   resolveAnswerLengthKind,
   type AnswerLengthKind,
@@ -456,6 +457,8 @@ REGELS:
 - ${lengthInstructionNl(answerLen)}
 ${klantgerichtBlock}
 ${capsBlock}
+
+${pricingAndStockAccuracyNl()}
 
 BELANGRIJK:
 - Gebruik ALLEEN feiten die in de context hieronder staan (website, extra info, FAQ, snippets)

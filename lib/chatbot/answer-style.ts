@@ -88,3 +88,15 @@ export function maxTokensForAnswerKind(kind: AnswerLengthKind): number {
   if (kind === "normaal") return 620;
   return 380;
 }
+
+/** Voorkomt verkeerde “vanaf”-prijs en voorraad-hallucinaties (webshops / Shopify). */
+export function pricingAndStockAccuracyNl(): string {
+  return [
+    "PRIJZEN (strikt):",
+    '- Bij vragen naar startprijs, “hoe duur”, “vanaf”, of algemene fatbike-prijs: noem het **laagste** concrete bedrag dat in de context staat voor dat type product — niet alleen een duur voorbeeld (bijv. niet €1399 als “begint bij” als er ook €749, €799 of €899 in de kennis staat).',
+    "- Je mag daarna 1–2 andere prijspunten noemen als voorbeeld, maar het **eerste** antwoord op “vanaf” moet het minimum uit de context zijn.",
+    "VOORRAAD (strikt):",
+    '- Zeg **niet** dat iets niet op voorraad is tenzij de context dat expliciet vermeldt (bijv. schema “out of stock”, “uitverkocht”, “niet leverbaar”).',
+    "- Bij twijfel over voorraad: geef geen harde ontkenning; verwijs kort naar de productpagina of “actuele voorraad op de website”.",
+  ].join("\n");
+}

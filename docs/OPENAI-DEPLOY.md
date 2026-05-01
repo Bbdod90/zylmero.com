@@ -25,6 +25,9 @@ Minimaal voor AI-demo + app-AI:
 
 - `OPENAI_API_KEY` — **verplicht** voor echte antwoorden (zonder key: fallback of foutmelding).
 - `OPENAI_MODEL` — optioneel; default in code is `gpt-4o-mini`.
+- **`OPENAI_CHATBOT_MODEL`** (optioneel) — alleen voor chatbot-preview in het dashboard; als leeg, volgt die `OPENAI_CHATBOT_MODEL` / `OPENAI_MODEL_PREVIEW` / `OPENAI_MODEL`.
+
+**Welk model voor webshop-chat?** `gpt-4o-mini` is snel en goedkoop en volstaat vaak als crawl + structured data compleet zijn. Voor **maximale nauwkeurigheid** bij prijs/voorraad met romige HTML: zet `OPENAI_MODEL=gpt-4o` (of nieuwere `gpt-4.1-mini` / `gpt-4o` volgens je OpenAI-dashboard). Duurdere modellen lossen geen ontbrekende crawl-data op — herscan je website na wijzigingen.
 
 **Preview branches:** als Preview geen env heeft, werkt AI daar niet tot je `OPENAI_API_KEY` ook voor Preview invult (of alleen Production test).
 

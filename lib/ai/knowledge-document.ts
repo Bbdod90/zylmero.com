@@ -7,6 +7,26 @@ import {
 /** Max. platte tekst per pagina vóór opslag (incl. JSON-LD regels). */
 export const AI_KNOWLEDGE_TEXT_PER_PAGE = 6000;
 
+/**
+ * Haalt korte "Vanaf €…"-fragmenten uit platte tekst (Shopify-collecties tonen dit vaak naast JSON-LD).
+ */
+export function extractNlRetailPriceHints(flatText: string): string {
+  const seen = new Set<string>();
+  const hints: string[] = [];
+  const vanafRe =
+    /(?:^|\s)(Vanaf|vanaf)\s+(€\s*[\d]{1,4}(?:[.,]\d{3})*[.,]\d{2}|€\s*[\d]{1,4}[.,]\d{2})/g;
+  let m: RegExpExecArray | null;
+  while ((m = vanafRe.exec(flatText)) && hints.length < 40) {
+    const line = `${m[1]} ${m[2]}`.replace(/\s+/g, " ").trim();
+    if (!seen.has(line)) {
+      seen.add(line);
+      hints.push(line);
+    }
+  }
+  if (!hints.length) return "";
+  return `[Prijsfragmenten uit paginatekst]\n${hints.join(" · ")}`;
+}
+
 export function truncateCrawledDocForPrompt(raw: string): string {
   if (raw.length <= AI_KNOWLEDGE_PROMPT_CRAWLED_MAX_CHARS) return raw;
   return `${raw.slice(0, AI_KNOWLEDGE_PROMPT_CRAWLED_MAX_CHARS)}\n\n[…ingekort voor modelcontext]`;
@@ -45,6 +65,18 @@ function collectStructuredLines(node: unknown, out: string[], depth: number): vo
   const name = String(o.name || "").trim();
   const offers = o.offers;
 
+  const availabilityNote = (off: Record<string, unknown>): string => {
+    const raw = off.availability;
+    if (raw == null) return "";
+    const s = String(raw).toLowerCase();
+    if (s.includes("instock")) return " · voorraad: op voorraad";
+    if (s.includes("outofstock") || s.includes("soldout") || s.includes("discontinued")) {
+      return " · voorraad: niet op voorraad";
+    }
+    if (s.includes("preorder")) return " · voorraad: preorder";
+    return "";
+  };
+
   const tryProduct = () => {
     if (!name) return;
     const parts: string[] = [name];
@@ -52,12 +84,31 @@ function collectStructuredLines(node: unknown, out: string[], depth: number): vo
     if (sku) parts.push(`SKU ${sku}`);
     const priceBits: string[] = [];
     const readOffer = (off: Record<string, unknown>) => {
-      const price = off.price ?? off.lowPrice ?? off.highPrice;
+      const offerType = String(off["@type"] ?? "").toLowerCase();
       const cur = off.priceCurrency ? String(off.priceCurrency) : "";
+
+      if (offerType.includes("aggregateoffer")) {
+        const low = off.lowPrice ?? off.price;
+        const high = off.highPrice;
+        const av = availabilityNote(off);
+        if (low != null && String(low).trim()) {
+          const hi =
+            high != null &&
+            String(high).trim() &&
+            String(high) !== String(low)
+              ? ` – tot ${String(high)}`
+              : "";
+          priceBits.push(
+            `vanaf ${String(low)}${cur ? ` ${cur}` : ""}${hi}${av}`,
+          );
+        }
+        return;
+      }
+
+      const price = off.price ?? off.lowPrice ?? off.highPrice;
+      const av = availabilityNote(off);
       if (price != null && String(price).trim()) {
-        priceBits.push(
-          `${String(price)}${cur ? ` ${cur}` : ""}`,
-        );
+        priceBits.push(`${String(price)}${cur ? ` ${cur}` : ""}${av}`);
       }
     };
     if (offers && typeof offers === "object") {
@@ -72,6 +123,24 @@ function collectStructuredLines(node: unknown, out: string[], depth: number): vo
     if (priceBits.length) parts.push(`Prijzen: ${priceBits.join("; ")}`);
     out.push(`[Structured data] ${parts.join(" — ")}`);
   };
+
+  if (typeStr.toLowerCase().includes("aggregateoffer")) {
+    const cur = o.priceCurrency ? String(o.priceCurrency) : "";
+    const low = o.lowPrice ?? o.price;
+    const high = o.highPrice;
+    const av = availabilityNote(o);
+    if (low != null && String(low).trim()) {
+      const hi =
+        high != null &&
+        String(high).trim() &&
+        String(high) !== String(low)
+          ? ` – tot ${String(high)}`
+          : "";
+      out.push(
+        `[Structured data] Aanbod — vanaf ${String(low)}${cur ? ` ${cur}` : ""}${hi}${av}`,
+      );
+    }
+  }
 
   if (typeStr.toLowerCase().includes("product") || (name && offers)) {
     tryProduct();
@@ -103,6 +172,7 @@ export function sortPagesForKnowledge(pages: AiKnowledgePage[]): AiKnowledgePage
     if (u.includes("/product")) s += 3;
     if (u.includes("product")) s += 2;
     if (u.includes("shop") || u.includes("winkel") || u.includes("aanbieding")) s += 1;
+    if (u.includes("slot") || u.includes("ketting") || u.includes("accessoire")) s += 4;
     return s;
   };
   return [...pages].sort((a, b) => score(b.url) - score(a.url));

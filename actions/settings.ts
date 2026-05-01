@@ -17,6 +17,7 @@ import {
   AI_KNOWLEDGE_TEXT_PER_PAGE,
   buildCrawledKnowledgeDocument,
   extractJsonLdPlainLines,
+  extractNlRetailPriceHints,
 } from "@/lib/ai/knowledge-document";
 import type { AiKnowledgePage, KnowledgeSnippet } from "@/lib/types";
 import { generateSiteKnowledgeDigestNl } from "@/lib/openai/site-knowledge-digest";
@@ -280,7 +281,9 @@ async function crawlKnowledgeWebsite(startWebsite: string): Promise<CrawlResult>
       const stripped = stripHtml(html);
       const combined = [jsonLd, stripped].filter(Boolean).join("\n\n");
       const normalized = combined.replace(/\s+/g, " ").trim();
-      const content = normalized.slice(0, AI_KNOWLEDGE_TEXT_PER_PAGE);
+      const hints = extractNlRetailPriceHints(normalized);
+      const contentBase = hints ? `${hints}\n\n${normalized}` : normalized;
+      const content = contentBase.slice(0, AI_KNOWLEDGE_TEXT_PER_PAGE);
       if (content.length < 80) continue;
       pages.push({
         url: key,
