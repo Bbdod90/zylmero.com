@@ -65,6 +65,12 @@ export function ChatbotStudio(props: {
   };
   initialVragenTerugStellen: boolean;
   initialAntwoordLengte: "short" | "normal";
+  initialExtraGoals: {
+    productadvies: boolean;
+    faqUitleg: boolean;
+    contactEscalatie: boolean;
+    afspraakOpVerzoek: boolean;
+  };
   embedSnippet: string;
 }) {
   const [bedrijfsOmschrijving, setBedrijfsOmschrijving] = useState(props.initialBedrijfsOmschrijving);
@@ -75,12 +81,7 @@ export function ChatbotStudio(props: {
   const [vragenTerugStellen, setVragenTerugStellen] = useState(
     props.initialVragenTerugStellen,
   );
-  const [extraGoals, setExtraGoals] = useState({
-    productadvies: true,
-    faqUitleg: true,
-    contactEscalatie: true,
-    afspraakOpVerzoek: true,
-  });
+  const [extraGoals, setExtraGoals] = useState(props.initialExtraGoals);
   const [antwoordLengte, setAntwoordLengte] = useState<"short" | "normal">(props.initialAntwoordLengte);
   const [saved, setSaved] = useState(props.initialScannedCount > 0 || props.initialExtraInfo.trim().length > 0);
   const [error, setError] = useState<string | null>(null);
@@ -381,6 +382,10 @@ export function ChatbotStudio(props: {
                 Normaal
               </Button>
             </div>
+            <p className="text-xs leading-relaxed text-gray-500">
+              <span className="font-semibold text-gray-700">Kort:</span> 1–3 zinnen; geen prijslijst tenzij de klant om prijzen/modellen vraagt.{" "}
+              <span className="font-semibold text-gray-700">Normaal:</span> iets meer ruimte om uit te leggen (ongeveer 3–6 zinnen).
+            </p>
           </section>
 
           <section className="space-y-1.5">

@@ -1,4 +1,10 @@
 import type { CompanySettings } from "@/lib/types";
+import {
+  lengthInstructionNl,
+  maxTokensForAnswerKind,
+  relevanceAndCapabilityRulesNl,
+  resolveAnswerLengthKind,
+} from "@/lib/chatbot/answer-style";
 import { businessContextBlock } from "@/lib/openai/prompts";
 import { getOpenAI, OPENAI_MODEL } from "@/lib/openai/client";
 
@@ -28,27 +34,28 @@ export async function previewVisitorChatReply(input: {
   const lang = input.settings?.language || "nl";
   const prefs = (input.settings?.automation_preferences as Record<string, unknown> | undefined) || {};
   const vragenTerugStellen = prefs.chatbot_vragen_terug_stellen === true;
-  const answerLength =
-    typeof prefs.chatbot_answer_length === "string" && prefs.chatbot_answer_length === "normal"
-      ? "normal"
-      : "short";
 
-  const lengthInstruction = vragenTerugStellen
-    ? answerLength === "short"
-      ? "Maximaal 2 korte zinnen."
-      : "Maximaal 4 korte zinnen."
-    : answerLength === "short"
-      ? "Compact: bij voorkeur 2–5 zinnen; als de klant om prijzen, modellen of assortiment vraagt mag je een korte opsomming (alle items uit de context met prijs waar die genoemd zijn)."
-      : "Ruim genoeg om alle relevante modellen/prijzen uit de context te noemen indien van toepassing (max. ~8 zinnen).";
+  const kind = resolveAnswerLengthKind({
+    widgetSettings: {},
+    automationPrefs: prefs,
+  });
 
-  const maxOutTokens =
-    !vragenTerugStellen && answerLength === "short"
-      ? 380
-      : !vragenTerugStellen && answerLength === "normal"
-        ? 520
-        : answerLength === "short"
-          ? 120
-          : 220;
+  let lengthInstruction = lengthInstructionNl(kind);
+  if (vragenTerugStellen) {
+    lengthInstruction =
+      kind === "kort"
+        ? "Met vervolgvragen aan: maximaal 2 korte zinnen; stel alleen een gerichte vraag als dat echt nodig is."
+        : "Met vervolgvragen aan: maximaal 4 korte zinnen; stel alleen een gerichte vraag als dat echt nodig is.";
+  }
+
+  let maxOutTokens = maxTokensForAnswerKind(kind);
+  if (vragenTerugStellen) {
+    maxOutTokens = Math.min(maxOutTokens, kind === "kort" ? 260 : 400);
+  }
+
+  const capsBlock = relevanceAndCapabilityRulesNl({
+    capabilities: prefs.chatbot_capabilities,
+  });
 
   const recentHistory = (input.history || [])
     .slice(-8)
@@ -65,6 +72,9 @@ export async function previewVisitorChatReply(input: {
   const prompt = `Hieronder staat alle context die de chatbot mag gebruiken.
 
 ${ctx}
+
+---
+${capsBlock}
 
 ---
 De bezoeker stelt deze vraag (in ${lang}):
@@ -92,7 +102,7 @@ ${antiQuestionBlock}
         role: "system",
         content:
           "Je bent een professionele klantenservice-chatbot. Antwoord feitelijk en vriendelijk. " +
-          "Als prijzen, modellen of voorraad in de context staan (ook in samenvatting of gescande tekst), noem ze concreet. " +
+          "Als prijzen, modellen of voorraad in de context staan (ook in samenvatting of gescande tekst), noem ze alleen wanneer dat bij de vraag past. " +
           "Verzin geen prijzen of productdetails die niet in de context staan. " +
           (vragenTerugStellen
             ? "Stel alleen vervolgvragen wanneer nodig en doe geen valse bevestiging van afspraken of offertes."

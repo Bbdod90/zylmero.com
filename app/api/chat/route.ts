@@ -10,6 +10,13 @@ import {
 import { sealSocialToken, unsealSocialToken } from "@/lib/crypto/social-token";
 import { fetchAppleCalendarBusyRanges } from "@/lib/integrations/apple-calendar";
 import { truncateCrawledDocForPrompt } from "@/lib/ai/knowledge-document";
+import {
+  lengthInstructionNl,
+  maxTokensForAnswerKind,
+  relevanceAndCapabilityRulesNl,
+  resolveAnswerLengthKind,
+  type AnswerLengthKind,
+} from "@/lib/chatbot/answer-style";
 
 export const dynamic = "force-dynamic";
 
@@ -53,18 +60,6 @@ function safeString(input: unknown): string {
 
 function asRecord(input: unknown): Record<string, unknown> {
   return input && typeof input === "object" ? (input as Record<string, unknown>) : {};
-}
-
-function normalizeAnswerLength(settings: Record<string, unknown>): "kort" | "normaal" | "uitgebreid" {
-  const raw = safeString(settings.antwoord_lengte).toLowerCase();
-  if (raw === "normaal" || raw === "uitgebreid") return raw;
-  return "kort";
-}
-
-function lengthInstruction(kind: "kort" | "normaal" | "uitgebreid"): string {
-  if (kind === "uitgebreid") return "Maximaal 6 zinnen, compact en scanbaar.";
-  if (kind === "normaal") return "Maximaal 4 korte zinnen.";
-  return "Maximaal 2 korte zinnen.";
 }
 
 function parseRequestedDateTime(raw: string): Date | null {
@@ -427,7 +422,10 @@ function buildSystemPrompt(data: {
   );
   const digestNl = safeString(prefs.ai_knowledge_digest_nl);
   const knowledgeWebsite = safeString(prefs.ai_knowledge_website);
-  const answerLen = normalizeAnswerLength(data.settings);
+  const answerLen: AnswerLengthKind = resolveAnswerLengthKind({
+    widgetSettings: data.settings,
+    automationPrefs: prefs,
+  });
   const doelRegels = [
     "- Vragen beantwoorden met directe, bruikbare info",
     "- Klanten helpen met korte, concrete vervolgstappen",
@@ -441,6 +439,10 @@ function buildSystemPrompt(data: {
     : `- Stel GEEN onnodige vervolgvragen en eindig niet met retorische vragen naar de klant
 - Bij prijs-, model- of assortimentvragen: geef eerst een volledig antwoord uit de context (alle modellen met prijs als die in de context staan); vraag niet eerst om een specifiek model`;
 
+  const capsBlock = relevanceAndCapabilityRulesNl({
+    capabilities: prefs.chatbot_capabilities,
+  });
+
   const historyBlock = data.history
     .slice(-10)
     .map((m) => `${m.role === "assistant" ? "BOT" : "KLANT"}: ${m.content}`)
@@ -451,13 +453,14 @@ function buildSystemPrompt(data: {
 REGELS:
 - Antwoord altijd vriendelijk, duidelijk en to-the-point
 - Geef eerst het directe antwoord op de vraag van de klant
-- ${lengthInstruction(answerLen)}
+- ${lengthInstructionNl(answerLen)}
 ${klantgerichtBlock}
-- Nooit generieke branche-tekst: pas antwoord aan op dit bedrijf en deze context
+${capsBlock}
 
 BELANGRIJK:
 - Gebruik ALLEEN feiten die in de context hieronder staan (website, extra info, FAQ, snippets)
 - Noem NOOIT prijzen, openingstijden, voorraad, garanties of productdetails die niet expliciet in de context staan
+${!contactOk ? "- Contactverzoeken doorgeven staat uit: geen actieve push naar formulieren of \"laat je gegevens achter\"; antwoord inhoudelijk uit de context.\n" : ""}
 - Als info ontbreekt: zeg dat eerlijk kort${vragenTerugStellen ? " en stel max 1 gerichte vraag" : "; stel geen lange reeks vervolgvragen"}
 - Bevestig NOOIT dat een afspraak, offerte of bestelling "geregeld" is zonder echte boekingsactie/tool
 - Als klant wil boeken maar je kunt niet boeken in deze chat: verwijs naar contact/boekingslink uit context`;
@@ -606,6 +609,17 @@ export async function POST(request: NextRequest) {
         .reverse()
     : [];
 
+  const companyPrefs = asRecord(
+    companySettingsRow && typeof companySettingsRow === "object"
+      ? (companySettingsRow as Record<string, unknown>).automation_preferences
+      : {},
+  );
+  const answerKind = resolveAnswerLengthKind({
+    widgetSettings: settings,
+    automationPrefs: companyPrefs,
+  });
+  const maxTok = maxTokensForAnswerKind(answerKind);
+
   const systemPrompt = buildSystemPrompt({
     bedrijfsOmschrijving,
     websiteUrl: websiteUrl || null,
@@ -654,6 +668,7 @@ export async function POST(request: NextRequest) {
     const completion = await openai.chat.completions.create({
       model: OPENAI_MODEL,
       temperature: 0.2,
+      max_tokens: maxTok,
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: message },
@@ -676,6 +691,7 @@ export async function POST(request: NextRequest) {
   const completion = await openai.chat.completions.create({
     model: OPENAI_MODEL,
     temperature: 0.2,
+    max_tokens: maxTok,
     stream: true,
     messages: [
       { role: "system", content: systemPrompt },

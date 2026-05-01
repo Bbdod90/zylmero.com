@@ -8,6 +8,39 @@ import { DashboardWorkSurface } from "@/components/layout/dashboard-work-surface
 import { PageFrame } from "@/components/layout/page-frame";
 import { ChatbotStudio } from "@/components/chatbot/chatbot-studio";
 
+function extraGoalsFromCapabilities(caps: unknown): {
+  productadvies: boolean;
+  faqUitleg: boolean;
+  contactEscalatie: boolean;
+  afspraakOpVerzoek: boolean;
+} {
+  if (!Array.isArray(caps)) {
+    return {
+      productadvies: true,
+      faqUitleg: true,
+      contactEscalatie: true,
+      afspraakOpVerzoek: true,
+    };
+  }
+  if (caps.length === 0) {
+    return {
+      productadvies: false,
+      faqUitleg: false,
+      contactEscalatie: false,
+      afspraakOpVerzoek: false,
+    };
+  }
+  const lower = caps.map((c) => String(c).toLowerCase());
+  return {
+    productadvies: lower.some((s) => s.includes("productadvies")),
+    faqUitleg: lower.some((s) => s.includes("faq")),
+    contactEscalatie: lower.some(
+      (s) => s.includes("doorzetten") || s.includes("complexe"),
+    ),
+    afspraakOpVerzoek: lower.some((s) => s.includes("op verzoek")),
+  };
+}
+
 export default async function ChatbotPage() {
   const auth = await getAuth();
   if (!auth.user || !auth.company) return null;
@@ -69,6 +102,7 @@ export default async function ChatbotPage() {
           initialAntwoordLengte={
             prefs.chatbot_answer_length === "normal" ? "normal" : "short"
           }
+          initialExtraGoals={extraGoalsFromCapabilities(prefs.chatbot_capabilities)}
           embedSnippet={`<script src=\"${siteUrl().replace(/\/$/, "")}/widget.js\" data-id=\"${auth.company.id}\"></script>`}
         />
       </DashboardWorkSurface>
