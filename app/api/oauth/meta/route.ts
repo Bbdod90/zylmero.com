@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { randomBytes } from "crypto";
+import { getAuth } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import {
   buildMetaOAuthUrl,
@@ -25,28 +26,21 @@ export async function GET(request: Request) {
       ),
     );
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
+  const auth = await getAuth();
+  if (!auth.user) {
     return NextResponse.redirect(new URL("/login", site));
   }
-
-  const { data: company } = await supabase
-    .from("companies")
-    .select("id")
-    .eq("owner_user_id", user.id)
-    .maybeSingle();
-
-  if (!company?.id) {
+  if (!auth.company) {
     return fail("no_company");
   }
+
+  const supabase = await createClient();
+  const companyId = auth.company.id;
 
   const { data: settingsRow } = await supabase
     .from("company_settings")
     .select("automation_preferences")
-    .eq("company_id", company.id)
+    .eq("company_id", companyId)
     .maybeSingle();
   const companyMeta = getMetaCredentialsFromAutomationPreferences(
     (settingsRow?.automation_preferences as Record<string, unknown> | null) ??
@@ -59,8 +53,8 @@ export async function GET(request: Request) {
 
   const stateId = randomBytes(12).toString("hex");
   const payload = JSON.stringify({
-    companyId: company.id as string,
-    userId: user.id,
+    companyId: companyId,
+    userId: auth.user.id,
     next: nextTarget,
     exp: Date.now() + 10 * 60 * 1000,
   });

@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { randomBytes } from "crypto";
-import { createClient } from "@/lib/supabase/server";
+import { getAuth } from "@/lib/auth";
 import {
   buildGoogleEmailOAuthUrl,
   googleEmailConnectConfigured,
@@ -18,17 +18,17 @@ export async function GET() {
     NextResponse.redirect(new URL(`/dashboard/settings?tab=email&error=${encodeURIComponent(msg)}`, site));
 
   if (!googleEmailConnectConfigured()) return fail("google_email_not_configured");
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return NextResponse.redirect(new URL("/login", site));
 
-  const { data: company } = await supabase.from("companies").select("id").eq("owner_user_id", user.id).maybeSingle();
-  if (!company?.id) return fail("no_company");
+  const auth = await getAuth();
+  if (!auth.user) return NextResponse.redirect(new URL("/login", site));
+  if (!auth.company) return fail("no_company");
 
   const stateId = randomBytes(12).toString("hex");
-  const payload = JSON.stringify({ companyId: company.id as string, userId: user.id, exp: Date.now() + 10 * 60 * 1000 });
+  const payload = JSON.stringify({
+    companyId: auth.company.id,
+    userId: auth.user.id,
+    exp: Date.now() + 10 * 60 * 1000,
+  });
 
   const jar = await cookies();
   jar.set(`${COOKIE_PREFIX}${stateId}`, payload, {

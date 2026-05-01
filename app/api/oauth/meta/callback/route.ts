@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { getAuth } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import {
   exchangeMetaOAuthCode,
@@ -65,14 +66,8 @@ export async function GET(request: Request) {
     return fail("session_mismatch", payload.next);
   }
 
-  const { data: company } = await supabase
-    .from("companies")
-    .select("id")
-    .eq("id", payload.companyId)
-    .eq("owner_user_id", user.id)
-    .maybeSingle();
-
-  if (!company?.id) {
+  const auth = await getAuth();
+  if (!auth.company || auth.company.id !== payload.companyId) {
     return fail("no_company", payload.next);
   }
 

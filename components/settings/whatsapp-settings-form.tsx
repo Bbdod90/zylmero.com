@@ -32,14 +32,31 @@ const initial: SettingsFormState = {};
 
 const META_OAUTH_CONNECT = "/api/oauth/meta";
 
+function mapWhatsAppOAuthFlash(raw: string): string {
+  switch (raw) {
+    case "no_company":
+      return "We konden je bedrijf niet koppelen aan deze sessie. Vernieuw de pagina en probeer opnieuw, of log opnieuw in.";
+    case "meta_not_configured":
+      return "WhatsApp (Meta) is op deze omgeving nog niet ingesteld door de beheerder.";
+    case "session_mismatch":
+      return "Je sessie kwam niet overeen. Sluit andere tabs en probeer opnieuw te verbinden.";
+    case "state_expired":
+      return "De verbinding is verlopen. Klik nog een keer op verbinden.";
+    default:
+      return raw.length > 220 ? `${raw.slice(0, 220)}…` : raw;
+  }
+}
+
 export function WhatsAppSettingsForm({
   channel,
   socialConnections,
   metaConfigured,
+  oauthFlashError,
 }: {
   channel: WhatsAppChannelSettings;
   socialConnections: CompanySocialConnection[];
   metaConfigured: boolean;
+  oauthFlashError?: string | null;
 }) {
   const [state, action] = useFormState(updateWhatsAppSettingsAction, initial);
 
@@ -86,6 +103,11 @@ export function WhatsAppSettingsForm({
             "space-y-5",
           )}
         >
+          {oauthFlashError ? (
+            <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive shadow-sm">
+              {mapWhatsAppOAuthFlash(oauthFlashError)}
+            </p>
+          ) : null}
           <div className="rounded-2xl border border-border/55 bg-muted/[0.18] p-5 dark:border-white/[0.08] dark:bg-white/[0.03] sm:p-6">
             <div className="mb-4 flex items-start gap-3.5">
               <span className="mt-0.5 inline-flex size-8 items-center justify-center rounded-lg bg-background/80 text-primary ring-1 ring-border/60 dark:bg-white/[0.04] dark:ring-white/[0.1]">
@@ -105,7 +127,7 @@ export function WhatsAppSettingsForm({
                   size="lg"
                   className="h-11 rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-[0_12px_28px_-16px_hsl(var(--primary)/0.75)] transition hover:translate-y-[-1px]"
                 >
-                  <a href={META_OAUTH_CONNECT}>
+                  <a href={META_OAUTH_CONNECT} target="_top" rel="noopener noreferrer">
                     <ExternalLink className="mr-2 size-4 opacity-90" aria-hidden />
                     {metaConnected ? "Opnieuw verbinden met Meta" : "Nu verbinden met WhatsApp"}
                   </a>

@@ -47,10 +47,10 @@ export default async function SettingsPage({
     typeof prefs.email_linked_address === "string"
       ? prefs.email_linked_address.trim()
       : auth.company.contact_email?.trim() || "";
-  const emailFlashError =
-    searchParams?.tab === "email" && typeof searchParams?.error === "string"
-      ? searchParams.error
-      : null;
+  const oauthFlash =
+    typeof searchParams?.error === "string" ? searchParams.error : null;
+  const emailFlashError = searchParams?.tab === "email" && oauthFlash ? oauthFlash : null;
+  const whatsappFlashError = searchParams?.tab === "whatsapp" && oauthFlash ? oauthFlash : null;
   const leadsThisMonth = await countLeadsThisMonth(supabase, auth.company.id);
   const leadCap = maxLeadsPerMonth(auth.company);
 
@@ -109,6 +109,7 @@ export default async function SettingsPage({
           socialConnections={socialConnections}
           metaConfigured={metaConfigured}
           emailFlashError={emailFlashError}
+          whatsappFlashError={whatsappFlashError}
         />
       </DashboardWorkSurface>
     </PageFrame>

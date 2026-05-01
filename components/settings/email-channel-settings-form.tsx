@@ -220,7 +220,9 @@ export function EmailChannelSettingsForm({
               ? "Google koppeling staat nog niet goed ingesteld op de server."
               : flashError === "microsoft_email_not_configured"
                 ? "Microsoft koppeling staat nog niet goed ingesteld op de server."
-                : "E-mail koppeling is niet gelukt. Probeer opnieuw."}
+                : flashError === "no_company"
+                  ? "We vonden geen bedrijf bij dit account. Vernieuw de pagina of log opnieuw in — teamleden kunnen nu ook koppelen."
+                  : "E-mail koppeling is niet gelukt. Probeer opnieuw."}
           </p>
         ) : null}
         {state.error ? (

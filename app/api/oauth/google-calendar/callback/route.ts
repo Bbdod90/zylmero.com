@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { getAuth } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import {
   exchangeGoogleOAuthCode,
@@ -48,13 +49,8 @@ export async function GET(request: Request) {
   } = await supabase.auth.getUser();
   if (!user || user.id !== payload.userId) return fail("session_mismatch");
 
-  const { data: company } = await supabase
-    .from("companies")
-    .select("id")
-    .eq("id", payload.companyId)
-    .eq("owner_user_id", user.id)
-    .maybeSingle();
-  if (!company?.id) return fail("no_company");
+  const auth = await getAuth();
+  if (!auth.company || auth.company.id !== payload.companyId) return fail("no_company");
 
   try {
     const token = await exchangeGoogleOAuthCode(code);

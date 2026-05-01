@@ -116,6 +116,7 @@ export function SettingsTabs({
   socialConnections,
   metaConfigured,
   emailFlashError,
+  whatsappFlashError,
 }: {
   company: Company;
   widgetEmbedToken: string | null;
@@ -150,6 +151,7 @@ export function SettingsTabs({
   socialConnections: CompanySocialConnection[];
   metaConfigured: boolean;
   emailFlashError: string | null;
+  whatsappFlashError?: string | null;
 }) {
   const [s1, a1] = useFormState(updateBusinessProfileAction, initial);
   const [s2, a2] = useFormState(updateKnowledgeAction, initial);
@@ -551,6 +553,7 @@ export function SettingsTabs({
             channel={settings.whatsapp_channel}
             socialConnections={socialConnections}
             metaConfigured={metaConfigured}
+            oauthFlashError={whatsappFlashError ?? null}
           />
         </TabsContent>
 
