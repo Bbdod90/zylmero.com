@@ -99,6 +99,8 @@ export function sortPagesForKnowledge(pages: AiKnowledgePage[]): AiKnowledgePage
     if (u.includes("/products/")) s += 6;
     if (u.includes("/collections/")) s += 5;
     if (u.includes("/collection/")) s += 4;
+    if (u.includes("fatbike") || u.includes("/fiets") || u.includes("e-bike")) s += 5;
+    if (u.includes("/product")) s += 3;
     if (u.includes("product")) s += 2;
     if (u.includes("shop") || u.includes("winkel") || u.includes("aanbieding")) s += 1;
     return s;

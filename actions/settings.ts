@@ -23,6 +23,54 @@ import { generateSiteKnowledgeDigestNl } from "@/lib/openai/site-knowledge-diges
 import { previewVisitorChatReply } from "@/lib/openai/preview-visitor-chat";
 import { sealSocialToken } from "@/lib/crypto/social-token";
 
+/**
+ * Voorkomt dat een mislukte of lege crawl bestaande site-kennis wist zolang de URL gelijk blijft.
+ */
+function mergeKnowledgeCrawlWithPrevious(
+  website: string | null | undefined,
+  prevAi: Record<string, unknown>,
+  pages: AiKnowledgePage[],
+  crawledDocument: string,
+  crawlCapped: boolean,
+): { pages: AiKnowledgePage[]; crawledDocument: string; crawlCapped: boolean } {
+  const w = typeof website === "string" ? website.trim() : "";
+  if (!w) {
+    return { pages: [], crawledDocument: "", crawlCapped: false };
+  }
+
+  const crawlHasResults =
+    crawledDocument.trim().length > 0 || pages.length > 0;
+  if (crawlHasResults) {
+    return { pages, crawledDocument, crawlCapped };
+  }
+
+  const prevPages = Array.isArray(prevAi.ai_knowledge_pages)
+    ? (prevAi.ai_knowledge_pages as AiKnowledgePage[])
+    : [];
+  const prevCrawled =
+    typeof prevAi.ai_knowledge_crawled_document === "string"
+      ? prevAi.ai_knowledge_crawled_document
+      : "";
+
+  const prevW =
+    typeof prevAi.ai_knowledge_website === "string"
+      ? prevAi.ai_knowledge_website.trim()
+      : "";
+  const sameSite =
+    prevW &&
+    normalizeKnowledgeWebsiteUrl(prevW) === normalizeKnowledgeWebsiteUrl(w);
+
+  if (sameSite && (prevPages.length > 0 || prevCrawled.trim().length > 0)) {
+    return {
+      pages: prevPages,
+      crawledDocument: prevCrawled,
+      crawlCapped: Boolean(prevAi.ai_knowledge_crawl_capped),
+    };
+  }
+
+  return { pages, crawledDocument, crawlCapped };
+}
+
 export type SettingsFormState = {
   ok?: boolean;
   error?: string;
@@ -898,6 +946,17 @@ export async function updateAiKnowledgeAction(
     }
   }
 
+  const merged = mergeKnowledgeCrawlWithPrevious(
+    website || null,
+    prevAi,
+    pages,
+    crawledDocument,
+    crawlCapped,
+  );
+  pages = merged.pages;
+  crawledDocument = merged.crawledDocument;
+  crawlCapped = merged.crawlCapped;
+
   const digestNl = await generateSiteKnowledgeDigestNl({
     companyName: auth.company.name,
     website: website || null,
@@ -1262,6 +1321,17 @@ export async function saveChatbotStudioAction(input: {
       // non-blocking
     }
   }
+
+  const merged = mergeKnowledgeCrawlWithPrevious(
+    website || null,
+    prevAi,
+    pages,
+    crawledDocument,
+    crawlCapped,
+  );
+  pages = merged.pages;
+  crawledDocument = merged.crawledDocument;
+  crawlCapped = merged.crawlCapped;
 
   const digestNl = await generateSiteKnowledgeDigestNl({
     companyName: auth.company.name,

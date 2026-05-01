@@ -22,6 +22,7 @@ export function businessContextBlock(
     | {
         niche_intake?: Record<string, string>;
         ai_knowledge_crawled_document?: string;
+        ai_knowledge_digest_nl?: string | null;
         chatbot_company_description?: string;
         chatbot_opening_line?: string;
         chatbot_extra_info?: string;
@@ -86,6 +87,10 @@ export function businessContextBlock(
       : "",
     settings?.ai_knowledge_document
       ? `Document / vrije kennis voor AI:\n${settings.ai_knowledge_document}`
+      : "",
+    prefs?.ai_knowledge_digest_nl &&
+    String(prefs.ai_knowledge_digest_nl).trim().length > 0
+      ? `Samenvatting website (NL, uit crawl):\n${String(prefs.ai_knowledge_digest_nl).slice(0, 3500)}`
       : "",
     prefs?.ai_knowledge_crawled_document
       ? `Automatisch gescande website-pagina's:\n${truncateCrawledDocForPrompt(String(prefs.ai_knowledge_crawled_document))}`
