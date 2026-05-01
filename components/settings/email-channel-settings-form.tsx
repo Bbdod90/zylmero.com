@@ -42,7 +42,6 @@ function Submit({ label }: { label: string }) {
 export function EmailChannelSettingsForm({
   emailInboundEnabled,
   emailProvider,
-  emailProviderDetail: _emailProviderDetail,
   hasContactEmail,
   socialConnections,
   flashError,
