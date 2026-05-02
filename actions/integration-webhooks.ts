@@ -5,9 +5,9 @@ import { getAuth } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { mapCompanySettingsRow } from "@/lib/queries/map-company-settings";
 import { isDemoMode } from "@/lib/env";
+import { INTEGRATION_WEBHOOK_MAX_URLS } from "@/lib/integrations/outbound-webhook-constants";
 import {
   generateWebhookSecret,
-  INTEGRATION_WEBHOOK_MAX_URLS,
   isHttpsWebhookUrl,
   postSignedWebhook,
 } from "@/lib/integrations/outbound-webhook";

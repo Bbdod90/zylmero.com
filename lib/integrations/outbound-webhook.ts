@@ -1,7 +1,8 @@
+import "server-only";
+
 import { createHmac, randomBytes } from "node:crypto";
 
-export const INTEGRATION_WEBHOOK_MAX_URLS = 5;
-export const INTEGRATION_WEBHOOK_TIMEOUT_MS = 12_000;
+import { INTEGRATION_WEBHOOK_TIMEOUT_MS } from "@/lib/integrations/outbound-webhook-constants";
 
 export function generateWebhookSecret(): string {
   return randomBytes(32).toString("hex");

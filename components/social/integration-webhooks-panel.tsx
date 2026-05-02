@@ -13,7 +13,7 @@ import {
   regenerateWebhookSecretAction,
   testIntegrationWebhooksAction,
 } from "@/actions/integration-webhooks";
-import { INTEGRATION_WEBHOOK_MAX_URLS } from "@/lib/integrations/outbound-webhook";
+import { INTEGRATION_WEBHOOK_MAX_URLS } from "@/lib/integrations/outbound-webhook-constants";
 import { cn } from "@/lib/utils";
 
 export type IntegrationWebhooksInitial = {
@@ -35,11 +35,12 @@ export function IntegrationWebhooksPanel({
   const [urlsText, setUrlsText] = useState(initial.urls.join("\n"));
   const [hasSecret, setHasSecret] = useState(initial.hasSecret);
 
+  const initialUrlsKey = initial.urls.join("\n");
   useEffect(() => {
     setEnabled(initial.enabled);
-    setUrlsText(initial.urls.join("\n"));
+    setUrlsText(initialUrlsKey);
     setHasSecret(initial.hasSecret);
-  }, [initial.enabled, initial.hasSecret, initial.urls.join("\n")]);
+  }, [initial.enabled, initial.hasSecret, initialUrlsKey]);
 
   function parseUrls(): string[] {
     const lines = urlsText.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
