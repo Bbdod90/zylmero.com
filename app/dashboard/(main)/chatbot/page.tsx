@@ -10,6 +10,8 @@ import { ChatbotStudio } from "@/components/chatbot/chatbot-studio";
 import { WIDGET_STARTER_WELCOME_DEFAULT } from "@/lib/chatbot/widget-starters";
 import {
   normalizeStartersFromPrefs,
+  WIDGET_DEFAULT_BOT_BUBBLE,
+  WIDGET_DEFAULT_HEADER,
   WIDGET_DEFAULT_PRIMARY,
 } from "@/lib/chatbot/widget-public-config";
 import { buildWidgetContactLinks } from "@/lib/phone/widget-contact";
@@ -122,6 +124,18 @@ export default async function ChatbotPage() {
   const initialWidgetStarters = normalizeStartersFromPrefs(prefs.chatbot_widget_starters);
   const initialShopLinks = parseShopLinksFromPrefs(prefs as Record<string, unknown>);
 
+  const headerRaw =
+    typeof prefs.chatbot_widget_header_color === "string" ? prefs.chatbot_widget_header_color.trim() : "";
+  const initialWidgetHeaderColor = /^#[0-9A-Fa-f]{6}$/.test(headerRaw)
+    ? headerRaw
+    : WIDGET_DEFAULT_HEADER;
+
+  const botRaw =
+    typeof prefs.chatbot_widget_bot_color === "string" ? prefs.chatbot_widget_bot_color.trim() : "";
+  const initialWidgetBotColor = /^#[0-9A-Fa-f]{6}$/.test(botRaw)
+    ? botRaw
+    : WIDGET_DEFAULT_BOT_BUBBLE;
+
   return (
     <PageFrame
       title="Je chatbot"
@@ -166,6 +180,8 @@ export default async function ChatbotPage() {
           initialWidgetShowStarters={initialWidgetShowStarters}
           initialWidgetStarters={initialWidgetStarters}
           initialShopLinks={initialShopLinks}
+          initialWidgetHeaderColor={initialWidgetHeaderColor}
+          initialWidgetBotColor={initialWidgetBotColor}
           contactPreview={contactPreview}
           embedSnippet={`<script src=\"${siteUrl().replace(/\/$/, "")}/widget.js\" data-id=\"${embedChatbotId}\"></script>`}
         />

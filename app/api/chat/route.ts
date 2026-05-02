@@ -26,6 +26,7 @@ import {
   resolveAnswerLengthKind,
   type AnswerLengthKind,
 } from "@/lib/chatbot/answer-style";
+import { serviceMindsetRulesNl } from "@/lib/chatbot/service-mindset-nl";
 
 const CHAT_JSON_MODEL =
   process.env.OPENAI_CHATBOT_MODEL?.trim() ||
@@ -498,7 +499,7 @@ function buildSystemPrompt(data: {
     .map((m) => `${m.role === "assistant" ? "BOT" : "KLANT"}: ${m.content}`)
     .join("\n");
 
-  const systemBase = `Je bent de website-chatbot van dit specifieke bedrijf.
+  const systemBase = `Je bent de digitale assistent van dit bedrijf — denk en praat als een menselijke medewerker (balie/telefoon), niet als een generieke FAQ-bot. Pas je aan bij elke branche (werkplaats, zorg, retail, dienstverlening): wat zij professioneel aanbieden, bied jij aan.
 
 REGELS:
 - Antwoord altijd vriendelijk, duidelijk en to-the-point
@@ -510,6 +511,8 @@ ${capsBlock}
 ${pricingAndStockAccuracyNl()}
 
 ${dutchLanguageQualityNl()}
+
+${serviceMindsetRulesNl()}
 
 BELANGRIJK:
 - Gebruik ALLEEN feiten die in de context hieronder staan (website, extra info, FAQ, snippets)

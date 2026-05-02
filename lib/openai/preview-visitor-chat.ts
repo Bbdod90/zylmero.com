@@ -14,6 +14,7 @@ import {
   relevanceAndCapabilityRulesNl,
   resolveAnswerLengthKind,
 } from "@/lib/chatbot/answer-style";
+import { serviceMindsetRulesNl } from "@/lib/chatbot/service-mindset-nl";
 import { businessContextBlock } from "@/lib/openai/prompts";
 import { getOpenAI, OPENAI_MODEL } from "@/lib/openai/client";
 import { extractJsonObject } from "@/lib/openai/json";
@@ -100,6 +101,9 @@ ${pricingAndStockAccuracyNl()}
 ${dutchLanguageQualityNl()}
 
 ---
+${serviceMindsetRulesNl()}
+
+---
 De bezoeker stelt deze vraag (in ${lang}):
 ${input.visitorMessage}
 
@@ -137,7 +141,8 @@ OUTPUTFORMAAT — strikt JSON, geen markdown-fences:
       {
         role: "system",
         content:
-          "Je bent een professionele klantenservice-chatbot. Schrijf altijd in correct, natuurlijk Nederlands (behalve merknamen). " +
+          "Je bent de digitale collega van het bedrijf: menselijk, oplossingsgericht, nooit een kille FAQ-bot. " +
+          "Schrijf altijd in correct, natuurlijk Nederlands (behalve merknamen). " +
           "Antwoord feitelijk en vriendelijk; geen tegenstrijdige prijszinnen (geen ‘begint bij’-bedrag dat hoger is dan andere prijzen die je in hetzelfde antwoord noemt). " +
           "Als prijzen, modellen of voorraad in de context staan (ook in samenvatting of gescande tekst), noem ze alleen wanneer dat bij de vraag past. " +
           "Verzin geen prijzen of productdetails die niet in de context staan. " +

@@ -25,7 +25,11 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { WIDGET_STARTER_WELCOME_DEFAULT, WIDGET_STARTERS } from "@/lib/chatbot/widget-starters";
-import { WIDGET_DEFAULT_PRIMARY } from "@/lib/chatbot/widget-public-config";
+import {
+  WIDGET_DEFAULT_BOT_BUBBLE,
+  WIDGET_DEFAULT_HEADER,
+  WIDGET_DEFAULT_PRIMARY,
+} from "@/lib/chatbot/widget-public-config";
 import type { WidgetContactPublic } from "@/lib/phone/widget-contact";
 import type { ChatAction } from "@/lib/chatbot/chat-actions";
 
@@ -126,6 +130,8 @@ export function ChatbotStudio(props: {
   initialWidgetStarters: { label: string; prompt: string }[];
   /** Optionele vaste product-/winkelmand-links voor AI-actieknoppen. */
   initialShopLinks?: { label: string; url: string }[];
+  initialWidgetHeaderColor: string;
+  initialWidgetBotColor: string;
   contactPreview: WidgetContactPublic;
   embedSnippet: string;
 }) {
@@ -153,10 +159,10 @@ export function ChatbotStudio(props: {
   ]);
   const [saving, startSaving] = useTransition();
   const [replying, startReplying] = useTransition();
-  const [chatHeight, setChatHeight] = useState(190);
+  const [chatHeight, setChatHeight] = useState(300);
   const isDraggingRef = useRef(false);
   const dragStartYRef = useRef(0);
-  const dragStartHeightRef = useRef(190);
+  const dragStartHeightRef = useRef(300);
 
   const [widgetPrimary, setWidgetPrimary] = useState(
     /^#[0-9A-Fa-f]{6}$/.test(props.initialWidgetPrimary)
@@ -183,6 +189,18 @@ export function ChatbotStudio(props: {
         }))
       : [],
   );
+  const [widgetHeaderColor, setWidgetHeaderColor] = useState(() =>
+    /^#[0-9A-Fa-f]{6}$/.test(props.initialWidgetHeaderColor)
+      ? props.initialWidgetHeaderColor
+      : WIDGET_DEFAULT_HEADER,
+  );
+  const [widgetBotColor, setWidgetBotColor] = useState(() =>
+    /^#[0-9A-Fa-f]{6}$/.test(props.initialWidgetBotColor)
+      ? props.initialWidgetBotColor
+      : WIDGET_DEFAULT_BOT_BUBBLE,
+  );
+  const [logoUploading, setLogoUploading] = useState(false);
+  const logoFileRef = useRef<HTMLInputElement>(null);
 
   const canSave = bedrijfsOmschrijving.trim().length > 0 && !props.demoMode;
 
@@ -210,7 +228,7 @@ export function ChatbotStudio(props: {
     const onMove = (event: MouseEvent) => {
       if (!isDraggingRef.current) return;
       const delta = event.clientY - dragStartYRef.current;
-      const next = Math.max(120, Math.min(420, dragStartHeightRef.current + delta));
+      const next = Math.max(140, Math.min(520, dragStartHeightRef.current + delta));
       setChatHeight(next);
     };
     const onUp = () => {
@@ -247,6 +265,8 @@ export function ChatbotStudio(props: {
         openingLine: openingszin,
         widgetTitle,
         primaryColor: widgetPrimary,
+        headerColor: widgetHeaderColor,
+        botBubbleColor: widgetBotColor,
         logoUrl: widgetLogoUrl,
         showStarters: showStarterChoices,
         starters: starterRows.filter((r) => r.label.trim() && r.prompt.trim()),
@@ -425,17 +445,106 @@ export function ChatbotStudio(props: {
                 />
               </div>
             </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="widget-header-color">Kop / bovenbalk</Label>
+                <div className="flex items-center gap-2">
+                  <input
+                    id="widget-header-color"
+                    type="color"
+                    value={/^#[0-9A-Fa-f]{6}$/.test(widgetHeaderColor) ? widgetHeaderColor : WIDGET_DEFAULT_HEADER}
+                    onChange={(e) => setWidgetHeaderColor(e.target.value)}
+                    className="h-11 w-14 cursor-pointer rounded-lg border border-gray-200 bg-white p-1"
+                    aria-label="Kopkleur"
+                  />
+                  <Input
+                    value={widgetHeaderColor}
+                    onChange={(e) => setWidgetHeaderColor(e.target.value)}
+                    placeholder="#161618"
+                    className={cn(textFieldClass, "h-11 flex-1 font-mono text-sm")}
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="widget-bot-color">Bot-antwoorden (bellen)</Label>
+                <div className="flex items-center gap-2">
+                  <input
+                    id="widget-bot-color"
+                    type="color"
+                    value={/^#[0-9A-Fa-f]{6}$/.test(widgetBotColor) ? widgetBotColor : WIDGET_DEFAULT_BOT_BUBBLE}
+                    onChange={(e) => setWidgetBotColor(e.target.value)}
+                    className="h-11 w-14 cursor-pointer rounded-lg border border-gray-200 bg-white p-1"
+                    aria-label="Kleur botberichten"
+                  />
+                  <Input
+                    value={widgetBotColor}
+                    onChange={(e) => setWidgetBotColor(e.target.value)}
+                    placeholder="#2a2a2e"
+                    className={cn(textFieldClass, "h-11 flex-1 font-mono text-sm")}
+                  />
+                </div>
+              </div>
+            </div>
             <div className="space-y-2">
-              <Label htmlFor="widget-logo">Logo (URL, https)</Label>
+              <Label htmlFor="widget-logo">Logo</Label>
+              <div className="flex flex-wrap items-center gap-3">
+                <input
+                  ref={logoFileRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml"
+                  className="sr-only"
+                  aria-hidden
+                  tabIndex={-1}
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file || props.demoMode) return;
+                    setLogoUploading(true);
+                    setError(null);
+                    try {
+                      const fd = new FormData();
+                      fd.append("file", file);
+                      const res = await fetch("/api/widget/logo", { method: "POST", body: fd });
+                      const data = (await res.json()) as { url?: string; error?: string };
+                      if (!res.ok) throw new Error(data.error || "Upload mislukt.");
+                      if (data.url) setWidgetLogoUrl(data.url);
+                    } catch (err) {
+                      setError(err instanceof Error ? err.message : "Logo-upload mislukt.");
+                    } finally {
+                      setLogoUploading(false);
+                      e.target.value = "";
+                    }
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="rounded-xl"
+                  disabled={props.demoMode || logoUploading}
+                  onClick={() => logoFileRef.current?.click()}
+                >
+                  {logoUploading ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
+                  Foto uploaden
+                </Button>
+                {widgetLogoUrl.trim() && /^https?:\/\//i.test(widgetLogoUrl.trim()) ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={widgetLogoUrl.trim()}
+                    alt=""
+                    className="size-9 rounded-full border border-stone-200 object-cover shadow-sm"
+                  />
+                ) : null}
+              </div>
               <Input
                 id="widget-logo"
                 value={widgetLogoUrl}
                 onChange={(e) => setWidgetLogoUrl(e.target.value)}
-                placeholder="https://…"
+                placeholder="Of plak een https://… URL"
                 className={cn(textFieldClass, "h-11")}
               />
               <p className="text-xs text-gray-500">
-                Publieke URL naar PNG/SVG/WebP. Verschijnt klein naast de titel op je widget.
+                Upload een vierkante afbeelding voor het beste ronde resultaat. Verschijnt links naast de titel in
+                de kop.
               </p>
               <p className="text-xs text-stone-500">
                 <span className="font-medium text-stone-700">Bellen & WhatsApp</span> onderin de widget komen uit
@@ -872,23 +981,26 @@ export function ChatbotStudio(props: {
           </div>
         </div>
 
-        <section className="flex min-h-[360px] flex-col overflow-hidden rounded-2xl border border-stone-200/90 bg-white shadow-[0_28px_80px_rgba(15,15,20,0.12)]">
+        <section className="flex min-h-[460px] flex-col overflow-hidden rounded-2xl border border-stone-200/90 bg-white shadow-[0_28px_80px_rgba(15,15,20,0.12)]">
         <header
-          className="border-b bg-gradient-to-b from-[#161618] to-[#0e0e10] px-5 py-3 text-zinc-100"
-          style={{ borderBottomColor: `rgba(${hexToRgbCss(widgetPrimary)}, 0.35)` }}
+          className="border-b px-5 py-3 text-zinc-100"
+          style={{
+            background: `linear-gradient(180deg, ${widgetHeaderColor}, ${shadeHex(widgetHeaderColor, 0.68)})`,
+            borderBottomColor: `rgba(${hexToRgbCss(widgetPrimary)}, 0.35)`,
+          }}
         >
-          <div className="flex items-start gap-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">Live preview</p>
+          <div className="mt-2 flex items-center gap-3">
             {widgetLogoUrl.trim() && /^https?:\/\//i.test(widgetLogoUrl.trim()) ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={widgetLogoUrl.trim()}
                 alt=""
-                className="mt-0.5 h-9 w-9 shrink-0 rounded-lg bg-white object-contain p-0.5"
+                className="size-8 shrink-0 rounded-full border border-white/15 bg-white/10 object-cover shadow-sm ring-1 ring-white/10"
               />
             ) : null}
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">Live preview</p>
-              <h3 className="mt-1 flex flex-wrap items-center gap-2 text-lg font-semibold tracking-tight">
+              <h3 className="flex flex-wrap items-center gap-2 text-lg font-semibold tracking-tight">
                 <span className="truncate">{widgetTitle || "Chat"}</span>
                 <Sparkles className="size-4 shrink-0 text-amber-200/90" aria-hidden />
               </h3>
@@ -913,8 +1025,15 @@ export function ChatbotStudio(props: {
                   "max-w-[88%] rounded-2xl px-3.5 py-2 text-sm leading-relaxed",
                   m.role === "user"
                     ? "border border-stone-200/80 bg-white text-stone-900 shadow-sm"
-                    : "border border-white/10 bg-gradient-to-br from-zinc-700 to-zinc-900 text-white shadow-lg",
+                    : "border border-white/10 text-white shadow-lg",
                 )}
+                style={
+                  m.role === "assistant"
+                    ? {
+                        background: `linear-gradient(165deg, ${widgetBotColor}, ${shadeHex(widgetBotColor, 0.88)})`,
+                      }
+                    : undefined
+                }
               >
                 <span className="whitespace-pre-wrap">{m.content}</span>
                 {m.role === "assistant" && m.actions && m.actions.length > 0 ? (
@@ -963,27 +1082,27 @@ export function ChatbotStudio(props: {
           </button>
           <p className="mb-1.5 text-center text-[11px] text-gray-500">Sleep omhoog/omlaag om meer chat te zien</p>
         </div>
-        <div className="space-y-2.5 border-t border-stone-200/80 bg-white/95 px-5 py-3 backdrop-blur-sm">
+        <div className="space-y-1.5 border-t border-stone-200/80 bg-white/95 px-4 py-2 backdrop-blur-sm">
           {props.contactPreview.tel_href || props.contactPreview.whatsapp_href ? (
-            <div className="flex flex-nowrap gap-1.5 border-b border-stone-100/90 pb-3">
+            <div className="flex flex-nowrap gap-1 border-b border-stone-100/90 pb-2">
               {props.contactPreview.tel_href ? (
                 <a
                   href={props.contactPreview.tel_href}
                   aria-label={`Bellen: ${props.contactPreview.phone_display ?? ""}`}
-                  className="group flex min-h-0 min-w-0 max-w-[calc(50%-3px)] flex-1 items-center gap-2 rounded-[11px] border border-stone-900/[0.09] bg-gradient-to-b from-white to-stone-50/90 px-2 py-1.5 pl-1.5 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition hover:border-stone-400/45 hover:shadow-md"
+                  className="group flex min-h-0 min-w-0 max-w-[calc(50%-2px)] flex-1 items-center gap-1.5 rounded-[10px] border border-stone-900/[0.09] bg-gradient-to-b from-white to-stone-50/90 px-1.5 py-1 pl-1.5 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition hover:border-stone-400/45 hover:shadow-md"
                   style={{
                     borderColor: `rgba(${hexToRgbCss(widgetPrimary)}, 0.22)`,
                   }}
                 >
                   <span
-                    className="flex size-[26px] shrink-0 items-center justify-center rounded-full border border-stone-900/[0.06] bg-black/[0.045] text-[13px] leading-none text-stone-700"
+                    className="flex size-[22px] shrink-0 items-center justify-center rounded-full border border-stone-900/[0.06] bg-black/[0.045] text-[11px] leading-none text-stone-700"
                     aria-hidden
                   >
                     ☎
                   </span>
                   <span className="flex min-w-0 flex-col gap-px">
-                    <span className="text-[9px] font-[650] uppercase tracking-[0.1em] text-stone-500">Bellen</span>
-                    <span className="truncate text-[11px] font-semibold tracking-[0.01em] text-stone-900">
+                    <span className="text-[8px] font-semibold uppercase tracking-[0.09em] text-stone-500">Bellen</span>
+                    <span className="truncate text-[10px] font-semibold tracking-[0.01em] text-stone-900">
                       {props.contactPreview.phone_display || "—"}
                     </span>
                   </span>
@@ -995,23 +1114,23 @@ export function ChatbotStudio(props: {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="WhatsApp openen"
-                  className="group flex min-h-0 min-w-0 max-w-[calc(50%-3px)] flex-1 items-center gap-2 rounded-[11px] border border-emerald-600/18 bg-gradient-to-b from-emerald-50/95 to-emerald-50/70 px-2 py-1.5 pl-1.5 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition hover:border-emerald-600/45 hover:shadow-md"
+                  className="group flex min-h-0 min-w-0 max-w-[calc(50%-2px)] flex-1 items-center gap-1.5 rounded-[10px] border border-emerald-600/18 bg-gradient-to-b from-emerald-50/95 to-emerald-50/70 px-1.5 py-1 pl-1.5 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition hover:border-emerald-600/45 hover:shadow-md"
                 >
                   <span
-                    className="flex size-[26px] shrink-0 items-center justify-center rounded-full border border-emerald-600/22 bg-emerald-500/10 text-[12px] leading-none"
+                    className="flex size-[22px] shrink-0 items-center justify-center rounded-full border border-emerald-600/22 bg-emerald-500/10 text-[10px] leading-none"
                     aria-hidden
                   >
                     💬
                   </span>
                   <span className="flex min-w-0 flex-col gap-px">
-                    <span className="text-[9px] font-[650] uppercase tracking-[0.1em] text-emerald-600">WhatsApp</span>
+                    <span className="text-[8px] font-semibold uppercase tracking-[0.09em] text-emerald-600">WhatsApp</span>
                     <span className="truncate text-[10px] font-semibold tracking-[0.02em] text-emerald-800">Bericht sturen</span>
                   </span>
                 </a>
               ) : null}
             </div>
           ) : (
-            <p className="border-b border-stone-100 pb-3 text-[11px] leading-relaxed text-stone-500">
+            <p className="border-b border-stone-100 pb-2 text-[11px] leading-relaxed text-stone-500">
               Nummers voor bellen/WhatsApp komen uit je{" "}
               <Link href="/dashboard/settings?tab=business" className="font-medium text-primary underline-offset-2 hover:underline">
                 bedrijfsinstellingen
@@ -1031,13 +1150,13 @@ export function ChatbotStudio(props: {
                     type="button"
                     aria-expanded={quickOptionsOpen}
                     onClick={() => setQuickOptionsOpen((o) => !o)}
-                    className="flex w-full flex-col gap-1 rounded-2xl border border-stone-300/80 bg-white px-3.5 py-2.5 text-left shadow-sm transition hover:border-stone-400 hover:bg-stone-50"
+                    className="flex w-full flex-col gap-0.5 rounded-xl border border-stone-300/80 bg-white px-2.5 py-1.5 text-left shadow-sm transition hover:border-stone-400 hover:bg-stone-50"
                     style={{
                       borderColor: `rgba(${hexToRgbCss(widgetPrimary)}, 0.22)`,
                     }}
                   >
                     <span className="flex w-full items-center justify-between gap-2">
-                      <span className="text-[13px] font-semibold text-stone-900">
+                      <span className="text-[12px] font-semibold text-stone-900">
                         {quickOptionsOpen
                           ? "Opties verbergen"
                           : validPreviewStarters.length === 1
@@ -1059,8 +1178,8 @@ export function ChatbotStudio(props: {
                     </span>
                   </button>
                   {quickOptionsOpen ? (
-                    <div className="flex flex-col gap-2 pt-1">
-                      <p className="text-right text-[10px] font-semibold uppercase tracking-[0.14em] text-stone-500">
+                    <div className="flex flex-col gap-1.5 pt-0.5">
+                      <p className="text-right text-[9px] font-semibold uppercase tracking-[0.12em] text-stone-500">
                         Kies een optie
                       </p>
                       {validPreviewStarters.map((s, idx) => (
@@ -1069,7 +1188,7 @@ export function ChatbotStudio(props: {
                           type="button"
                           disabled={replying}
                           onClick={() => runPreview(s.prompt, s.label)}
-                          className="flex w-full flex-col items-start gap-0.5 rounded-2xl border border-stone-300/60 bg-white/90 px-3.5 py-2.5 text-left shadow-sm transition hover:bg-white hover:shadow-md disabled:opacity-50"
+                          className="flex w-full flex-col items-start gap-0 rounded-xl border border-stone-300/60 bg-white/90 px-2.5 py-1.5 text-left shadow-sm transition hover:bg-white hover:shadow-md disabled:opacity-50"
                           style={{
                             borderColor: "rgba(120, 113, 108, 0.35)",
                           }}
@@ -1080,8 +1199,8 @@ export function ChatbotStudio(props: {
                             e.currentTarget.style.borderColor = "rgba(120, 113, 108, 0.35)";
                           }}
                         >
-                          <span className="text-[13px] font-semibold text-stone-900">{s.label}</span>
-                          <span className="text-[11px] font-medium text-stone-400">Meer informatie</span>
+                          <span className="text-[12px] font-semibold text-stone-900">{s.label}</span>
+                          <span className="text-[10px] font-medium text-stone-400">Meer informatie</span>
                         </button>
                       ))}
                     </div>
@@ -1092,11 +1211,12 @@ export function ChatbotStudio(props: {
           ) : (
             <p className="text-center text-xs text-stone-500">Snelle keuzes staan uit — alleen vrije invoer.</p>
           )}
-          <div className="flex items-center gap-2 pt-1">
+          <div className="flex items-center gap-2 pt-0.5">
             <Input
               value={chatInput}
               onChange={(e) => setChatInput(e.target.value)}
               placeholder="Of typ je eigen vraag…"
+              className={cn(textFieldClass, "h-9 text-sm")}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();

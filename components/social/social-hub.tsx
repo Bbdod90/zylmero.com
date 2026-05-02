@@ -11,11 +11,14 @@ import {
   Music2,
   Share2,
   Unplug,
-  Webhook,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { disconnectSocialAction } from "@/actions/social-connections";
 import type { CompanySocialConnection } from "@/lib/queries/social-connections";
+import {
+  IntegrationWebhooksPanel,
+  type IntegrationWebhooksInitial,
+} from "@/components/social/integration-webhooks-panel";
 import { cn } from "@/lib/utils";
 
 function CardShell({
@@ -44,6 +47,7 @@ export function SocialHub({
   flashError,
   flashOk,
   isOwner,
+  integrationWebhooks,
 }: {
   connections: CompanySocialConnection[];
   metaConfigured: boolean;
@@ -51,6 +55,7 @@ export function SocialHub({
   flashError?: string | null;
   flashOk?: boolean;
   isOwner: boolean;
+  integrationWebhooks: IntegrationWebhooksInitial;
 }) {
   const router = useRouter();
   const [pending, start] = useTransition();
@@ -244,22 +249,8 @@ export function SocialHub({
           )}
         </CardShell>
 
-        <CardShell className="opacity-85">
-          <div className="flex items-start gap-3">
-            <span className="flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-              <Webhook className="size-6" strokeWidth={1.6} aria-hidden />
-            </span>
-            <div>
-              <h3 className="text-lg font-semibold tracking-tight">Eigen integraties</h3>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Straks configureer je hier universele koppelingen — denk aan webhooks en API — zodat je praktisch elke tool
-                op je eigen manier aan Zylmero kunt hangen.
-              </p>
-              <span className="mt-3 inline-block rounded-full border border-border/60 px-2.5 py-0.5 text-2xs font-semibold uppercase tracking-wide text-muted-foreground">
-                Binnenkort
-              </span>
-            </div>
-          </div>
+        <CardShell>
+          <IntegrationWebhooksPanel initial={integrationWebhooks} isOwner={isOwner} />
         </CardShell>
 
         <CardShell className="opacity-85">

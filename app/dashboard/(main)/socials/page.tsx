@@ -17,6 +17,25 @@ export default async function SocialsPage({
   const googleCalendarReady = googleCalendarConfigured();
   const isOwner = companyRole === "owner";
 
+  const { data: settingsRow } = await supabase
+    .from("company_settings")
+    .select("automation_preferences")
+    .eq("company_id", company.id)
+    .maybeSingle();
+
+  const prefs = (settingsRow?.automation_preferences as Record<string, unknown>) || {};
+  const urlsRaw = prefs.integration_webhook_urls;
+  const webhookUrls = Array.isArray(urlsRaw)
+    ? urlsRaw.filter((x): x is string => typeof x === "string").slice(0, 5)
+    : [];
+  const integrationWebhooks = {
+    enabled: prefs.integration_webhooks_enabled === true,
+    urls: webhookUrls,
+    hasSecret:
+      typeof prefs.integration_webhook_secret === "string" &&
+      prefs.integration_webhook_secret.length >= 32,
+  };
+
   const err = searchParams.error;
   const meta = searchParams.meta;
   const gcal = searchParams.gcal;
@@ -32,6 +51,7 @@ export default async function SocialsPage({
         flashError={flashError}
         flashOk={flashOk}
         isOwner={isOwner}
+        integrationWebhooks={integrationWebhooks}
       />
     </main>
   );

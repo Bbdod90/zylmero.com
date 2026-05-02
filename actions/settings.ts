@@ -1430,6 +1430,10 @@ export type SaveChatbotWidgetStudioInput = {
   openingLine: string;
   widgetTitle: string;
   primaryColor: string;
+  /** Kop van de widget (donker). */
+  headerColor: string;
+  /** Kleur bot-antwoordbubbels. */
+  botBubbleColor: string;
   logoUrl: string;
   showStarters: boolean;
   starters: { label: string; prompt: string }[];
@@ -1458,6 +1462,14 @@ export async function saveChatbotWidgetStudioAction(
   let primaryColor = String(input.primaryColor || "").trim();
   if (!/^#[0-9A-Fa-f]{6}$/.test(primaryColor)) {
     primaryColor = "#c9a227";
+  }
+  let headerColor = String(input.headerColor || "").trim();
+  if (!/^#[0-9A-Fa-f]{6}$/.test(headerColor)) {
+    headerColor = "#161618";
+  }
+  let botBubbleColor = String(input.botBubbleColor || "").trim();
+  if (!/^#[0-9A-Fa-f]{6}$/.test(botBubbleColor)) {
+    botBubbleColor = "#2a2a2e";
   }
   const logoUrl = String(input.logoUrl || "").trim();
   if (logoUrl.length > 2000) {
@@ -1523,6 +1535,8 @@ export async function saveChatbotWidgetStudioAction(
     chatbot_opening_line: openingLine || null,
     chatbot_widget_title: widgetTitle,
     chatbot_widget_primary: primaryColor,
+    chatbot_widget_header_color: headerColor,
+    chatbot_widget_bot_color: botBubbleColor,
     chatbot_widget_logo_url: logoUrl || null,
     chatbot_widget_show_starters: showStarters,
     chatbot_widget_starters: starters.length > 0 ? starters : prevAi.chatbot_widget_starters ?? [],
