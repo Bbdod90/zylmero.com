@@ -1,5 +1,12 @@
 import type { CompanySettings } from "@/lib/types";
 import {
+  allowedLinkHosts,
+  type ChatAction,
+  hostsFromKnowledgeText,
+  parseShopLinksFromPrefs,
+  sanitizeChatActions,
+} from "@/lib/chatbot/chat-actions";
+import {
   dutchLanguageQualityNl,
   lengthInstructionNl,
   maxTokensForAnswerKind,
@@ -9,6 +16,7 @@ import {
 } from "@/lib/chatbot/answer-style";
 import { businessContextBlock } from "@/lib/openai/prompts";
 import { getOpenAI, OPENAI_MODEL } from "@/lib/openai/client";
+import { extractJsonObject } from "@/lib/openai/json";
 
 const OPENAI_CHATBOT_MODEL =
   process.env.OPENAI_CHATBOT_MODEL?.trim() ||
@@ -23,7 +31,9 @@ export async function previewVisitorChatReply(input: {
   nicheId: string | null;
   visitorMessage: string;
   history?: Array<{ role: "user" | "assistant"; content: string }>;
-}): Promise<string> {
+  /** Studio: niet-opgeslagen shoplinks meesturen voor prompts + URL-toestemming. */
+  draftShopLinks?: ChatAction[];
+}): Promise<{ reply: string; actions: ChatAction[] }> {
   const rawCtx = businessContextBlock(
     input.companyName,
     input.settings,
@@ -36,6 +46,11 @@ export async function previewVisitorChatReply(input: {
   const lang = input.settings?.language || "nl";
   const prefs = (input.settings?.automation_preferences as Record<string, unknown> | undefined) || {};
   const vragenTerugStellen = prefs.chatbot_vragen_terug_stellen === true;
+  const configuredShopLinks = [...parseShopLinksFromPrefs(prefs), ...(input.draftShopLinks || [])];
+  const shopLinksLines =
+    configuredShopLinks.length > 0
+      ? configuredShopLinks.map((l) => `- "${l.label}" → ${l.url}`).join("\n")
+      : "(geen apart geconfigureerd — gebruik dan alleen product-URL's die letterlijk in de kennis/context staan)";
 
   const kind = resolveAnswerLengthKind({
     widgetSettings: {},
@@ -98,13 +113,26 @@ Harde regels:
 - Gebruik alleen informatie uit de context.
 - Noem NOOIT een prijs, model, productdetail of openingstijd als die niet letterlijk in de context staat.
 ${antiQuestionBlock}
-- Bevestig NOOIT dat een afspraak/offerte/bestelling definitief is geregeld zonder echte boekingstool.`;
+- Bevestig NOOIT dat een afspraak/offerte/bestelling definitief is geregeld zonder echte boekingstool.
+
+Geconfigureerde shoplinks (alleen deze URL's gebruiken voor knoppen, plus exacte https-product-URL's uit de kennis hierboven):
+${shopLinksLines}
+
+ACTIEKNOPPEN (optioneel, max. 2):
+- Alleen bij duidelijke koop-/bestelintentie (bijv. model gekozen, levertijd na prijs, "ik wil die bestellen"): voeg dan "actions" toe met korte labels (bijv. "Naar GT-2000 — bestellen").
+- Geen knoppen bij algemene vragen, klachten of alleen informatie.
+- Gebruik GEEN verzonnen URL's.
+
+OUTPUTFORMAAT — strikt JSON, geen markdown-fences:
+{"reply":"je antwoordtekst voor de klant","actions":[{"label":"…","url":"https://…"}]}
+"actions" mag ontbreken of [] zijn.`;
 
   const openai = getOpenAI();
   const res = await openai.chat.completions.create({
     model: OPENAI_CHATBOT_MODEL,
     temperature: 0.15,
-    max_tokens: maxOutTokens,
+    max_tokens: maxOutTokens + 120,
+    response_format: { type: "json_object" },
     messages: [
       {
         role: "system",
@@ -113,6 +141,7 @@ ${antiQuestionBlock}
           "Antwoord feitelijk en vriendelijk; geen tegenstrijdige prijszinnen (geen ‘begint bij’-bedrag dat hoger is dan andere prijzen die je in hetzelfde antwoord noemt). " +
           "Als prijzen, modellen of voorraad in de context staan (ook in samenvatting of gescande tekst), noem ze alleen wanneer dat bij de vraag past. " +
           "Verzin geen prijzen of productdetails die niet in de context staan. " +
+          "Je antwoord MOET een JSON-object zijn met ten minste key \"reply\" (string). Optioneel \"actions\" (array). " +
           (vragenTerugStellen
             ? "Stel alleen vervolgvragen wanneer nodig en doe geen valse bevestiging van afspraken of offertes."
             : "Je prioriteit is het direct beantwoorden van de klantvraag uit de context; stel geen onnodige vervolgvragen."),
@@ -123,5 +152,28 @@ ${antiQuestionBlock}
 
   const text = res.choices[0]?.message?.content?.trim();
   if (!text) throw new Error("Lege AI-respons");
-  return text;
+
+  let reply = text;
+  let actionsRaw: unknown = [];
+  try {
+    const parsed = extractJsonObject<{ reply?: string; actions?: unknown }>(text);
+    reply = String(parsed.reply ?? "").trim() || text;
+    actionsRaw = parsed.actions ?? [];
+  } catch {
+    reply = text;
+    actionsRaw = [];
+  }
+
+  const allowedHosts = allowedLinkHosts({
+    websiteUrl: input.settings?.ai_knowledge_website,
+    knowledgeWebsite: input.settings?.ai_knowledge_website,
+    bookingLink: input.settings?.booking_link,
+    shopLinks: configuredShopLinks,
+  });
+  hostsFromKnowledgeText(ctx).forEach((h) => {
+    allowedHosts.add(h);
+  });
+
+  const actions = sanitizeChatActions(actionsRaw, allowedHosts);
+  return { reply, actions };
 }

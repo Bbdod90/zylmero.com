@@ -141,20 +141,22 @@
       ".zl-choice-title{font:600 13px system-ui,sans-serif;color:#1c1917;letter-spacing:.01em}" +
       ".zl-choice-sub{font:500 11px system-ui,sans-serif;color:#a8a29e;letter-spacing:.02em}" +
       ".zl-foot-outer{flex-shrink:0;display:flex;flex-direction:column;min-width:0;border-top:1px solid rgba(0,0,0,.08);background:rgba(255,255,255,.98);backdrop-filter:blur(12px)}" +
-      ".zl-contact-bar{display:none;flex-direction:row;flex-wrap:wrap;gap:8px;padding:10px 12px 8px}" +
+      ".zl-contact-bar{display:none;flex-direction:row;flex-wrap:nowrap;align-items:stretch;gap:6px;padding:6px 10px 7px;box-sizing:border-box}" +
       ".zl-contact-bar.zl-contact-visible{display:flex}" +
-      ".zl-contact-btn{flex:1;min-width:min(140px,calc(50% - 4px));display:flex;align-items:center;gap:8px;padding:10px 11px;border-radius:13px;border:1px solid rgba(28,25,23,.1);background:#fff;text-decoration:none;color:#1c1917;transition:border-color .2s ease,box-shadow .2s ease;box-shadow:0 1px 3px rgba(0,0,0,.05)}" +
+      ".zl-contact-btn{flex:1;min-width:0;max-width:calc(50% - 3px);display:flex;align-items:center;gap:8px;padding:5px 8px 5px 6px;border-radius:11px;border:1px solid rgba(28,25,23,.09);background:linear-gradient(180deg,#fff 0%,#fafaf9 100%);text-decoration:none;color:#1c1917;transition:border-color .18s ease,box-shadow .18s ease,transform .15s ease;box-shadow:0 1px 2px rgba(0,0,0,.04)}" +
       ".zl-contact-btn:hover{border-color:" +
-      rgba(0.42) +
-      ";box-shadow:0 4px 14px rgba(0,0,0,.09)}" +
+      rgba(0.38) +
+      ";box-shadow:0 3px 12px rgba(0,0,0,.07);transform:translateY(-0.5px)}" +
       ".zl-c-tel:focus-visible,.zl-c-wa:focus-visible{outline:2px solid " +
-      rgba(0.55) +
-      ";outline-offset:2px}" +
-      ".zl-c-ic{font-size:17px;line-height:1;flex-shrink:0;width:22px;text-align:center}" +
-      ".zl-c-stack{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0;text-align:left}" +
-      ".zl-c-l1{font:600 12px system-ui,-apple-system,sans-serif;letter-spacing:.01em}" +
-      ".zl-c-l2{font:500 10px system-ui,sans-serif;color:#78716c;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}" +
-      ".zl-c-wa .zl-c-l2{color:#059669}" +
+      rgba(0.5) +
+      ";outline-offset:1px}" +
+      ".zl-c-ring{flex-shrink:0;width:26px;height:26px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1;background:rgba(0,0,0,.045);border:1px solid rgba(0,0,0,.06)}" +
+      ".zl-c-wa .zl-c-ring{background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.22);font-size:12px}" +
+      ".zl-c-meta{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:1px;min-width:0;text-align:left;flex:1}" +
+      ".zl-c-tag{font:650 9px system-ui,-apple-system,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#78716c}" +
+      ".zl-c-num{font:600 11px system-ui,-apple-system,sans-serif;color:#1c1917;letter-spacing:.01em;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}" +
+      ".zl-c-wa .zl-c-tag{color:#059669}" +
+      ".zl-c-wa .zl-c-num{font:600 10px system-ui,sans-serif;color:#047857;letter-spacing:.02em}" +
       ".zl-foot{padding:12px;display:flex;gap:10px;border-top:none}" +
       ".zl-input{flex:1;height:42px;border:1px solid rgba(0,0,0,.1);border-radius:12px;padding:0 14px;font:14px system-ui,-apple-system,sans-serif;outline:none;background:#fafaf9}" +
       ".zl-input:focus{border-color:" +
@@ -170,6 +172,15 @@
       rgba(0.35) +
       "}" +
       ".zl-send:disabled{opacity:.55;cursor:not-allowed}" +
+      ".zl-actions-wrap{width:100%;max-width:92%;align-self:flex-end;display:flex;flex-direction:column;gap:6px;margin-top:6px}" +
+      ".zl-action-btn{display:block;width:100%;text-align:center;padding:9px 11px;border-radius:11px;font:600 12px system-ui,sans-serif;text-decoration:none;color:#fafafa;background:linear-gradient(165deg," +
+      pMid +
+      "," +
+      pDark +
+      ");border:1px solid " +
+      rgba(0.35) +
+      ";box-shadow:0 2px 8px rgba(0,0,0,.12);transition:opacity .15s ease,transform .15s ease}" +
+      ".zl-action-btn:hover{opacity:.95;transform:translateY(-0.5px)}" +
       ".zl-close{flex-shrink:0;height:32px;width:32px;border:none;border-radius:10px;background:rgba(255,255,255,.06);color:#d6d3d1;cursor:pointer;font:300 20px/1 system-ui,sans-serif;line-height:32px}"
     );
   }
@@ -180,10 +191,26 @@
     if (st) st.remove();
   }
 
-  function addMessage(role, content) {
-    var wrap = el("div", role === "user" ? "zl-row zl-row-user" : "zl-row zl-row-bot");
-    var bubbleN = el("div", role === "user" ? "zl-bubble zl-user" : "zl-bubble zl-bot", content);
+  function addMessage(role, content, actions) {
+    var isUser = role === "user";
+    var wrap = el("div", isUser ? "zl-row zl-row-user" : "zl-row zl-row-bot");
+    var bubbleN = el("div", isUser ? "zl-bubble zl-user" : "zl-bubble zl-bot", content);
     wrap.appendChild(bubbleN);
+    if (!isUser && actions && actions.length) {
+      var aw = el("div", "zl-actions-wrap");
+      for (var i = 0; i < actions.length; i++) {
+        var item = actions[i];
+        if (!item || !item.url || !item.label) continue;
+        var link = document.createElement("a");
+        link.className = "zl-action-btn";
+        link.href = String(item.url);
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = String(item.label);
+        aw.appendChild(link);
+      }
+      if (aw.childNodes.length) wrap.appendChild(aw);
+    }
     body.appendChild(wrap);
     body.scrollTop = body.scrollHeight;
   }
@@ -228,7 +255,11 @@
     postChat(apiMessage)
       .then(function (data) {
         if (data && data.gesprek_id) conversationId = data.gesprek_id;
-        addMessage("bot", data && data.reply ? String(data.reply) : "Er kwam geen antwoord.");
+        addMessage(
+          "bot",
+          data && data.reply ? String(data.reply) : "Er kwam geen antwoord.",
+          data && Array.isArray(data.actions) ? data.actions : null,
+        );
       })
       .catch(function () {
         addMessage("bot", "Sorry, er ging iets mis. Probeer het zo opnieuw.");
@@ -356,19 +387,19 @@
     }
     contactBar.className = "zl-contact-bar zl-contact-visible";
 
-    function stack(line1, line2) {
-      var st = el("div", "zl-c-stack");
-      st.appendChild(el("span", "zl-c-l1", line1));
-      st.appendChild(el("span", "zl-c-l2", line2));
-      return st;
+    function meta(tag, line) {
+      var m = el("div", "zl-c-meta");
+      m.appendChild(el("span", "zl-c-tag", tag));
+      m.appendChild(el("span", "zl-c-num", line));
+      return m;
     }
 
     if (tel) {
       var aTel = el("a", "zl-contact-btn zl-c-tel");
       aTel.href = tel;
-      aTel.appendChild(el("span", "zl-c-ic", "\u260E"));
-      aTel.appendChild(stack("Bellen", c.phone_display || "Start gesprek"));
-      aTel.setAttribute("aria-label", "Bellen: " + (c.phone_display || "telefoon"));
+      aTel.appendChild(el("span", "zl-c-ring", "\u260E"));
+      aTel.appendChild(meta("Bellen", c.phone_display || "\u2014"));
+      aTel.setAttribute("aria-label", "Bellen: " + (c.phone_display || ""));
       contactBar.appendChild(aTel);
     }
     if (wa) {
@@ -376,8 +407,8 @@
       aWa.href = wa;
       aWa.target = "_blank";
       aWa.rel = "noopener noreferrer";
-      aWa.appendChild(el("span", "zl-c-ic", "\uD83D\uDCAC"));
-      aWa.appendChild(stack("WhatsApp", "Chat in de app"));
+      aWa.appendChild(el("span", "zl-c-ring", "\uD83D\uDCAC"));
+      aWa.appendChild(meta("WhatsApp", "Bericht sturen"));
       aWa.setAttribute("aria-label", "WhatsApp openen");
       contactBar.appendChild(aWa);
     }

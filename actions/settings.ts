@@ -19,6 +19,7 @@ import {
   extractJsonLdPlainLines,
   extractNlRetailPriceHints,
 } from "@/lib/ai/knowledge-document";
+import type { ChatAction } from "@/lib/chatbot/chat-actions";
 import type { AiKnowledgePage, KnowledgeSnippet } from "@/lib/types";
 import { generateSiteKnowledgeDigestNl } from "@/lib/openai/site-knowledge-digest";
 import { previewVisitorChatReply } from "@/lib/openai/preview-visitor-chat";
@@ -81,7 +82,7 @@ export type SettingsFormState = {
 };
 
 export type ChatbotPreviewState =
-  | { ok: true; reply: string }
+  | { ok: true; reply: string; actions?: ChatAction[] }
   | { ok: false; error: string };
 
 export type ChatbotStudioState =
@@ -1119,6 +1120,7 @@ export async function previewChatbotVisitorMessageAction(
     websiteUrl?: string;
     extraInfo?: string;
     openingszin?: string;
+    shopLinks?: { label: string; url: string }[];
     doelen?: {
       contactAanvragenVerwerken?: boolean;
     };
@@ -1242,14 +1244,26 @@ export async function previewChatbotVisitorMessageAction(
         }
       : settings;
 
-    const reply = await previewVisitorChatReply({
+    const draftShop =
+      Array.isArray(draft?.shopLinks) && draft.shopLinks.length > 0
+        ? draft.shopLinks
+            .filter((x) => x && typeof x.label === "string" && typeof x.url === "string")
+            .map((x) => ({
+              label: String(x.label).trim().slice(0, 120),
+              url: String(x.url).trim(),
+            }))
+            .filter((x) => x.label && x.url)
+        : undefined;
+
+    const { reply, actions } = await previewVisitorChatReply({
       companyName: auth.company.name,
       settings: mergedSettings,
       nicheId: auth.company.niche ?? null,
       visitorMessage: trimmed,
       history: safeHistory,
+      draftShopLinks: draftShop,
     });
-    return { ok: true, reply };
+    return { ok: true, reply, ...(actions.length > 0 ? { actions } : {}) };
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Er ging iets mis.";
     return { ok: false, error: msg };
@@ -1419,6 +1433,8 @@ export type SaveChatbotWidgetStudioInput = {
   logoUrl: string;
   showStarters: boolean;
   starters: { label: string; prompt: string }[];
+  /** Optionele product-/winkelmandknoppen (max. 5). */
+  shopLinks?: { label: string; url: string }[];
 };
 
 export type SaveChatbotWidgetStudioResult =
@@ -1475,6 +1491,24 @@ export async function saveChatbotWidgetStudioAction(
     };
   }
 
+  const shopLinks: { label: string; url: string }[] = [];
+  if (Array.isArray(input.shopLinks)) {
+    for (const row of input.shopLinks.slice(0, 5)) {
+      if (!row || typeof row !== "object") continue;
+      const label = String((row as Record<string, unknown>).label ?? "").trim().slice(0, 120);
+      let url = String((row as Record<string, unknown>).url ?? "").trim().slice(0, 2000);
+      if (!label || !url) continue;
+      try {
+        const u = new URL(url.includes("://") ? url : `https://${url}`);
+        if (u.protocol !== "https:") continue;
+        url = u.toString();
+      } catch {
+        continue;
+      }
+      shopLinks.push({ label, url });
+    }
+  }
+
   const supabase = await createClient();
   const { data: settingsRow } = await supabase
     .from("company_settings")
@@ -1492,6 +1526,7 @@ export async function saveChatbotWidgetStudioAction(
     chatbot_widget_logo_url: logoUrl || null,
     chatbot_widget_show_starters: showStarters,
     chatbot_widget_starters: starters.length > 0 ? starters : prevAi.chatbot_widget_starters ?? [],
+    chatbot_shop_links: shopLinks,
   };
 
   const { error } = await supabase.from("company_settings").upsert(

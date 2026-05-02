@@ -48,6 +48,16 @@ export async function updateAppointmentStatus(
   return { ok: true, data: { status: s } };
 }
 
+/** Zoekt een Nederlands mobiel nummer in chattekst voor WhatsApp-bevestiging. */
+function extractNlMobileE164FromText(blob: string): string | null {
+  const compact = blob.replace(/\s+/g, "");
+  const plus31 = compact.match(/\+316\d{8}/);
+  if (plus31) return plus31[0];
+  const zero6 = compact.match(/06\d{8}/);
+  if (zero6) return "+31" + zero6[0].slice(1);
+  return null;
+}
+
 function extractGesprekIdFromNotes(notes: string | null | undefined): string | null {
   const text = (notes || "").trim();
   if (!text) return null;
@@ -132,6 +142,30 @@ export async function reviewAppointmentRequest(input: {
       rol: "bot",
       inhoud: customerText,
     });
+  }
+
+  if (gesprekId && input.decision === "confirm") {
+    try {
+      if (process.env.TWILIO_ACCOUNT_SID) {
+        const { data: msgs } = await supabase
+          .from("berichten")
+          .select("inhoud")
+          .eq("gesprek_id", gesprekId)
+          .order("created_at", { ascending: false })
+          .limit(80);
+        const blob = (msgs || []).map((r) => String((r as { inhoud?: string }).inhoud || "")).join("\n");
+        const digits = extractNlMobileE164FromText(blob);
+        if (digits) {
+          const { sendWhatsAppViaTwilio } = await import("@/lib/integrations/twilio");
+          const companyLabel = auth.company.name?.trim() || "Het bedrijf";
+          const waBody =
+            `${customerText}\n\n— ${String(companyLabel).slice(0, 80)}`.slice(0, 1400);
+          await sendWhatsAppViaTwilio({ to: digits, body: waBody });
+        }
+      }
+    } catch (e) {
+      console.error("appointment_confirm_whatsapp:", e);
+    }
   }
 
   await insertNotificationIfNew(supabase, {

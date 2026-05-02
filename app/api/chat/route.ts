@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  allowedLinkHosts,
+  hostsFromKnowledgeText,
+  parseShopLinksFromPrefs,
+  sanitizeChatActions,
+} from "@/lib/chatbot/chat-actions";
 import { getOpenAI, OPENAI_MODEL } from "@/lib/openai/client";
+import { extractJsonObject } from "@/lib/openai/json";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { insertNotificationIfNew } from "@/lib/notifications/create";
 import {
@@ -19,6 +26,11 @@ import {
   resolveAnswerLengthKind,
   type AnswerLengthKind,
 } from "@/lib/chatbot/answer-style";
+
+const CHAT_JSON_MODEL =
+  process.env.OPENAI_CHATBOT_MODEL?.trim() ||
+  process.env.OPENAI_MODEL_CHATBOT?.trim() ||
+  OPENAI_MODEL;
 
 export const dynamic = "force-dynamic";
 
@@ -116,10 +128,33 @@ function parseRequestedDateTime(raw: string): Date | null {
   return null;
 }
 
+function extractRepairTags(text: string): string[] {
+  const t = text.toLowerCase();
+  const defs: [RegExp, string][] = [
+    [/rem|brems/, "Remmen"],
+    [/accu|batterij/, "Accu"],
+    [/band/, "Band(en)"],
+    [/ketting/, "Ketting"],
+    [/motor/, "Motor"],
+    [/display|scherm/, "Display"],
+    [/licht|verlichting|lamp/, "Verlichting"],
+    [/software|update|firmware/, "Software/update"],
+    [/lader|oplad/, "Laden"],
+    [/stuurbekrachtiging|besturing/, "Besturing"],
+  ];
+  const out: string[] = [];
+  for (const [re, label] of defs) {
+    if (re.test(t) && !out.includes(label)) out.push(label);
+  }
+  return out.slice(0, 8);
+}
+
 function detectAppointmentIntent(message: string): AppointmentIntent {
   const text = message.toLowerCase();
   const wantsAppointment =
-    /(afspraak|inplannen|plan|boeken|boek|vrijdag|morgen|vandaag)/.test(text);
+    /(afspraak|inplannen|plan|boeken|boek|vrijdag|morgen|vandaag|reparatie|werkplaats|service|storing|kapot|defect|onderhoud)/.test(
+      text,
+    );
   const requestedStart = parseRequestedDateTime(text);
   return {
     wantsAppointment,
@@ -266,6 +301,17 @@ async function tryHandleAppointmentRequest(input: {
   const intent = detectAppointmentIntent(input.message);
   if (!intent.wantsAppointment) return null;
   if (!intent.requestedStart) {
+    const repairish = /reparatie|werkplaats|kapot|defect|storing|onderhoud/.test(input.message.toLowerCase());
+    if (repairish) {
+      return [
+        "Ik help je graag met een werkplaats-/reparatieafspraak.",
+        "Stuur in één bericht:",
+        "• Kort wat er aan de hand is (je mag ook trefwoorden gebruiken, zoals remmen of accu)",
+        "• Welke dag en tijd je wilt (bijv. vrijdag 10:00)",
+        "",
+        "Het bedrijf ziet je aanvraag in de agenda en bevestigt de tijd daarna handmatig.",
+      ].join("\n");
+    }
     return "Top, ik help je graag met een afspraak. Welke dag en tijd wil je precies (bijv. vrijdag 10:00)?";
   }
 
@@ -341,7 +387,9 @@ async function tryHandleAppointmentRequest(input: {
     return `Dit tijdstip lijkt al bezet in de agenda. ${altText}`;
   }
 
-  const notes = `Chatbot afspraakverzoek (${input.conversationId}) - klant vroeg: "${intent.rawTimeText || input.message}"`;
+  const tags = extractRepairTags(input.message);
+  const tagPart = tags.length ? ` Tags: ${tags.join(", ")}.` : "";
+  const notes = `Chatbot afspraakverzoek (${input.conversationId}).${tagPart} Klant: "${intent.rawTimeText || input.message}"`;
   const { error: createErr } = await input.supabase.from("appointments").insert({
     company_id: input.companyId,
     starts_at: requestedStart.toISOString(),
@@ -677,23 +725,75 @@ export async function POST(request: NextRequest) {
   const streamMode = body.stream !== false;
 
   if (!streamMode) {
+    const configuredShopLinks = parseShopLinksFromPrefs(companyPrefs);
+    const shopLinksLines =
+      configuredShopLinks.length > 0
+        ? configuredShopLinks.map((l) => `- "${l.label}" → ${l.url}`).join("\n")
+        : "(geen — gebruik alleen https-product-URL's uit de kennis/context)";
+    const crawlForHosts = truncateCrawledDocForPrompt(safeString(companyPrefs.ai_knowledge_crawled_document));
+    const digestNl = safeString(companyPrefs.ai_knowledge_digest_nl);
+    const hostExtractSource = [bedrijfsOmschrijving, crawlForHosts, digestNl].join("\n");
+
+    const jsonAppendix = [
+      "",
+      "Geconfigureerde shop-/productlinks:",
+      shopLinksLines,
+      "",
+      "ACTIEKNOPPEN (optioneel, max. 2): alleen bij duidelijke koop-/bestelintentie.",
+      "Gebruik GEEN verzonnen URL's — alleen links hierboven of exacte https-URL's uit de context.",
+      "",
+      'OUTPUTFORMAAT — strikt JSON: {"reply":"…","actions":[{"label":"…","url":"https://…"}]}',
+      '"actions" mag [] zijn of ontbreken.',
+    ].join("\n");
+
     const completion = await openai.chat.completions.create({
-      model: OPENAI_MODEL,
+      model: CHAT_JSON_MODEL,
       temperature: 0.2,
-      max_tokens: maxTok,
+      max_tokens: maxTok + 120,
+      response_format: { type: "json_object" },
       messages: [
-        { role: "system", content: systemPrompt },
+        {
+          role: "system",
+          content: `${systemPrompt}${jsonAppendix}\n\nJe antwoord MOET geldig JSON zijn met minimaal het veld "reply" (string).`,
+        },
         { role: "user", content: message },
       ],
     });
-    const content = completion.choices[0]?.message?.content?.trim() || "Sorry, ik kon nu geen antwoord maken.";
+    const raw = completion.choices[0]?.message?.content?.trim() || "";
+    let reply = raw || "Sorry, ik kon nu geen antwoord maken.";
+    let actionsRaw: unknown = [];
+    try {
+      const parsed = extractJsonObject<{ reply?: string; actions?: unknown }>(raw);
+      reply = String(parsed.reply ?? "").trim() || reply;
+      actionsRaw = parsed.actions ?? [];
+    } catch {
+      reply = raw || "Sorry, ik kon nu geen antwoord maken.";
+      actionsRaw = [];
+    }
+
+    const cs = companySettingsRow && typeof companySettingsRow === "object" ? companySettingsRow : null;
+    const allowedHosts = allowedLinkHosts({
+      websiteUrl: safeString(cs?.ai_knowledge_website) || websiteUrl || null,
+      knowledgeWebsite: safeString(cs?.ai_knowledge_website),
+      bookingLink: safeString(cs?.booking_link),
+      shopLinks: configuredShopLinks,
+    });
+    hostsFromKnowledgeText(hostExtractSource).forEach((h) => {
+      allowedHosts.add(h);
+    });
+    const actions = sanitizeChatActions(actionsRaw, allowedHosts);
+
     await supabase.from("berichten").insert({
       gesprek_id: gesprekId,
       rol: "bot",
-      inhoud: content,
+      inhoud: reply,
     });
     return NextResponse.json(
-      { reply: content, gesprek_id: gesprekId },
+      {
+        reply,
+        ...(actions.length > 0 ? { actions } : {}),
+        gesprek_id: gesprekId,
+      },
       {
         headers: CORS_HEADERS,
       },

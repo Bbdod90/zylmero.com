@@ -27,8 +27,13 @@ import { cn } from "@/lib/utils";
 import { WIDGET_STARTER_WELCOME_DEFAULT, WIDGET_STARTERS } from "@/lib/chatbot/widget-starters";
 import { WIDGET_DEFAULT_PRIMARY } from "@/lib/chatbot/widget-public-config";
 import type { WidgetContactPublic } from "@/lib/phone/widget-contact";
+import type { ChatAction } from "@/lib/chatbot/chat-actions";
 
-type ChatMessage = { role: "user" | "assistant"; content: string };
+type ChatMessage = {
+  role: "user" | "assistant";
+  content: string;
+  actions?: ChatAction[];
+};
 
 function shadeHex(hex: string, factor: number): string {
   const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex.trim());
@@ -119,6 +124,8 @@ export function ChatbotStudio(props: {
   initialWidgetTitle: string;
   initialWidgetShowStarters: boolean;
   initialWidgetStarters: { label: string; prompt: string }[];
+  /** Optionele vaste product-/winkelmand-links voor AI-actieknoppen. */
+  initialShopLinks?: { label: string; url: string }[];
   contactPreview: WidgetContactPublic;
   embedSnippet: string;
 }) {
@@ -164,6 +171,18 @@ export function ChatbotStudio(props: {
   const [widgetSaveMessage, setWidgetSaveMessage] = useState<string | null>(null);
   /** Preview: snelle opties inklapbaar (zelfde idee als de echte widget). */
   const [quickOptionsOpen, setQuickOptionsOpen] = useState(false);
+  /** Studio: heel blok Widget & merk in/uitklappen. */
+  const [widgetBrandExpanded, setWidgetBrandExpanded] = useState(true);
+  /** Per snelle keuze: inklapbaar bewerken. */
+  const [starterPanelOpen, setStarterPanelOpen] = useState<Record<number, boolean>>({});
+  const [shopLinkRows, setShopLinkRows] = useState<{ label: string; url: string }[]>(() =>
+    props.initialShopLinks?.length
+      ? props.initialShopLinks.slice(0, 5).map((r) => ({
+          label: String(r.label ?? "").slice(0, 120),
+          url: String(r.url ?? ""),
+        }))
+      : [],
+  );
 
   const canSave = bedrijfsOmschrijving.trim().length > 0 && !props.demoMode;
 
@@ -231,6 +250,7 @@ export function ChatbotStudio(props: {
         logoUrl: widgetLogoUrl,
         showStarters: showStarterChoices,
         starters: starterRows.filter((r) => r.label.trim() && r.prompt.trim()),
+        shopLinks: shopLinkRows.filter((r) => r.label.trim() && r.url.trim()),
       });
       if (!res.ok) {
         setError(res.error);
@@ -292,6 +312,7 @@ export function ChatbotStudio(props: {
           websiteUrl,
           extraInfo,
           openingszin,
+          shopLinks: shopLinkRows.filter((r) => r.label.trim() && r.url.trim()),
           doelen: goals,
           vragenTerugStellen,
           extraDoelen: extraGoals,
@@ -299,7 +320,14 @@ export function ChatbotStudio(props: {
         },
       );
       if (out.ok) {
-        setChat((prev) => [...prev, { role: "assistant", content: out.reply }]);
+        setChat((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: out.reply,
+            ...(out.actions && out.actions.length > 0 ? { actions: out.actions } : {}),
+          },
+        ]);
       } else {
         const friendly = normalizePreviewError(out.error);
         setError(friendly);
@@ -323,33 +351,49 @@ export function ChatbotStudio(props: {
         </div>
 
         <div className="mt-6 space-y-5">
-          <section className="space-y-4 rounded-2xl border border-stone-200/90 bg-gradient-to-b from-stone-50/80 to-white p-5 shadow-sm">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-stone-900 text-white">
+          <section className="overflow-hidden rounded-2xl border border-stone-200/90 bg-gradient-to-b from-stone-50/90 via-white to-white shadow-[0_12px_40px_-28px_rgba(15,23,42,0.35)]">
+            <div className="flex flex-wrap items-start gap-2 border-b border-stone-200/70 bg-gradient-to-r from-stone-50/80 to-white px-4 py-4 sm:px-5">
+              <button
+                type="button"
+                className="group flex min-w-0 flex-1 items-center gap-3 rounded-xl text-left transition hover:bg-white/70"
+                onClick={() => setWidgetBrandExpanded((e) => !e)}
+              >
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-stone-900 to-stone-800 text-white shadow-md ring-1 ring-white/10">
                   <Palette className="size-4" aria-hidden />
                 </span>
-                <div>
-                  <h3 className="text-base font-semibold text-gray-900">Widget & merk</h3>
-                  <p className="text-xs text-gray-500">Zelfde look als op je site na embedden.</p>
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-base font-semibold tracking-tight text-stone-900">Widget & merk</h3>
+                  <p className="text-xs text-stone-500">
+                    Thema, logo, snelle keuzes —{" "}
+                    <span className="font-medium text-stone-600">tik om {widgetBrandExpanded ? "in" : "uit"} te klappen</span>
+                  </p>
                 </div>
-              </div>
+                <ChevronDown
+                  className={cn(
+                    "size-5 shrink-0 text-stone-400 transition-transform duration-200 group-hover:text-stone-500",
+                    widgetBrandExpanded && "rotate-180",
+                  )}
+                  aria-hidden
+                />
+              </button>
               <Button
                 type="button"
                 size="sm"
-                className="rounded-xl bg-stone-900 text-white hover:bg-stone-800"
+                className="shrink-0 rounded-xl bg-stone-900 text-white hover:bg-stone-800"
                 disabled={props.demoMode || widgetSavePending}
-                onClick={onSaveWidget}
+                onClick={() => onSaveWidget()}
               >
                 {widgetSavePending ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
                 Widget opslaan
               </Button>
             </div>
             {widgetSaveMessage ? (
-              <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-900">
+              <p className="border-b border-stone-100 bg-emerald-50/80 px-4 py-2.5 text-sm text-emerald-900 sm:px-5">
                 {widgetSaveMessage}
               </p>
             ) : null}
+            {widgetBrandExpanded ? (
+              <div className="space-y-4 p-4 sm:p-5">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="widget-primary">Accentkleur</Label>
@@ -406,6 +450,60 @@ export function ChatbotStudio(props: {
                 .
               </p>
             </div>
+            <div className="space-y-3 rounded-xl border border-stone-200/80 bg-stone-50/40 px-3 py-3 sm:px-4">
+              <div className="space-y-1">
+                <Label className="text-sm font-semibold text-stone-900">Shop-/productknoppen (optioneel)</Label>
+                <p className="text-xs text-stone-500">
+                  Vaste links (bijv. GT-2000 productpagina). De AI mag hier bij koopintentie een knop bijzetten —
+                  altijd met jouw https-URL.
+                </p>
+              </div>
+              <div className="space-y-2">
+                {shopLinkRows.map((row, idx) => (
+                  <div key={`shop-${idx}`} className="flex flex-col gap-2 sm:flex-row sm:items-start">
+                    <Input
+                      value={row.label}
+                      onChange={(e) =>
+                        setShopLinkRows((rows) =>
+                          rows.map((x, i) => (i === idx ? { ...x, label: e.target.value } : x)),
+                        )
+                      }
+                      placeholder="Knoptekst (bijv. Bestel GT-2000)"
+                      className={cn(textFieldClass, "h-9 sm:flex-1")}
+                    />
+                    <Input
+                      value={row.url}
+                      onChange={(e) =>
+                        setShopLinkRows((rows) =>
+                          rows.map((x, i) => (i === idx ? { ...x, url: e.target.value } : x)),
+                        )
+                      }
+                      placeholder="https://…"
+                      className={cn(textFieldClass, "h-9 sm:min-w-[200px] sm:flex-[1.4]")}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-9 shrink-0 text-stone-500 hover:text-red-600"
+                      onClick={() => setShopLinkRows((rows) => rows.filter((_, i) => i !== idx))}
+                    >
+                      Verwijderen
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="rounded-lg"
+                  disabled={shopLinkRows.length >= 5}
+                  onClick={() => setShopLinkRows((rows) => [...rows, { label: "", url: "" }])}
+                >
+                  Link toevoegen
+                </Button>
+              </div>
+            </div>
             <SettingSwitchRow
               title="Snelle keuzes tonen"
               description="Knoppen onder het eerste bericht — ideaal voor reparatie, prijzen, retour."
@@ -429,62 +527,105 @@ export function ChatbotStudio(props: {
                     Rij toevoegen
                   </Button>
                 </div>
-                <div className="space-y-3">
-                  {starterRows.map((row, idx) => (
-                    <div
-                      key={`starter-${idx}-${row.label.slice(0, 8)}`}
-                      className="rounded-xl border border-gray-200 bg-white p-3 shadow-sm"
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">
-                          Keuze {idx + 1}
-                        </span>
-                        {starterRows.length > 1 ? (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 text-xs text-red-600 hover:text-red-700"
-                            onClick={() => setStarterRows((r) => r.filter((_, i) => i !== idx))}
-                          >
-                            Verwijderen
-                          </Button>
+                <div className="space-y-2">
+                  {starterRows.map((row, idx) => {
+                    const rowOpen = starterPanelOpen[idx] ?? false;
+                    return (
+                      <div
+                        key={`starter-${idx}-${row.label.slice(0, 8)}`}
+                        className="overflow-hidden rounded-xl border border-stone-200/90 bg-white shadow-sm ring-1 ring-stone-900/[0.03]"
+                      >
+                        <button
+                          type="button"
+                          className="flex w-full items-center justify-between gap-2 px-3 py-2.5 text-left transition hover:bg-stone-50/90"
+                          onClick={() =>
+                            setStarterPanelOpen((prev) => ({
+                              ...prev,
+                              [idx]: !(prev[idx] ?? false),
+                            }))
+                          }
+                        >
+                          <span className="min-w-0 flex-1">
+                            <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-stone-400">
+                              Keuze {idx + 1}
+                            </span>
+                            <span className="mt-0.5 block truncate text-sm font-medium text-stone-900">
+                              {row.label.trim() || "Nog geen label — tik om in te vullen"}
+                            </span>
+                          </span>
+                          <ChevronDown
+                            className={cn(
+                              "size-4 shrink-0 text-stone-400 transition-transform duration-200",
+                              rowOpen && "rotate-180",
+                            )}
+                            aria-hidden
+                          />
+                        </button>
+                        {rowOpen ? (
+                          <div className="space-y-2 border-t border-stone-100 bg-stone-50/40 px-3 py-3">
+                            <Input
+                              value={row.label}
+                              onChange={(e) =>
+                                setStarterRows((r) =>
+                                  r.map((x, i) => (i === idx ? { ...x, label: e.target.value } : x)),
+                                )
+                              }
+                              placeholder="Label op de knop"
+                              className={cn(textFieldClass, "h-9 bg-white")}
+                            />
+                            <Textarea
+                              value={row.prompt}
+                              onChange={(e) =>
+                                setStarterRows((r) =>
+                                  r.map((x, i) => (i === idx ? { ...x, prompt: e.target.value } : x)),
+                                )
+                              }
+                              placeholder="Wat de AI precies moet weten (wordt naar de chat gestuurd)"
+                              rows={2}
+                              className={cn(textFieldClass, "min-h-[72px] bg-white text-sm")}
+                            />
+                            {starterRows.length > 1 ? (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-full text-xs text-red-600 hover:bg-red-50 hover:text-red-700"
+                                onClick={() => {
+                                  setStarterRows((r) => r.filter((_, i) => i !== idx));
+                                  setStarterPanelOpen((prev) => {
+                                    const next: Record<number, boolean> = {};
+                                    for (const [kStr, v] of Object.entries(prev)) {
+                                      const k = Number(kStr);
+                                      if (k === idx) continue;
+                                      next[k > idx ? k - 1 : k] = v;
+                                    }
+                                    return next;
+                                  });
+                                }}
+                              >
+                                Deze keuze verwijderen
+                              </Button>
+                            ) : null}
+                          </div>
                         ) : null}
                       </div>
-                      <div className="mt-2 space-y-2">
-                        <Input
-                          value={row.label}
-                          onChange={(e) =>
-                            setStarterRows((r) =>
-                              r.map((x, i) => (i === idx ? { ...x, label: e.target.value } : x)),
-                            )
-                          }
-                          placeholder="Label op de knop"
-                          className={cn(textFieldClass, "h-9")}
-                        />
-                        <Textarea
-                          value={row.prompt}
-                          onChange={(e) =>
-                            setStarterRows((r) =>
-                              r.map((x, i) => (i === idx ? { ...x, prompt: e.target.value } : x)),
-                            )
-                          }
-                          placeholder="Wat de AI precies moet weten (wordt naar de chat gestuurd)"
-                          rows={2}
-                          className={cn(textFieldClass, "min-h-[64px] text-sm")}
-                        />
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             ) : null}
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-stone-500">
               Chat-ID voor je script:{" "}
-              <code className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[11px]">
+              <code className="rounded-md bg-stone-100 px-1.5 py-0.5 font-mono text-[11px] text-stone-800">
                 {props.embedChatbotId}
               </code>
             </p>
+              </div>
+            ) : (
+              <p className="border-t border-stone-100 bg-stone-50/50 px-4 py-3 text-center text-xs text-stone-500 sm:px-5">
+                Widget-sectie ingeklapt — tik op de titel om kleuren, logo en snelle keuzes te bewerken.
+              </p>
+            )}
           </section>
 
           <section className="space-y-3">
@@ -775,7 +916,26 @@ export function ChatbotStudio(props: {
                     : "border border-white/10 bg-gradient-to-br from-zinc-700 to-zinc-900 text-white shadow-lg",
                 )}
               >
-                {m.content}
+                <span className="whitespace-pre-wrap">{m.content}</span>
+                {m.role === "assistant" && m.actions && m.actions.length > 0 ? (
+                  <div className="mt-2.5 flex flex-col gap-1.5 border-t border-white/10 pt-2.5">
+                    {m.actions.map((a) => (
+                      <a
+                        key={a.url}
+                        href={a.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center rounded-lg px-3 py-2 text-center text-xs font-semibold text-stone-900 shadow-sm transition hover:opacity-95"
+                        style={{
+                          background: `linear-gradient(165deg, ${widgetPrimary}, ${shadeHex(widgetPrimary, 0.85)})`,
+                          boxShadow: `0 1px 2px rgba(0,0,0,0.08)`,
+                        }}
+                      >
+                        {a.label}
+                      </a>
+                    ))}
+                  </div>
+                ) : null}
               </div>
             </div>
           ))}
@@ -805,22 +965,26 @@ export function ChatbotStudio(props: {
         </div>
         <div className="space-y-2.5 border-t border-stone-200/80 bg-white/95 px-5 py-3 backdrop-blur-sm">
           {props.contactPreview.tel_href || props.contactPreview.whatsapp_href ? (
-            <div className="flex flex-wrap gap-2 border-b border-stone-100 pb-3">
+            <div className="flex flex-nowrap gap-1.5 border-b border-stone-100/90 pb-3">
               {props.contactPreview.tel_href ? (
                 <a
                   href={props.contactPreview.tel_href}
-                  className="flex min-h-[52px] min-w-[min(100%,160px)] flex-1 items-center gap-2.5 rounded-xl border bg-white px-3 py-2 text-left shadow-sm transition hover:bg-stone-50 hover:shadow-md"
+                  aria-label={`Bellen: ${props.contactPreview.phone_display ?? ""}`}
+                  className="group flex min-h-0 min-w-0 max-w-[calc(50%-3px)] flex-1 items-center gap-2 rounded-[11px] border border-stone-900/[0.09] bg-gradient-to-b from-white to-stone-50/90 px-2 py-1.5 pl-1.5 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition hover:border-stone-400/45 hover:shadow-md"
                   style={{
-                    borderColor: `rgba(${hexToRgbCss(widgetPrimary)}, 0.28)`,
+                    borderColor: `rgba(${hexToRgbCss(widgetPrimary)}, 0.22)`,
                   }}
                 >
-                  <span className="text-lg leading-none text-stone-700" aria-hidden>
+                  <span
+                    className="flex size-[26px] shrink-0 items-center justify-center rounded-full border border-stone-900/[0.06] bg-black/[0.045] text-[13px] leading-none text-stone-700"
+                    aria-hidden
+                  >
                     ☎
                   </span>
-                  <span className="flex min-w-0 flex-col gap-0.5">
-                    <span className="text-[12px] font-semibold text-stone-900">Bellen</span>
-                    <span className="truncate text-[10px] font-medium text-stone-500">
-                      {props.contactPreview.phone_display || "Direct bellen"}
+                  <span className="flex min-w-0 flex-col gap-px">
+                    <span className="text-[9px] font-[650] uppercase tracking-[0.1em] text-stone-500">Bellen</span>
+                    <span className="truncate text-[11px] font-semibold tracking-[0.01em] text-stone-900">
+                      {props.contactPreview.phone_display || "—"}
                     </span>
                   </span>
                 </a>
@@ -830,14 +994,18 @@ export function ChatbotStudio(props: {
                   href={props.contactPreview.whatsapp_href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex min-h-[52px] min-w-[min(100%,160px)] flex-1 items-center gap-2.5 rounded-xl border border-emerald-600/25 bg-emerald-50/60 px-3 py-2 text-left shadow-sm transition hover:border-emerald-600/40 hover:bg-emerald-50"
+                  aria-label="WhatsApp openen"
+                  className="group flex min-h-0 min-w-0 max-w-[calc(50%-3px)] flex-1 items-center gap-2 rounded-[11px] border border-emerald-600/18 bg-gradient-to-b from-emerald-50/95 to-emerald-50/70 px-2 py-1.5 pl-1.5 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition hover:border-emerald-600/45 hover:shadow-md"
                 >
-                  <span className="text-lg leading-none" aria-hidden>
+                  <span
+                    className="flex size-[26px] shrink-0 items-center justify-center rounded-full border border-emerald-600/22 bg-emerald-500/10 text-[12px] leading-none"
+                    aria-hidden
+                  >
                     💬
                   </span>
-                  <span className="flex min-w-0 flex-col gap-0.5">
-                    <span className="text-[12px] font-semibold text-emerald-900">WhatsApp</span>
-                    <span className="text-[10px] font-medium text-emerald-800/90">Opent de app</span>
+                  <span className="flex min-w-0 flex-col gap-px">
+                    <span className="text-[9px] font-[650] uppercase tracking-[0.1em] text-emerald-600">WhatsApp</span>
+                    <span className="truncate text-[10px] font-semibold tracking-[0.02em] text-emerald-800">Bericht sturen</span>
                   </span>
                 </a>
               ) : null}

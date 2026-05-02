@@ -13,6 +13,7 @@ import {
   WIDGET_DEFAULT_PRIMARY,
 } from "@/lib/chatbot/widget-public-config";
 import { buildWidgetContactLinks } from "@/lib/phone/widget-contact";
+import { parseShopLinksFromPrefs } from "@/lib/chatbot/chat-actions";
 
 function extraGoalsFromCapabilities(caps: unknown): {
   productadvies: boolean;
@@ -119,6 +120,7 @@ export default async function ChatbotPage() {
   const initialWidgetShowStarters = prefs.chatbot_widget_show_starters !== false;
 
   const initialWidgetStarters = normalizeStartersFromPrefs(prefs.chatbot_widget_starters);
+  const initialShopLinks = parseShopLinksFromPrefs(prefs as Record<string, unknown>);
 
   return (
     <PageFrame
@@ -163,6 +165,7 @@ export default async function ChatbotPage() {
           initialWidgetTitle={initialWidgetTitle}
           initialWidgetShowStarters={initialWidgetShowStarters}
           initialWidgetStarters={initialWidgetStarters}
+          initialShopLinks={initialShopLinks}
           contactPreview={contactPreview}
           embedSnippet={`<script src=\"${siteUrl().replace(/\/$/, "")}/widget.js\" data-id=\"${embedChatbotId}\"></script>`}
         />
