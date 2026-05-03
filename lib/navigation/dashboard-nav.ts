@@ -2,6 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   Bot,
   CalendarDays,
+  Cable,
   FileText,
   Kanban,
   LayoutDashboard,
@@ -9,7 +10,6 @@ import {
   Mail,
   MessageCircle,
   Settings2,
-  Share2,
   UserSearch,
   Users,
 } from "lucide-react";
@@ -32,7 +32,7 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
     label: "AI & antwoorden",
     items: [
       { href: "/dashboard/chatbot", label: "Je chatbot", icon: Bot },
-      { href: "/dashboard/socials", label: "Socials", icon: Share2 },
+      { href: "/dashboard/socials", label: "Integraties", icon: Cable },
     ],
   },
   {
@@ -40,7 +40,7 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
     label: "Werk",
     items: [
       { href: "/dashboard", label: "Home", icon: LayoutDashboard },
-      { href: "/dashboard/ai-koppelingen", label: "Koppelingen", icon: Link2 },
+      { href: "/dashboard/ai-koppelingen", label: "Inbox & widget", icon: Link2 },
       { href: "/dashboard/inbox", label: "Chat", icon: MessageCircle },
       { href: "/dashboard/quotes", label: "Offertes", icon: FileText },
       { href: "/dashboard/leads", label: "Klanten", icon: UserSearch },

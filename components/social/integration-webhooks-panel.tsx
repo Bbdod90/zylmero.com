@@ -129,9 +129,10 @@ export function IntegrationWebhooksPanel({
       </span>
       <div className="min-w-0 flex-1 space-y-4">
         <div>
-          <h3 className="text-lg font-semibold tracking-tight">Eigen integraties</h3>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Koppel Zapier, Make, n8n of een eigen HTTPS-endpoint. Zylmero stuurt getekende JSON-webhooks
+              <h3 className="text-lg font-semibold tracking-tight">Webhooks — al je andere tools</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Wat niet als knop hierboven staat (CRM, Slack, databases, volledig maatwerk): koppel via Zapier,
+                Make, n8n of een eigen HTTPS-endpoint. Zylmero stuurt getekende JSON-webhooks
             (<span className="font-mono text-xs">X-Zylmero-Event</span>,{" "}
             <span className="font-mono text-xs">X-Zylmero-Signature</span>) zodat je downstream flows kunt bouwen.
           </p>

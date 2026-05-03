@@ -24,6 +24,8 @@ import type { AiKnowledgePage, KnowledgeSnippet } from "@/lib/types";
 import { generateSiteKnowledgeDigestNl } from "@/lib/openai/site-knowledge-digest";
 import { previewVisitorChatReply } from "@/lib/openai/preview-visitor-chat";
 import { sealSocialToken } from "@/lib/crypto/social-token";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { tryChatAppointmentBooking } from "@/lib/chatbot/appointment-booking";
 
 /**
  * Voorkomt dat een mislukte of lege crawl bestaande site-kennis wist zolang de URL gelijk blijft.
@@ -1254,6 +1256,24 @@ export async function previewChatbotVisitorMessageAction(
             }))
             .filter((x) => x.label && x.url)
         : undefined;
+
+    const admin = createAdminClient();
+    const bookingReply = await tryChatAppointmentBooking({
+      supabase: admin,
+      companyId: auth.company.id,
+      companyName: auth.company.name,
+      conversationId: `studio-preview:${auth.company.id}`,
+      history: safeHistory,
+      message: trimmed,
+      companySettings: settingsRow && typeof settingsRow === "object"
+        ? (settingsRow as Record<string, unknown>)
+        : null,
+      source: "chatbot_studio_preview",
+    });
+    if (bookingReply) {
+      revalidatePath("/dashboard/appointments");
+      return { ok: true, reply: bookingReply };
+    }
 
     const { reply, actions } = await previewVisitorChatReply({
       companyName: auth.company.name,

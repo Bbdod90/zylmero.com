@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { CopyButton } from "@/components/growth/copy-button";
 import { Button } from "@/components/ui/button";
@@ -135,6 +136,7 @@ export function ChatbotStudio(props: {
   contactPreview: WidgetContactPublic;
   embedSnippet: string;
 }) {
+  const router = useRouter();
   const [bedrijfsOmschrijving, setBedrijfsOmschrijving] = useState(props.initialBedrijfsOmschrijving);
   const [websiteUrl, setWebsiteUrl] = useState(props.initialWebsiteUrl);
   const [extraInfo, setExtraInfo] = useState(props.initialExtraInfo);
@@ -348,6 +350,7 @@ export function ChatbotStudio(props: {
             ...(out.actions && out.actions.length > 0 ? { actions: out.actions } : {}),
           },
         ]);
+        router.refresh();
       } else {
         const friendly = normalizePreviewError(out.error);
         setError(friendly);

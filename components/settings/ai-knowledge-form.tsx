@@ -701,7 +701,7 @@ export function AiKnowledgeForm({
             <Button asChild variant="secondary" size="lg" className="h-11 rounded-xl px-5 font-semibold">
               <Link href="/dashboard/socials">
                 <Share2 className="mr-2 size-4" aria-hidden />
-                Socials
+                Integraties
               </Link>
             </Button>
             <Button asChild variant="secondary" size="lg" className="h-11 rounded-xl px-5 font-semibold">

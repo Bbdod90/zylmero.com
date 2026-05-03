@@ -1,15 +1,19 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
-  Building2,
+  ArrowUpRight,
   CalendarDays,
   Camera,
+  Cable,
+  LayoutGrid,
+  Mail,
   MessageCircle,
-  Music2,
   Share2,
+  Smartphone,
   Unplug,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -91,23 +95,87 @@ export function SocialHub({
     <div className="space-y-8">
       <header className="space-y-2">
         <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-          Socials & kanalen
+          Integraties
         </p>
         <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-          Verbind je zichtbaarheid
+          Al je koppelingen op één plek
         </h2>
         <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-          Facebook, Instagram (Meta) en later TikTok en LinkedIn — berichten kunnen straks
-          in dezelfde inbox terechtkomen als WhatsApp en e-mail. Start met Meta; andere
-          platforms volgen.
+          WhatsApp, Gmail of Outlook, websitechat, Facebook/Instagram, agenda én Zapier/Make —
+          configured hier of via de gekoppelde schermen. Zo blijft alles onder één dak bij Zylmero.
         </p>
         {!isOwner ? (
           <p className="text-sm font-medium text-amber-900 dark:text-amber-200/90">
-            Alleen de bedrijfseigenaar kan Meta koppelen of ontkoppelen. Je ziet hier wel de
-            status als die al ingesteld is.
+            Alleen de eigenaar kan nieuwe accounts koppelen of verbreken. Je ziet wel de status van
+            bestaande koppelingen.
           </p>
         ) : null}
       </header>
+
+      <CardShell className="border-primary/20 bg-gradient-to-br from-primary/[0.06] to-transparent">
+        <div className="flex flex-wrap items-start gap-4">
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-primary/12 text-primary">
+            <Cable className="size-6" strokeWidth={1.6} aria-hidden />
+          </span>
+          <div className="min-w-0 flex-1">
+            <h3 className="text-lg font-semibold tracking-tight">Inbox & klantcontact</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              WhatsApp Business, inkomende mail (Gmail/Microsoft) en je website-widget — straks dezelfde
+              inbox. Start bij Kanalen of stel direct een kanaal in onder Instellingen.
+            </p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 sm:grid-cols-3">
+          <Button
+            asChild
+            variant="default"
+            className="h-auto min-h-[4.25rem] justify-start gap-3 rounded-xl px-4 py-3 text-left shadow-sm"
+          >
+            <Link href="/dashboard/ai-koppelingen" className="flex items-start">
+              <LayoutGrid className="mt-0.5 size-5 shrink-0 opacity-90" aria-hidden />
+              <span className="flex min-w-0 flex-col gap-0.5">
+                <span className="flex items-center gap-1 font-semibold leading-tight">
+                  Kanalen & inbox
+                  <ArrowUpRight className="size-3.5 shrink-0 opacity-70" aria-hidden />
+                </span>
+                <span className="text-xs font-normal leading-snug text-primary-foreground/85">
+                  Overzicht: WhatsApp, widget, mail — status en volgende stappen
+                </span>
+              </span>
+            </Link>
+          </Button>
+          <Button
+            asChild
+            variant="outline"
+            className="h-auto min-h-[4.25rem] justify-start gap-3 rounded-xl px-4 py-3 text-left"
+          >
+            <Link href="/dashboard/settings?tab=whatsapp" className="flex items-start">
+              <Smartphone className="mt-0.5 size-5 shrink-0 text-muted-foreground" aria-hidden />
+              <span className="flex min-w-0 flex-col gap-0.5">
+                <span className="font-semibold leading-tight text-foreground">WhatsApp</span>
+                <span className="text-xs font-normal leading-snug text-muted-foreground">
+                  Business-nummer en widget-knop instellen
+                </span>
+              </span>
+            </Link>
+          </Button>
+          <Button
+            asChild
+            variant="outline"
+            className="h-auto min-h-[4.25rem] justify-start gap-3 rounded-xl px-4 py-3 text-left"
+          >
+            <Link href="/dashboard/settings?tab=email" className="flex items-start">
+              <Mail className="mt-0.5 size-5 shrink-0 text-muted-foreground" aria-hidden />
+              <span className="flex min-w-0 flex-col gap-0.5">
+                <span className="font-semibold leading-tight text-foreground">Gmail & Outlook</span>
+                <span className="text-xs font-normal leading-snug text-muted-foreground">
+                  Google of Microsoft voor inkomende klantmail
+                </span>
+              </span>
+            </Link>
+          </Button>
+        </div>
+      </CardShell>
 
       <div className="grid gap-5 lg:grid-cols-2">
         <CardShell>
@@ -182,7 +250,7 @@ export function SocialHub({
           )}
         </CardShell>
 
-        <CardShell className="opacity-85">
+        <CardShell>
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">
               <span className="flex size-12 items-center justify-center rounded-2xl bg-emerald-500/15 text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-300">
@@ -249,44 +317,8 @@ export function SocialHub({
           )}
         </CardShell>
 
-        <CardShell>
+        <CardShell className="lg:col-span-2">
           <IntegrationWebhooksPanel initial={integrationWebhooks} isOwner={isOwner} />
-        </CardShell>
-
-        <CardShell className="opacity-85">
-          <div className="flex items-start gap-3">
-            <span className="flex size-12 items-center justify-center rounded-2xl bg-foreground/5">
-              <Music2 className="size-6 text-foreground/70" strokeWidth={1.6} aria-hidden />
-            </span>
-            <div>
-              <h3 className="text-lg font-semibold tracking-tight">TikTok</h3>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Business messaging en leads — gepland. Geen publieke DM-API zoals Meta;
-                we koppelen straks aan jouw workflow (o.a. formulieren en notificaties).
-              </p>
-              <span className="mt-3 inline-block rounded-full border border-border/60 px-2.5 py-0.5 text-2xs font-semibold uppercase tracking-wide text-muted-foreground">
-                Binnenkort
-              </span>
-            </div>
-          </div>
-        </CardShell>
-
-        <CardShell className="opacity-85">
-          <div className="flex items-start gap-3">
-            <span className="flex size-12 items-center justify-center rounded-2xl bg-blue-600/10">
-              <Building2 className="size-6 text-blue-700 dark:text-blue-300" aria-hidden />
-            </span>
-            <div>
-              <h3 className="text-lg font-semibold tracking-tight">LinkedIn</h3>
-              <p className="mt-1 text-sm text-muted-foreground">
-                B2B-berichten en pagina-updates — gepland met officiële partner-flows waar
-                dat mag volgens LinkedIn.
-              </p>
-              <span className="mt-3 inline-block rounded-full border border-border/60 px-2.5 py-0.5 text-2xs font-semibold uppercase tracking-wide text-muted-foreground">
-                Binnenkort
-              </span>
-            </div>
-          </div>
         </CardShell>
       </div>
 
@@ -296,9 +328,19 @@ export function SocialHub({
           Handig om te weten
         </div>
         <ul className="mt-3 list-inside list-disc space-y-2 text-sm text-muted-foreground">
-          <li>Socials vullen je zichtbaarheid aan naast WhatsApp en websitechat.</li>
-          <li>Berichten komen straks bij dezelfde plek als je andere kanalen.</li>
-          <li>Vragen over rechten of pagina&apos;s? Meta helpt je stap voor stap tijdens het koppelen.</li>
+          <li>
+            <strong className="font-medium text-foreground">Inbox</strong> (WhatsApp, mail, widget):{" "}
+            <Link href="/dashboard/ai-koppelingen" className="font-medium text-primary underline-offset-4 hover:underline">
+              Kanalen & inbox
+            </Link>
+            .
+          </li>
+          <li>
+            <strong className="font-medium text-foreground">Social</strong>: Meta voor Facebook/Instagram — berichten richting je team.
+          </li>
+          <li>
+            <strong className="font-medium text-foreground">Rest van je stack</strong>: gebruik webhooks + Zapier/Make om Gmail-notities, databases of duizenden andere apps aan Zylmero te hangen.
+          </li>
         </ul>
       </CardShell>
     </div>
